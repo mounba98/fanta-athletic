@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Giornata Calcolata!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: rgba(0,0,0,0.8);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .popup {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      max-width: 500px;
+      width: 100%;
+      overflow: hidden;
+      animation: slideUp 0.4s ease-out;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+      color: white;
+      padding: 40px 24px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .trophy-icon {
+      font-size: 80px;
+      margin-bottom: 16px;
+      animation: bounce 1s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    
+    .giornata {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+    
+    .content {
+      padding: 32px 24px;
+    }
+    
+    .result-box {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    
+    .your-score {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .score {
+      font-size: 56px;
+      font-weight: 900;
+      color: #dc143c;
+      margin-bottom: 8px;
+    }
+    
+    .position {
+      font-size: 16px;
+      color: #666;
+    }
+    
+    .position strong {
+      color: #dc143c;
+      font-size: 20px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .stat {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #dc143c;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #b91846;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    
+    .next-match {
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(220, 20, 60, 0.05);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .next-match-title {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .next-match-info {
+      font-size: 16px;
+      font-weight: 600;
+      color: #dc143c;
+    }
+  </style>
+</head>
+<body>
+  <div class="popup">
+    <div class="header">
+      <div class="trophy-icon">🏆</div>
+      <h1>Giornata Completata!</h1>
+      <div class="giornata">Giornata <span id="giornataNum">1</span></div>
+    </div>
+    
+    <div class="content">
+      <div class="result-box">
+        <div class="your-score">Il Tuo Punteggio</div>
+        <div class="score" id="yourScore">75.5</div>
+        <div class="position">
+          Posizione: <strong id="yourPosition">#3</strong>
+        </div>
+      </div>
+      
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Bonus</div>
+          <div class="stat-value" id="bonusValue">+12</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Malus</div>
+          <div class="stat-value" id="malusValue">-3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Risultato H2H</div>
+          <div class="stat-value" id="h2hResult">Vittoria</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Punti Classifica</div>
+          <div class="stat-value" id="pointsValue">+3</div>
+        </div>
+      </div>
+      
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="closePopup()">Chiudi</button>
+        <button class="btn btn-primary" onclick="goToResults()">📊 Classifica</button>
+      </div>
+      
+      <div class="next-match">
+        <div class="next-match-title">Prossimo Match</div>
+        <div class="next-match-info" id="nextMatch">vs Team XYZ • Giornata 2</div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Parse URL params
+    const params = new URLSearchParams(window.location.search);
+    const giornata = params.get('giornata') || '1';
+    const score = params.get('score') || '0';
+    const position = params.get('position') || '1';
+    const bonus = params.get('bonus') || '+0';
+    const malus = params.get('malus') || '-0';
+    const h2h = params.get('h2h') || 'Pareggio';
+    const points = params.get('points') || '+0';
+    
+    // Populate
+    document.getElementById('giornataNum').textContent = giornata;
+    document.getElementById('yourScore').textContent = score;
+    document.getElementById('yourPosition').textContent = '#' + position;
+    document.getElementById('bonusValue').textContent = bonus;
+    document.getElementById('malusValue').textContent = malus;
+    document.getElementById('h2hResult').textContent = h2h;
+    document.getElementById('pointsValue').textContent = points;
+    
+    function closePopup() {
+      localStorage.setItem('popup_giornata_' + giornata, 'seen');
+      window.location.href = 'index.html';
+    }
+    
+    function goToResults() {
+      localStorage.setItem('popup_giornata_' + giornata, 'seen');
+      window.location.href = 'classifiche.html?giornata=' + giornata;
+    }
+    
+    // Auto-close dopo 30s
+    setTimeout(() => {
+      if (!document.hidden) {
+        closePopup();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>

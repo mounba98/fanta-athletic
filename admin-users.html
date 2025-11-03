@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Gestione Utenti</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .container { max-width: 1400px; margin: 0 auto; padding: 16px; }
+    .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 20px; }
+    .table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .table th, .table td { border-bottom: 1px solid rgba(0,0,0,0.08); padding: 12px; text-align: left; }
+    .table th { background: var(--primary); color: white; font-weight: 700; position: sticky; top: 0; }
+    .btn-sm { padding: 8px 12px; font-size: 13px; }
+    .uid { font-family: monospace; font-size: 12px; color: #666; }
+    .input { padding: 10px 12px; border:1px solid #dbe1e8; border-radius: 10px; font-size: 14px; width: 100%; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Admin • Gestione Utenti</h1>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="margin:0;">Utenti Registrati (<span id="userCount">0</span>)</h2>
+        <input id="searchInput" class="input" placeholder="🔍 Cerca..." style="max-width:300px;" oninput="filterUsers()" />
+      </div>
+      <div style="max-height:70vh;overflow-y:auto;">
+        <table class="table" id="usersTable">
+          <thead>
+            <tr>
+              <th style="width:100px;">Codice</th>
+              <th>Nome</th>
+              <th>Cognome</th>
+              <th>Email</th>
+              <th>Squadra</th>
+              <th style="width:120px;">Registrato</th>
+              <th style="width:150px;">Azioni</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Edit Modal -->
+  <div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--card);padding:24px;border-radius:12px;max-width:500px;width:90%;">
+      <h3>Modifica Utente</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;margin:16px 0;">
+        <div>
+          <label style="font-size:12px;color:#666;">UID (non modificabile)</label>
+          <input id="editUid" class="input" readonly style="background:#f5f5f5;font-family:monospace;font-size:11px;" />
+        </div>
+        <input id="editEmail" class="input" placeholder="Email" type="email" />
+        <input id="editDisplayName" class="input" placeholder="Nome visualizzato" />
+        <input id="editFirstName" class="input" placeholder="Nome" />
+        <input id="editLastName" class="input" placeholder="Cognome" />
+        <div>
+          <label style="font-size:12px;color:#666;">Squadra</label>
+          <select id="editTeam" class="input">
+            <option value="">-- Nessuna squadra --</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-secondary" onclick="closeEditModal()">Annulla</button>
+        <button class="btn" onclick="saveEdit()">💾 Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script>
+
+    firebase.auth().onAuthStateChanged(async (user)=>{
+      if (!user) return location.href='auth.html';
+      const a = await db.collection('admins').doc(user.uid).get();
+      if (!a.exists) return location.href='index.html';
+      boot();
+    });
+
+    let usersData = [];
+    let teamsData = [];
+    let currentEditId = null;
+
+    async function boot(){
+      // Load teams
+      const teamsSnap = await db.collection('teams').get();
+      teamsData = teamsSnap.docs.map(d=>({id:d.id, ...d.data()}));
+
+      db.collection('users').onSnapshot(s=>{
+        usersData = s.docs.map(d=>({id:d.id, ...d.data()}));
+        renderUsers();
+      });
+    }
+
+    function capitalize(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+
+    function renderUsers(){
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+      const filtered = usersData.filter(u=> 
+        !search || 
+        u.email?.toLowerCase().includes(search) ||
+        u.display_name?.toLowerCase().includes(search) ||
+        u.firstName?.toLowerCase().includes(search) ||
+        u.lastName?.toLowerCase().includes(search) ||
+        u.id.toLowerCase().includes(search)
+      );
+      
+      document.getElementById('userCount').textContent = filtered.length;
+      
+      const tbody = document.querySelector('#usersTable tbody');
+      tbody.innerHTML = filtered.map(u=>{
+        const teamName = teamsData.find(t=> t.id === String(u.team_index))?.name || '—';
+        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('it-IT') : '—';
+        const shortId = u.id.substring(0, 8);
+        const firstName = capitalize(u.firstName || '');
+        const lastName = capitalize(u.lastName || '');
+        
+        return `
+          <tr>
+            <td class="uid" title="${u.id}">${shortId}</td>
+            <td>${firstName || '—'}</td>
+            <td>${lastName || '—'}</td>
+            <td>${u.email || '—'}</td>
+            <td>${teamName}</td>
+            <td>${date}</td>
+            <td>
+              <button class="btn btn-sm btn-edit" onclick="openEditModal('${u.id}')">✏️</button>
+              <button class="btn btn-sm btn-delete" onclick="deleteUser('${u.id}')">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterUsers(){
+      renderUsers();
+    }
+
+    function openEditModal(id){
+      const user = usersData.find(u=> u.id === id);
+      if (!user) return;
+      
+      currentEditId = id;
+      document.getElementById('editUid').value = user.id;
+      document.getElementById('editEmail').value = user.email || '';
+      document.getElementById('editDisplayName').value = user.display_name || '';
+      document.getElementById('editFirstName').value = user.firstName || '';
+      document.getElementById('editLastName').value = user.lastName || '';
+      
+      // Populate team dropdown
+      const teamSelect = document.getElementById('editTeam');
+      teamSelect.innerHTML = '<option value="">-- Nessuna squadra --</option>' +
+        teamsData.map(t=> `<option value="${t.id}" ${user.team_index == t.id ? 'selected' : ''}>${t.name}</option>`).join('');
+      
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal(){
+      document.getElementById('editModal').style.display = 'none';
+      currentEditId = null;
+    }
+
+    async function saveEdit(){
+      if (!currentEditId) return;
+      
+      const email = document.getElementById('editEmail').value.trim();
+      const displayName = document.getElementById('editDisplayName').value.trim();
+      const firstName = capitalize(document.getElementById('editFirstName').value.trim());
+      const lastName = capitalize(document.getElementById('editLastName').value.trim());
+      const teamId = document.getElementById('editTeam').value;
+      
+      await db.collection('users').doc(currentEditId).update({
+        email: email || null,
+        display_name: displayName || null,
+        firstName: firstName || null,
+        lastName: lastName || null,
+        team_index: teamId ? parseInt(teamId) : null
+      });
+      
+      closeEditModal();
+    }
+
+    async function deleteUser(id){
+      const user = usersData.find(u=> u.id === id);
+      if (!confirm(`Eliminare utente ${user.email || user.id}?\n\nQuesta azione è irreversibile.`)) return;
+      await db.collection('users').doc(id).delete();
+    }
+  </script>
+    <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+</body>
+</html>

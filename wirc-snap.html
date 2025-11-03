@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>WIRC SNAP v2.5 - Complete</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+      color: white;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .game-container { height: 100vh; display: flex; flex-direction: column; }
+
+    /* Header */
+    .header {
+      background: rgba(0,0,0,0.7);
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #dc143c;
+    }
+    .player-info { display: flex; gap: 15px; align-items: center; }
+    .energy { background: #3b82f6; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 18px; }
+    .turn { text-align: center; font-size: 24px; font-weight: 700; color: #fbbf24; }
+
+    /* Battlefield */
+    .battlefield {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      padding: 15px;
+      overflow-y: auto;
+    }
+    .location {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid #475569;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .location-header {
+      background: #dc143c;
+      padding: 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 10px 10px 0 0;
+    }
+    .location-effect { font-size: 10px; opacity: 0.9; margin-top: 3px; }
+    .zone {
+      flex: 1;
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-content: flex-start;
+      min-height: 100px;
+    }
+    .zone-opponent { border-bottom: 1px dashed #475569; }
+    .score {
+      padding: 8px;
+      text-align: center;
+      font-weight: 700;
+      background: rgba(0,0,0,0.5);
+      border-top: 1px solid #475569;
+    }
+
+    /* Cards */
+    .card {
+      width: 100px;
+      background: #1e293b;
+      border: 2px solid #475569;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .card:hover { transform: translateY(-3px); border-color: #fbbf24; }
+    .card.selected { border-color: #22c55e; box-shadow: 0 0 15px #22c55e; }
+    .card-cost {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background: #3b82f6;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      z-index: 1;
+    }
+    .card-power {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #dc143c;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      z-index: 1;
+    }
+    .card-img {
+      height: 50px;
+      background: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .card-name {
+      padding: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+      background: rgba(0,0,0,0.3);
+    }
+    .card-effect {
+      padding: 4px;
+      font-size: 8px;
+      background: rgba(251,191,36,0.1);
+      min-height: 30px;
+      line-height: 1.2;
+    }
+
+    /* Hand */
+    .hand {
+      background: rgba(0,0,0,0.8);
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      overflow-x: auto;
+      border-top: 2px solid #dc143c;
+      min-height: 160px;
+    }
+
+    /* Controls */
+    .controls {
+      position: fixed;
+      bottom: 170px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-end { background: #22c55e; color: white; }
+    .btn-skip { background: #64748b; color: white; }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      border: 3px solid #dc143c;
+      max-width: 400px;
+    }
+    .modal-title { font-size: 48px; margin-bottom: 15px; }
+    .modal-text { font-size: 20px; margin: 15px 0; }
+    .btn-restart {
+      background: #dc143c;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 1024px) {
+      .battlefield { grid-template-columns: 1fr; }
+      .card { width: 85px; }
+      .card-img { height: 40px; font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="header">
+      <div class="player-info">
+        <div style="font-weight:700">🧑 TU</div>
+        <div class="energy" id="playerEnergy">⚡ 1</div>
+      </div>
+      <div class="turn">Turno <span id="turn">1</span>/6</div>
+      <div class="player-info">
+        <div class="energy" id="opponentEnergy">⚡ 1</div>
+        <div style="font-weight:700">🤖 AI</div>
+      </div>
+    </div>
+
+    <div class="battlefield" id="battlefield"></div>
+
+    <div class="controls">
+      <button class="btn btn-skip" onclick="skipTurn()">⏭️ Salta</button>
+      <button class="btn btn-end" onclick="endTurn()">▶️ Fine Turno</button>
+    </div>
+
+    <div class="hand" id="hand"></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitle">🏆</div>
+      <div class="modal-text" id="modalText">Vittoria!</div>
+      <div id="modalStats" style="margin: 20px 0;"></div>
+      <button class="btn-restart" onclick="location.reload()">🔄 Nuova Partita</button>
+      <br><br>
+      <a href="index.html" style="color:#fbbf24">← Home</a>
+    </div>
+  </div>
+
+  <script>
+    const CARDS = [
+      {nome:"Fracks",costo:4,forza:6,emoji:"👔",effetto:{tipo:"Continuo",desc:"+1 Forza a tutte le tue carte in questo campo"}},
+      {nome:"Tommy",costo:5,forza:8,emoji:"⚽",effetto:{tipo:"Continuo",desc:"-1 Forza a carte avversarie nel campo"}},
+      {nome:"Bosi",costo:2,forza:3,emoji:"🌿",effetto:{tipo:"Continuo",desc:"+1 Forza a fine turno"}},
+      {nome:"Dux",costo:2,forza:3,emoji:"😎",effetto:{tipo:"Scoperta",desc:"+2 Forza"}},
+      {nome:"Chep",costo:3,forza:2,emoji:"🧠",effetto:{tipo:"Scoperta",desc:"Disattiva effetto carta nemica"}},
+      {nome:"Toti",costo:3,forza:4,emoji:"☕",effetto:{tipo:"Continuo",desc:"+1 Forza"}},
+      {nome:"Paolino",costo:1,forza:1,emoji:"🔍",effetto:{tipo:"Scoperta",desc:"Pesca 1 carta"}},
+      {nome:"Pippo",costo:2,forza:3,emoji:"🎉",effetto:{tipo:"Scoperta",desc:"+1 Forza"}},
+      {nome:"Giulietto",costo:2,forza:2,emoji:"📊",effetto:{tipo:"Continuo",desc:"+1 Forza"}},
+      {nome:"Wabione",costo:4,forza:7,emoji:"🧱",effetto:{tipo:"Continuo",desc:"+3 Forza se nel mazzo ci sono 2+ Relaxati"}},
+      {nome:"Calosi",costo:3,forza:5,emoji:"🎨",effetto:{tipo:"Continuo",desc:"+2 Forza"}},
+      {nome:"Giabba",costo:3,forza:4,emoji:"🎸",effetto:{tipo:"Continuo",desc:"+2 Forza"}},
+      {nome:"Santo",costo:3,forza:4,emoji:"🎵",effetto:{tipo:"Scoperta",desc:"+2 Forza"}},
+      {nome:"Trendiu",costo:2,forza:2,emoji:"🤪",effetto:{tipo:"Scoperta",desc:"Raddoppia effetto"}},
+      {nome:"Pato",costo:3,forza:5,emoji:"💪",effetto:{tipo:"Continuo",desc:"+2 Forza"}},
+      {nome:"Beppe",costo:3,forza:5,emoji:"⚽",effetto:{tipo:"Continuo",desc:"+1 Forza"}},
+      {nome:"G Cazzi",costo:2,forza:3,emoji:"🏋️",effetto:{tipo:"Scoperta",desc:"+3 Forza"}},
+      {nome:"Cocci",costo:1,forza:1,emoji:"😤",effetto:{tipo:"Continuo",desc:"+2 Forza se colpito"}},
+      {nome:"Meme",costo:3,forza:3,emoji:"🏦",effetto:{tipo:"Scoperta",desc:"Copia effetto nemico"}},
+      {nome:"Flondi",costo:3,forza:4,emoji:"🔬",effetto:{tipo:"Continuo",desc:"+1 Forza/turno"}},
+      {nome:"Andreino",costo:2,forza:3,emoji:"🏗️",effetto:{tipo:"Scoperta",desc:"+2 Forza"}},
+      {nome:"Labanca",costo:2,forza:2,emoji:"🎭",effetto:{tipo:"Continuo",desc:"+2 Forza"}},
+      {nome:"Momo",costo:4,forza:6,emoji:"😏",effetto:{tipo:"Scoperta",desc:"Disattiva effetto"}},
+      {nome:"Titti",costo:3,forza:4,emoji:"🎯",effetto:{tipo:"Continuo",desc:"+2 Forza"}},
+      {nome:"Nicola",costo:4,forza:6,emoji:"💻",effetto:{tipo:"Scoperta",desc:"Duplica effetto"}},
+      {nome:"Wengi",costo:3,forza:4,emoji:"🤕",effetto:{tipo:"Continuo",desc:"+1 Forza/carta nemica"}},
+      {nome:"Leo",costo:2,forza:3,emoji:"🏎️",effetto:{tipo:"Scoperta",desc:"+1 Forza"}},
+      {nome:"Boro",costo:3,forza:5,emoji:"🍺",effetto:{tipo:"Scoperta",desc:"+1 Energia max"}},
+      {nome:"Calo",costo:2,forza:3,emoji:"🎲",effetto:{tipo:"Scoperta",desc:"Pesca e scarta"}},
+      {nome:"Canni",costo:2,forza:3,emoji:"🔧",effetto:{tipo:"Continuo",desc:"+2 Forza"}},
+      {nome:"Il Pres",costo:6,forza:10,emoji:"👑",effetto:{tipo:"Continuo",desc:"+2 Forza a Fracks e Tommy se in campo"}},
+      {nome:"First Lady",costo:5,forza:7,emoji:"👸",effetto:{tipo:"Continuo",desc:"+1 Forza a tutte le carte famiglia"}},
+      {nome:"Sissi",costo:2,forza:3,emoji:"👓",effetto:{tipo:"Scoperta",desc:"Rivela 1 carta avversaria"}},
+      {nome:"Ida",costo:3,forza:4,emoji:"💉",effetto:{tipo:"Scoperta",desc:"Cura +2 Forza a carta alleata ferita"}},
+      {nome:"Giulia",costo:2,forza:3,emoji:"💝",effetto:{tipo:"Continuo",desc:"+2 Forza a Titti se in campo"}},
+      {nome:"Serena",costo:3,forza:4,emoji:"📚",effetto:{tipo:"Scoperta",desc:"Pesca 2 carte e scarta 1"}},
+      {nome:"Matilde",costo:2,forza:3,emoji:"🏕️",effetto:{tipo:"Continuo",desc:"+1 Forza a carte Scout"}},
+      {nome:"Martina",costo:2,forza:3,emoji:"🎨",effetto:{tipo:"Scoperta",desc:"+1 Forza a Carlos e Ale Lupi"}},
+      {nome:"Marta",costo:3,forza:5,emoji:"💍",effetto:{tipo:"Continuo",desc:"+3 Forza a Tommy Guardu"}},
+      {nome:"Lisa",costo:2,forza:3,emoji:"🌸",effetto:{tipo:"Continuo",desc:"+2 Forza a Ale Lupi"}},
+      {nome:"Wonia",costo:3,forza:4,emoji:"🌹",effetto:{tipo:"Continuo",desc:"+2 Forza a Wabione se in campo"}},
+      {nome:"Purple",costo:3,forza:4,emoji:"💜",effetto:{tipo:"Scoperta",desc:"Cura +1 Forza a tutte carte alleate"}}
+    ];
+
+    const LOCATIONS = [
+      {nome:"Sala Carte",desc:"+2 Forza"},
+      {nome:"Bar",desc:"+1 Forza/turno"},
+      {nome:"Veranda",desc:"+3 turno 3"},
+      {nome:"Chiringuito",desc:"-1 costo"},
+      {nome:"La 10",desc:"+2 Forza"},
+      {nome:"Angolo Rotture",desc:"Blocca Scoperta"},
+      {nome:"Sala Grande",desc:"Forza 6+ → +3"},
+      {nome:"Esterno",desc:"10% -2 Forza"},
+      {nome:"Misericordia",desc:"Tutte -1"},
+      {nome:"Doccia",desc:"+2 Forza"},
+      {nome:"Palestra",desc:"+2 Forza"},
+      {nome:"Sala Musica",desc:"+2 Forza"}
+    ];
+
+    const game = {
+      turn: 1,
+      player: { energy: 1, deck: [], hand: [], field: [[],[],[]] },
+      opponent: { energy: 1, deck: [], hand: [], field: [[],[],[]] },
+      locations: [],
+      selected: null,
+      selectedLoc: null
+    };
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function init() {
+      // 3 location random
+      game.locations = shuffle(LOCATIONS).slice(0, 3);
+      
+      // Deck 12 carte random per player
+      const deck = shuffle(CARDS);
+      game.player.deck = deck.slice(0, 12).map(c => ({...c}));
+      game.opponent.deck = deck.slice(12, 24).map(c => ({...c}));
+      
+      // Pesca 4 carte iniziali
+      for (let i = 0; i < 4; i++) {
+        draw('player');
+        draw('opponent');
+      }
+      
+      render();
+    }
+
+    function draw(who) {
+      const p = game[who];
+      if (p.deck.length > 0) {
+        p.hand.push(p.deck.pop());
+      }
+    }
+
+    function render() {
+      renderBattlefield();
+      renderHand();
+      renderStats();
+    }
+
+    function renderBattlefield() {
+      const bf = document.getElementById('battlefield');
+      bf.innerHTML = game.locations.map((loc, i) => `
+        <div class="location">
+          <div class="location-header">
+            <div>${loc.nome}</div>
+            <div class="location-effect">${loc.desc}</div>
+          </div>
+          <div class="zone zone-opponent">${renderCards(game.opponent.field[i])}</div>
+          <div class="zone">${renderCards(game.player.field[i], true)}</div>
+          <div class="score">
+            <span style="color:#ef4444">${calcScore(game.opponent.field[i])}</span> - 
+            <span style="color:#22c55e">${calcScore(game.player.field[i])}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderCards(cards, clickable = false) {
+      if (!cards.length) return '<div style="color:#64748b;font-size:12px;text-align:center;padding:20px">Vuoto</div>';
+      return cards.map((c, i) => `
+        <div class="card ${game.selected === c ? 'selected' : ''}" ${clickable ? `onclick="selectCard(${i})"` : ''}>
+          <div class="card-cost">${c.costo}</div>
+          <div class="card-power">${c.forza}</div>
+          <div class="card-img">${c.emoji}</div>
+          <div class="card-name">${c.nome}</div>
+          <div class="card-effect">${c.effetto.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderHand() {
+      const hand = document.getElementById('hand');
+      hand.innerHTML = game.player.hand.map((c, i) => `
+        <div class="card ${game.selected === c ? 'selected' : ''}" onclick="playCard(${i})">
+          <div class="card-cost">${c.costo}</div>
+          <div class="card-power">${c.forza}</div>
+          <div class="card-img">${c.emoji}</div>
+          <div class="card-name">${c.nome}</div>
+          <div class="card-effect">${c.effetto.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderStats() {
+      document.getElementById('playerEnergy').textContent = `⚡ ${game.player.energy}`;
+      document.getElementById('opponentEnergy').textContent = `⚡ ${game.opponent.energy}`;
+      document.getElementById('turn').textContent = game.turn;
+    }
+
+    function playCard(idx) {
+      const card = game.player.hand[idx];
+      if (!card) return;
+      
+      if (game.player.energy < card.costo) {
+        alert('Energia insufficiente!');
+        return;
+      }
+      
+      game.selected = card;
+      game.selectedLoc = prompt('Scegli location (0, 1 o 2):');
+      
+      if (game.selectedLoc === null) {
+        game.selected = null;
+        return;
+      }
+      
+      const loc = parseInt(game.selectedLoc);
+      if (loc < 0 || loc > 2 || game.player.field[loc].length >= 4) {
+        alert('Location non valida o piena!');
+        game.selected = null;
+        return;
+      }
+      
+      game.player.energy -= card.costo;
+      game.player.field[loc].push(card);
+      game.player.hand.splice(idx, 1);
+      game.selected = null;
+      
+      // Effetto "Scoperta"
+      if (card.effetto.tipo === 'Scoperta') {
+        if (card.nome === 'Paolino') draw('player');
+      }
+      
+      render();
+    }
+
+    function calcScore(cards) {
+      return cards.reduce((sum, c) => sum + c.forza, 0);
+    }
+
+    function endTurn() {
+      if (game.turn === 6) {
+        checkWinner();
+        return;
+      }
+      
+      // AI turn
+      opponentTurn();
+      
+      game.turn++;
+      game.player.energy = Math.min(6, game.turn);
+      game.opponent.energy = Math.min(6, game.turn);
+      
+      draw('player');
+      draw('opponent');
+      
+      render();
+    }
+
+    function skipTurn() {
+      endTurn();
+    }
+
+    function opponentTurn() {
+      // AI semplice: gioca carte random
+      const affordable = game.opponent.hand.filter(c => c.costo <= game.opponent.energy);
+      
+      while (affordable.length > 0 && game.opponent.energy > 0) {
+        const card = affordable[Math.floor(Math.random() * affordable.length)];
+        const locIdx = Math.floor(Math.random() * 3);
+        
+        if (game.opponent.field[locIdx].length < 4 && game.opponent.energy >= card.costo) {
+          game.opponent.energy -= card.costo;
+          game.opponent.field[locIdx].push(card);
+          game.opponent.hand.splice(game.opponent.hand.indexOf(card), 1);
+          affordable.splice(affordable.indexOf(card), 1);
+        } else {
+          break;
+        }
+      }
+    }
+
+    function checkWinner() {
+      let playerWins = 0;
+      let opponentWins = 0;
+      
+      for (let i = 0; i < 3; i++) {
+        const pScore = calcScore(game.player.field[i]);
+        const oScore = calcScore(game.opponent.field[i]);
+        
+        if (pScore > oScore) playerWins++;
+        else if (oScore > pScore) opponentWins++;
+      }
+      
+      const modal = document.getElementById('modal');
+      const title = document.getElementById('modalTitle');
+      const text = document.getElementById('modalText');
+      const stats = document.getElementById('modalStats');
+      
+      if (playerWins > opponentWins) {
+        title.textContent = '🏆';
+        text.textContent = 'VITTORIA!';
+      } else if (opponentWins > playerWins) {
+        title.textContent = '💀';
+        text.textContent = 'SCONFITTA';
+      } else {
+        title.textContent = '🤝';
+        text.textContent = 'PAREGGIO';
+      }
+      
+      stats.innerHTML = `
+        <div style="font-size:18px;font-weight:700">
+          Campi Vinti: <span style="color:#22c55e">${playerWins}</span> - <span style="color:#ef4444">${opponentWins}</span>
+        </div>
+      `;
+      
+      modal.classList.add('show');
+    }
+
+    init();
+  </script>
+</body>
+</html>

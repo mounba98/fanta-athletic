@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contest Pronostici | Athletic Brescia</title>
+  <link rel="icon" href="resources/favicon.ico">
+  <link rel="stylesheet" href="resources/theme.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    
+    .hero h1 {
+      font-size: 2.5rem;
+      margin: 0 0 10px;
+      font-weight: 900;
+    }
+    
+    .hero p {
+      font-size: 1.2rem;
+      opacity: 0.95;
+      margin: 0;
+    }
+    
+    .prize {
+      background: rgba(255,255,255,0.2);
+      display: inline-block;
+      padding: 15px 30px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: -30px auto 40px;
+      padding: 0 20px;
+    }
+    
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    
+    .matchday-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .matchday-btn {
+      padding: 12px 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .matchday-btn:hover {
+      border-color: #2d6cdf;
+      background: #eff6ff;
+    }
+    
+    .matchday-btn.active {
+      background: #2d6cdf;
+      color: white;
+      border-color: #2d6cdf;
+    }
+    
+    .matchday-btn.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .match-box {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border: 2px solid #e5e7eb;
+    }
+    
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .match-teams {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+      justify-content: center;
+    }
+    
+    .team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 200px;
+    }
+    
+    .team-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.5rem;
+      border: 3px solid #e5e7eb;
+    }
+    
+    .team-name {
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    .vs {
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: #6b7280;
+    }
+    
+    .match-info {
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    .prediction-input {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .score-input {
+      width: 70px;
+      height: 70px;
+      font-size: 2rem;
+      text-align: center;
+      border: 3px solid #2d6cdf;
+      border-radius: 12px;
+      font-weight: 900;
+    }
+    
+    .score-separator {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #6b7280;
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: transform 0.2s;
+    }
+    
+    .submit-btn:hover {
+      transform: scale(1.02);
+    }
+    
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    
+    .status-open {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-locked {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-closed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .my-prediction {
+      background: #eff6ff;
+      border: 2px solid #2d6cdf;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      text-align: center;
+    }
+    
+    .leaderboard-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .leaderboard-link a {
+      display: inline-block;
+      padding: 15px 30px;
+      background: #10b981;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2d6cdf;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 9999;
+      animation: slideIn 0.3s;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero p { font-size: 1rem; }
+      .match-teams { flex-direction: column; gap: 10px; }
+      .vs { transform: rotate(90deg); }
+      .score-input { width: 60px; height: 60px; font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <!-- Hero -->
+  <div class="hero">
+    <h1>🏆 Contest Pronostici</h1>
+    <p>Indovina il risultato e vinci la felpa Athletic!</p>
+    <div class="prize">🎁 Premio: Felpa Ufficiale</div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Login Card -->
+    <div class="card" id="loginCard" style="display:none;">
+      <h2 style="text-align:center;">🔐 Login Richiesto</h2>
+      <p style="text-align:center; color:#6b7280;">Devi essere loggato per partecipare al contest.</p>
+      <button class="submit-btn" onclick="window.location.href='/auth.html'">Accedi Ora</button>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" style="display:none;">
+      <!-- Matchday Selector -->
+      <div class="card">
+        <h2 style="margin-top:0;">Seleziona Giornata</h2>
+        <div class="matchday-selector" id="matchdaySelector"></div>
+      </div>
+
+      <!-- Match Card -->
+      <div class="card" id="matchCard" style="display:none;">
+        <div class="match-box">
+          <div class="match-info" id="matchInfo"></div>
+          
+          <div class="match-teams">
+            <div class="team">
+              <div class="team-logo" id="homeTeamLogo">ATH</div>
+              <div class="team-name" id="homeTeamName">Athletic Brescia</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team">
+              <div class="team-logo" id="awayTeamLogo">???</div>
+              <div class="team-name" id="awayTeamName">Avversario</div>
+            </div>
+          </div>
+
+          <div class="prediction-input" style="margin-top:25px;">
+            <input type="number" class="score-input" id="homeScore" min="0" max="99" placeholder="0">
+            <span class="score-separator">-</span>
+            <input type="number" class="score-input" id="awayScore" min="0" max="99" placeholder="0">
+          </div>
+
+          <div id="myPredictionBox" style="display:none;"></div>
+
+          <button class="submit-btn" id="submitBtn" onclick="submitPrediction()">
+            📤 Invia Pronostico
+          </button>
+        </div>
+      </div>
+
+      <!-- Leaderboard Link -->
+      <div class="leaderboard-link">
+        <a href="contest-leaderboard.html">📊 Visualizza Classifica</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar Script -->
+  <script src="resources/navbar.js?v=2025101901"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+
+  <script>
+    let state = {
+      user: null,
+      selectedMatchday: 1,
+      matches: {},
+      myPredictions: {}
+    };
+
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    async function init() {
+      // Wait for Firebase
+      let retries = 0;
+      while ((!window.auth || !window.db) && retries < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+      }
+
+      if (!window.auth || !window.db) {
+        toast('❌ Firebase non disponibile');
+        return;
+      }
+
+      // Auth check
+      window.auth.onAuthStateChanged(async (user) => {
+        state.user = user;
+        
+        if (!user) {
+          document.getElementById('loginCard').style.display = 'block';
+          document.getElementById('mainContent').style.display = 'none';
+        } else {
+          document.getElementById('loginCard').style.display = 'none';
+          document.getElementById('mainContent').style.display = 'block';
+          await loadData();
+        }
+      });
+    }
+
+    async function loadData() {
+      try {
+        // Load matches from contest (with results) AND calendario (for future)
+        const matchesSnap = await window.db.collection('contest').doc('matches').get();
+        if (matchesSnap.exists) {
+          state.matches = matchesSnap.data() || {};
+        }
+        
+        // Also load from athletic_calendar to get real match data
+        const calendarSnap = await window.db.collection('athletic_calendar')
+          .where('homeScore', '==', null) // Only future matches
+          .limit(10)
+          .get();
+        
+        calendarSnap.docs.forEach(doc => {
+          const match = doc.data();
+          const giornataKey = `G${match.giornata}`;
+          
+          // Only add if not already in contest
+          if (!state.matches[giornataKey]) {
+            // Calculate deadline: 30min before match
+            const [day, monthName] = match.date.split(' ');
+            const monthIndex = [
+              'Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+              'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'
+            ].indexOf(monthName);
+            
+            const year = monthIndex >= 8 ? 2024 : 2025;
+            const [hours, minutes] = (match.time || '15:00').split(':');
+            
+            const matchDate = new Date(year, monthIndex, parseInt(day), 
+                                      parseInt(hours), parseInt(minutes));
+            matchDate.setMinutes(matchDate.getMinutes() - 30);
+            
+            state.matches[giornataKey] = {
+              homeTeam: match.homeTeam,
+              awayTeam: match.awayTeam,
+              deadline: matchDate.toISOString(),
+              result: null
+            };
+          }
+        });
+
+        // Load my predictions
+        if (state.user) {
+          const predSnap = await window.db.collection('contest').doc('predictions')
+            .collection(state.user.uid).get();
+          
+          predSnap.docs.forEach(doc => {
+            state.myPredictions[doc.id] = doc.data();
+          });
+        }
+
+        renderMatchdaySelector();
+        renderMatch();
+      } catch (e) {
+        console.error('Load error:', e);
+        toast('❌ Errore caricamento dati');
+      }
+    }
+
+    function renderMatchdaySelector() {
+      const container = document.getElementById('matchdaySelector');
+      let html = '';
+      
+      for (let i = 1; i <= 24; i++) {
+        const matchKey = `G${i}`;
+        const match = state.matches[matchKey];
+        const hasMatch = !!match;
+        const isLocked = match && new Date() >= new Date(match.deadline);
+        const active = i === state.selectedMatchday ? 'active' : '';
+        const locked = isLocked ? 'locked' : '';
+        
+        html += `<button class="matchday-btn ${active} ${locked}" 
+                  onclick="selectMatchday(${i})" ${isLocked ? 'disabled' : ''}>
+                  G${i}
+                </button>`;
+      }
+      
+      container.innerHTML = html;
+    }
+
+    function selectMatchday(num) {
+      state.selectedMatchday = num;
+      renderMatchdaySelector();
+      renderMatch();
+    }
+
+    function renderMatch() {
+      const matchKey = `G${state.selectedMatchday}`;
+      const match = state.matches[matchKey];
+      const myPred = state.myPredictions[matchKey];
+      
+      if (!match) {
+        document.getElementById('matchCard').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('matchCard').style.display = 'block';
+
+      // Match info
+      const deadline = new Date(match.deadline);
+      const isLocked = new Date() >= deadline;
+      const timeStr = deadline.toLocaleString('it-IT', { 
+        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
+      });
+      
+      let status = '';
+      if (match.result) {
+        status = `<span class="status-badge status-closed">Risultato: ${match.result.home}-${match.result.away}</span>`;
+      } else if (isLocked) {
+        status = `<span class="status-badge status-locked">⏰ Deadline scaduta</span>`;
+      } else {
+        status = `<span class="status-badge status-open">✅ Aperto fino al ${timeStr}</span>`;
+      }
+      
+      document.getElementById('matchInfo').innerHTML = `
+        Giornata ${state.selectedMatchday} • ${timeStr}<br>${status}
+      `;
+
+      // Teams
+      document.getElementById('homeTeamName').textContent = match.homeTeam || 'Athletic Brescia';
+      document.getElementById('awayTeamName').textContent = match.awayTeam || 'Avversario';
+      document.getElementById('homeTeamLogo').textContent = (match.homeTeam || 'ATH').substring(0, 3).toUpperCase();
+      document.getElementById('awayTeamLogo').textContent = (match.awayTeam || '???').substring(0, 3).toUpperCase();
+
+      // Inputs
+      const homeInput = document.getElementById('homeScore');
+      const awayInput = document.getElementById('awayScore');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      if (myPred) {
+        homeInput.value = myPred.home;
+        awayInput.value = myPred.away;
+      } else {
+        homeInput.value = '';
+        awayInput.value = '';
+      }
+
+      // Lock if deadline passed or result exists
+      const canEdit = !isLocked && !match.result;
+      homeInput.disabled = !canEdit;
+      awayInput.disabled = !canEdit;
+      submitBtn.disabled = !canEdit;
+
+      // Show my prediction
+      const predBox = document.getElementById('myPredictionBox');
+      if (myPred) {
+        let points = '';
+        if (match.result && myPred.points !== undefined) {
+          points = ` • <strong>${myPred.points} punti</strong>`;
+        }
+        predBox.innerHTML = `
+          <div class="my-prediction">
+            Il tuo pronostico: <strong>${myPred.home}-${myPred.away}</strong>${points}
+          </div>
+        `;
+        predBox.style.display = 'block';
+      } else {
+        predBox.style.display = 'none';
+      }
+    }
+
+    async function submitPrediction() {
+      const homeScore = parseInt(document.getElementById('homeScore').value);
+      const awayScore = parseInt(document.getElementById('awayScore').value);
+
+      if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0) {
+        toast('⚠️ Inserisci un punteggio valido!');
+        return;
+      }
+
+      try {
+        const matchKey = `G${state.selectedMatchday}`;
+        const match = state.matches[matchKey];
+        
+        if (!match) {
+          toast('❌ Partita non trovata');
+          return;
+        }
+
+        if (new Date() >= new Date(match.deadline)) {
+          toast('⏰ Deadline scaduta!');
+          return;
+        }
+
+        await window.db.collection('contest').doc('predictions')
+          .collection(state.user.uid).doc(matchKey).set({
+            home: homeScore,
+            away: awayScore,
+            timestamp: new Date().toISOString()
+          });
+
+        state.myPredictions[matchKey] = { home: homeScore, away: awayScore };
+        
+        toast('✅ Pronostico salvato!');
+        renderMatch();
+      } catch (e) {
+        console.error('Submit error:', e);
+        toast('❌ Errore salvataggio');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

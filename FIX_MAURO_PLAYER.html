@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Fix Player Mauro</title>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f0f4f8;
+    }
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 { color: #dc143c; margin-top: 0; }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      background: #dc143c;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 8px;
+    }
+    button:hover { background: #b91c1c; }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+    .status.show { display: block; }
+    .info {
+      background: #fef3c7;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      border: 1px solid #f59e0b;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔧 Fix Player Mauro</h1>
+    
+    <div class="info">
+      <strong>⚠️ Player ID trovato:</strong> <code>c4fyWntWj1mTj4fekijO</code><br>
+      Questo player non esiste nel database. Compila i dati per crearlo.
+    </div>
+    
+    <div class="form-group">
+      <label>Player ID (NON MODIFICARE)</label>
+      <input type="text" id="playerId" value="c4fyWntWj1mTj4fekijO" readonly style="background:#f0f0f0;">
+    </div>
+    
+    <div class="form-group">
+      <label>Nome Completo *</label>
+      <input type="text" id="nomeCompleto" placeholder="es. Mauro Lupi" value="Mauro Lupi">
+    </div>
+    
+    <div class="form-group">
+      <label>Nickname</label>
+      <input type="text" id="nickname" placeholder="es. mauro" value="mauro">
+    </div>
+    
+    <div class="form-group">
+      <label>Ruolo *</label>
+      <select id="role">
+        <option value="Portiere">Portiere</option>
+        <option value="Difensore">Difensore</option>
+        <option value="Centrocampista" selected>Centrocampista</option>
+        <option value="Attaccante">Attaccante</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Squadra (opzionale)</label>
+      <input type="text" id="team" placeholder="es. Nome Squadra">
+    </div>
+    
+    <div class="form-group">
+      <label>Età (opzionale)</label>
+      <input type="number" id="eta" placeholder="es. 25">
+    </div>
+    
+    <button id="createBtn" onclick="createPlayer()">✅ Crea Player nel Database</button>
+    <button id="checkBtn" onclick="checkPlayer()" style="background:#3b82f6; margin-top:4px;">🔍 Verifica se esiste</button>
+    
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    // Init Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    async function checkPlayer() {
+      const status = document.getElementById('status');
+      const playerId = document.getElementById('playerId').value;
+      
+      status.className = 'status';
+      status.textContent = '🔍 Controllo in corso...';
+      status.classList.add('show');
+      
+      try {
+        const doc = await db.collection('players').doc(playerId).get();
+        
+        if (doc.exists) {
+          const data = doc.data();
+          status.className = 'status success show';
+          status.innerHTML = `
+            ✅ <strong>Player ESISTE!</strong><br>
+            Nome: ${data.nome_completo || 'N/A'}<br>
+            Ruolo: ${data.role || 'N/A'}<br>
+            Nickname: ${data.nickname || 'N/A'}
+          `;
+        } else {
+          status.className = 'status error show';
+          status.textContent = '❌ Player NON trovato nel database. Clicca "Crea Player" per aggiungerlo.';
+        }
+      } catch (e) {
+        status.className = 'status error show';
+        status.textContent = '❌ Errore controllo: ' + e.message;
+        console.error(e);
+      }
+    }
+
+    async function createPlayer() {
+      const status = document.getElementById('status');
+      const btn = document.getElementById('createBtn');
+      
+      // Check auth
+      const user = auth.currentUser;
+      if (!user) {
+        status.className = 'status error show';
+        status.textContent = '❌ Devi essere loggato! Apri la console e fai: firebase.auth().signInWithEmailAndPassword(email, password)';
+        return;
+      }
+      
+      // Get values
+      const playerId = document.getElementById('playerId').value;
+      const nomeCompleto = document.getElementById('nomeCompleto').value.trim();
+      const nickname = document.getElementById('nickname').value.trim();
+      const role = document.getElementById('role').value;
+      const team = document.getElementById('team').value.trim();
+      const eta = document.getElementById('eta').value;
+      
+      if (!nomeCompleto) {
+        alert('Nome completo obbligatorio!');
+        return;
+      }
+      
+      btn.disabled = true;
+      status.className = 'status';
+      status.textContent = '⏳ Creazione in corso...';
+      status.classList.add('show');
+      
+      const playerData = {
+        player_id: playerId,
+        nome_completo: nomeCompleto,
+        nickname: nickname || '',
+        role: role,
+        team: team || '',
+        eta: eta ? Number(eta) : null,
+        altezza: null,
+        peso: null,
+        foto_url: ''
+      };
+      
+      try {
+        await db.collection('players').doc(playerId).set(playerData);
+        
+        status.className = 'status success show';
+        status.innerHTML = `
+          ✅ <strong>Player creato con successo!</strong><br>
+          ID: <code>${playerId}</code><br>
+          Nome: ${nomeCompleto}<br>
+          Ruolo: ${role}<br><br>
+          <strong>Ora ricarica squadre.html per vedere il nome corretto!</strong>
+        `;
+        
+        console.log('✅ Player creato:', playerData);
+      } catch (e) {
+        status.className = 'status error show';
+        status.textContent = '❌ Errore: ' + e.message;
+        console.error('Errore creazione player:', e);
+        btn.disabled = false;
+      }
+    }
+
+    // Auto-check on load
+    window.addEventListener('DOMContentLoaded', () => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          console.log('✅ Loggato come:', user.email);
+          checkPlayer();
+        } else {
+          console.warn('⚠️ Non loggato! Fai login prima di creare il player.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

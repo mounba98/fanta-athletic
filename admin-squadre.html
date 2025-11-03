@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Gestione Squadre</title>
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .team-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .team-info { flex: 1; }
+    .team-name { font-size: 20px; font-weight: 700; }
+    .team-meta { color: var(--muted); font-size: 14px; margin-top: 5px; }
+    .team-actions { display: flex; gap: 10px; }
+    .danger-zone {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 30px 0;
+    }
+    :root.dark .danger-zone {
+      background: #3d2f00;
+      border-color: #ffc107;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🛠️ Gestione Squadre</h1>
+  </header>
+
+  <main class="container">
+    <div class="section">
+      <h2>Squadre Attive</h2>
+      <p>Gestisci le squadre della competizione. Attualmente: <strong id="teamCount">0</strong> squadre</p>
+      <div id="teamsList"></div>
+    </div>
+
+    <div class="danger-zone">
+      <h3>⚠️ Zona Pericolosa</h3>
+      <p>Queste azioni sono irreversibili e influenzano l'intera competizione.</p>
+      
+      <div style="margin: 20px 0;">
+        <h4>Numero Squadre Competizione</h4>
+        <p>Imposta il numero di squadre attive (18 o 19)</p>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="number" id="numSquadre" min="1" max="19" value="19" class="input" style="max-width:100px;" />
+          <button class="btn" onclick="setNumeroSquadre()">Imposta</button>
+        </div>
+      </div>
+
+      <div style="margin: 20px 0;">
+        <h4>Rigenera Calendario Scontri</h4>
+        <p>Rigenera il calendario con il numero attuale di squadre. Tutti i punteggi saranno mantenuti.</p>
+        <button class="btn btn-secondary" onclick="rigeneraCalendario()">🔄 Rigenera Calendario</button>
+      </div>
+
+      <div style="margin: 20px 0;">
+        <h4>Reset Competizione</h4>
+        <p>⚠️ ATTENZIONE: Cancella tutti i punteggi e ricrea il calendario da zero.</p>
+        <button class="btn btn-danger" onclick="resetCompetizione()">🗑️ Reset Completo</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-init.js"></script>
+  
+  <script>
+    const db = firebase.firestore();
+    let teams = [];
+
+    // Verifica admin
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        alert('Accesso negato');
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      const adminDoc = await db.collection('admins').doc(user.uid).get();
+      if (!adminDoc.exists) {
+        alert('Solo gli admin possono accedere');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      loadTeams();
+    });
+
+    function loadTeams() {
+      teams = JSON.parse(localStorage.getItem('teams_data') || '[]');
+      document.getElementById('teamCount').textContent = teams.length;
+      
+      const list = document.getElementById('teamsList');
+      list.innerHTML = teams.map((team, idx) => `
+        <div class="team-card">
+          <div class="team-info">
+            <div class="team-name">${team.name || `Squadra ${idx + 1}`}</div>
+            <div class="team-meta">
+              Rosa: ${(team.roster || []).length}/11 • 
+              Allenatori: ${(team.coach_ids || []).length}
+            </div>
+          </div>
+          <div class="team-actions">
+            <button class="btn btn-secondary btn-sm" onclick="editTeam(${idx})">✏️ Modifica</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTeam(${idx})">🗑️ Elimina</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editTeam(idx) {
+      window.location.href = `squadre.html#team-${idx}`;
+    }
+
+    function deleteTeam(idx) {
+      if (!confirm(`Eliminare ${teams[idx].name}? Questa azione è irreversibile.`)) return;
+      
+      teams.splice(idx, 1);
+      localStorage.setItem('teams_data', JSON.stringify(teams));
+      loadTeams();
+      alert('✅ Squadra eliminata');
+    }
+
+    function setNumeroSquadre() {
+      const num = parseInt(document.getElementById('numSquadre').value);
+      if (num < 1 || num > 19) {
+        alert('Numero squadre deve essere tra 1 e 19');
+        return;
+      }
+
+      if (num < teams.length) {
+        if (!confirm(`Ridurre a ${num} squadre? Le squadre in eccesso saranno eliminate.`)) return;
+        teams = teams.slice(0, num);
+      } else if (num > teams.length) {
+        for (let i = teams.length; i < num; i++) {
+          teams.push({
+            name: `Squadra ${i + 1}`,
+            roster: [],
+            lineup: [],
+            captain: null,
+            coach_ids: []
+          });
+        }
+      }
+
+      localStorage.setItem('teams_data', JSON.stringify(teams));
+      loadTeams();
+      alert(`✅ Numero squadre impostato a ${num}`);
+    }
+
+    function rigeneraCalendario() {
+      if (!confirm('Rigenerare il calendario? I punteggi saranno mantenuti.')) return;
+      
+      localStorage.setItem('calendario_version', Date.now().toString());
+      alert('✅ Calendario rigenerato! Vai su Calendario per vedere i cambiamenti.');
+      window.location.href = 'calendario.html';
+    }
+
+    function resetCompetizione() {
+      const conferma = prompt('Digitare "RESET" per confermare il reset completo della competizione:');
+      if (conferma !== 'RESET') {
+        alert('Reset annullato');
+        return;
+      }
+
+      // Cancella tutti i punteggi
+      for (let i = 1; i <= 24; i++) {
+        localStorage.removeItem(`standings_G${i}`);
+        localStorage.removeItem(`players_G${i}`);
+        localStorage.removeItem(`coaches_G${i}`);
+        localStorage.removeItem(`curva_G${i}`);
+      }
+
+      // Rigenera calendario
+      localStorage.setItem('calendario_version', Date.now().toString());
+      
+      alert('✅ Competizione resettata! Tutti i punteggi sono stati cancellati.');
+      window.location.href = 'calendario.html';
+    }
+  </script>
+  
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>🔧 Admin Calendario Athletic</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #2d6cdf;
+      margin-bottom: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2d6cdf;
+    }
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #2d6cdf;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1e5bbf;
+    }
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #059669;
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    .matches-list {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .match-item {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #2d6cdf;
+    }
+    .match-item:hover {
+      background: #eff6ff;
+    }
+    .match-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .match-details {
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .match-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2d6cdf;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 9999;
+      animation: slideIn 0.3s;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(400px); }
+      to { transform: translateX(0); }
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="container">
+    <h1>🔧 Admin Calendario Athletic</h1>
+
+    <div class="grid">
+      <!-- Form Nuova Partita -->
+      <div class="card">
+        <h2>➕ Nuova Partita</h2>
+        <form id="matchForm">
+          <div class="form-group">
+            <label>Giornata</label>
+            <input type="number" id="giornata" min="1" max="38" required>
+          </div>
+
+          <div class="form-group">
+            <label>Mese</label>
+            <select id="month" required>
+              <option>Settembre</option>
+              <option selected>Ottobre</option>
+              <option>Novembre</option>
+              <option>Dicembre</option>
+              <option>Gennaio</option>
+              <option>Febbraio</option>
+              <option>Marzo</option>
+              <option>Aprile</option>
+              <option>Maggio</option>
+              <option>Giugno</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Data (es. 13 Ottobre)</label>
+            <input type="text" id="date" required placeholder="13 Ottobre">
+          </div>
+
+          <div class="form-group">
+            <label>Ora (es. 15:00)</label>
+            <input type="text" id="time" required placeholder="15:00">
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Squadra Casa</label>
+              <input type="text" id="homeTeam" required placeholder="Athletic Brescia">
+            </div>
+            <div class="form-group">
+              <label>Squadra Ospite</label>
+              <input type="text" id="awayTeam" required placeholder="Avversario">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Campo (opzionale)</label>
+            <input type="text" id="location" placeholder="Campo Sportivo">
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;">
+            ✅ Aggiungi Partita
+          </button>
+        </form>
+      </div>
+
+      <!-- Lista Partite -->
+      <div class="card">
+        <h2>📋 Partite Inserite</h2>
+        <div class="matches-list" id="matchesList">
+          <p style="color:#6b7280;text-align:center;">Caricamento...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sync Contest -->
+    <div class="card" style="margin-top:30px;">
+      <h2>🏆 Sync Contest</h2>
+      <p style="color:#6b7280;margin-bottom:20px;">
+        Sincronizza partite Athletic con il contest pronostici. 
+        Solo partite future saranno aggiunte al contest.
+      </p>
+      <button class="btn btn-success" onclick="syncContest()">
+        🔄 Sincronizza Contest
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Init Firebase IMMEDIATELY
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDnQMuPvx_Gr8VjBJf_Hrx39O8w2dm67co",
+        authDomain: "fanta-athletic.firebaseapp.com",
+        projectId: "fanta-athletic",
+        storageBucket: "fanta-athletic.firebasestorage.app",
+        messagingSenderId: "845950461193",
+        appId: "1:845950461193:web:04475bb0eaa2dc459a9fd8"
+      });
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    console.log('✅ Firebase initialized:', window.db ? 'OK' : 'FAIL');
+  </script>
+
+  <script>
+    let matches = [];
+
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    async function init() {
+      if (!window.db) {
+        toast('❌ Firebase non disponibile');
+        console.error('window.db è null!');
+        return;
+      }
+      
+      console.log('✅ init() con Firebase pronto');
+
+      await loadMatches();
+
+      // Form submit
+      document.getElementById('matchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await addMatch();
+      });
+    }
+
+    async function loadMatches() {
+      try {
+        const snapshot = await window.db.collection('athletic_calendar')
+          .orderBy('giornata', 'asc').get();
+        
+        matches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderMatches();
+      } catch (e) {
+        console.error(e);
+        toast('❌ Errore caricamento');
+      }
+    }
+
+    function renderMatches() {
+      const container = document.getElementById('matchesList');
+      
+      if (matches.length === 0) {
+        container.innerHTML = '<p style="color:#6b7280;text-align:center;">Nessuna partita inserita</p>';
+        return;
+      }
+
+      let html = '';
+      matches.forEach(match => {
+        const hasResult = match.homeScore !== null && match.awayScore !== null;
+        const score = hasResult ? `${match.homeScore}-${match.awayScore}` : 'vs';
+        
+        html += `
+          <div class="match-item">
+            <div class="match-title">
+              G${match.giornata}: ${match.homeTeam} ${score} ${match.awayTeam}
+            </div>
+            <div class="match-details">
+              📅 ${match.date} • ⏰ ${match.time} • ${match.month}
+            </div>
+            <div class="match-actions">
+              <button class="btn btn-primary" style="padding:8px 16px;font-size:13px;" 
+                      onclick="editResult('${match.id}')">
+                📝 Risultato
+              </button>
+              <button class="btn btn-danger" style="padding:8px 16px;font-size:13px;" 
+                      onclick="deleteMatch('${match.id}')">
+                🗑️ Elimina
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    async function addMatch() {
+      try {
+        const data = {
+          giornata: parseInt(document.getElementById('giornata').value),
+          month: document.getElementById('month').value,
+          date: document.getElementById('date').value,
+          time: document.getElementById('time').value,
+          homeTeam: document.getElementById('homeTeam').value,
+          awayTeam: document.getElementById('awayTeam').value,
+          location: document.getElementById('location').value || null,
+          homeScore: null,
+          awayScore: null,
+          postponed: false,
+          createdAt: new Date().toISOString()
+        };
+
+        await window.db.collection('athletic_calendar').add(data);
+        
+        toast('✅ Partita aggiunta!');
+        document.getElementById('matchForm').reset();
+        await loadMatches();
+      } catch (e) {
+        console.error(e);
+        toast('❌ Errore salvataggio');
+      }
+    }
+
+    async function editResult(matchId) {
+      const match = matches.find(m => m.id === matchId);
+      if (!match) return;
+
+      const homeScore = prompt(`Gol ${match.homeTeam}:`, match.homeScore || '');
+      if (homeScore === null) return;
+
+      const awayScore = prompt(`Gol ${match.awayTeam}:`, match.awayScore || '');
+      if (awayScore === null) return;
+
+      try {
+        await window.db.collection('athletic_calendar').doc(matchId).update({
+          homeScore: parseInt(homeScore),
+          awayScore: parseInt(awayScore)
+        });
+
+        toast('✅ Risultato salvato!');
+        await loadMatches();
+      } catch (e) {
+        console.error(e);
+        toast('❌ Errore salvataggio');
+      }
+    }
+
+    async function deleteMatch(matchId) {
+      if (!confirm('Eliminare questa partita?')) return;
+
+      try {
+        await window.db.collection('athletic_calendar').doc(matchId).delete();
+        toast('✅ Partita eliminata');
+        await loadMatches();
+      } catch (e) {
+        console.error(e);
+        toast('❌ Errore eliminazione');
+      }
+    }
+
+    async function syncContest() {
+      try {
+        toast('🔄 Sync in corso...');
+
+        // Get future matches (no result yet)
+        const futureMatches = matches.filter(m => 
+          m.homeScore === null && m.awayScore === null
+        ).slice(0, 10); // Max 10 partite
+
+        if (futureMatches.length === 0) {
+          toast('⚠️ Nessuna partita futura da sincronizzare');
+          return;
+        }
+
+        // Get existing contest matches
+        const contestDoc = await window.db.collection('contest').doc('matches').get();
+        const existingMatches = contestDoc.exists ? contestDoc.data() : {};
+
+        // Add new matches
+        futureMatches.forEach((match, index) => {
+          const giornataKey = `G${match.giornata}`;
+          
+          // Only add if not exists
+          if (!existingMatches[giornataKey]) {
+            // Deadline: 30min before match
+            const [day, monthName] = match.date.split(' ');
+            const monthIndex = [
+              'Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+              'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'
+            ].indexOf(monthName);
+            
+            const year = monthIndex >= 8 ? 2024 : 2025; // Set <Sept before 2025
+            const [hours, minutes] = match.time.split(':');
+            
+            const matchDate = new Date(year, monthIndex, parseInt(day), 
+                                      parseInt(hours), parseInt(minutes));
+            matchDate.setMinutes(matchDate.getMinutes() - 30); // -30min
+            
+            existingMatches[giornataKey] = {
+              homeTeam: match.homeTeam,
+              awayTeam: match.awayTeam,
+              deadline: matchDate.toISOString(),
+              result: null
+            };
+          }
+        });
+
+        // Save
+        await window.db.collection('contest').doc('matches').set(existingMatches);
+
+        toast(`✅ Sync completato! ${futureMatches.length} partite`);
+      } catch (e) {
+        console.error(e);
+        toast('❌ Errore sync');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

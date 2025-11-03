@@ -1,0 +1,121 @@
+[
+  {
+    "id": "bar",
+    "name": "Bar",
+    "effect": "plus_one_per_card",
+    "description": "Ogni carta giocata qui ottiene +1 Forza per ogni altra carta nel campo.",
+    "reveal_turn": 1
+  },
+  {
+    "id": "veranda",
+    "name": "Veranda",
+    "effect": "plus_one",
+    "description": "Le carte qui ottengono +1 Forza.",
+    "reveal_turn": 1
+  },
+  {
+    "id": "sala",
+    "name": "Sala",
+    "effect": "double_strongest",
+    "description": "Alla fine del turno, raddoppia la Forza della carta più forte in questo campo.",
+    "reveal_turn": 2
+  },
+  {
+    "id": "chiringuito",
+    "name": "Chiringuito",
+    "effect": "reduce_hand_cost",
+    "description": "Quando viene rivelato, le carte nella tua mano al momento costano 1 in meno (min 1).",
+    "reveal_turn": 3
+  },
+  {
+    "id": "doccia",
+    "name": "Doccia",
+    "effect": "no_destroy",
+    "description": "Le carte qui non possono essere distrutte.",
+    "reveal_turn": 2
+  },
+  {
+    "id": "palestra",
+    "name": "Palestra",
+    "effect": "boost_cost3_plus",
+    "description": "Le carte di costo 3 o superiore ottengono +3 Forza.",
+    "reveal_turn": 3
+  },
+  {
+    "id": "angolo_rotture",
+    "name": "Angolo Rotture",
+    "effect": "minus_one_end_turn",
+    "description": "Le carte qui perdono 1 Forza a fine turno.",
+    "reveal_turn": 2
+  },
+  {
+    "id": "sala_musica",
+    "name": "Sala Musica",
+    "effect": "double_ongoing",
+    "description": "Gli effetti continui in questo campo vengono attivati due volte.",
+    "reveal_turn": 3
+  },
+  {
+    "id": "esterno_sala",
+    "name": "Esterno Sala",
+    "effect": "move_turn3",
+    "description": "Alla fine del turno 3, sposta tutte le carte giocate qui in un campo casuale.",
+    "reveal_turn": 1
+  },
+  {
+    "id": "palestra_bagno",
+    "name": "Palestra Bagno",
+    "effect": "copy_to_deck",
+    "description": "Quando giochi una carta qui, mescolane una copia 1/1 nel mazzo.",
+    "reveal_turn": 2
+  },
+  {
+    "id": "misericordia",
+    "name": "Misericordia",
+    "effect": "cost_plus_one",
+    "description": "Nel prossimo turno, tutte le carte costeranno +1 (min 1).",
+    "reveal_turn": 3
+  },
+  {
+    "id": "bagno_palestra",
+    "name": "Bagno Palestra",
+    "effect": "move_random_end_turn",
+    "description": "Alla fine di ogni turno, sposta casualmente una carta in questo campo.",
+    "reveal_turn": 2
+  },
+  {
+    "id": "panchina_athletic",
+    "name": "Panchina Athletic",
+    "effect": "return_discard",
+    "description": "Quando scarti una carta, rimandala in mano con +1 Forza.",
+    "reveal_turn": 2
+  },
+  {
+    "id": "palestrina",
+    "name": "Palestrina",
+    "effect": "boost_low_cost",
+    "description": "Le carte di costo 1 e 2 ottengono +2 Forza.",
+    "reveal_turn": 1
+  },
+  {
+    "id": "calcino",
+    "name": "Calcino",
+    "effect": "first_card_bonus",
+    "description": "La prima carta giocata qui ogni turno ottiene +3 Forza.",
+    "reveal_turn": 2
+  },
+  {
+    "id": "morello_arena",
+    "name": "Morello Arena",
+    "effect": "high_cost_only",
+    "description": "Dopo il turno 4, solo carte di costo 4 o superiore possono essere giocate qui.",
+    "reveal_turn": 3
+  },
+  {
+    "id": "campo_allenamento",
+    "name": "Campo Allenamento",
+    "effect": "copy_first_card",
+    "description": "La prima carta giocata qui in partita viene copiata 1/1 in un altro campo casuale.",
+    "reveal_turn": 1
+  }
+]

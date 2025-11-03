@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Classifiche</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <style>
+    .container { width: min(100%, 1100px); margin: 0 auto; padding: 16px; box-sizing: border-box; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: nowrap; background: var(--card); padding: 12px; border-radius: 12px; box-shadow: var(--shadow); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tab-btn { padding: 12px 20px; border-radius: 8px; background: transparent; color: var(--text); border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 15px; white-space: nowrap; flex-shrink: 0; }
+    .tab-btn:hover { background: rgba(220, 20, 60, 0.1); }
+    .tab-btn.active { background: var(--primary); color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .export-buttons { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
+    .export-btn { width: 100%; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 14px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; }
+    .export-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    
+    /* Mobile-friendly table scroll */
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+    .table { width: 100%; border-collapse: collapse; margin: 20px 0; min-width: 540px; }
+    .table th, .table td { border-bottom: 1px solid rgba(0,0,0,0.08); padding: 10px; text-align: left; white-space: nowrap; }
+    .table th { background: var(--primary); color: white; font-weight: 700; position: sticky; top: 0; z-index: 10; }
+    .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 20px; overflow-x: hidden; }
+    .giornata-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .giornata-controls .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .giornata-controls label { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .giornata-controls select { min-width: 160px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.35); background: var(--card); color: inherit; font-size: 14px; }
+    #myLineupBtn { padding: 10px 16px; border-radius: 10px; border: none; background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(99,102,241,0.25); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    #myLineupBtn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(99,102,241,0.35); }
+    
+    /* Mobile/Tablet responsive */
+    @media (max-width: 768px) {
+      .container { padding: 8px; max-width: 100vw; overflow-x: hidden; }
+      .tabs { padding: 6px; gap: 4px; }
+      .tab-btn { padding: 8px 12px; font-size: 12px; }
+      .export-buttons { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+      .export-btn { width: 100%; min-width: 0; padding: 8px 12px; font-size: 12px; }
+      .table-wrapper { max-width: calc(100vw - 24px); }
+      .table { min-width: 380px; font-size: 12px; }
+      .table th, .table td { padding: 6px 4px; font-size: 12px; }
+      .card { padding: 12px; max-width: 100%; }
+      .giornata-controls { flex-direction: column; align-items: stretch; }
+      #myLineupBtn { width: 100%; }
+    }
+    
+    @media (max-width: 480px) {
+      .container { padding: 4px; }
+      .tabs { padding: 4px; gap: 3px; }
+      .tab-btn { padding: 6px 10px; font-size: 11px; }
+      .export-buttons { grid-template-columns: 1fr; }
+      .export-btn { padding: 6px 10px; font-size: 11px; }
+      .table-wrapper { max-width: calc(100vw - 12px); }
+      .table { min-width: 320px; font-size: 11px; }
+      .table th, .table td { padding: 4px 2px; font-size: 10px; }
+      .card { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>📊 Classifiche</h1>
+  </header>
+
+  <main class="container">
+    <!-- Export & Podio Buttons -->
+    <div class="export-buttons">
+      <button onclick="showFinalPodium()" class="export-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; ">
+        🏆 Podio
+      </button>
+      <button onclick="exportStandings('csv')" class="export-btn" style="background: #27ae60; color: white;">
+        📥 CSV
+      </button>
+      <button onclick="exportStandings('excel')" class="export-btn" style="background: #2ecc71; color: white;">
+        📊 Excel
+      </button>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="squadre" onclick="switchTab('squadre', event)">🏆 Classifica Squadre</button>
+      <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h', event)">⚔️ Scontri Diretti</button>
+      <button class="tab-btn" data-tab="giornate" onclick="switchTab('giornate', event)">📅 Per Giornata</button>
+    </div>
+
+    <!-- Tab Classifica Squadre -->
+    <div id="tab-squadre" class="tab-content active">
+      <div class="card">
+        <h2>Classifica Squadre (Cumulata)</h2>
+        <div class="table-wrapper">
+          <table class="table" id="teamsRank">
+            <thead>
+              <tr><th>#</th><th>Squadra</th><th>Coach</th><th>Totale</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Scontri Diretti -->
+    <div id="tab-h2h" class="tab-content">
+      <div class="card">
+        <h2>Classifica Scontri Diretti H2H</h2>
+        <p>Sistema 3-1-0. Criteri: Punti, Scontri diretti, Differenza punti, Punti totali.</p>
+        <div class="table-wrapper">
+          <table class="table" id="h2hTable">
+            <thead>
+              <tr>
+                <th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th>
+                <th>Pt Fatti</th><th>Pt Subiti</th><th>Diff</th><th>Punti</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Per Giornata -->
+    <div id="tab-giornate" class="tab-content">
+      <div class="card">
+        <h2>Dettaglio per Giornata</h2>
+        <div class="giornata-controls">
+          <div class="control-group">
+            <label for="giornataSel">Seleziona Giornata</label>
+          <select id="giornataSel" class="input" style="max-width:200px;"></select>
+          </div>
+          <button id="myLineupBtn">👥 I miei titolari</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="table" id="byTeamDay">
+            <thead>
+              <tr><th>#</th><th>Squadra</th><th>Curva</th><th>Giocatori</th><th>Capitano</th><th>Coach</th><th>Totale</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script>
+    // Init Firebase IMMEDIATAMENTE
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    const db = window.db; // Alias locale per compatibilità
+    console.log('✅ Classifiche: Firebase initialized');
+  </script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/standings-export.js"></script>
+  <script src="resources/podium-animation.js"></script>
+  <script>
+    const SEASON = '2024-25';
+
+    function switchTab(tab, ev) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      const trigger = ev?.currentTarget || document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+      if (trigger) trigger.classList.add('active');
+      const pane = document.getElementById(`tab-${tab}`);
+      if (pane) pane.classList.add('active');
+    }
+
+    const state = {
+      teams: [],
+      coaches: new Map(),
+      schedule: new Map(),
+      results: new Map(),
+      teamMetaByKey: new Map(),
+      selectedGiornata: null
+    };
+
+    const lineupBtn = document.getElementById('myLineupBtn');
+
+    const podiumStyles = [
+      { bg: '#ffd700', color: '#000' },
+      { bg: '#c0c0c0', color: '#000' },
+      { bg: '#cd7f32', color: '#000' }
+    ];
+
+    function normalizeTeamKey(key) {
+      if (key === undefined || key === null) return null;
+      if (typeof key === 'number') return String(key);
+      return String(key).trim();
+    }
+
+    function toNumberSafe(value) {
+      const num = Number(value);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function extractPoints(data = {}) {
+      const raw = data.points ?? data.total ?? data.totalPoints ?? 0;
+      const num = Number(raw);
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function getTeamMeta(teamKey) {
+      const normalized = normalizeTeamKey(teamKey);
+      if (!normalized) return null;
+      if (state.teamMetaByKey.has(normalized)) {
+        return state.teamMetaByKey.get(normalized);
+      }
+      const numeric = toNumberSafe(normalized);
+      if (numeric !== null && state.teamMetaByKey.has(String(numeric))) {
+        return state.teamMetaByKey.get(String(numeric));
+      }
+      if (numeric !== null && state.teamMetaByKey.has(numeric)) {
+        return state.teamMetaByKey.get(numeric);
+      }
+      return null;
+    }
+
+    function renderTeamsRanking() {
+      const tbody = document.querySelector('#teamsRank tbody');
+      if (!tbody) return;
+
+      if (!state.teams.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted);">Nessuna squadra trovata.</td></tr>';
+        return;
+      }
+
+      const aggregateById = new Map();
+      const aggregates = state.teams.map(team => {
+        const entry = {
+          teamId: team.id,
+          numericId: team.numericId,
+        name: team.name,
+        coach: team.coachLabel,
+        total: 0,
+          giornate: 0,
+          forfeit: 0
+        };
+        aggregateById.set(team.id, entry);
+        if (team.numericId !== null && team.numericId !== undefined) {
+          aggregateById.set(String(team.numericId), entry);
+          aggregateById.set(team.numericId, entry);
+        }
+        return entry;
+      });
+
+      // NUOVO: Somma punti da results/{giornata}/teams/{teamId}
+      console.log('📊 [CLASSIFICA] Calcolo punti da', state.results.size, 'giornate');
+      state.results.forEach((giornataData, giornataId) => {
+        const teams = giornataData.teams || {};
+        console.log(`  ${giornataId}:`, Object.keys(teams).length, 'teams');
+        Object.entries(teams).forEach(([teamId, teamData]) => {
+          const aggregate = aggregateById.get(teamId);
+          if (!aggregate) {
+            console.warn('⚠️ [CLASSIFICA] Team non mappato nei risultati:', teamId, teamData);
+            return;
+          }
+          const pts = extractPoints(teamData);
+            console.log(`    Team ${teamId}: +${pts}pt`);
+          aggregate.total += pts;
+          aggregate.giornate += 1;
+          if (teamData.forfeit) {
+            aggregate.forfeit = (aggregate.forfeit || 0) + Number(teamData.forfeit);
+          }
+        });
+      });
+      console.log('📊 [CLASSIFICA] Punti finali:', aggregates.map(a => `${a.name}: ${a.total}pt`));
+
+      const rows = aggregates
+        .slice()
+        .sort((a, b) => (b.total - a.total) || a.name.localeCompare(b.name, 'it'));
+
+      tbody.innerHTML = rows.map((row, index) => {
+        const style = podiumStyles[index] || { bg: 'transparent', color: 'var(--text)' };
+        const forfeitIndicator = row.forfeit ? ` ⚠️(${row.forfeit})` : '';
+        return `
+          <tr style="background:${style.bg};color:${style.color};">
+            <td>${index + 1}</td>
+            <td style="font-weight:${index < 3 ? '800' : '600'};">${row.name}${forfeitIndicator}</td>
+            <td>${row.coach}</td>
+            <td>${row.total.toFixed(2)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderH2HTable() {
+      const tbody = document.querySelector('#h2hTable tbody');
+      if (!tbody) return;
+
+      if (!state.teams.length) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--muted);">Nessuna squadra trovata.</td></tr>';
+        return;
+      }
+
+      const stats = state.teams.map(team => ({
+        teamId: team.id,
+        numericId: team.numericId,
+        name: team.name,
+        g: 0,
+        v: 0,
+        n: 0,
+        p: 0,
+        pf: 0,
+        ps: 0,
+        pts: 0,
+        forfeit: 0
+      }));
+
+      const statByKey = new Map();
+      stats.forEach(entry => {
+        statByKey.set(entry.teamId, entry);
+        if (entry.numericId !== null && entry.numericId !== undefined) {
+          statByKey.set(String(entry.numericId), entry);
+          statByKey.set(entry.numericId, entry);
+        }
+      });
+
+      state.results.forEach(res => {
+        (res.matches || []).forEach(match => {
+          const { home, away, scoreHome, scoreAway, forfeitHome, forfeitAway } = match;
+          if (home == null || away == null || scoreHome == null || scoreAway == null) return;
+          const homeStat = statByKey.get(home);
+          const awayStat = statByKey.get(away);
+          if (!homeStat || !awayStat) return;
+          homeStat.g += 1;
+          awayStat.g += 1;
+          const homeScore = Number(scoreHome);
+          const awayScore = Number(scoreAway);
+          homeStat.pf += Number.isFinite(homeScore) ? homeScore : 0;
+          homeStat.ps += Number.isFinite(awayScore) ? awayScore : 0;
+          awayStat.pf += Number.isFinite(awayScore) ? awayScore : 0;
+          awayStat.ps += Number.isFinite(homeScore) ? homeScore : 0;
+
+          // Track forfeit penalties
+          if (forfeitHome) {
+            homeStat.forfeit = (homeStat.forfeit || 0) + 1;
+          }
+          if (forfeitAway) {
+            awayStat.forfeit = (awayStat.forfeit || 0) + 1;
+          }
+
+          if (homeScore > awayScore) {
+            homeStat.v += 1;
+            awayStat.p += 1;
+            homeStat.pts += 3;
+          } else if (homeScore < awayScore) {
+            awayStat.v += 1;
+            homeStat.p += 1;
+            awayStat.pts += 3;
+          } else {
+            homeStat.n += 1;
+            awayStat.n += 1;
+            homeStat.pts += 1;
+            awayStat.pts += 1;
+          }
+        });
+      });
+
+      stats.sort((a, b) => (b.pts - a.pts) || ((b.pf - b.ps) - (a.pf - a.ps)) || (b.pf - a.pf) || a.name.localeCompare(b.name, 'it'));
+
+      tbody.innerHTML = stats.map((row, index) => {
+        const style = podiumStyles[index] || { bg: 'transparent', color: 'var(--text)' };
+        const forfeitIndicator = row.forfeit ? ` ⚠️(${row.forfeit})` : '';
+        return `
+          <tr style="background:${style.bg};color:${style.color};">
+            <td>${index + 1}</td>
+            <td style="font-weight:${index < 3 ? '800' : '600'};">${row.name}${forfeitIndicator}</td>
+            <td>${row.g}</td>
+            <td>${row.v}</td>
+            <td>${row.n}</td>
+            <td>${row.p}</td>
+            <td>${row.pf.toFixed(2)}</td>
+            <td>${row.ps.toFixed(2)}</td>
+            <td>${(row.pf - row.ps).toFixed(2)}</td>
+            <td style="font-weight:${index < 3 ? '900' : '700'};">${row.pts}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderGiornataSelect() {
+      const select = document.getElementById('giornataSel');
+      if (!select) return;
+
+      // NUOVO: Usa results invece di schedule
+      const giornate = Array.from(state.results.keys()).sort((a, b) => {
+        const na = Number(a.replace('G', ''));
+        const nb = Number(b.replace('G', ''));
+        return na - nb;
+      });
+
+      if (!giornate.length) {
+        select.innerHTML = '<option value="">Nessuna giornata calcolata</option>';
+        renderGiornata(null);
+        return;
+      }
+
+      select.innerHTML = giornate.map(id => `<option value="${id}">Giornata ${id.replace('G', '')}</option>`).join('');
+      select.onchange = (e) => renderGiornata(e.target.value);
+      renderGiornata(giornate[0]);
+
+      if (lineupBtn) {
+        lineupBtn.disabled = !giornate.length;
+        lineupBtn.onclick = () => {
+          if (!state.selectedGiornata) {
+            alert('Seleziona una giornata per vedere i tuoi titolari.');
+            return;
+          }
+          window.location.href = `lineup-summary.html?g=${state.selectedGiornata}`;
+        };
+      }
+    }
+
+    function renderGiornata(giornataId) {
+      const tbody = document.querySelector('#byTeamDay tbody');
+      if (!tbody) return;
+
+      state.selectedGiornata = giornataId || null;
+      if (lineupBtn) {
+        lineupBtn.disabled = !state.selectedGiornata;
+      }
+
+      if (!giornataId || !state.results.has(giornataId)) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">Nessun dato disponibile per questa giornata.</td></tr>';
+        return;
+      }
+
+      // NUOVO: Leggi direttamente da results/{giornataId}/teams/*
+      const giornataData = state.results.get(giornataId) || {};
+      const teams = giornataData.teams || {};
+      
+      const rows = Object.entries(teams).map(([teamId, teamData]) => {
+        const meta = getTeamMeta(teamId);
+        const points = extractPoints(teamData);
+        const breakdown = teamData.breakdown || {};
+        const fallbackName = meta?.numericId != null ? `Squadra ${meta.numericId + 1}` : `Squadra ${teamId}`;
+        return {
+          teamKey: teamId,
+          name: teamData.teamName || meta?.name || fallbackName,
+          points,
+          breakdown
+        };
+      });
+
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">Giornata non ancora calcolata.</td></tr>';
+        return;
+      }
+
+      rows.sort((a, b) => b.points - a.points || a.name.localeCompare(b.name, 'it'));
+
+      tbody.innerHTML = rows.map((row, index) => {
+        const { curva, players, captain, coach } = row.breakdown;
+        return `
+          <tr>
+            <td style="font-weight:${index < 3 ? '800' : '600'};">${index + 1}</td>
+            <td style="font-weight:${index < 3 ? '700' : '600'};">${row.name}</td>
+            <td>${row.points.toFixed(2)}</td>
+            <td style="font-size:11px;color:var(--muted);">
+              Curva ${(curva || 0).toFixed(1)} | 
+              Form ${(row.breakdown?.formation || 0).toFixed(1)} |
+              Gioc ${(players || 0).toFixed(1)} | 
+              Cap ${(captain || 0).toFixed(1)} | 
+              Coach ${(coach || 0).toFixed(1)}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadClassificheData() {
+      try {
+        console.log('📊 Caricamento classifiche...');
+        
+        const [teamsSnap, coachesSnap, scheduleSnap] = await Promise.all([
+          db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get(),
+          db.collection('coaches').get().catch(() => null),
+          db.collection('h2h_schedule').doc(SEASON).collection('giornate').get()
+        ]);
+
+        state.coaches.clear();
+        if (coachesSnap) {
+          coachesSnap.docs.forEach(doc => {
+            const data = doc.data();
+            state.coaches.set(doc.id, data);
+          });
+        }
+
+        const rawTeams = teamsSnap.docs.map((doc, idx) => {
+          const data = doc.data() || {};
+          const coachLabel = (data.coach_ids || [])
+            .map(id => {
+              const coach = state.coaches.get(id) || {};
+              return coach.nome || coach.name || null;
+            })
+            .filter(Boolean)
+            .join(', ') || '—';
+          const numericId = toNumberSafe(doc.id);
+          return {
+            id: doc.id,
+            numericId,
+            name: data.name || (numericId !== null ? `Squadra ${numericId + 1}` : `Squadra ${idx + 1}`),
+            coachLabel
+          };
+        });
+
+        state.teams = rawTeams.sort((a, b) => {
+          if (a.numericId !== null && b.numericId !== null) {
+            return a.numericId - b.numericId;
+          }
+          if (a.numericId !== null) return -1;
+          if (b.numericId !== null) return 1;
+          return a.name.localeCompare(b.name, 'it');
+        });
+
+        state.teamMetaByKey = new Map();
+        state.teams.forEach(team => {
+          const keys = [team.id];
+          if (team.numericId !== null && team.numericId !== undefined) {
+            keys.push(team.numericId, String(team.numericId));
+          }
+          keys.forEach(key => state.teamMetaByKey.set(key, team));
+        });
+
+        state.schedule.clear();
+        scheduleSnap.docs.forEach(doc => state.schedule.set(doc.id, doc.data() || {}));
+
+        // NUOVO: Carica risultati da results/{giornata}/teams/*
+        state.results.clear();
+        console.log('📊 Caricamento risultati da Firestore results/...');
+        
+        const giornataIds = Array.from({ length: 24 }, (_, i) => `G${i + 1}`);
+
+        const giornateResults = await Promise.all(
+          giornataIds.map(giornataId =>
+            db.collection('results').doc(giornataId).collection('teams').get()
+              .then(snap => ({ giornataId, snap }))
+              .catch(error => ({ giornataId, snap: null, error }))
+          )
+        );
+
+        giornateResults.forEach(({ giornataId, snap, error }) => {
+          const giornataData = state.results.get(giornataId) || { teams: {}, matches: [] };
+
+          if (error) {
+            console.warn(`⚠️ Errore caricamento risultati ${giornataId}:`, error);
+          }
+
+          if (snap && !snap.empty) {
+            giornataData.teams = {};
+          snap.docs.forEach(doc => {
+            giornataData.teams[doc.id] = doc.data();
+          });
+            console.log(`✅ ${giornataId}: ${snap.size} squadre`);
+          }
+          
+          state.results.set(giornataId, giornataData);
+        });
+
+        const h2hResults = await Promise.all(
+          giornataIds.map(giornataId =>
+            db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornataId).get()
+              .then(doc => ({ giornataId, data: doc.exists ? doc.data() : null }))
+              .catch(() => ({ giornataId, data: null }))
+          )
+        );
+
+        h2hResults.forEach(({ giornataId, data }) => {
+          if (!data) return;
+          const existing = state.results.get(giornataId) || { teams: {}, matches: [] };
+          existing.matches = Array.isArray(data.matches) ? data.matches : [];
+          state.results.set(giornataId, existing);
+        });
+        
+        console.log('✅ Risultati caricati:', state.results.size, 'giornate con dati');
+
+        renderTeamsRanking();
+        renderH2HTable();
+        renderGiornataSelect();
+      } catch (error) {
+        console.error('Errore caricamento classifiche:', error);
+        const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
+        tables.forEach(sel => {
+          const tbody = document.querySelector(sel);
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#ff6b6b;">Errore nel caricamento dei dati.</td></tr>';
+          }
+        });
+      }
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        location.href = 'auth.html';
+        return;
+      }
+      loadClassificheData();
+    });
+    
+    // Export standings function
+    async function exportStandings(format) {
+      const leagueId = localStorage.getItem('last_league_id');
+      if (!leagueId) {
+        alert('Seleziona una lega prima!');
+        return;
+      }
+      
+      if (format === 'csv') {
+        const result = await StandingsExport.exportToCSV(leagueId);
+        if (result.success) {
+          alert('✅ Classifica esportata: ' + result.filename);
+        } else {
+          alert('❌ Errore: ' + result.error);
+        }
+      } else if (format === 'excel') {
+        const result = await StandingsExport.exportToExcel(leagueId);
+        if (result.success) {
+          alert('✅ Classifica esportata: ' + result.filename);
+        } else {
+          alert('❌ Errore: ' + result.error);
+        }
+      }
+    }
+    
+    // Show final podium
+    function showFinalPodium() {
+      const leagueId = localStorage.getItem('last_league_id');
+      if (!leagueId) {
+        alert('Seleziona una lega prima!');
+        return;
+      }
+      
+      // Get top 3 from table
+      const rows = document.querySelectorAll('#teamsRank tbody tr');
+      if (rows.length < 3) {
+        alert('Servono almeno 3 squadre in classifica!');
+        return;
+      }
+      
+      const top3 = Array.from(rows).slice(0, 3).map(row => {
+        const cells = row.cells;
+        return {
+          name: cells[1]?.textContent || 'Squadra',
+          points: parseInt(cells[3]?.textContent || '0')
+        };
+      });
+      
+      // Get season from localStorage or default
+      const season = localStorage.getItem('current_season') || '24/25';
+      PodiumAnimation.showPodium(top3, `Classifica Finale ${season}`);
+    }
+  </script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/lazy-load.js?v=20251020"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+</body>
+</html>

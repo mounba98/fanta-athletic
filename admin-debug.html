@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Debug & Monitor - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .debug-container { max-width: 1200px; margin: 0 auto; }
+    .debug-section { background: var(--card); border-radius: 12px; padding: 20px; margin: 20px 0; }
+    .error-log { background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: monospace; max-height: 400px; overflow-y: auto; }
+    .error-item { margin: 10px 0; padding: 10px; background: #4a5568; border-radius: 4px; }
+    .error-type { font-weight: bold; color: #f56565; }
+    .error-message { color: #e2e8f0; }
+    .error-timestamp { color: #a0aec0; font-size: 0.9em; }
+    .btn { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+    .btn:hover { background: #2980b9; }
+    .btn-danger { background: #e53e3e; }
+    .btn-danger:hover { background: #c53030; }
+    .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+    .status-ok { background: #48bb78; }
+    .status-error { background: #f56565; }
+    .status-warning { background: #ed8936; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🔍 Debug & Monitor</h1>
+  </header>
+
+  <main class="debug-container">
+    <div class="section">
+      <h2>Monitoraggio Sistema</h2>
+      <p>Strumenti per monitorare errori e performance dell'applicazione.</p>
+    </div>
+
+    <!-- Error Logs -->
+    <div class="debug-section">
+      <h3>📋 Error Logs</h3>
+      <p>Errori JavaScript, Firebase e di rete catturati dall'applicazione.</p>
+      <div id="errorCount" class="status-indicator status-ok"></div>
+      <span id="errorCountText">0 errori</span>
+      <button class="btn" onclick="refreshErrorLogs()">🔄 Aggiorna</button>
+      <button class="btn btn-danger" onclick="clearErrorLogs()">🗑️ Pulisci Log</button>
+      <div id="errorLogs" class="error-log"></div>
+    </div>
+
+    <!-- System Status -->
+    <div class="debug-section">
+      <h3>⚙️ System Status</h3>
+      <div id="systemStatus">
+        <div><span class="status-indicator status-ok"></span>Firebase: <span id="firebaseStatus">Checking...</span></div>
+        <div><span class="status-indicator status-ok"></span>Auth: <span id="authStatus">Checking...</span></div>
+        <div><span class="status-indicator status-ok"></span>Firestore: <span id="firestoreStatus">Checking...</span></div>
+        <div><span class="status-indicator status-ok"></span>Storage: <span id="storageStatus">Checking...</span></div>
+      </div>
+    </div>
+
+    <!-- Performance -->
+    <div class="debug-section">
+      <h3>📊 Performance</h3>
+      <div id="performanceInfo">
+        <div>Load Time: <span id="loadTime">-</span>ms</div>
+        <div>Memory Usage: <span id="memoryUsage">-</span>MB</div>
+        <div>Connection: <span id="connectionType">-</span></div>
+      </div>
+    </div>
+
+    <!-- Firebase Data -->
+    <div class="debug-section">
+      <h3>🔥 Firebase Data</h3>
+      <button class="btn" onclick="checkFirebaseData()">Verifica Dati</button>
+      <div id="firebaseData"></div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/error-logger.js?v=20251018"></script>
+  <script>
+    // Inizializza variabili globali PRIMA di tutto
+    let startTime = performance.now();
+    
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script>
+    // Verifica admin
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      try {
+        const adminDoc = await firebase.firestore().collection('admins').doc(user.uid).get();
+        if (!adminDoc.exists) {
+          window.location.href = 'index.html';
+          return;
+        }
+      } catch (e) {
+        console.error('Admin check failed:', e);
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Inizializza debug
+      async function initializeDebug() {
+        refreshErrorLogs();
+        checkSystemStatus();
+        updatePerformanceInfo();
+      }
+
+      initializeDebug();
+    });
+
+    function refreshErrorLogs() {
+      const errors = window.getErrorLogs();
+      const errorCount = errors.length;
+      const errorCountEl = document.getElementById('errorCount');
+      const errorCountTextEl = document.getElementById('errorCountText');
+      const errorLogsEl = document.getElementById('errorLogs');
+
+      if (errorCount === 0) {
+        errorCountEl.className = 'status-indicator status-ok';
+        errorCountTextEl.textContent = '0 errori';
+        errorLogsEl.innerHTML = '<div class="error-item">✅ Nessun errore rilevato</div>';
+      } else {
+        errorCountEl.className = 'status-indicator status-error';
+        errorCountTextEl.textContent = `${errorCount} errori`;
+        
+        errorLogsEl.innerHTML = errors.map((error, index) => `
+          <div class="error-item">
+            <div class="error-type">[${error.type.toUpperCase()}]</div>
+            <div class="error-message">${error.message}</div>
+            <div class="error-timestamp">${new Date(error.timestamp).toLocaleString()}</div>
+            ${error.error ? `<div style="color: #a0aec0; font-size: 0.8em;">${error.error.message}</div>` : ''}
+          </div>
+        `).join('');
+      }
+    }
+
+    function clearErrorLogs() {
+      if (confirm('Sei sicuro di voler cancellare tutti i log degli errori?')) {
+        window.clearErrorLogs();
+        refreshErrorLogs();
+      }
+    }
+
+    async function checkSystemStatus() {
+      const firebaseStatusEl = document.getElementById('firebaseStatus');
+      const authStatusEl = document.getElementById('authStatus');
+      const firestoreStatusEl = document.getElementById('firestoreStatus');
+      const storageStatusEl = document.getElementById('storageStatus');
+
+      // Firebase
+      try {
+        if (window.firebase && firebase.apps.length > 0) {
+          firebaseStatusEl.textContent = '✅ Connesso';
+        } else {
+          firebaseStatusEl.textContent = '❌ Non inizializzato';
+        }
+      } catch (e) {
+        firebaseStatusEl.textContent = '❌ Errore';
+      }
+
+      // Auth
+      try {
+        const user = firebase.auth().currentUser;
+        authStatusEl.textContent = user ? `✅ Loggato (${user.email})` : '⚠️ Non loggato';
+      } catch (e) {
+        authStatusEl.textContent = '❌ Errore';
+      }
+
+      // Firestore
+      try {
+        await firebase.firestore().collection('test').limit(1).get();
+        firestoreStatusEl.textContent = '✅ Connesso';
+      } catch (e) {
+        firestoreStatusEl.textContent = '❌ Errore';
+      }
+
+      // Storage (simulato)
+      try {
+        if (navigator.storage && navigator.storage.estimate) {
+          const estimate = await navigator.storage.estimate();
+          storageStatusEl.textContent = `✅ Disponibile (${Math.round(estimate.quota / 1024 / 1024)}MB)`;
+        } else {
+          storageStatusEl.textContent = '⚠️ Non supportato';
+        }
+      } catch (e) {
+        storageStatusEl.textContent = '❌ Errore';
+      }
+    }
+
+    function updatePerformanceInfo() {
+      const loadTimeEl = document.getElementById('loadTime');
+      const memoryUsageEl = document.getElementById('memoryUsage');
+      const connectionTypeEl = document.getElementById('connectionType');
+
+      // Load time - usa variabile globale con fallback
+      if (!startTime) startTime = performance.now();
+      const loadTime = Math.round(performance.now() - startTime);
+      loadTimeEl.textContent = loadTime;
+
+      // Memory usage
+      if (performance.memory) {
+        const memoryMB = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+        memoryUsageEl.textContent = memoryMB;
+      } else {
+        memoryUsageEl.textContent = 'N/A';
+      }
+
+      // Connection
+      if (navigator.connection) {
+        connectionTypeEl.textContent = navigator.connection.effectiveType || 'Unknown';
+      } else {
+        connectionTypeEl.textContent = 'Unknown';
+      }
+    }
+
+    async function checkFirebaseData() {
+      const firebaseDataEl = document.getElementById('firebaseData');
+      firebaseDataEl.innerHTML = 'Verifica in corso...';
+
+      try {
+        const collections = ['teams', 'players', 'coaches', 'admins', 'days', 'h2h_results'];
+        const results = {};
+
+        for (const collection of collections) {
+          try {
+            const snapshot = await firebase.firestore().collection(collection).limit(1).get();
+            results[collection] = {
+              exists: !snapshot.empty,
+              count: snapshot.size
+            };
+          } catch (e) {
+            results[collection] = {
+              exists: false,
+              error: e.message
+            };
+          }
+        }
+
+        firebaseDataEl.innerHTML = `
+          <div style="margin-top: 10px;">
+            ${Object.entries(results).map(([collection, data]) => `
+              <div style="margin: 5px 0;">
+                <strong>${collection}:</strong> 
+                ${data.error ? `❌ ${data.error}` : (data.exists ? `✅ ${data.count} documenti` : '⚠️ Vuota')}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } catch (e) {
+        firebaseDataEl.innerHTML = `<div style="color: #e53e3e;">Errore: ${e.message}</div>`;
+      }
+    }
+
+    // Auto-refresh ogni 30 secondi
+    setInterval(() => {
+      refreshErrorLogs();
+      checkSystemStatus();
+    }, 30000);
+  </script>
+</body>
+</html>

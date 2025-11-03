@@ -1,0 +1,333 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Migrazione Dati Esistenti</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+    .btn { padding: 12px 24px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+    .btn:hover { background: #2980b9; }
+    .log { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-top: 20px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px; }
+    .success { color: #27ae60; }
+    .error { color: #e74c3c; }
+    .warning { color: #f39c12; }
+  </style>
+</head>
+<body>
+  <h1>🔄 Migrazione Dati Esistenti a Struttura Multi-Lega</h1>
+  <p>Questo script migra i dati esistenti (squadre, giocatori, admin) nella nuova struttura leagues.</p>
+  
+  <div>
+    <button class="btn" onclick="checkExistingData()">1️⃣ Check Dati Esistenti</button>
+    <button class="btn" onclick="createFantaAthleticLeague()">2️⃣ Crea Lega "Fanta Athletic"</button>
+    <button class="btn" onclick="migrateAllData()">3️⃣ Migra Tutto</button>
+  </div>
+  
+  <div id="log" class="log">Log operazioni...</div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    
+    let currentUser = null;
+    let logEl = document.getElementById('log');
+    
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        log('❌ Non autenticato. Effettua login.', 'error');
+        setTimeout(() => location.href = 'auth.html', 2000);
+      } else {
+        currentUser = user;
+        log(`✅ Autenticato come: ${user.email}`, 'success');
+      }
+    });
+    
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : '';
+      logEl.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(message);
+    }
+    
+    async function checkExistingData() {
+      log('🔍 Controllo dati esistenti...', 'warning');
+      
+      try {
+        // Check teams
+        const teamsSnap = await db.collection('teams').get();
+        log(`📊 Teams trovati: ${teamsSnap.size}`);
+        
+        // Check players  
+        const playersSnap = await db.collection('players').get();
+        log(`👥 Players trovati: ${playersSnap.size}`);
+        
+        // Check admins
+        const adminsSnap = await db.collection('admins').get();
+        log(`👑 Admins trovati: ${adminsSnap.size}`);
+        adminsSnap.forEach(doc => {
+          log(`  - Admin: ${doc.id}`);
+        });
+        
+        // Check existing leagues
+        const leaguesSnap = await db.collection('leagues').get();
+        log(`🏆 Leghe esistenti: ${leaguesSnap.size}`);
+        
+        if (leaguesSnap.size === 0) {
+          log('⚠️ Nessuna lega trovata. Procedere con creazione!', 'warning');
+        } else {
+          leaguesSnap.forEach(doc => {
+            const league = doc.data();
+            log(`  - Lega: ${league.name} (${doc.id})`);
+          });
+        }
+        
+        log('✅ Check completato', 'success');
+        
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+      }
+    }
+    
+    async function createFantaAthleticLeague() {
+      log('🏗️ Creazione lega "Fanta Athletic"...', 'warning');
+      
+      if (!currentUser) {
+        log('❌ Non autenticato!', 'error');
+        return;
+      }
+      
+      try {
+        // Check if already exists
+        const existingSnap = await db.collection('leagues')
+          .where('name', '==', 'Fanta Athletic')
+          .limit(1)
+          .get();
+        
+        if (!existingSnap.empty) {
+          const existingLeague = existingSnap.docs[0];
+          log(`⚠️ Lega "Fanta Athletic" già esistente: ${existingLeague.id}`, 'warning');
+          localStorage.setItem('last_league_id', existingLeague.id);
+          log(`✅ ID salvato in localStorage`, 'success');
+          return existingLeague.id;
+        }
+        
+        // Get all admins
+        const adminsSnap = await db.collection('admins').get();
+        const adminIds = adminsSnap.docs.map(doc => doc.id);
+        log(`👑 Admin trovati: ${adminIds.length}`);
+        
+        // Get all teams to count
+        const teamsSnap = await db.collection('teams').get();
+        const teamCount = teamsSnap.size;
+        
+        // Get all players to count
+        const playersSnap = await db.collection('players').get();
+        const playerCount = playersSnap.size;
+        
+        // Create league
+        const leagueData = {
+          name: 'Fanta Athletic',
+          type: 'multi',
+          season: '2024/2025',
+          createdBy: currentUser.uid,
+          createdAt: firebase.firestore.Timestamp.now(),
+          admins: adminIds,
+          members: adminIds, // Start with admins as members
+          inviteCode: generateInviteCode(),
+          status: 'active',
+          settings: {
+            sport: 'calcio',
+            formations: ['3-4-3', '3-5-2', '4-3-3', '4-4-2', '4-5-1', '5-3-2', '5-4-1'],
+            maxTeams: 20,
+            budgetPerTeam: 500,
+            enableTransfers: true,
+            scoringSystem: 'default',
+            usePlayerRatings: true,
+            defenseModifier: {
+              enabled: false
+            },
+            cupSystem: {
+              enabled: false
+            },
+            wildcard: {
+              enabled: true,
+              multiplier: 2.0,
+              usesPerSeason: 0,
+              maxPerMatchday: 1
+            }
+          },
+          stats: {
+            teamCount: teamCount,
+            playerCount: playerCount,
+            activeMembers: adminIds.length
+          }
+        };
+        
+        const docRef = await db.collection('leagues').add(leagueData);
+        log(`✅ Lega "Fanta Athletic" creata con ID: ${docRef.id}`, 'success');
+        log(`📋 Codice invito: ${leagueData.inviteCode}`);
+        log(`👥 Membri: ${adminIds.length}`);
+        log(`🏆 Squadre: ${teamCount}`);
+        log(`⚽ Giocatori: ${playerCount}`);
+        
+        // Save to localStorage
+        localStorage.setItem('last_league_id', docRef.id);
+        log(`✅ ID salvato in localStorage`, 'success');
+        
+        return docRef.id;
+        
+      } catch (error) {
+        log(`❌ Errore creazione lega: ${error.message}`, 'error');
+      }
+    }
+    
+    function generateInviteCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+    
+    async function migrateAllData() {
+      log('🚀 INIZIO MIGRAZIONE COMPLETA...', 'warning');
+      
+      try {
+        // Step 1: Create league
+        log('📋 Step 1: Creazione lega...', 'warning');
+        let leagueId = await createFantaAthleticLeague();
+        
+        if (!leagueId) {
+          // Get existing if already created
+          const existingSnap = await db.collection('leagues')
+            .where('name', '==', 'Fanta Athletic')
+            .limit(1)
+            .get();
+          
+          if (!existingSnap.empty) {
+            leagueId = existingSnap.docs[0].id;
+            log(`✅ Uso lega esistente: ${leagueId}`, 'success');
+          } else {
+            log('❌ Impossibile ottenere ID lega', 'error');
+            return;
+          }
+        }
+        
+        // Step 2: Migrate teams
+        log('📋 Step 2: Migrazione squadre...', 'warning');
+        const teamsSnap = await db.collection('teams').get();
+        
+        let teamsCount = 0;
+        for (const teamDoc of teamsSnap.docs) {
+          const teamData = teamDoc.data();
+          
+          // Copy to new location
+          await db.collection(`leagues/${leagueId}/teams`).doc(teamDoc.id).set({
+            ...teamData,
+            leagueId: leagueId,
+            migratedAt: firebase.firestore.Timestamp.now()
+          });
+          
+          teamsCount++;
+          log(`  ✅ Team migrato: ${teamData.name || teamDoc.id}`);
+        }
+        
+        log(`✅ ${teamsCount} squadre migrate`, 'success');
+        
+        // Step 3: Migrate players
+        log('📋 Step 3: Migrazione giocatori...', 'warning');
+        const playersSnap = await db.collection('players').get();
+        
+        let playersCount = 0;
+        const batchSize = 500;
+        let batch = db.batch();
+        let batchCount = 0;
+        
+        for (const playerDoc of playersSnap.docs) {
+          const playerData = playerDoc.data();
+          
+          const newPlayerRef = db.collection(`leagues/${leagueId}/players`).doc(playerDoc.id);
+          batch.set(newPlayerRef, {
+            ...playerData,
+            leagueId: leagueId,
+            migratedAt: firebase.firestore.Timestamp.now()
+          });
+          
+          batchCount++;
+          playersCount++;
+          
+          // Commit batch every 500
+          if (batchCount >= batchSize) {
+            await batch.commit();
+            log(`  ✅ Batch ${Math.floor(playersCount / batchSize)} completato (${playersCount} giocatori)`, 'success');
+            batch = db.batch();
+            batchCount = 0;
+          }
+        }
+        
+        // Commit remaining
+        if (batchCount > 0) {
+          await batch.commit();
+        }
+        
+        log(`✅ ${playersCount} giocatori migrati`, 'success');
+        
+        // Step 4: Update league stats
+        log('📋 Step 4: Aggiornamento statistiche lega...', 'warning');
+        await db.collection('leagues').doc(leagueId).update({
+          'stats.teamCount': teamsCount,
+          'stats.playerCount': playersCount
+        });
+        
+        log(`✅ Stats aggiornate`, 'success');
+        
+        // Step 5: Add team owners as members
+        log('📋 Step 5: Aggiunta proprietari squadre come membri...', 'warning');
+        const teamOwnersSet = new Set();
+        teamsSnap.forEach(doc => {
+          const ownerId = doc.data().ownerId || doc.data().userId;
+          if (ownerId) {
+            teamOwnersSet.add(ownerId);
+          }
+        });
+        
+        if (teamOwnersSet.size > 0) {
+          await db.collection('leagues').doc(leagueId).update({
+            members: firebase.firestore.FieldValue.arrayUnion(...Array.from(teamOwnersSet)),
+            'stats.activeMembers': firebase.firestore.FieldValue.increment(teamOwnersSet.size)
+          });
+          
+          log(`✅ ${teamOwnersSet.size} membri aggiunti`, 'success');
+        }
+        
+        log('🎊 MIGRAZIONE COMPLETATA CON SUCCESSO!', 'success');
+        log('✅ Puoi ora ricaricare l\'app e tutto funzionerà!', 'success');
+        
+        // Reload after 3 seconds
+        setTimeout(() => {
+          log('🔄 Ricarico pagina...', 'warning');
+          setTimeout(() => location.href = 'index.html', 1000);
+        }, 3000);
+        
+      } catch (error) {
+        log(`❌ ERRORE MIGRAZIONE: ${error.message}`, 'error');
+        console.error('Migration error:', error);
+      }
+    }
+  </script>
+</body>
+</html>

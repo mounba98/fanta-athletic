@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sblocca Formazioni - Temp Admin</title>
+  <link rel="stylesheet" href="resources/sheet.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    h1 { margin-bottom: 12px; }
+    .subtitle { color: #94a3b8; margin-bottom: 32px; }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #d91847, #b91846);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:disabled { background: #334155; cursor: not-allowed; }
+    .info {
+      background: rgba(34, 197, 94, 0.1);
+      border-left: 4px solid #22c55e;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .warning {
+      background: rgba(234, 179, 8, 0.1);
+      border-left: 4px solid #eab308;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: left;
+      color: #fef08a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⏰ Sblocca Formazioni</h1>
+    <p class="subtitle">Estendi deadline fino alle 21:15 di oggi</p>
+    
+    <div class="warning">
+      ⚠️ <strong>Solo Admin!</strong><br>
+      Questa pagina imposta la deadline a <strong>21:15 di OGGI</strong> per permettere a tutti di inserire/modificare le formazioni.
+    </div>
+    
+    <div id="status"></div>
+    
+    <div class="form-group">
+      <label>Giornata da sbloccare:</label>
+      <select id="giornataSelect" class="input" style="width:100%; padding:12px;">
+        <!-- popolato via JS -->
+      </select>
+    </div>
+    
+    <button class="btn" onclick="sblocca()">
+      🔓 Sblocca fino alle 21:15
+    </button>
+    
+    <button class="btn" style="background:#64748b; margin-top:20px;" onclick="window.location.href='admin.html'">
+      ← Torna ad Admin
+    </button>
+    
+    <div id="result"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    
+    let currentLeagueId = null;
+
+    // Auth + Admin check
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+
+      const adminDoc = await db.collection('admins').doc(user.uid).get();
+      if (!adminDoc.exists) {
+        alert('⚠️ Solo gli admin possono accedere a questa pagina!');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Wait for league
+      const checkLeague = setInterval(() => {
+        if (window.currentLeague && window.currentLeague.id) {
+          clearInterval(checkLeague);
+          currentLeagueId = window.currentLeague.id;
+          init();
+        }
+      }, 500);
+    });
+
+    function init() {
+      // Popola select giornate
+      const select = document.getElementById('giornataSelect');
+      let options = '';
+      for (let i = 1; i <= 38; i++) {
+        options += `<option value="${i}">Giornata ${i}</option>`;
+      }
+      select.innerHTML = options;
+      
+      // Pre-seleziona giornata 2 (giornata corrente)
+      select.value = '2';
+      
+      document.getElementById('status').innerHTML = `
+        <div class="info">
+          ✅ <strong>Lega caricata</strong><br>
+          Seleziona la giornata e clicca "Sblocca"
+        </div>
+      `;
+    }
+
+    async function sblocca() {
+      const giornata = document.getElementById('giornataSelect').value;
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = '⏳ Sblocco in corso...';
+      
+      try {
+        // Crea deadline: oggi alle 21:15
+        const today = new Date();
+        today.setHours(21);
+        today.setMinutes(15);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        
+        console.log('🔓 Setting deadline to:', today);
+        
+        await db.collection('leagues')
+          .doc(currentLeagueId)
+          .collection('deadlines')
+          .doc(`giornata_${giornata}`)
+          .set({
+            giornata: parseInt(giornata),
+            deadline: firebase.firestore.Timestamp.fromDate(today),
+            createdBy: firebase.auth().currentUser.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            note: 'Sbloccato temporaneamente fino alle 21:15'
+          });
+        
+        document.getElementById('result').innerHTML = `
+          <div class="info" style="margin-top:20px;">
+            ✅ <strong>SBLOCCATO!</strong><br>
+            Giornata ${giornata} ora aperta fino alle <strong>21:15 di oggi</strong>.<br><br>
+            Tutti gli utenti possono ora inserire/modificare le formazioni.
+          </div>
+        `;
+        
+        btn.textContent = '✅ Sbloccato!';
+        btn.style.background = '#22c55e';
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = `
+          <div style="background:rgba(239,68,68,0.1); border-left:4px solid #ef4444; padding:16px; border-radius:8px; margin-top:20px;">
+            ❌ <strong>Errore</strong><br>
+            ${error.message}
+          </div>
+        `;
+        btn.disabled = false;
+        btn.textContent = '🔓 Riprova';
+      }
+    }
+  </script>
+  
+  <!-- Carica league-selector per avere currentLeague -->
+  <script src="resources/league-selector.js?v=2025101905"></script>
+</body>
+</html>

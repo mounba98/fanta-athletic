@@ -1,0 +1,11 @@
+[
+  {
+    "origin": [
+      "https://fanta-athletic.web.app",
+      "https://fanta-athletic.firebaseapp.com"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "Authorization"]
+  }
+]

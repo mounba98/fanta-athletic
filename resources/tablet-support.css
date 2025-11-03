@@ -1,0 +1,134 @@
+/* Tablet Support - Portrait & Landscape */
+/* Version: 2025102002 */
+
+/* Tablet Portrait (600-1024px) - Usa navbar mobile */
+@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
+  /* Navbar come mobile */
+  header nav .nav-link {
+    display: none !important;
+  }
+  
+  .logo-left {
+    display: block !important;
+  }
+  
+  .hamburger-btn-right {
+    display: block !important;
+  }
+  
+  .theme-btn {
+    display: none !important;
+  }
+  
+  /* Attiva bottom nav anche su tablet portrait */
+  body.tablet-portrait .bottom-nav {
+    display: flex !important;
+  }
+  
+  body {
+    padding-bottom: 80px;
+  }
+}
+
+/* Tablet Landscape (1024px+ in landscape) - Supporto orizzontale */
+@media (min-width: 1024px) and (orientation: landscape) {
+  /* Navbar normale desktop */
+  header {
+    padding: 16px 40px;
+  }
+  
+  header nav .nav-link {
+    font-size: 14px;
+    gap: 6px;
+  }
+  
+  .nav-icon {
+    font-size: 18px;
+  }
+  
+  .nav-label {
+    font-size: 13px;
+  }
+  
+  /* Ottimizza layout per landscape */
+  .grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px;
+  }
+  
+  /* Dashboard più compatta */
+  #dashboardSection {
+    margin-bottom: 30px;
+  }
+  
+  #dashboardCarousel {
+    min-height: 300px !important;
+    padding: 24px !important;
+  }
+}
+
+/* Tablet Small Portrait (600-768px) */
+@media (min-width: 600px) and (max-width: 768px) and (orientation: portrait) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  header {
+    padding: 16px 20px;
+  }
+}
+
+/* Tablet Large Portrait (768-1024px) */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  header {
+    padding: 18px 30px;
+  }
+}
+
+/* Fix per Samsung Tablet S9 FE specifico */
+@media (min-width: 1024px) and (max-width: 1920px) and (orientation: landscape) {
+  /* Navbar ottimizzata */
+  header nav {
+    gap: 16px;
+  }
+  
+  header nav .nav-link {
+    padding: 8px 12px;
+  }
+  
+  /* Cards più compatte */
+  .section {
+    padding: 24px 18px;
+    min-height: 160px;
+  }
+  
+  .section h2 {
+    font-size: 20px;
+  }
+  
+  .section p {
+    font-size: 13px;
+  }
+}
+
+/* Auto-detect tablet e applica classi */
+@media (min-width: 600px) and (max-width: 1024px) {
+  body {
+    --tablet-mode: true;
+  }
+  
+  /* Forza scroll smooth */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Touch target più grandi */
+  button, a, .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

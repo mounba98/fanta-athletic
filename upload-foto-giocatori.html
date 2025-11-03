@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload Foto Giocatori - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+  <style>
+    .upload-container { max-width: 900px; margin: 0 auto; }
+    .upload-section { background: var(--card); border-radius: 12px; padding: 24px; margin: 20px 0; }
+    
+    .drop-zone {
+      border: 3px dashed rgba(0,0,0,0.2);
+      border-radius: 12px;
+      padding: 60px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(0,0,0,0.02);
+    }
+    
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--primary);
+      background: rgba(220, 20, 60, 0.05);
+    }
+    
+    .crop-container {
+      max-width: 100%;
+      max-height: 500px;
+      margin: 20px 0;
+      display: none;
+    }
+    
+    /* Circular cropper */
+    .cropper-view-box,
+    .cropper-face {
+      border-radius: 50% !important;
+    }
+    
+    .crop-container.active {
+      display: block;
+    }
+    
+    #cropImage {
+      max-width: 100%;
+      display: block;
+    }
+    
+    .crop-controls {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #b91846;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #218838;
+    }
+    
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    
+    .player-card {
+      background: rgba(0,0,0,0.03);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .player-photo {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid var(--primary);
+      margin-bottom: 8px;
+    }
+    
+    .player-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    
+    .player-role {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    
+    .delete-photo-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e53e3e;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      opacity: 0.8;
+      transition: all 0.2s;
+    }
+    
+    .delete-photo-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    
+    .spinner {
+      border: 3px solid rgba(0,0,0,0.1);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>📸 Upload Foto Giocatori</h1>
+  </header>
+
+  <main class="upload-container">
+    <div class="section">
+      <h2>Gestione Foto Giocatori</h2>
+      <p>Carica, ritaglia e gestisci le foto dei giocatori della tua lega.</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+      <h3>📤 Carica Nuova Foto</h3>
+      
+      <!-- Player Selector -->
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Seleziona Giocatore:</label>
+        <select id="playerSelector" class="search-box" style="cursor: pointer;">
+          <option value="">-- Caricamento giocatori... --</option>
+        </select>
+      </div>
+
+      <!-- Drop Zone -->
+      <div class="drop-zone" id="dropZone">
+        <div style="font-size: 48px; margin-bottom: 16px;">📷</div>
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+          Trascina un'immagine qui
+        </div>
+        <div style="font-size: 14px; color: var(--muted); margin-bottom: 16px;">
+          oppure clicca per selezionare
+        </div>
+        <div style="font-size: 12px; color: var(--muted);">
+          Formati: JPG, PNG (max 5MB)
+        </div>
+      </div>
+      
+      <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+
+      <!-- Crop Container -->
+      <div class="crop-container" id="cropContainer">
+        <h4 style="margin-bottom: 12px;">✂️ Ritaglia e Regola</h4>
+        <div style="background: #000; border-radius: 8px; overflow: hidden;">
+          <img id="cropImage" />
+        </div>
+        
+        <div class="crop-controls">
+          <button class="btn btn-secondary" onclick="cropper.zoom(0.1)">🔍 Zoom +</button>
+          <button class="btn btn-secondary" onclick="cropper.zoom(-0.1)">🔍 Zoom -</button>
+          <button class="btn btn-secondary" onclick="cropper.rotate(90)">🔄 Ruota</button>
+          <button class="btn btn-secondary" onclick="cropper.reset()">↺ Reset</button>
+          <button class="btn btn-success" onclick="saveCroppedImage()">✅ Salva Foto</button>
+          <button class="btn btn-secondary" onclick="cancelCrop()">✖ Annulla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Players Grid -->
+    <div class="upload-section">
+      <h3>👥 Giocatori con Foto</h3>
+      <input type="text" class="search-box" id="searchPlayers" placeholder="🔍 Cerca giocatore..." />
+      
+      <div id="loadingPlayers" class="loading">
+        <div class="spinner"></div>
+        Caricamento giocatori...
+      </div>
+      
+      <div id="playersGrid" class="preview-grid" style="display: none;">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </main>
+
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-3"></script>
+  <script>
+    // Init Firebase IMMEDIATAMENTE
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    window.storage = firebase.storage();
+  </script>
+
+  <script src="resources/app-init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  
+  <script>
+    let cropper = null;
+    let currentLeagueId = null;
+    let selectedPlayerId = null;
+    let allPlayers = [];
+
+    // Auth check + Admin only
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      // Check admin
+      try {
+        const adminDoc = await firebase.firestore().collection('admins').doc(user.uid).get();
+        if (!adminDoc.exists) {
+          alert('Solo gli admin possono accedere a questa pagina.');
+          window.location.href = 'index.html';
+          return;
+        }
+      } catch (e) {
+        console.error('Admin check failed:', e);
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Wait for league con timeout
+      let attempts = 0;
+      const maxAttempts = 20; // 10 secondi
+      const checkLeague = setInterval(() => {
+        attempts++;
+        console.log(`Tentativo ${attempts}: currentLeague =`, window.currentLeague);
+        
+        if (window.currentLeague && window.currentLeague.id) {
+          clearInterval(checkLeague);
+          currentLeagueId = window.currentLeague.id;
+          console.log('✅ League found:', currentLeagueId);
+          initUploadPage();
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkLeague);
+          console.error('❌ Timeout: currentLeague non trovata');
+          alert('Errore: nessuna lega trovata. Ricarica la pagina.');
+        }
+      }, 500);
+    });
+
+    async function initUploadPage() {
+      console.log('📸 Init upload page for league:', currentLeagueId);
+      
+      // Load players
+      await loadPlayers();
+      
+      // Setup drop zone
+      setupDropZone();
+      
+      // Search functionality
+      document.getElementById('searchPlayers').addEventListener('input', filterPlayers);
+    }
+
+    async function loadPlayers() {
+      try {
+        const db = firebase.firestore();
+        const snapshot = await db.collection('leagues')
+          .doc(currentLeagueId)
+          .collection('players')
+          .orderBy('cognome')
+          .get();
+
+        allPlayers = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        populatePlayerSelector();
+        renderPlayersGrid();
+        
+        document.getElementById('loadingPlayers').style.display = 'none';
+        document.getElementById('playersGrid').style.display = 'grid';
+      } catch (error) {
+        console.error('Error loading players:', error);
+        document.getElementById('loadingPlayers').innerHTML = '<div style="color: #e53e3e;">Errore caricamento giocatori</div>';
+      }
+    }
+
+    function populatePlayerSelector() {
+      const selector = document.getElementById('playerSelector');
+      selector.innerHTML = '<option value="">-- Seleziona un giocatore --</option>' +
+        allPlayers.map(p => `
+          <option value="${p.id}" data-player-id="${p.player_id || p.id}">${p.cognome || 'Sconosciuto'} ${p.nome || ''} (${p.ruolo || 'N/A'})</option>
+        `).join('');
+      
+      selector.addEventListener('change', (e) => {
+        selectedPlayerId = e.target.value;
+      });
+    }
+
+    function renderPlayersGrid(filterText = '') {
+      const grid = document.getElementById('playersGrid');
+      
+      const playersWithPhotos = allPlayers.filter(p => p.photoURL);
+      const filtered = filterText 
+        ? playersWithPhotos.filter(p => 
+            (p.cognome || '').toLowerCase().includes(filterText.toLowerCase()) ||
+            (p.nome || '').toLowerCase().includes(filterText.toLowerCase())
+          )
+        : playersWithPhotos;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px;">Nessun giocatore con foto</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(player => `
+        <div class="player-card">
+          <button class="delete-photo-btn" onclick="deletePhoto('${player.id}')" title="Elimina foto">✕</button>
+          <img src="${player.photoURL}" class="player-photo" alt="${player.cognome}" onerror="this.src='resources/logo.png'" />
+          <div class="player-name">${player.cognome || 'N/A'}</div>
+          <div class="player-role">${player.ruolo || 'N/A'}</div>
+        </div>
+      `).join('');
+    }
+
+    function filterPlayers() {
+      const filterText = document.getElementById('searchPlayers').value;
+      renderPlayersGrid(filterText);
+    }
+
+    function setupDropZone() {
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFileSelect(files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+    }
+
+    function handleFileSelect(file) {
+      if (!selectedPlayerId) {
+        alert('Seleziona prima un giocatore!');
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        alert('Seleziona un file immagine valido!');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File troppo grande! Max 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const cropImage = document.getElementById('cropImage');
+        
+        // Reset completo prima di caricare nuova immagine
+        if (cropper) {
+          cropper.destroy();
+          cropper = null;
+        }
+        
+        cropImage.src = e.target.result;
+        document.getElementById('cropContainer').classList.add('active');
+
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.8,
+          restore: false,
+          guides: true,
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false,
+          ready: function() {
+            // Force circular crop with CSS
+            const cropBox = this.cropper.cropBox;
+            cropBox.style.borderRadius = '50%';
+            cropBox.style.overflow = 'hidden';
+          }
+        });
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+   async function saveCroppedImage() {
+  if (!cropper || !selectedPlayerId) {
+    alert('Errore: nessuna immagine o giocatore selezionato');
+    return;
+  }
+
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert('Utente non autenticato, ricarica la pagina.');
+    return;
+  }
+
+  // 🔐 Aggiorna token ID per sicurezza
+  const token = await user.getIdToken(true);
+
+  try {
+    const canvas = cropper.getCroppedCanvas({
+      width: 400,
+      height: 400,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high'
+    });
+
+    canvas.toBlob(async (blob) => {
+      const storage = firebase.storage();
+      const fileRef = storage.ref(`players/${currentLeagueId}/${selectedPlayerId}.jpg`);
+
+      const metadata = {
+        contentType: 'image/jpeg',
+        customMetadata: {
+          uploader: user.uid,
+        }
+      };
+
+      // ✅ Passa esplicitamente il token di autenticazione
+      const uploadTask = fileRef.put(blob, metadata);
+
+      uploadTask.on('state_changed',
+        null,
+        (error) => {
+          console.error('Errore durante l\'upload:', error);
+          alert('❌ Upload fallito: ' + error.message);
+        },
+        async () => {
+          const photoURL = await fileRef.getDownloadURL();
+
+          // 🔄 Aggiorna Firestore in ENTRAMBE le collections
+          const db = firebase.firestore();
+          
+          // 1. Salva in /leagues/{leagueId}/players/{playerId}
+          await db.collection('leagues')
+            .doc(currentLeagueId)
+            .collection('players')
+            .doc(selectedPlayerId)
+            .update({ photoURL });
+          
+          // 2. Recupera dati completi giocatore
+          const playerDoc = await db.collection('leagues')
+            .doc(currentLeagueId)
+            .collection('players')
+            .doc(selectedPlayerId)
+            .get();
+          
+          const playerData = playerDoc.data();
+          
+          // 3. Salva in /players/{playerId} con TUTTI i campi base
+          await db.collection('players')
+            .doc(selectedPlayerId)
+            .set({ 
+              photoURL,
+              nome_completo: playerData.cognome || playerData.nome_completo || playerData.nome || 'Sconosciuto',
+              ruolo: playerData.ruolo || 'N/A',
+              active: playerData.active ?? true,
+              squadra_reale: playerData.squadra_reale || playerData.team || null
+            }, { merge: true });
+          
+          console.log('✅ Foto e dati salvati in entrambe le collections');
+
+          alert('✅ Foto salvata con successo!');
+          cancelCrop();
+          document.getElementById('playerSelector').value = '';
+          selectedPlayerId = null;
+          await loadPlayers();
+        }
+      );
+    }, 'image/jpeg', 0.9);
+  } catch (error) {
+    console.error('❌ Errore generale:', error);
+    alert('Errore durante il salvataggio: ' + error.message);
+  }
+}
+
+
+    function cancelCrop() {
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      document.getElementById('cropContainer').classList.remove('active');
+      document.getElementById('fileInput').value = '';
+      document.getElementById('cropImage').src = '';
+      // Non resettare selectedPlayerId per permettere upload multipli sullo stesso giocatore
+    }
+
+    async function deletePhoto(playerId) {
+      if (!confirm('Sei sicuro di voler eliminare questa foto?')) return;
+
+      try {
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Get player data first
+        const playerDoc = await db.collection('leagues')
+          .doc(currentLeagueId)
+          .collection('players')
+          .doc(playerId)
+          .get();
+
+        const photoURL = playerDoc.data().photoURL;
+
+        // Delete from Storage
+        if (photoURL) {
+          try {
+            const fileRef = storage.refFromURL(photoURL);
+            await fileRef.delete();
+          } catch (e) {
+            console.warn('Storage delete error (maybe already deleted):', e);
+          }
+        }
+
+        // Remove from Firestore (ENTRAMBE le collections)
+        
+        // 1. Rimuovi da /leagues/{leagueId}/players/{playerId}
+        await db.collection('leagues')
+          .doc(currentLeagueId)
+          .collection('players')
+          .doc(playerId)
+          .update({ photoURL: firebase.firestore.FieldValue.delete() });
+        
+        // 2. Rimuovi ANCHE da /players/{playerId}
+        await db.collection('players')
+          .doc(playerId)
+          .update({ photoURL: firebase.firestore.FieldValue.delete() });
+        
+        console.log('✅ Foto cancellata da entrambe le collections');
+
+        alert('✅ Foto eliminata!');
+
+        // Reload
+        await loadPlayers();
+      } catch (error) {
+        console.error('Error deleting photo:', error);
+        alert('❌ Errore durante l\'eliminazione: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

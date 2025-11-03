@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔧 Admin Hub | Athletic Brescia</title>
+  <link rel="icon" href="resources/favicon.ico">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      border-radius: 16px;
+      margin-bottom: 30px;
+    }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    
+    .container { max-width: 1400px; margin: 0 auto; }
+    
+    .category {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #2d6cdf;
+    }
+    
+    .category-icon {
+      font-size: 2.5rem;
+    }
+    
+    .category-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    
+    .category-desc {
+      color: #64748b;
+      margin-top: 5px;
+    }
+    
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .card {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 4px solid #2d6cdf;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(45,108,223,0.2);
+    }
+    
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+    
+    .card-desc {
+      font-size: 0.9rem;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    
+    .card-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: #2d6cdf;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    .card-link:hover {
+      text-decoration: underline;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    
+    .badge-new { background: #10b981; color: white; }
+    .badge-important { background: #ef4444; color: white; }
+    .badge-legacy { background: #6b7280; color: white; }
+    
+    .danger { border-left-color: #ef4444; }
+    .warning { border-left-color: #f59e0b; }
+    .success { border-left-color: #10b981; }
+    .info { border-left-color: #3b82f6; }
+    .purple { border-left-color: #8b5cf6; }
+    
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.8rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>🔧 Admin Central Hub</h1>
+    <p>Pannello di Controllo Athletic Brescia</p>
+  </div>
+
+  <div class="container">
+    
+    <!-- ========== SETUP INIZIALE ========== -->
+    <div class="category">
+      <div class="category-header">
+        <div class="category-icon">⚙️</div>
+        <div>
+          <div class="category-title">Setup Iniziale <span class="badge badge-important">IMPORTANTE</span></div>
+          <div class="category-desc">Configurazioni base da fare UNA VOLTA</div>
+        </div>
+      </div>
+      
+      <div class="cards-grid">
+        <div class="card danger" onclick="window.location='admin-setup.html'">
+          <div class="card-title">🔥 Setup Database</div>
+          <div class="card-desc">Upload regole, setup contest, calendario. Fai questo PRIMA di tutto!</div>
+          <a href="admin-setup.html" class="card-link">Apri Setup →</a>
+        </div>
+        
+        <div class="card warning" onclick="window.open('https://console.firebase.google.com/project/fanta-athletic/firestore/rules')">
+          <div class="card-title">🔐 Firestore Rules</div>
+          <div class="card-desc">Configura permessi database (già fatto se admin-calendario funziona)</div>
+          <a href="https://console.firebase.google.com/project/fanta-athletic/firestore/rules" target="_blank" class="card-link">Firebase Console →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CALENDARIO & CONTEST ========== -->
+    <div class="category">
+      <div class="category-header">
+        <div class="category-icon">📅</div>
+        <div>
+          <div class="category-title">Calendario & Contest <span class="badge badge-new">NUOVO</span></div>
+          <div class="category-desc">Gestione partite reali Athletic e pronostici</div>
+        </div>
+      </div>
+      
+      <div class="cards-grid">
+        <div class="card success" onclick="window.location='admin-calendario.html'">
+          <div class="card-title">📆 Gestione Calendario</div>
+          <div class="card-desc">Aggiungi partite Athletic, inserisci risultati, sync con contest</div>
+          <a href="admin-calendario.html" class="card-link">Gestisci →</a>
+        </div>
+        
+        <div class="card info" onclick="window.location='calendario-athletic.html'">
+          <div class="card-title">👁️ Vista Calendario Pubblico</div>
+          <div class="card-desc">Vedi come gli utenti vedono il calendario partite</div>
+          <a href="calendario-athletic.html" class="card-link">Visualizza →</a>
+        </div>
+        
+        <div class="card info" onclick="window.location='contest-leaderboard.html'">
+          <div class="card-title">🏆 Classifica Contest</div>
+          <div class="card-desc">Verifica punti e posizioni utenti nel contest pronostici</div>
+          <a href="contest-leaderboard.html" class="card-link">Classifica →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== FANTACALCIO ========== -->
+    <div class="category">
+      <div class="category-header">
+        <div class="category-icon">⚽</div>
+        <div>
+          <div class="category-title">Gestione Fantacalcio</div>
+          <div class="category-desc">Squadre, giocatori, giornate, risultati</div>
+        </div>
+      </div>
+      
+      <div class="cards-grid">
+        <div class="card" onclick="window.location='admin-squadre.html'">
+          <div class="card-title">👥 Gestione Squadre</div>
+          <div class="card-desc">Crea squadre, assegna allenatori, gestisci rose</div>
+          <a href="admin-squadre.html" class="card-link">Gestisci →</a>
+        </div>
+        
+        <div class="card" onclick="window.location='admin-players.html'">
+          <div class="card-title">🏃 Gestione Giocatori Completa</div>
+          <div class="card-desc">CRUD giocatori, stats, import/export, foto</div>
+          <a href="admin-players.html" class="card-link">Gestisci →</a>
+        </div>
+        
+        <div class="card" onclick="window.location='admin-giornate.html'">
+          <div class="card-title">📅 Gestione Giornate</div>
+          <div class="card-desc">Crea giornate, scontri, calcola punteggi fanta</div>
+          <a href="admin-giornate.html" class="card-link">Gestisci →</a>
+        </div>
+        
+        <div class="card purple" onclick="window.location='admin-rules.html'">
+          <div class="card-title">⚖️ Regole Bonus/Malus</div>
+          <div class="card-desc">Modifica punteggi regole, attiva/disattiva</div>
+          <a href="admin-rules.html" class="card-link">Gestisci →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== UTILITY & TOOLS ========== -->
+    <div class="category">
+      <div class="category-header">
+        <div class="category-icon">🛠️</div>
+        <div>
+          <div class="category-title">Utility & Tools</div>
+          <div class="category-desc">Strumenti admin e manutenzione</div>
+        </div>
+      </div>
+      
+      <div class="cards-grid">
+        <div class="card success" onclick="window.location='force-update.html'">
+          <div class="card-title">🔄 Force Update <span class="badge badge-new">NUOVO</span></div>
+          <div class="card-desc">Forza refresh cache su tutti i dispositivi dopo deploy</div>
+          <a href="force-update.html" class="card-link">Force Update →</a>
+        </div>
+        
+        <div class="card warning" onclick="window.location='sblocca-formazioni-temp.html'">
+          <div class="card-title">🔓 Sblocco Formazioni Rapido</div>
+          <div class="card-desc">Estendi deadline formazioni fino alle 21:15 oggi</div>
+          <a href="sblocca-formazioni-temp.html" class="card-link">Sblocca →</a>
+        </div>
+        
+        <div class="card" onclick="window.location='admin-deadline.html'">
+          <div class="card-title">⏰ Gestione Deadline</div>
+          <div class="card-desc">Imposta deadline per ogni giornata con preset</div>
+          <a href="admin-deadline.html" class="card-link">Gestisci →</a>
+        </div>
+        
+        <div class="card success" onclick="window.location='upload-foto-giocatori.html'">
+          <div class="card-title">📸 Upload Foto Giocatori</div>
+          <div class="card-desc">Carica foto profilo con drag & drop e crop</div>
+          <a href="upload-foto-giocatori.html" class="card-link">Upload →</a>
+        </div>
+        
+        <div class="card info" onclick="window.location='verifica-squadre-utenti.html'">
+          <div class="card-title">✅ Verifica Squadre Utenti</div>
+          <div class="card-desc">Vedi utenti senza squadra e assegna rapidamente</div>
+          <a href="verifica-squadre-utenti.html" class="card-link">Verifica →</a>
+        </div>
+        
+        <div class="card purple" onclick="window.location='upload-rules-to-firestore.html'">
+          <div class="card-title">📋 Upload Regole <span class="badge badge-legacy">LEGACY</span></div>
+          <div class="card-desc">Tool specifico upload regole (ora in admin-setup)</div>
+          <a href="upload-rules-to-firestore.html" class="card-link">Upload →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CONSOLE & DEBUG ========== -->
+    <div class="category">
+      <div class="category-header">
+        <div class="category-icon">🐛</div>
+        <div>
+          <div class="category-title">Console & Debug</div>
+          <div class="category-desc">Debug, logs, monitoring</div>
+        </div>
+      </div>
+      
+      <div class="cards-grid">
+        <div class="card danger" onclick="window.open('https://console.firebase.google.com/project/fanta-athletic/firestore')">
+          <div class="card-title">🔥 Firestore Console</div>
+          <div class="card-desc">Accedi database Firestore per modifiche manuali</div>
+          <a href="https://console.firebase.google.com/project/fanta-athletic/firestore" target="_blank" class="card-link">Apri →</a>
+        </div>
+        
+        <div class="card info" onclick="window.location='admin-debug.html'">
+          <div class="card-title">🔍 Debug & Monitor</div>
+          <div class="card-desc">Monitora errori, performance, stato sistema</div>
+          <a href="admin-debug.html" class="card-link">Debug →</a>
+        </div>
+        
+        <div class="card" onclick="window.location='test-foto-live.html'">
+          <div class="card-title">📸 Test Foto Live</div>
+          <div class="card-desc">Verifica foto giocatori nel database</div>
+          <a href="test-foto-live.html" class="card-link">Test →</a>
+        </div>
+        
+        <div class="card warning" onclick="window.location='clear-sw.html'">
+          <div class="card-title">🗑️ Clear Service Worker</div>
+          <div class="card-desc">Pulisci cache SW se app non si aggiorna</div>
+          <a href="clear-sw.html" class="card-link">Clear →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

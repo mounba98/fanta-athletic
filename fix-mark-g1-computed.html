@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fix G1 Computed</title>
+</head>
+<body>
+  <h1>🔧 Mark G1 as Computed</h1>
+  <button id="fixBtn" style="padding:15px 30px;font-size:18px;cursor:pointer;">
+    Mark G1 as Computed
+  </button>
+  <div id="log" style="margin-top:20px;font-family:monospace;"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDnQMuPvx_Gr8VjBJf_Hrx39O8w2dm67co",
+        authDomain: "fanta-athletic.firebaseapp.com",
+        projectId: "fanta-athletic",
+        storageBucket: "fanta-athletic.firebasestorage.app",
+        messagingSenderId: "845950461193",
+        appId: "1:845950461193:web:04475bb0eaa2dc459a9fd8"
+      });
+    }
+    const db = firebase.firestore();
+    
+    function log(msg) {
+      document.getElementById('log').innerHTML += msg + '<br>';
+    }
+    
+    document.getElementById('fixBtn').onclick = async () => {
+      log('⏳ Checking G1...');
+      
+      const doc = await db.collection('days').doc('G1').get();
+      
+      if (!doc.exists) {
+        log('❌ G1 does not exist!');
+        return;
+      }
+      
+      const data = doc.data();
+      log('Current G1 data: ' + JSON.stringify(data));
+      
+      if (data.computed === true) {
+        log('✅ G1 already marked as computed!');
+        return;
+      }
+      
+      log('⚡ Marking G1 as computed...');
+      
+      await db.collection('days').doc('G1').update({
+        computed: true,
+        computed_at: new Date().toISOString()
+      });
+      
+      log('✅ G1 now marked as computed!');
+      log('🔄 Refresh squadre.html to see G2 selected');
+    };
+  </script>
+</body>
+</html>

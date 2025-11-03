@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Foto Live - Fanta Athletic</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    .player-card {
+      background: #1e293b;
+      padding: 16px;
+      margin: 12px 0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-left: 4px solid #3b82f6;
+    }
+    .player-card.has-photo {
+      border-left-color: #10b981;
+    }
+    .player-card.no-photo {
+      border-left-color: #ef4444;
+    }
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #334155;
+    }
+    .info {
+      flex: 1;
+    }
+    .name {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .url {
+      font-size: 12px;
+      color: #94a3b8;
+      word-break: break-all;
+    }
+    .status {
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .status.ok {
+      background: #10b981;
+      color: white;
+    }
+    .status.fail {
+      background: #ef4444;
+      color: white;
+    }
+    button {
+      background: #dc143c;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #b91846;
+    }
+    .header {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .stat {
+      display: inline-block;
+      margin: 0 20px 10px 0;
+      font-size: 18px;
+    }
+    .stat strong {
+      color: #00ff00;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 style="margin: 0 0 16px 0;">🔍 Test Foto Live</h1>
+    <p style="margin: 0 0 16px 0; color: #94a3b8;">
+      Verifica quali giocatori hanno foto nel DB e se le foto si caricano correttamente
+    </p>
+    <button onclick="testPhotos()">🔄 Testa Foto</button>
+    <button onclick="clearCache()">🗑️ Pulisci Cache Immagini</button>
+    <div id="stats" style="margin-top: 16px;"></div>
+  </div>
+
+  <div id="results"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    async function testPhotos() {
+      const results = document.getElementById('results');
+      const stats = document.getElementById('stats');
+      
+      results.innerHTML = '<p style="text-align:center;">⏳ Caricamento giocatori...</p>';
+      
+      try {
+        const snap = await db.collection('players').get();
+        const players = snap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        console.log('📊 Players loaded:', players.length);
+        console.log('📋 First player sample:', players[0]);
+        
+        let withPhoto = 0;
+        let withoutPhoto = 0;
+        let photoLoadOk = 0;
+        let photoLoadFail = 0;
+
+        results.innerHTML = '';
+
+        for (const player of players) {
+          const hasPhoto = !!player.photoURL;
+          
+          if (hasPhoto) {
+            withPhoto++;
+          } else {
+            withoutPhoto++;
+          }
+
+          const card = document.createElement('div');
+          card.className = `player-card ${hasPhoto ? 'has-photo' : 'no-photo'}`;
+          
+          if (hasPhoto) {
+            // Test caricamento foto
+            const img = new Image();
+            img.src = player.photoURL;
+            
+            const statusSpan = document.createElement('span');
+            statusSpan.className = 'status';
+            statusSpan.textContent = '⏳ Caricamento...';
+            
+            img.onload = () => {
+              statusSpan.className = 'status ok';
+              statusSpan.textContent = '✅ Caricata';
+              photoLoadOk++;
+              updateStats();
+            };
+            
+            img.onerror = () => {
+              statusSpan.className = 'status fail';
+              statusSpan.textContent = '❌ Errore caricamento';
+              photoLoadFail++;
+              updateStats();
+            };
+
+            card.innerHTML = `
+              <img src="${player.photoURL}" alt="${player.nome_completo}" />
+              <div class="info">
+                <div class="name">${player.nome_completo || 'Nome sconosciuto'}</div>
+                <div class="url">📎 ${player.photoURL}</div>
+              </div>
+            `;
+            card.appendChild(statusSpan);
+          } else {
+            card.innerHTML = `
+              <div style="width:60px;height:60px;border-radius:50%;background:#334155;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#94a3b8;">
+                ${(player.nome_completo || '??').substring(0,2).toUpperCase()}
+              </div>
+              <div class="info">
+                <div class="name">${player.nome_completo || 'Nome sconosciuto'}</div>
+                <div class="url">❌ Nessuna foto nel DB</div>
+              </div>
+              <span class="status fail">No Photo</span>
+            `;
+          }
+
+          results.appendChild(card);
+        }
+
+        function updateStats() {
+          stats.innerHTML = `
+            <div class="stat">📊 Totale: <strong>${players.length}</strong></div>
+            <div class="stat">✅ Con foto: <strong>${withPhoto}</strong></div>
+            <div class="stat">❌ Senza foto: <strong>${withoutPhoto}</strong></div>
+            <div class="stat">🖼️ Caricate OK: <strong>${photoLoadOk}</strong></div>
+            <div class="stat">⚠️ Errori: <strong>${photoLoadFail}</strong></div>
+            <div class="stat">📈 Percentuale: <strong>${((withPhoto/players.length)*100).toFixed(1)}%</strong></div>
+          `;
+        }
+
+        updateStats();
+
+      } catch (error) {
+        console.error('Error loading players:', error);
+        results.innerHTML = `<p style="color:#ef4444;text-align:center;">❌ Errore: ${error.message}</p>`;
+      }
+    }
+
+    function clearCache() {
+      // Force reload all images
+      const images = document.querySelectorAll('img');
+      images.forEach(img => {
+        const src = img.src;
+        img.src = '';
+        img.src = src + '?t=' + Date.now();
+      });
+      
+      alert('🗑️ Cache immagini pulita! Le foto si ricaricheranno.');
+    }
+
+    // Auto-load on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      testPhotos();
+    });
+  </script>
+</body>
+</html>

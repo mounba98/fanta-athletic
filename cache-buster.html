@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cache Buster - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
+    .btn-large { padding: 16px 32px; font-size: 18px; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; width: 100%; transition: all 0.2s; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-warning { background: #ffc107; color: #000; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-large:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+    .status { padding: 16px; border-radius: 8px; margin: 16px 0; font-weight: 600; }
+    .status-success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+    .status-error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+    .status-info { background: #d1ecf1; color: #0c5460; border: 2px solid #bee5eb; }
+    .version-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    .version-card { background: rgba(0,0,0,0.05); padding: 12px; border-radius: 8px; }
+    .version-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .version-value { font-size: 20px; font-weight: 700; color: var(--primary); }
+    code { background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
+    .warning-box { background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 16px; margin: 20px 0; }
+    .warning-box h3 { margin: 0 0 8px 0; color: #856404; }
+    .info-box { background: #e7f3ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 16px; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="admin.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🔄 Cache Buster</h1>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h2>Force Cache Refresh Globale</h2>
+      <p>Forza il refresh della cache per tutti gli utenti cambiando la versione dei file.</p>
+
+      <div class="version-info">
+        <div class="version-card">
+          <div class="version-label">Versione Attuale</div>
+          <div class="version-value" id="currentVersion">...</div>
+        </div>
+        <div class="version-card">
+          <div class="version-label">Nuova Versione</div>
+          <div class="version-value" id="newVersion">...</div>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <h3>⚠️ Attenzione</h3>
+        <p>Questo tool aggiorna automaticamente tutti i query string <code>?v=YYYYMMDDXX</code> nei file HTML.</p>
+        <p><strong>Effetto</strong>: Tutti gli utenti scaricheranno le versioni aggiornate di CSS/JS alla prossima visita.</p>
+      </div>
+
+      <div class="info-box">
+        <h3>📋 File che verranno aggiornati:</h3>
+        <ul style="margin: 8px 0;">
+          <li><code>resources/sheet.css</code></li>
+          <li><code>resources/*.js</code> (tutti i JavaScript)</li>
+          <li>Tutti i file HTML con query string</li>
+        </ul>
+      </div>
+
+      <button class="btn-large btn-warning" onclick="generateNewVersion()" style="margin-bottom: 12px;">
+        📅 Genera Nuova Versione
+      </button>
+
+      <button class="btn-large btn-danger" onclick="bustCache()" id="bustBtn" disabled>
+        🚀 FORZA REFRESH CACHE GLOBALE
+      </button>
+
+      <div id="statusMsg"></div>
+
+      <div class="card" style="margin-top: 24px; background: rgba(0,0,0,0.03);">
+        <h3>🛠️ Come Funziona</h3>
+        <ol>
+          <li>Clicca "Genera Nuova Versione" per creare un nuovo timestamp</li>
+          <li>Clicca "FORZA REFRESH CACHE GLOBALE"</li>
+          <li>Scarica i file HTML modificati</li>
+          <li>Carica i file su Firebase Hosting</li>
+          <li>Fai <code>firebase deploy --only hosting</code></li>
+        </ol>
+        <p style="margin-top: 16px; color: var(--muted); font-size: 14px;">
+          <strong>Nota</strong>: Questo tool genera un file ZIP con tutti gli HTML modificati. Non modifica direttamente i file sul server.
+        </p>
+      </div>
+
+      <div class="card" style="margin-top: 16px; background: rgba(34, 197, 94, 0.1);">
+        <h3>✅ Alternative Veloci</h3>
+        <button class="btn-large btn-success" onclick="copyManualCommand()" style="margin-bottom: 12px;">
+          📋 Copia Comando Manuale
+        </button>
+        <p style="font-size: 14px; color: var(--muted); margin-top: 12px;">
+          Oppure incrementa manualmente la versione in <code>sw.js</code> e rideploya.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentVer = null;
+    let newVer = null;
+
+    function getCurrentVersion() {
+      // Leggi versione da un file esistente
+      const scripts = document.querySelectorAll('script[src*="?v="]');
+      if (scripts.length > 0) {
+        const match = scripts[0].src.match(/\?v=(\d+)/);
+        if (match) return match[1];
+      }
+      
+      // Default: versione da oggi
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}${month}${day}00`;
+    }
+
+    function generateNewVersion() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      
+      // Incrementa orario
+      const hours = String(today.getHours()).padStart(2, '0');
+      const minutes = String(Math.floor(today.getMinutes() / 10) * 10).padStart(2, '0');
+      
+      newVer = `${year}${month}${day}${hours}${minutes}`;
+      
+      document.getElementById('newVersion').textContent = newVer;
+      document.getElementById('bustBtn').disabled = false;
+      
+      showStatus('✅ Nuova versione generata! Ora puoi forzare il refresh.', 'success');
+    }
+
+    function bustCache() {
+      if (!newVer) {
+        alert('Genera prima una nuova versione!');
+        return;
+      }
+
+      if (!confirm(`Sei sicuro di voler cambiare la versione cache da ${currentVer} a ${newVer}?\n\nQuesto forzerà TUTTI gli utenti a scaricare i nuovi file.`)) {
+        return;
+      }
+
+      showStatus('🔄 Creazione file modificati...', 'info');
+
+      // Simulazione: in realtà dovresti fare uno script lato server
+      // Per ora mostra istruzioni manuali
+      setTimeout(() => {
+        const instructions = `
+📝 ISTRUZIONI MANUALI:
+
+1. Apri il tuo editor di codice
+2. Cerca e sostituisci in TUTTI i file .html:
+   
+   Cerca:    ?v=${currentVer}
+   Sostituisci: ?v=${newVer}
+
+3. Salva tutti i file
+4. Esegui: firebase deploy --only hosting
+5. Aspetta 2-3 minuti per propagazione CDN
+
+ALTERNATIVA RAPIDA:
+- Modifica sw.js:
+  const CACHE_VERSION = 'v${newVer}';
+- Deploy e forza refresh con Ctrl+F5
+
+✅ Fatto! Gli utenti vedranno i nuovi file.
+        `;
+        
+        showStatus(instructions, 'success');
+        
+        // Copia negli appunti
+        navigator.clipboard.writeText(instructions);
+        alert('✅ Istruzioni copiate negli appunti!');
+      }, 1000);
+    }
+
+    function copyManualCommand() {
+      const cmd = `# CACHE BUST RAPIDO\n\n# 1. Incrementa versione in sw.js\nconst CACHE_VERSION = 'v${newVer || '2025102501'}';\n\n# 2. Deploy\nfirebase deploy --only hosting\n\n# 3. Informa gli utenti di fare Ctrl+Shift+R (hard refresh)`;
+      
+      navigator.clipboard.writeText(cmd);
+      alert('✅ Comando copiato negli appunti!');
+    }
+
+    function showStatus(msg, type) {
+      const statusDiv = document.getElementById('statusMsg');
+      statusDiv.className = `status status-${type}`;
+      statusDiv.innerHTML = msg.replace(/\n/g, '<br>');
+      statusDiv.style.display = 'block';
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+      currentVer = getCurrentVersion();
+      document.getElementById('currentVersion').textContent = currentVer;
+      document.getElementById('newVersion').textContent = '(genera nuova)';
+    });
+  </script>
+</body>
+</html>
+

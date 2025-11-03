@@ -1,0 +1,966 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Giornate</title>
+  <meta name="description" content="Inserimento punteggi per Giornata." />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .layout { display: grid; grid-template-columns: minmax(320px, 1fr) 2fr; gap: 20px; }
+    .sidebar, .panel { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .tab { padding: 10px 16px; font-weight: 700; border-radius: 999px; border: 2px solid #c7d1db; background:#fff; cursor:pointer; }
+    .tab.active { background:#e8f3fc; border-color: var(--primary); color: var(--primary); box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
+    .rule { display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 6px 0; border-bottom:1px dashed #eee; }
+    .rule:last-child { border-bottom: 0; }
+    .chip { padding: 6px 10px; border-radius: 999px; border: 1px solid #dbe1e8; background: #fff; cursor: pointer; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .list { display:grid; gap:8px; }
+    .item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border:1px solid #ccd6e0; border-radius:10px; cursor:pointer; background:#fff; }
+    .item:hover { box-shadow: 0 0 0 3px var(--ring); background:#f7fbff; }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 1100px){ .layout { grid-template-columns: 1fr; } }
+
+    /* Players tab enhancements */
+    .role-title { margin:12px 0 6px; font-weight:800; letter-spacing:.2px; color:#14212e; }
+    .players-wrap { display:grid; grid-template-columns: minmax(260px, 1fr) 2fr; gap: 16px; align-items:start; }
+    #plist, #pdetail { max-height: calc(100vh - 260px); overflow:auto; }
+    .filters { display:flex; gap:6px; flex-wrap:wrap; }
+    .chip.toggle { user-select:none; }
+    .chip.on { background:#1f87e6; color:#fff; border-color:#1f87e6; }
+    /* Accordion ruoli */
+    .role-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; background:#fff; }
+    .role-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:800; }
+    .role-body { display:grid; gap:8px; margin-top:6px; }
+    .role-section.collapsed .role-body { display:none; }
+    /* Accordion gruppi (Bonus/Malus) */
+    .group-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; background:#fff; margin-bottom:8px; }
+    .group-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:800; }
+    .group-body { display:grid; gap:8px; margin-top:6px; }
+    .group-section.collapsed .group-body { display:none; }
+    /* Curva layout */
+    .curva-wrap { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    .curva-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; background:#fff; }
+    .curva-header { font-weight:800; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+    .curva-body { display:grid; gap:6px; }
+    .curva-section.collapsed .curva-body { display:none; }
+    /* Dark theme refined */
+    :root.dark { --card:#1b2430; --muted:#9fb0c0; --ring:rgba(52,152,219,0.15); }
+    :root.dark body { background:#111723; color:#e6eef6; }
+    :root.dark .item { background:#1b2430; border-color:#2a3642; }
+    :root.dark .panel, :root.dark .sidebar { background:#1b2430; }
+    :root.dark .chip { background:#223043; border-color:#304155; color:#e6eef6; }
+    :root.dark .chip.on { background:#2c7bd7; border-color:#2c7bd7; color:#fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Giornata</h1>
+    <nav class="nav" style="display:flex; align-items:center; gap:12px;">
+      <a href="index.html">Home</a>
+      <a href="matchday.html" aria-current="page">Giornate</a>
+      <a href="standings.html">Classifica</a>
+      <a href="squadre.html">Squadre</a>
+      <a href="statistiche.html">Statistiche</a>
+      <a href="auth.html">Accedi</a>
+      <span style="flex:1"></span>
+      <button id="themeToggle" class="btn btn-secondary">Tema</button>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <section class="sidebar">
+      <div class="grid2">
+        <label>
+          <div class="muted">Seleziona giornata</div>
+          <select id="giornata" style="width:100%; padding:8px; border:1px solid #dbe1e8; border-radius:8px;"></select>
+        </label>
+        <label>
+          <div class="muted">Data</div>
+          <input id="data" type="date" style="width:100%; padding:8px; border:1px solid #dbe1e8; border-radius:8px;" />
+        </label>
+      </div>
+      <div id="adminRow" class="row" style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+        <div class="muted">Modalità admin: <strong id="adminStatus">Disattivata</strong></div>
+        <button class="btn btn-secondary" id="toggleAdmin">Entra admin</button>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="players">Giocatori</button>
+        <button class="tab" data-tab="coaches">Allenatori</button>
+        <button class="tab" data-tab="curva">Curva</button>
+        <button class="tab" data-tab="squads">Squadre</button>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="muted">Riepilogo (senza squadre)</div>
+        <div id="summary" class="list" style="margin-top:6px;"></div>
+      </div>
+      <div id="saveRow" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn" id="saveAll">Salva giornata</button>
+        <button class="btn btn-secondary" id="resetAll">Reset giornata</button>
+        <button class="btn btn-secondary" id="setDir">Imposta cartella salvataggi</button>
+      </div>
+      <div id="uploadRow" style="margin-top:10px; display:grid; gap:8px;">
+        <label class="row" style="gap:8px;">
+          <input id="autoUpload" type="checkbox" />
+          <span class="muted">Invia automaticamente i dati a un endpoint dopo il salvataggio</span>
+        </label>
+        <input id="uploadUrl" placeholder="https://example.com/webhook" class="input" />
+      </div>
+      <div id="adminTools" style="margin-top:10px; display:none;">
+        <div class="muted" style="font-weight:800; margin-bottom:6px;">Admin • Giocatori</div>
+        <div class="grid2" style="margin-bottom:6px;">
+          <input id="admName" class="input" placeholder="Nome completo" />
+          <select id="admRole" class="input">
+            <option>Portiere</option>
+            <option>Difensore</option>
+            <option>Centrocampista</option>
+            <option>Attaccante</option>
+          </select>
+        </div>
+        <div class="grid2" style="margin-bottom:6px;">
+          <input id="admNick" class="input" placeholder="Soprannome (opzionale)" />
+          <button id="admAddPlayer" class="btn">Aggiungi</button>
+        </div>
+        <div class="grid2" style="margin-bottom:6px;">
+          <select id="admDelSel" class="input"></select>
+          <button id="admDelPlayer" class="btn btn-secondary">Rimuovi</button>
+        </div>
+        <div class="row" style="gap:8px;">
+          <button id="admImportPlayers" class="btn btn-secondary">Importa base in Firestore</button>
+          <span id="admMsg" class="muted"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div id="panelContent"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+  </footer>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/rules-loader.js?v=2025110301"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+    const state = {
+      giornata: 'G1',
+      data: '',
+      players: [],
+      rules: [],
+      coaches: [],
+      // selections scoped per giornata
+      selPlayers: {},
+      selCoaches: {},
+      selCurva: {},
+      tab: 'players',
+      search: '',
+      selectedPlayerId: null,
+      selectedCoachId: null,
+      // UI preferences
+      showBonus: true,
+      showMalus: true,
+      roleFilters: { Portiere:true, Difensore:true, Centrocampista:true, Attaccante:true }
+    };
+
+    // Keys per-giornata
+    const keyP = () => `players_${state.giornata}`;
+    const keyC = () => `coaches_${state.giornata}`;
+    const keyV = () => `curva_${state.giornata}`;
+    const keyD = () => `giornata_meta_${state.giornata}`;
+
+    const REPEATABLE_PLAYERS = new Set(['R040','R041','R042','R072','R075','R089','R097','R044','R045','R056','R057','R058','R061','R070','R063','R073','R092']);
+    const REPEATABLE_COACH = new Set(['R020','R036']);
+    const REPEATABLE_CURVA = new Set(['R008','R027','R028','R029','R015','R003','R002']);
+
+    // Admin mode via Firebase Auth + allowlist admins/{uid}
+    state.isAdmin = false;
+    function loadAdmin(){
+      if (window.auth){
+        window.auth.onAuthStateChanged(async (user)=>{
+          if (!user){ state.isAdmin=false; updateAdminUI(); renderTabs(); return; }
+          try{
+            // allowlist: admins/{uid}
+            if (window.db){
+              const doc = await window.db.collection('admins').doc(user.uid).get();
+              state.isAdmin = !!doc.exists;
+            } else {
+              state.isAdmin = false;
+            }
+          } catch { state.isAdmin = false; }
+          updateAdminUI();
+          renderTabs();
+        });
+      } else {
+        updateAdminUI();
+      }
+    }
+
+    function renderSquadsTab(){
+      const prules = normalizePlayersRules({ rules: state.rules });
+      const crules = normalizeCoachRules({ rules: state.rules });
+      const vrules = normalizeCurvaRules({ rules: state.rules });
+      const panel = $('#panelContent'); panel.innerHTML='';
+      const wrap = document.createElement('div');
+      wrap.className = 'list';
+      // load teams
+      let teams = [];
+      try { teams = JSON.parse(localStorage.getItem('teams_data')||'[]'); } catch { teams = []; }
+      if (!Array.isArray(teams) || teams.length!==19){
+        teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null }));
+      }
+      // compute curva base live from current selections
+      const curvaBase = computeTotalRules(state.selCurva, vrules);
+      const rows = teams.map((t,idx)=>{
+        const starters = (t.lineup||[]).filter(Boolean);
+        const playerSum = starters.reduce((acc, pid)=>{
+          const sel = state.selPlayers[pid]||{};
+          const pts = prules.reduce((s,r)=> s + ((r.rule_id in sel)? (r.input==='counter'? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+          return acc + pts;
+        },0);
+        let captainBonus = 0;
+        if (t.captain){
+          const selC = state.selPlayers[t.captain]||{};
+          const capPts = prules.reduce((s,r)=> s + ((r.rule_id in selC)? (r.input==='counter'? Number(selC[r.rule_id]||0)*Number(r.valore) : (selC[r.rule_id]?Number(r.valore):0)) : 0), 0);
+          captainBonus = capPts;
+        }
+        let coachPts = 0;
+        const coachId = (t.coach_ids&&t.coach_ids[0])||null;
+        if (coachId){
+          const selCoach = state.selCoaches[coachId]||{};
+          coachPts = crules.reduce((s,r)=> s + ((r.rule_id in selCoach)? (r.input==='counter'? Number(selCoach[r.rule_id]||0)*Number(r.valore) : (selCoach[r.rule_id]?Number(r.valore):0)) : 0), 0);
+        }
+        const total = curvaBase + playerSum + captainBonus + coachPts;
+        return { name: t.name||`Squadra ${idx+1}`, curvaBase, playerSum, captainBonus, coachPts, total };
+      });
+      rows.sort((a,b)=> b.total-a.total || a.name.localeCompare(b.name,'it'));
+      wrap.innerHTML = rows.map(r=> `
+        <div class="item">
+          <div>
+            <div style="font-weight:700;">${r.name}</div>
+            <div class="muted">Curva ${r.curvaBase.toFixed(2)} • Giocatori ${r.playerSum.toFixed(2)} • Cap ${r.captainBonus.toFixed(2)} • Coach ${r.coachPts.toFixed(2)}</div>
+          </div>
+          <div class="muted">${r.total.toFixed(2)} pt</div>
+        </div>
+      `).join('') || '<div class="muted">Nessuna squadra trovata.</div>';
+      panel.appendChild(wrap);
+    }
+    function updateAdminUI(){
+      const as = document.getElementById('adminStatus');
+      const btn = document.getElementById('toggleAdmin');
+      if (!as || !btn) return;
+      const email = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '';
+      as.textContent = state.isAdmin ? (email? `Attiva • ${email}` : 'Attiva') : 'Disattivata';
+      btn.textContent = state.isAdmin ? 'Esci admin' : 'Entra admin';
+      // enable/disable editing controls
+      document.getElementById('saveAll').disabled = !state.isAdmin;
+      document.getElementById('resetAll').disabled = !state.isAdmin;
+      document.getElementById('setDir').disabled = !state.isAdmin;
+      document.getElementById('data').disabled = !state.isAdmin;
+      const au = document.getElementById('autoUpload');
+      const url = document.getElementById('uploadUrl');
+      if (au) au.disabled = !state.isAdmin;
+      if (url) url.disabled = !state.isAdmin;
+      // admin tools visibility
+      const tools = document.getElementById('adminTools');
+      if (tools){ tools.style.display = state.isAdmin? 'block':'none'; if (state.isAdmin) bindAdminTools(); }
+    }
+    function bindAdminTools(){
+      const msg = (t)=>{ const el=document.getElementById('admMsg'); if (el){ el.textContent=t; setTimeout(()=> el.textContent='', 2000); } };
+      const addBtn = document.getElementById('admAddPlayer');
+      const delBtn = document.getElementById('admDelPlayer');
+      const impBtn = document.getElementById('admImportPlayers');
+      // populate delete select by surname
+      const delSel = document.getElementById('admDelSel');
+      if (delSel){
+        const bySurname = (p)=>{
+          const parts=(p.nome_completo||'').trim().split(/\s+/); const last=parts.pop()||''; return last.toLowerCase();
+        };
+        const items = state.players.slice().sort((a,b)=> bySurname(a).localeCompare(bySurname(b),'it'));
+        delSel.innerHTML = '<option value="">Seleziona giocatore da rimuovere</option>' + items.map(p=>{
+          const label = (function(){
+            const parts=(p.nome_completo||'').trim().split(/\s+/); const last=parts.pop()||''; const name=parts.join(' ');
+            const nick=p.nickname? ' "'+String(p.nickname).toUpperCase()+'"':'';
+            return `${last.toUpperCase()}, ${name}${nick}`;
+          })();
+          return `<option value="${p.player_id||''}">${label}</option>`;
+        }).join('');
+      }
+      addBtn?.addEventListener('click', async ()=>{
+        const name=(document.getElementById('admName').value||'').trim();
+        const role=(document.getElementById('admRole').value||'Centrocampista');
+        const nick=(document.getElementById('admNick').value||'').trim();
+        if (!name) { msg('Nome mancante'); return; }
+        try{
+          if (window.db){ await window.db.collection('players').add({ nome_completo:name, role, nickname: nick||null, active:true }); msg('Aggiunto su Firestore'); }
+          else { msg('Firestore non disponibile'); }
+        }catch(e){ msg('Errore aggiunta'); }
+        await loadPlayers(); renderTabs();
+      });
+      delBtn?.addEventListener('click', async ()=>{
+        const id=(document.getElementById('admDelSel').value||'').trim(); if (!id){ msg('Seleziona un giocatore'); return; }
+        try{ if (window.db){ await window.db.collection('players').doc(id).delete(); msg('Rimosso'); } else { msg('Firestore non disponibile'); } }
+        catch(e){ msg('Errore rimozione'); }
+        await loadPlayers(); renderTabs();
+      });
+      impBtn?.addEventListener('click', async ()=>{
+        try{
+          const resp = await fetch('resources/players.json'); const js = await resp.json(); const arr = js.players||[];
+          if (!window.db){ msg('Firestore non disponibile'); return; }
+          // Use batched writes with stable or auto IDs
+          const writes = arr.map(async (p)=>{
+            const id = p.player_id && String(p.player_id).trim().length>0 ? p.player_id : window.db.collection('players').doc().id;
+            await window.db.collection('players').doc(id).set({ nome_completo:p.nome_completo, role:p.role, nickname:p.nickname||null, active:true }, { merge:true });
+          });
+          await Promise.all(writes);
+          msg('Import completato'); await loadPlayers(); renderTabs();
+        }catch(e){ msg('Errore import'); }
+      });
+    }
+    function enterAdmin(){
+      const email = window.prompt('Email admin?'); if (email===null) return;
+      const password = window.prompt('Password?'); if (password===null) return;
+      if (!window.signIn){ alert('Firebase non inizializzato'); return; }
+      window.signIn(email, password).then(()=>{ /* onAuthStateChanged gestirà UI */ }).catch(()=> alert('Login fallito'));
+    }
+    function exitAdmin(){ if (window.signOutFirebase){ window.signOutFirebase(); } }
+
+    // Mobile handling: hide admin features and force read-only
+    function isMobileDevice(){
+      return (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) || window.matchMedia('(max-width: 640px)').matches;
+    }
+    function applyMobileMode(){
+      if (!isMobileDevice()) return;
+      // Force read-only
+      state.isAdmin = false; localStorage.setItem('admin_enabled','false');
+      updateAdminUI();
+      // Hide admin related rows
+      const ar = document.getElementById('adminRow'); if (ar) ar.style.display='none';
+      const sr = document.getElementById('saveRow'); if (sr) sr.style.display='none';
+      const ur = document.getElementById('uploadRow'); if (ur) ur.style.display='none';
+    }
+
+    // File System Access API support (Chromium-based browsers)
+    let dirHandle = null;
+    async function pickDirectory(){
+      if (!window.showDirectoryPicker) {
+        alert('Il salvataggio diretto richiede un browser Chromium (es. Chrome/Edge). Userò il download del file.');
+        return;
+      }
+      try {
+        dirHandle = await window.showDirectoryPicker();
+        // Richiedi permessi di scrittura
+        const perm = await dirHandle.requestPermission({ mode: 'readwrite' });
+        if (perm !== 'granted') { dirHandle = null; alert('Permesso negato: userò il download del file.'); }
+      } catch (e) {
+        console.warn('Directory non selezionata:', e);
+      }
+    }
+    async function writeJsonToDir(filename, dataObj){
+      if (!dirHandle) return false;
+      try {
+        const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' }));
+        await writable.close();
+        return true;
+      } catch (e) {
+        console.error('Scrittura file fallita:', e);
+        return false;
+      }
+    }
+
+    function normalizePlayersRules(raw){
+      return raw.rules.filter(r => r.soggetto === 'Giocatore').map(r => ({
+        ...r,
+        input: REPEATABLE_PLAYERS.has(r.rule_id) ? 'counter' : 'toggle',
+        max: REPEATABLE_PLAYERS.has(r.rule_id) ? 10 : 1
+      }));
+    }
+    function normalizeCoachRules(raw){
+      return raw.rules.filter(r => r.soggetto === 'Allenatore').map(r => ({
+        ...r,
+        input: REPEATABLE_COACH.has(r.rule_id) ? 'counter' : 'toggle',
+        max: REPEATABLE_COACH.has(r.rule_id) ? 10 : 1
+      }));
+    }
+    function normalizeCurvaRules(raw){
+      return raw.rules.filter(r => r.soggetto === 'Curva').map(r => ({
+        ...r,
+        input: REPEATABLE_CURVA.has(r.rule_id) ? 'counter' : 'toggle',
+        max: REPEATABLE_CURVA.has(r.rule_id) ? 50 : 1
+      }));
+    }
+
+    async function loadDay(){
+      // local fallback first
+      try { state.selPlayers = JSON.parse(localStorage.getItem(keyP())||'{}') } catch { state.selPlayers = {} }
+      try { state.selCoaches = JSON.parse(localStorage.getItem(keyC())||'{}') } catch { state.selCoaches = {} }
+      try { state.selCurva = JSON.parse(localStorage.getItem(keyV())||'{}') } catch { state.selCurva = {} }
+      try { const meta = JSON.parse(localStorage.getItem(keyD())||'{}'); if (meta.data) $('#data').value = meta.data; } catch {}
+      // override with Firestore if available
+      try{
+        if (window.db){
+          const doc = await window.db.collection('days').doc(state.giornata).get();
+          if (doc.exists){
+            const d = doc.data();
+            state.selPlayers = d.players||{};
+            state.selCoaches = d.coaches||{};
+            state.selCurva = d.curva||{};
+            if (d.data) $('#data').value = d.data;
+          }
+        }
+      }catch(e){ console.warn('Firestore read error', e); }
+    }
+    function saveDay(){
+      localStorage.setItem(keyP(), JSON.stringify(state.selPlayers));
+      localStorage.setItem(keyC(), JSON.stringify(state.selCoaches));
+      localStorage.setItem(keyV(), JSON.stringify(state.selCurva));
+      localStorage.setItem(keyD(), JSON.stringify({ data: $('#data').value||'' }));
+    }
+
+    function computeTotalRules(selections, rules){
+      return rules.reduce((sum, r) => {
+        const v = Number(r.valore);
+        const selVal = selections[r.rule_id];
+        if (r.input === 'counter') return sum + (Number(selVal||0) * v);
+        return sum + ((selVal ? 1 : 0) * v);
+      }, 0);
+    }
+
+    function renderSummary(){
+      const prules = normalizePlayersRules({ rules: state.rules });
+      const crules = normalizeCoachRules({ rules: state.rules });
+      const vrules = normalizeCurvaRules({ rules: state.rules });
+      const p = Object.keys(state.selPlayers).reduce((sum, pid) => {
+        const playerSel = state.selPlayers[pid]||{};
+        const total = prules.reduce((s, r) => s + ((r.rule_id in playerSel) ? (r.input==='counter'? Number(playerSel[r.rule_id]||0)*Number(r.valore) : (playerSel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+        return sum + total;
+      }, 0);
+      const c = Object.keys(state.selCoaches).reduce((sum, cid) => {
+        const coachSel = state.selCoaches[cid]||{};
+        const total = crules.reduce((s, r) => s + ((r.rule_id in coachSel) ? (r.input==='counter'? Number(coachSel[r.rule_id]||0)*Number(r.valore) : (coachSel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+        return sum + total;
+      }, 0);
+      const v = computeTotalRules(state.selCurva, vrules);
+      $('#summary').innerHTML = `
+        <div class="item"><span class="muted">Totale Giocatori</span><strong>${p.toFixed(2)}</strong></div>
+        <div class="item"><span class="muted">Totale Allenatori</span><strong>${c.toFixed(2)}</strong></div>
+        <div class="item"><span class="muted">Totale Curva</span><strong>${v.toFixed(2)}</strong></div>
+        <div class="item"><span class="muted">Somma (senza squadre)</span><strong>${(p+c+v).toFixed(2)}</strong></div>
+      `;
+    }
+
+    function renderTabs(){
+      $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===state.tab));
+      if (state.tab === 'players') renderPlayersTab();
+      if (state.tab === 'coaches') renderCoachesTab();
+      if (state.tab === 'curva') renderCurvaTab();
+      if (state.tab === 'squads') renderSquadsTab();
+    }
+
+    function matchesPlayer(rule, player){
+      if (!rule.player_ids || rule.player_ids.length===0) return true;
+      return rule.player_ids.includes(player.player_id);
+    }
+
+    function matchesCoach(rule, coach){
+      if (!rule.coach_ids || rule.coach_ids.length===0) return true;
+      return rule.coach_ids.includes(coach.coach_id);
+    }
+
+    function renderPlayersTab(){
+      const prules = normalizePlayersRules({ rules: state.rules });
+      const ROLE_ORDER = ['Portiere','Difensore','Centrocampista','Attaccante'];
+      const panel = $('#panelContent'); panel.innerHTML = '';
+      const container = document.createElement('div');
+      container.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; margin-bottom:8px;">
+          <input id="searchPlayers" placeholder="Cerca giocatori..." style="width:100%; padding:8px; border:1px solid #dbe1e8; border-radius:8px;" />
+          <div class="filters" id="roleFilters">${ROLE_ORDER.map(r=>`<button class="chip toggle ${state.roleFilters[r]?'on':''}" data-role="${r}">${r}</button>`).join('')}</div>
+        </div>
+        <div class="players-wrap">
+          <div id="plist" style="display:grid; gap:12px;"></div>
+          <div id="pdetail" style="border-left:2px solid #c7d1db; padding-left:20px;">
+            <div class="filters" id="bmToggles" style="margin-bottom:8px;">
+              <button class="chip toggle ${state.showBonus?'on':''}" data-bm="Bonus">Bonus</button>
+              <button class="chip toggle ${state.showMalus?'on':''}" data-bm="Malus">Malus</button>
+            </div>
+          </div>
+        </div>
+      `;
+      panel.appendChild(container);
+      const plist = container.querySelector('#plist');
+      const pdetail = container.querySelector('#pdetail');
+
+      function getSurname(full){
+        if (!full) return '';
+        const parts = full.trim().split(/\s+/);
+        if (parts.length===1) return parts[0];
+        const particles = new Set(['di','de','del','della','della','da','van','von','la','le','lo','mc']);
+        const last = parts[parts.length-1];
+        const prev = (parts[parts.length-2]||'').toLowerCase();
+        if (particles.has(prev)) return parts.slice(-2).join(' ');
+        return last;
+      }
+      function formatDisplayName(full, nickname){
+        const parts = full.trim().split(/\s+/);
+        if (parts.length===1){
+          const cognome = parts[0];
+          const nick = nickname? `<strong>"${nickname.toUpperCase()}"</strong> `: '';
+          return `${nick}<strong>${cognome}</strong>`;
+        }
+        const particles = new Set(['di','de','del','della','della','da','van','von','la','le','lo','mc']);
+        let cognome = parts.pop();
+        const prev = (parts[parts.length-1]||'').toLowerCase();
+        if (particles.has(prev)) { cognome = parts.pop()+ ' ' + cognome; }
+        const nome = parts.join(' ');
+        const nick = nickname? `<strong>"${nickname.toUpperCase()}"</strong> `: '';
+        return `${nick}<strong>${cognome}</strong>, ${nome}`;
+      }
+
+      function renderPlayerPanel(p){
+        const sel = state.selPlayers[p.player_id]||{};
+        const applicable = prules.filter(r=>matchesPlayer(r,p));
+        const PORTIERE_ORDER = { R043:0, R072:1, R045:2, R044:3 };
+        const PORTIERE_RULES = new Set(['R043','R044','R045','R071','R072','R095']);
+        const rulesSorted = ['P001','P002','P026'].includes(p.player_id)
+          ? applicable.slice().sort((a,b)=>{
+              const ap = ['R043','R044','R045','R071','R072','R095'].includes(a.rule_id), bp = ['R043','R044','R045','R071','R072','R095'].includes(b.rule_id);
+              if (ap&&bp) return (['R043','R072'].includes(a.rule_id)?0:1)-(['R043','R072'].includes(b.rule_id)?0:1);
+              if (ap) return -1; if (bp) return 1; return 0;
+            })
+          : applicable;
+        const total = rulesSorted.reduce((s,r)=>{
+          const v=Number(r.valore); const sv=sel[r.rule_id];
+          return s + (r.input==='counter'? Number(sv||0)*v : (sv? v:0));
+        },0);
+        const byTipo = { Bonus: [], Malus: [] };
+        rulesSorted.forEach(r=>{ (byTipo[r.tipo]||byTipo.Bonus).push(r); });
+        const MULTIPLIER_NAMES = [/gol\s*segnato/i, /gol\s*in\s*panchina/i, /ammoni/i, /toccate?\s+di\s+capelli/i, /esultan/i, /gesti?\s+sportivi/i, /rigori?\s+sbagliati/i, /rigori?\s+parati/i, /parat[ae]\s+decisiv/i, /pallone\s+perso/i];
+        const isMultiplier = (r)=> MULTIPLIER_NAMES.some(re=> re.test(r.nome_bonus||'')) || (p.role==='Portiere' && (/rigori?\s+parati/i.test(r.nome_bonus||'') || /parat[ae]\s+decisiv/i.test(r.nome_bonus||'')));
+        const sectionHtml = ['Bonus','Malus'].map(cat=>{
+          if ((cat==='Bonus' && !state.showBonus) || (cat==='Malus' && !state.showMalus)) return '';
+          const arr = byTipo[cat]||[]; if (!arr.length) return '';
+          const body = arr.map(r=>{
+            const wantCounter = (r.input==='counter') || isMultiplier(r);
+            const cur=sel[r.rule_id]??0;
+            return (
+              `<div class="rule" data-player="${p.player_id}" data-rule-id="${r.rule_id}">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  ${wantCounter ? `
+                    <button class="chip" data-act="dec" ${!state.isAdmin?'disabled':''}>-</button>
+                    <span class="muted">x</span>
+                    <span class="count">${cur}</span>
+                    <button class="chip" data-act="inc" ${!state.isAdmin?'disabled':''}>+</button>
+                    <span>${r.nome_bonus}</span>
+                  ` : `
+                    <input type="checkbox" data-act="toggle" ${sel[r.rule_id]? 'checked': ''} ${!state.isAdmin?'disabled':''} />
+                    <span>${r.nome_bonus}</span>
+                  `}
+                </div>
+                <span>${Number(r.valore)>0?'+':''}${r.valore}${wantCounter?' cad.':''}</span>
+              </div>`
+            );
+          }).join('');
+          return (
+            `<div class="group-section collapsed" data-cat="${cat}">
+              <div class="group-header">${cat} <span>▾</span></div>
+              <div class="group-body">${body}</div>
+            </div>`
+          );
+        }).join('');
+        pdetail.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="font-weight:800;">${formatDisplayName(p.nome_completo, p.nickname||'')}</div>
+              <div class="muted">${p.role}${p.secondary_roles&&p.secondary_roles.length? ' (2°: '+p.secondary_roles.join(', ')+')':''}</div>
+            </div>
+            <div class="muted">${total.toFixed(2)} pt</div>
+          </div>
+          <div class="list" style="margin-top:8px;">${sectionHtml}</div>
+        `;
+        $$('#pdetail .rule [data-act="toggle"]').forEach(cb=>cb.addEventListener('change',()=>{
+          const row = cb.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
+          state.selPlayers[pid]=state.selPlayers[pid]||{}; state.selPlayers[pid][rid]=cb.checked?1:0;
+          // Exclusivity: if Porta inviolata (R043) is set, zero Gol subiti (R072)
+          if (rid==='R043' && cb.checked) { state.selPlayers[pid]['R072']=0; }
+          saveDay(); renderPlayerPanel(p); renderSummary();
+        }));
+        $$('#pdetail .rule [data-act="inc"]').forEach(btn=>btn.addEventListener('click',()=>{
+          const row = btn.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
+          state.selPlayers[pid]=state.selPlayers[pid]||{}; const cur=Number(state.selPlayers[pid][rid]||0); state.selPlayers[pid][rid]=Math.min(10,cur+1); saveDay(); renderPlayerPanel(p); renderSummary();
+        }));
+        $$('#pdetail .rule [data-act="dec"]').forEach(btn=>btn.addEventListener('click',()=>{
+          const row = btn.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
+          state.selPlayers[pid]=state.selPlayers[pid]||{}; const cur=Number(state.selPlayers[pid][rid]||0); state.selPlayers[pid][rid]=Math.max(0,cur-1); saveDay(); renderPlayerPanel(p); renderSummary();
+        }));
+        // row-wide toggle for checkbox rules
+        $$('#pdetail .rule').forEach(el=> el.addEventListener('click', (e)=>{
+          if (!state.isAdmin) return;
+          if (e.target.closest('button,[data-act="inc"],[data-act="dec"],input')) return;
+          const cb = el.querySelector('input[type="checkbox"][data-act="toggle"]');
+          if (cb && !cb.disabled){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
+        }));
+        // collapsible Bonus/Malus sections
+        $$('#pdetail .group-section .group-header').forEach(h=> h.addEventListener('click', ()=> h.parentElement.classList.toggle('collapsed')));
+      }
+
+      function draw(){
+        const needle = (container.querySelector('#searchPlayers').value||'').toLowerCase();
+        const byRole = new Map(ROLE_ORDER.map(r=>[r,[]]));
+        state.players.forEach(p=>{
+          const text = (p.nome_completo+' '+(p.nickname||'')).toLowerCase();
+          if ((!needle || text.includes(needle)) && state.roleFilters[p.role]!==false) byRole.get(p.role).push(p);
+        });
+        const sections = [];
+        for (const role of ROLE_ORDER){
+          const list = (byRole.get(role)||[]).slice().sort((a,b)=>{
+            const sa = getSurname(a.nome_completo).toLowerCase();
+            const sb = getSurname(b.nome_completo).toLowerCase();
+            return sa.localeCompare(sb, 'it');
+          });
+          if (!list.length) continue;
+          let itemsHtml = '';
+          for (const p of list){
+            const sel = state.selPlayers[p.player_id]||{};
+            const total = prules.reduce((s,r)=> s + ((r.rule_id in sel)? (r.input==='counter'? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+            itemsHtml += '<div class="item" data-id="'+p.player_id+'">'+
+                         '  <div>'+
+                         '    <div>'+formatDisplayName(p.nome_completo, p.nickname||'')+'</div>'+
+                         '    <div class="muted">'+p.role+'</div>'+
+                         '  </div>'+
+                         '  <div class="muted">'+total.toFixed(2)+' pt</div>'+
+                         '</div>';
+          }
+          sections.push(
+            '<div class="role-section collapsed" data-role="'+role+'">'+
+              '<div class="role-header">'+role+' <span>▾</span></div>'+
+              '<div class="role-body">'+itemsHtml+'</div>'+
+            '</div>'
+          );
+        }
+        plist.innerHTML = sections.join('');
+        // bind item clicks
+        $$('#plist .item').forEach(el=> el.addEventListener('click', ()=>{
+          const pid = el.dataset.id; state.selectedPlayerId = pid; const p = state.players.find(x=>x.player_id===pid); renderPlayerPanel(p);
+        }));
+        // accordion toggles
+        $$('#plist .role-section .role-header').forEach(h=> h.addEventListener('click', ()=> h.parentElement.classList.toggle('collapsed')));
+        // Auto-open role of selected player
+        if (state.selectedPlayerId){
+          const p=state.players.find(x=>x.player_id===state.selectedPlayerId);
+          if (p){ const sect = $(`#plist .role-section[data-role="${p.role}"]`); if (sect) sect.classList.remove('collapsed'); renderPlayerPanel(p); }
+          else { state.selectedPlayerId=null; pdetail.innerHTML=''; }
+        }
+      }
+      container.querySelector('#searchPlayers').addEventListener('input', ()=>{ state.selectedPlayerId=null; pdetail.innerHTML=''; draw(); });
+      // Role filter toggles
+      $$('#roleFilters .toggle').forEach(btn=> btn.addEventListener('click', ()=>{
+        const role = btn.dataset.role; state.roleFilters[role] = !state.roleFilters[role]; draw();
+        btn.classList.toggle('on', !!state.roleFilters[role]);
+      }));
+      // Bonus/Malus toggles in detail
+      $$('#bmToggles .toggle').forEach(btn=> btn.addEventListener('click', ()=>{
+        const bm = btn.dataset.bm; if (bm==='Bonus') state.showBonus=!state.showBonus; else state.showMalus=!state.showMalus; btn.classList.toggle('on');
+        if (state.selectedPlayerId){ const p=state.players.find(x=>x.player_id===state.selectedPlayerId); if (p) renderPlayerPanel(p); }
+      }));
+      // (admin add/remove pannello rimosso per stabilità in questa versione)
+      draw();
+    }
+
+    function renderCoachesTab(){
+      const crules = normalizeCoachRules({ rules: state.rules });
+      const panel = $('#panelContent'); panel.innerHTML = '';
+      const container = document.createElement('div');
+      container.innerHTML = `
+        <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <input id="searchCoaches" placeholder="Cerca allenatori..." style="width:100%; padding:8px; border:1px solid #dbe1e8; border-radius:8px;" />
+        </div>
+        <div style="display:grid; grid-template-columns: minmax(260px, 1fr) 2fr; gap: 16px; align-items:start;">
+          <div id="clist" class="list"></div>
+          <div id="cdetail" style="border-left:2px solid #c7d1db; padding-left:20px;"></div>
+        </div>
+      `;
+      panel.appendChild(container);
+      const list = container.querySelector('#clist');
+      const detail = container.querySelector('#cdetail');
+
+      function drawList(){
+        const needle = (container.querySelector('#searchCoaches').value||'').toLowerCase();
+        const items = state.coaches.filter(c=> !needle || (c.nome||'').toLowerCase().includes(needle));
+        list.innerHTML = items.map(c=>{
+          const sel = state.selCoaches[c.coach_id]||{};
+          const applicable = crules.filter(r=>matchesCoach(r, c));
+          const total = applicable.reduce((s,r)=> s + ((r.rule_id in sel)? (r.input==='counter'? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+          return `
+            <div class="item ${state.selectedCoachId===c.coach_id?'selected':''}" data-id="${c.coach_id}">
+              <div>
+                <div style="font-weight:700;">${c.nome}</div>
+                <div class="muted">Allenatore</div>
+              </div>
+              <div class="muted">${total.toFixed(2)} pt</div>
+            </div>`;
+        }).join('');
+        $$('#clist .item').forEach(el=> el.addEventListener('click', ()=>{
+          const cid = el.dataset.id; state.selectedCoachId = cid; const c = state.coaches.find(x=>x.coach_id===cid); renderCoachDetail(c);
+        }));
+        if (state.selectedCoachId){
+          const c=state.coaches.find(x=>x.coach_id===state.selectedCoachId); if (c) renderCoachDetail(c); else { state.selectedCoachId=null; detail.innerHTML=''; }
+        }
+      }
+
+      function renderCoachDetail(c){
+        const sel = state.selCoaches[c.coach_id]||{};
+        const applicable = crules.filter(r=>matchesCoach(r, c));
+        const total = applicable.reduce((s,r)=> s + ((r.rule_id in sel)? (r.input==='counter'? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+        // group by tipo
+        const byTipo = { Bonus: applicable.filter(r=>r.tipo==='Bonus'), Malus: applicable.filter(r=>r.tipo==='Malus') };
+        detail.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="font-weight:800;">${c.nome}</div>
+              <div class="muted">ID: ${c.coach_id}</div>
+            </div>
+            <div class="muted">${total.toFixed(2)} pt</div>
+          </div>
+          <div class="list" style="margin-top:8px;">
+            ${['Bonus','Malus'].map(cat=>{
+              const arr = byTipo[cat]; if (!arr.length) return '';
+              return `
+                <div style=\"margin:6px 0; font-weight:700;\">${cat}</div>
+                ${arr.map(r=>{
+              const isC = r.input==='counter'; const cur=sel[r.rule_id]??0;
+              return `
+                <div class=\"rule\" data-coach=\"${c.coach_id}\" data-rule-id=\"${r.rule_id}\">\n                  <div style=\"display:flex;align-items:center;gap:8px;\">\n                    ${isC?`
+                      <button class=\"chip\" data-act=\"dec\" ${!state.isAdmin?'disabled':''}>-</button>
+                      <span class=\"muted\">x</span>
+                      <span class=\"count\">${cur}</span>
+                      <button class=\"chip\" data-act=\"inc\" ${!state.isAdmin?'disabled':''}>+</button>
+                      <span>${r.nome_bonus}</span>
+                    `:`
+                      <input type=\"checkbox\" data-act=\"toggle\" ${sel[r.rule_id]? 'checked': ''} ${!state.isAdmin?'disabled':''} />
+                      <span>${r.nome_bonus}</span>
+                    `}
+                  </div>
+                  <span>${Number(r.valore)>0?'+':''}${r.valore}${isC?' cad.':''}</span>
+                </div>`;
+                }).join('')}
+              `;
+            }).join('')}
+          </div>
+        `;
+        if (state.isAdmin){
+          $$('#cdetail .rule [data-act="toggle"]').forEach(cb=>cb.addEventListener('change',()=>{
+            const row = cb.closest('.rule'); const cid=row.dataset.coach; const rid=row.dataset.ruleId;
+            state.selCoaches[cid]=state.selCoaches[cid]||{}; state.selCoaches[cid][rid]=cb.checked?1:0; saveDay(); renderCoachDetail(c); renderSummary();
+          }));
+          $$('#cdetail .rule [data-act="inc"]').forEach(btn=>btn.addEventListener('click',()=>{
+            const row = btn.closest('.rule'); const cid=row.dataset.coach; const rid=row.dataset.ruleId;
+            state.selCoaches[cid]=state.selCoaches[cid]||{}; const cur=Number(state.selCoaches[cid][rid]||0); state.selCoaches[cid][rid]=Math.min(10,cur+1); saveDay(); renderCoachDetail(c); renderSummary();
+          }));
+          $$('#cdetail .rule [data-act="dec"]').forEach(btn=>btn.addEventListener('click',()=>{
+            const row = btn.closest('.rule'); const cid=row.dataset.coach; const rid=row.dataset.ruleId;
+            state.selCoaches[cid]=state.selCoaches[cid]||{}; const cur=Number(state.selCoaches[cid][rid]||0); state.selCoaches[cid][rid]=Math.max(0,cur-1); saveDay(); renderCoachDetail(c); renderSummary();
+          }));
+          // row-wide toggle for checkbox rules
+          $$('#cdetail .rule').forEach(el=> el.addEventListener('click', (e)=>{
+            if (!state.isAdmin) return;
+            if (e.target.closest('button,[data-act="inc"],[data-act="dec"],input')) return;
+            const cb = el.querySelector('input[type="checkbox"][data-act="toggle"]');
+            if (cb && !cb.disabled){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
+          }));
+        }
+      }
+
+      container.querySelector('#searchCoaches').addEventListener('input', ()=>{ state.selectedCoachId=null; detail.innerHTML=''; drawList(); });
+      drawList();
+    }
+
+    function renderCurvaTab(){
+      const vrules = normalizeCurvaRules({ rules: state.rules });
+      const panel = $('#panelContent'); panel.innerHTML = '';
+      const wrap = document.createElement('div'); wrap.className='curva-wrap';
+      const group = { Casa:[], Trasferta:[], Generico:[] };
+      const isCasa = (n)=> /casa/i.test(n||'');
+      const isTrasferta = (n)=> /trasferta/i.test(n||'');
+      const MULTI = [/gol/i, /ammoni/i, /toccate?\s+di\s+capelli/i, /esultan/i, /gesti?\s+sportivi/i, /rigori?\s+sbagliati/i, /rigori?\s+parati/i, /parat[ae]\s+decisiv/i, /pallone\s+perso/i];
+      vrules.forEach(r=>{
+        const name = r.nome_bonus||'';
+        const key = isTrasferta(name)? 'Trasferta' : (isCasa(name)? 'Casa' : 'Generico');
+        group[key].push(r);
+      });
+      const buildSection = (title, items) => {
+        if (!items.length) return '';
+        const body = items.map(r=>{
+          const rid=r.rule_id; const val = Number(r.valore)||0; const cur = Number(state.selCurva[rid]||0);
+          const wantCounter = (r.input==='counter') || MULTI.some(re=> re.test(r.nome_bonus||''));
+          return `
+            <div class="rule" data-rule-id="${rid}">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span>${r.nome_bonus}</span>
+                <span class="muted">${val>0?'+':''}${val}${wantCounter?' cad.':''}</span>
+              </div>
+              ${ wantCounter ? `
+              <div style="display:flex;align-items:center;gap:6px;">
+                <button class="chip" data-act="dec" ${!state.isAdmin?'disabled':''}>-</button>
+                <span class="muted">x</span>
+                <span>${cur}</span>
+                <button class="chip" data-act="inc" ${!state.isAdmin?'disabled':''}>+</button>
+              </div>` : `
+              <label class="row" style="gap:6px;">
+                <input type="checkbox" data-act="toggle" ${cur? 'checked':''} ${!state.isAdmin?'disabled':''}/>
+              </label>`}
+            </div>`;
+        }).join('');
+        return `
+          <div class="curva-section" data-curva="${title}">
+            <div class="curva-header">${title} <span>▾</span></div>
+            <div class="curva-body">${body}</div>
+          </div>`;
+      };
+      wrap.innerHTML = ['Casa','Trasferta','Generico'].map(k=> buildSection(k, group[k])).join('');
+      panel.appendChild(wrap);
+      // listeners
+      if (state.isAdmin){
+        $$('.curva-section .rule [data-act="toggle"]').forEach(cb=>cb.addEventListener('change',()=>{
+          const row=cb.closest('.rule'); const rid=row.dataset.ruleId; state.selCurva[rid]=cb.checked?1:0; saveDay(); renderCurvaTab(); renderSummary();
+        }));
+        $$('.curva-section .rule [data-act="inc"]').forEach(btn=>btn.addEventListener('click',()=>{
+          const row=btn.closest('.rule'); const rid=row.dataset.ruleId; const cur=Number(state.selCurva[rid]||0); state.selCurva[rid]=Math.min(50,cur+1); saveDay(); renderCurvaTab(); renderSummary();
+        }));
+        $$('.curva-section .rule [data-act="dec"]').forEach(btn=>btn.addEventListener('click',()=>{
+          const row=btn.closest('.rule'); const rid=row.dataset.ruleId; const cur=Number(state.selCurva[rid]||0); state.selCurva[rid]=Math.max(0,cur-1); saveDay(); renderCurvaTab(); renderSummary();
+        }));
+        $$('.curva-section .curva-header').forEach(h=> h.addEventListener('click', ()=> h.parentElement.classList.toggle('collapsed')));
+      }
+    }
+
+    function bootSelect(){
+      const sel = $('#giornata'); sel.innerHTML = Array.from({length:24}, (_,i)=>`<option value="G${i+1}">Giornata ${i+1}</option>`).join('');
+      sel.value = state.giornata;
+      sel.addEventListener('change', async ()=>{ state.giornata = sel.value; await loadDay(); renderTabs(); renderSummary(); });
+      $('#data').addEventListener('change', saveDay);
+      $$('.tab').forEach(t=> t.addEventListener('click', ()=>{ state.tab=t.dataset.tab; renderTabs(); }));
+      $('#saveAll').addEventListener('click', async () => {
+        if (!state.isAdmin) { alert('Solo admin può salvare o caricare.'); return; }
+        if (!confirm('Confermi il salvataggio della giornata?')) return;
+        if (!state.isAdmin) { alert('Solo admin può salvare o caricare.'); return; }
+        // Save to localStorage
+        saveDay();
+        // Prepare payload
+        const selText = sel.options[sel.selectedIndex]?.text || state.giornata;
+        const data = { giornata: state.giornata, label: selText, data: $('#data').value||'', players: state.selPlayers, coaches: state.selCoaches, curva: state.selCurva };
+        const fname = (selText || state.giornata).replace(/\s+/g,'_') + '.json';
+        // Write to Firestore
+        try{
+          let wroteFS = false;
+          if (window.db){ await window.db.collection('days').doc(state.giornata).set(data, { merge: true }); toast('Salvato su Firestore'); wroteFS=true; }
+          // If saved to Firestore, skip local export
+          if (wroteFS) return;
+        }catch(e){ console.warn('Firestore save error', e); toast('Errore salvataggio Firestore'); }
+        // If not on Firestore: write to directory or fallback to download
+        const ok = await writeJsonToDir(fname, data);
+        if (!ok) {
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = fname;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+        // Auto-upload webhook if configured
+        try{
+          const doUpload = document.getElementById('autoUpload').checked;
+          const url = (document.getElementById('uploadUrl').value||'').trim();
+          localStorage.setItem('auto_upload_enabled', JSON.stringify(doUpload));
+          localStorage.setItem('auto_upload_url', url);
+          if (doUpload && url){
+            await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+          }
+        }catch(e){ console.warn('Upload fallito', e); }
+      });
+      $('#resetAll').addEventListener('click', ()=>{ if (!state.isAdmin) return; if (!confirm('Sicuro di voler resettare la giornata?')) return; state.selPlayers={}; state.selCoaches={}; state.selCurva={}; saveDay(); renderTabs(); renderSummary(); });
+      $('#setDir').addEventListener('click', pickDirectory);
+      // Admin toggle
+      document.getElementById('toggleAdmin').addEventListener('click', ()=>{ state.isAdmin? exitAdmin() : enterAdmin(); });
+      // restore auto-upload settings
+      try { document.getElementById('autoUpload').checked = JSON.parse(localStorage.getItem('auto_upload_enabled')||'false'); } catch {}
+      document.getElementById('uploadUrl').value = localStorage.getItem('auto_upload_url')||'';
+      // Theme toggle
+      const savedTheme = localStorage.getItem('theme'); if (savedTheme){ document.documentElement.classList.toggle('dark', savedTheme==='dark'); }
+      document.getElementById('themeToggle')?.addEventListener('click', ()=>{
+        const nextDark = !document.documentElement.classList.contains('dark');
+        document.documentElement.classList.toggle('dark', nextDark);
+        localStorage.setItem('theme', nextDark? 'dark':'light');
+      });
+    }
+
+    async function loadPlayers(){
+      let base=[];
+      try{ const resp = await fetch('resources/players.json'); const js = await resp.json(); base = js.players||[]; }
+      catch{ base = []; }
+      try{
+        if (window.db){ const snap = await window.db.collection('players').get(); const docs = snap.docs.map(d=> ({ player_id:d.id, ...(d.data()||{}) }));
+          const map=new Map(base.map(p=>[p.player_id||p.nome_completo,p]));
+          for (const x of docs){ const key=x.player_id||x.nome_completo; map.set(key, { ...(map.get(key)||{}), ...x }); }
+          state.players = Array.from(map.values());
+        } else { state.players = base; }
+      }catch{ state.players = base; }
+    }
+    async function boot(){
+      const [rulesRes, coachesRes] = await Promise.all([
+        (window.loadRulesJSON ? window.loadRulesJSON() : Promise.resolve({ rules: [] })),
+        fetch('resources/coaches.json')
+      ]);
+      await loadPlayers();
+      state.rules = (await rulesRes.json()).rules||[];
+      state.coaches = (await coachesRes.json()).coaches||[];
+      await loadAdmin();
+      loadDay();
+      bootSelect();
+      renderTabs();
+      renderSummary();
+      document.getElementById('year').textContent = new Date().getFullYear();
+      applyMobileMode();
+    }
+    boot();
+  </script>
+  <script>
+    // very small toast helper
+    function toast(msg){
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.position='fixed'; el.style.bottom='16px'; el.style.right='16px'; el.style.background='#2d6cdf'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.boxShadow='var(--shadow)'; el.style.zIndex='9999';
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.remove(); }, 2000);
+    }
+  </script>
+</body>
+</html>

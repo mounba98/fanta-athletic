@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WIRC Snap Card Maker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    input[type="file"],
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+    .preview-section {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .preview-container {
+      position: relative;
+      display: inline-block;
+      max-width: 500px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .preview-image {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .badge {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      border: 4px solid white;
+    }
+    .badge-cost {
+      background: linear-gradient(135deg, #FF6B35, #F7931E);
+      top: 15px;
+      left: 15px;
+    }
+    .badge-power {
+      background: linear-gradient(135deg, #4A90E2, #357ABD);
+      top: 15px;
+      right: 15px;
+    }
+    .name-overlay {
+      position: absolute;
+      top: 55%;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.85), rgba(0,0,0,0));
+      padding: 20px 20px;
+      color: white;
+      font-size: 42px;
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 4px 16px rgba(0,0,0,1), 0 0 40px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,1);
+      letter-spacing: 3px;
+    }
+    .effect-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.8) 70%, transparent);
+      padding: 25px 15px 15px;
+      color: white;
+    }
+    .effect-type {
+      font-size: 16px;
+      font-weight: 900;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      text-align: center;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.9);
+    }
+    .effect-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.5;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .instructions {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      border-left: 4px solid #667eea;
+    }
+    .instructions h3 {
+      margin-bottom: 10px;
+      color: #667eea;
+    }
+    .instructions ol {
+      margin-left: 20px;
+    }
+    .instructions li {
+      margin-bottom: 8px;
+      color: #555;
+    }
+    #canvasOutput {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ WIRC Snap Card Maker</h1>
+    <p class="subtitle">Crea le tue card personalizzate con badge costo e forza</p>
+
+    <div class="instructions">
+      <h3>📋 Istruzioni (AUTOMATICHE!)</h3>
+      <ol>
+        <li><strong>Seleziona carta dal dropdown</strong> (67 disponibili)</li>
+        <li>Nome, Costo e Forza si compilano AUTOMATICAMENTE ✨</li>
+        <li>Carica solo la foto del personaggio (JPG/PNG)</li>
+        <li>Vedi preview → Clicca "💾 Download Card"</li>
+      </ol>
+      <p style="background:#fff3cd;padding:10px;border-radius:8px;border-left:4px solid #ffc107;">
+        ⚡ <strong>Risparmio tempo</strong>: 2min/card → 30sec/card = 3 ore risparmiate su 67 carte!
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="cardSelect">🎴 Seleziona Carta (67 disponibili)</label>
+      <select id="cardSelect" style="width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;">
+        <option value="">-- Scegli una carta --</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="imageInput">📸 Foto Personaggio</label>
+      <input type="file" id="imageInput" accept="image/*">
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label for="nameInput">👤 Nome (auto)</label>
+        <input type="text" id="nameInput" placeholder="Auto-fill da dropdown" readonly style="background:#f5f5f5;">
+      </div>
+
+      <div class="form-group">
+        <label for="costInput">🟠 Costo (auto)</label>
+        <input type="number" id="costInput" min="1" max="10" placeholder="Auto-fill" readonly style="background:#f5f5f5;">
+      </div>
+
+      <div class="form-group">
+        <label for="powerInput">🔵 Forza (auto)</label>
+        <input type="number" id="powerInput" min="1" max="15" placeholder="Auto-fill" readonly style="background:#f5f5f5;">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" id="showEffectCheckbox" checked style="margin-right:8px;">
+        Mostra effetto sulla carta
+      </label>
+    </div>
+
+    <div class="form-group" id="effectFieldsGroup">
+      <label for="effectTypeInput">⚡ Tipo Effetto (editabile)</label>
+      <input type="text" id="effectTypeInput" placeholder="ON REVEAL / ONGOING / NO ABILITY" value="">
+      
+      <label for="effectTextInput" style="margin-top:10px;">📝 Testo Effetto (editabile)</label>
+      <textarea id="effectTextInput" placeholder="Descrizione abilità..." style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:14px;min-height:80px;font-family:inherit;"></textarea>
+    </div>
+
+    <div class="preview-section" id="previewSection" style="display: none;">
+      <h2 style="margin-bottom: 20px;">👁️ Preview Card</h2>
+      <div class="preview-container" id="previewContainer">
+        <img id="previewImage" class="preview-image">
+        <div class="badge badge-cost" id="badgeCost">4</div>
+        <div class="badge badge-power" id="badgePower">6</div>
+        <div class="name-overlay" id="nameOverlay">NICO</div>
+        <div class="effect-overlay">
+          <div class="effect-type" id="effectType">ON REVEAL</div>
+          <div class="effect-text" id="effectText">Ability text goes here...</div>
+        </div>
+      </div>
+      <button class="btn" id="downloadBtn">💾 Download Card</button>
+    </div>
+
+    <canvas id="canvasOutput"></canvas>
+  </div>
+
+  <script>
+    const cardSelect = document.getElementById('cardSelect');
+    const imageInput = document.getElementById('imageInput');
+    const nameInput = document.getElementById('nameInput');
+    const costInput = document.getElementById('costInput');
+    const powerInput = document.getElementById('powerInput');
+    const previewSection = document.getElementById('previewSection');
+    const previewImage = document.getElementById('previewImage');
+    const badgeCost = document.getElementById('badgeCost');
+    const badgePower = document.getElementById('badgePower');
+    const nameOverlay = document.getElementById('nameOverlay');
+    const effectType = document.getElementById('effectType');
+    const effectText = document.getElementById('effectText');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const canvas = document.getElementById('canvasOutput');
+    const ctx = canvas.getContext('2d');
+
+    let currentImage = null;
+    let cardsData = [];
+    let selectedCard = null;
+
+    // Load cards JSON
+    fetch('data/wirc-snap-cards-full.json')
+      .then(res => res.json())
+      .then(cards => {
+        cardsData = cards;
+        // Populate dropdown
+        cards.forEach(card => {
+          const option = document.createElement('option');
+          option.value = card.name;
+          option.textContent = `${card.name} (${card.cost}/${card.power})`;
+          cardSelect.appendChild(option);
+        });
+      })
+      .catch(err => {
+        alert('❌ Errore caricamento carte: ' + err.message);
+      });
+
+    // Auto-fill on card selection
+    cardSelect.addEventListener('change', (e) => {
+      const selectedName = e.target.value;
+      if (!selectedName) {
+        nameInput.value = '';
+        costInput.value = '';
+        powerInput.value = '';
+        document.getElementById('effectTypeInput').value = '';
+        document.getElementById('effectTextInput').value = '';
+        return;
+      }
+
+      const card = cardsData.find(c => c.name === selectedName);
+      if (card) {
+        selectedCard = card;
+        nameInput.value = card.name;
+        costInput.value = card.cost;
+        powerInput.value = card.power;
+        document.getElementById('effectTypeInput').value = card.type.replace('_', ' ').toUpperCase();
+        document.getElementById('effectTextInput').value = card.effect;
+        updatePreview();
+      }
+    });
+    
+    // Toggle effect visibility
+    document.getElementById('showEffectCheckbox').addEventListener('change', updatePreview);
+    document.getElementById('effectTypeInput').addEventListener('input', updatePreview);
+    document.getElementById('effectTextInput').addEventListener('input', updatePreview);
+
+    // Load image
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        currentImage = new Image();
+        currentImage.onload = () => {
+          previewImage.src = event.target.result;
+          previewSection.style.display = 'block';
+          updatePreview();
+        };
+        currentImage.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // No manual input needed, dropdown auto-fills
+
+    function updatePreview() {
+      nameOverlay.textContent = nameInput.value.toUpperCase() || 'NOME';
+      badgeCost.textContent = costInput.value || '?';
+      badgePower.textContent = powerInput.value || '?';
+      
+      const showEffect = document.getElementById('showEffectCheckbox').checked;
+      const effectOverlay = document.querySelector('.effect-overlay');
+      
+      if (showEffect) {
+        effectOverlay.style.display = 'block';
+        effectType.textContent = document.getElementById('effectTypeInput').value || 'NO ABILITY';
+        effectText.textContent = document.getElementById('effectTextInput').value || '';
+      } else {
+        effectOverlay.style.display = 'none';
+      }
+    }
+
+    // Download card
+    downloadBtn.addEventListener('click', () => {
+      if (!currentImage) {
+        alert('Carica prima un\'immagine!');
+        return;
+      }
+
+      const name = nameInput.value || 'card';
+      const cost = costInput.value || '0';
+      const power = powerInput.value || '0';
+
+      // Set canvas size to image size
+      canvas.width = currentImage.width;
+      canvas.height = currentImage.height;
+
+      // Draw base image
+      ctx.drawImage(currentImage, 0, 0);
+
+      // Calculate badge size relative to image (10% of width)
+      const badgeSize = canvas.width * 0.12;
+      const badgeRadius = badgeSize / 2;
+      const badgePadding = canvas.width * 0.03;
+
+      // Draw cost badge (top-left)
+      drawBadge(
+        badgePadding + badgeRadius, 
+        badgePadding + badgeRadius, 
+        badgeRadius, 
+        cost,
+        ['#FF6B35', '#F7931E'] // Orange gradient
+      );
+
+      // Draw power badge (top-right)
+      drawBadge(
+        canvas.width - badgePadding - badgeRadius,
+        badgePadding + badgeRadius,
+        badgeRadius,
+        power,
+        ['#4A90E2', '#357ABD'] // Blue gradient
+      );
+
+      // Draw NAME in middle-bottom area (55% from top)
+      const nameY = canvas.height * 0.55;
+      const nameOverlayHeight = canvas.height * 0.14;
+      const nameGradient = ctx.createLinearGradient(0, nameY - nameOverlayHeight/2, 0, nameY + nameOverlayHeight/2);
+      nameGradient.addColorStop(0, 'rgba(0,0,0,0)');
+      nameGradient.addColorStop(0.5, 'rgba(0,0,0,0.85)');
+      nameGradient.addColorStop(1, 'rgba(0,0,0,0)');
+      
+      ctx.fillStyle = nameGradient;
+      ctx.fillRect(0, nameY - nameOverlayHeight/2, canvas.width, nameOverlayHeight);
+
+      // Draw name text (BIGGER & BOLD)
+      const nameFontSize = canvas.width * 0.11;
+      ctx.font = `900 ${nameFontSize}px Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'white';
+      ctx.shadowColor = 'rgba(0,0,0,1)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetY = 4;
+      ctx.fillText(name.toUpperCase(), canvas.width / 2, nameY);
+      // Second shadow layer for extra pop
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 0;
+      ctx.fillText(name.toUpperCase(), canvas.width / 2, nameY);
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Draw EFFECT OVERLAY at bottom (solo se checkbox checked)
+      const showEffect = document.getElementById('showEffectCheckbox').checked;
+      
+      if (showEffect) {
+        const effectOverlayHeight = canvas.height * 0.18;
+        const effectGradient = ctx.createLinearGradient(0, canvas.height - effectOverlayHeight, 0, canvas.height);
+        effectGradient.addColorStop(0, 'rgba(0,0,0,0)');
+        effectGradient.addColorStop(0.3, 'rgba(0,0,0,0.8)');
+        effectGradient.addColorStop(1, 'rgba(0,0,0,0.95)');
+        
+        ctx.fillStyle = effectGradient;
+        ctx.fillRect(0, canvas.height - effectOverlayHeight, canvas.width, effectOverlayHeight);
+
+        // Usa campi editabili invece di selectedCard
+        const effectTypeText = document.getElementById('effectTypeInput').value || 'NO ABILITY';
+        const effectBodyText = document.getElementById('effectTextInput').value || '';
+        
+        // Draw effect type (editabile)
+        const effectTypeFontSize = canvas.width * 0.045;
+        ctx.font = `900 ${effectTypeFontSize}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#fbbf24';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(
+          effectTypeText.toUpperCase(), 
+          canvas.width / 2, 
+          canvas.height - effectOverlayHeight + 15
+        );
+        
+        // Draw effect text (editabile) - BIGGER & BOLD
+        if (effectBodyText) {
+          const effectTextFontSize = canvas.width * 0.038;
+          ctx.font = `600 ${effectTextFontSize}px Arial, sans-serif`;
+          ctx.fillStyle = 'white';
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          
+          // Word wrap effect text
+          const maxWidth = canvas.width * 0.92;
+          const lineHeight = effectTextFontSize * 1.5;
+          const words = effectBodyText.split(' ');
+          let line = '';
+          let y = canvas.height - effectOverlayHeight + 55;
+          
+          for (let i = 0; i < words.length; i++) {
+            const testLine = line + words[i] + ' ';
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && i > 0) {
+              ctx.fillText(line, canvas.width / 2, y);
+              line = words[i] + ' ';
+              y += lineHeight;
+            } else {
+              line = testLine;
+            }
+          }
+          ctx.fillText(line, canvas.width / 2, y);
+        }
+      }
+
+      // Download
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `wirc-${name.toLowerCase().replace(/\s+/g, '-')}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    });
+
+    function drawBadge(x, y, radius, text, colors) {
+      // Gradient
+      const gradient = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
+      gradient.addColorStop(0, colors[0]);
+      gradient.addColorStop(1, colors[1]);
+
+      // White border
+      ctx.beginPath();
+      ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+
+      // Badge circle
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Shadow
+      ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 4;
+
+      // Text
+      const fontSize = radius * 0.8;
+      ctx.font = `bold ${fontSize}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'white';
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 4;
+      ctx.fillText(text, x, y);
+
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+    }
+  </script>
+</body>
+</html>

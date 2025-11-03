@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Bacheca</title>
+  <meta name="description" content="Bacheca goliardica e trash talk" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <style>
+    .bacheca-container { max-width: 900px; margin: 0 auto; }
+    
+    /* Post Form */
+    .post-form {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .post-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 15px;
+      border: 2px solid #dbe1e8;
+      border-radius: 10px;
+      font-size: 16px;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+    .post-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+    .post-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+    }
+    
+    @media (max-width: 600px) {
+      .post-actions {
+        justify-content: center;
+      }
+      .emoji-picker {
+        display: none;
+      }
+    }
+    .emoji-picker {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .emoji-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+    }
+    
+    /* Emoji Carousel */
+    .emoji-carousel {
+      background: var(--card);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 8px;
+    }
+    
+    /* User Picker */
+    .user-picker {
+      background: var(--card);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .user-item {
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .user-item:hover {
+      background: rgba(220,20,60,0.1);
+    }
+    
+    /* Post Menu */
+    .post-menu {
+      position: relative;
+      margin-left: auto;
+    }
+    
+    .post-menu-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 5px 10px;
+      color: var(--muted);
+    }
+    
+    .post-menu-btn:hover {
+      color: var(--text);
+    }
+    
+    .post-menu-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      min-width: 150px;
+      display: none;
+      z-index: 1000;
+    }
+    
+    .post-menu-dropdown.show {
+      display: block;
+    }
+    
+    .post-menu-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      transition: all 0.2s;
+    }
+    
+    .post-menu-item:last-child {
+      border-bottom: none;
+    }
+    
+    .post-menu-item:hover {
+      background: rgba(220,20,60,0.1);
+    }
+    
+    .post-menu-item.delete {
+      color: #e74c3c;
+    }
+    
+    .post-menu-item.delete:hover {
+      background: rgba(231,76,60,0.1);
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 5px;
+      transition: all 0.2s;
+    }
+    .emoji-btn:hover {
+      background: #f0f0f0;
+      transform: scale(1.2);
+    }
+    
+    /* Image Preview */
+    .image-preview-container {
+      position: relative;
+      margin-top: 15px;
+      max-width: 100%;
+    }
+    .image-preview {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      border: 2px solid #dbe1e8;
+    }
+    .image-preview-remove {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(231, 76, 60, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .image-preview-remove:hover {
+      background: #e74c3c;
+      transform: scale(1.1);
+    }
+    .image-preview-info {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    
+    /* Loading Indicator */
+    .upload-loading {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(52, 152, 219, 0.1);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+    .upload-loading.active {
+      display: flex;
+    }
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(52, 152, 219, 0.3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: #2ecc71;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.error {
+      background: #e74c3c;
+    }
+    .toast.info {
+      background: #3498db;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Post Card */
+    .post {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+      border-left: 4px solid transparent;
+    }
+    .post:hover {
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      border-left-color: var(--primary);
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .post-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+    .post-author {
+      flex: 1;
+    }
+    .post-author-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: var(--text);
+    }
+    .post-time {
+      font-size: 12px;
+      color: #999;
+    }
+    .post-content {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      word-wrap: break-word;
+    }
+    .post-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      background: #f5f5f5;
+    }
+    
+    @media (max-width: 768px) {
+      .post-image {
+        max-height: 300px;
+      }
+    }
+
+    /* Reactions */
+    .post-reactions {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 15px;
+    }
+    .reaction-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    .reaction-btn:hover {
+      background: #f8f9fa;
+      transform: translateY(-2px);
+    }
+    .reaction-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .reaction-emoji { font-size: 18px; }
+    .reaction-count { font-weight: bold; }
+    
+    /* Comments */
+    .comments-section {
+      margin-top: 15px;
+    }
+    .comment {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .comment-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .comment-content {
+      flex: 1;
+    }
+    .comment-author {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .comment-text {
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .comment-time {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .comment-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: all 0.2s;
+    }
+    .comment-delete:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    .comment-form {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .comment-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 20px;
+      font-size: 14px;
+      background: var(--card);
+      color: var(--text);
+    }
+    .comment-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    /* Dark mode comments */
+    :root.dark .comment {
+      background: #1e293b;
+      border-color: #334155;
+    }
+    :root.dark .comment-input {
+      background: #1e293b;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+    
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 10px 20px;
+      border: 2px solid #ddd;
+      border-radius: 25px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .filter-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    /* Badges */
+    .badge-trash { background: #e74c3c; color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
+    .badge-epic { background: #9b59b6; color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
+    
+    @media (max-width: 640px) {
+      .post { padding: 15px; }
+      .post-avatar { width: 40px; height: 40px; }
+      .emoji-picker { gap: 3px; }
+      .emoji-btn { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>💬 Bacheca</h1>
+  </header>
+
+  <main class="container bacheca-container">
+    <!-- Post Form -->
+    <div class="post-form">
+      <textarea 
+        id="postContent" 
+        class="post-textarea" 
+        placeholder="Scrivi qualcosa di epico, trash o semplicemente insulta qualcuno... 😈"
+      ></textarea>
+      
+      <!-- Image Preview -->
+      <div id="imagePreviewContainer" class="image-preview-container" style="display: none;">
+        <img id="imagePreview" class="image-preview" alt="Preview" />
+        <button class="image-preview-remove" onclick="removeImagePreview()" title="Rimuovi immagine">×</button>
+        <div id="imagePreviewInfo" class="image-preview-info"></div>
+      </div>
+      
+      <!-- Upload Loading -->
+      <div id="uploadLoading" class="upload-loading">
+        <div class="spinner"></div>
+        <span id="uploadLoadingText">Caricamento in corso...</span>
+      </div>
+      
+      <div style="margin-bottom:15px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#1e40af; color:#fff; padding:10px 14px; border-radius:8px; font-weight:600; font-size:14px; width:fit-content;">
+          <input type="checkbox" id="postAsTeam" style="width:18px; height:18px; cursor:pointer; margin:0;" />
+          <span>🏆 Pubblica come squadra</span>
+        </label>
+      </div>
+      
+      <div class="post-actions" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <button class="btn btn-secondary" onclick="toggleEmojiPicker()">😀 Emoji</button>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)" />
+        <button class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">📷 Foto</button>
+        <input type="file" id="videoInput" accept="video/*" style="display:none;" onchange="handleVideoSelect(event)" />
+        <button class="btn btn-secondary" onclick="document.getElementById('videoInput').click()">🎥 Video</button>
+        <button class="btn btn-secondary" onclick="toggleUserPicker()">@ Tagga</button>
+        <button class="btn" onclick="publishPost()">🚀 Pubblica</button>
+      </div>
+      
+      <!-- Emoji Picker Carosello -->
+      <div id="emojiPicker" class="emoji-carousel" style="display: none;">
+        <div class="emoji-grid">
+          <button class="emoji-btn" onclick="addEmoji('😂')">😂</button>
+          <button class="emoji-btn" onclick="addEmoji('🔥')">🔥</button>
+          <button class="emoji-btn" onclick="addEmoji('💩')">💩</button>
+          <button class="emoji-btn" onclick="addEmoji('🤡')">🤡</button>
+          <button class="emoji-btn" onclick="addEmoji('👑')">👑</button>
+          <button class="emoji-btn" onclick="addEmoji('💀')">💀</button>
+          <button class="emoji-btn" onclick="addEmoji('🎯')">🎯</button>
+          <button class="emoji-btn" onclick="addEmoji('⚡')">⚡</button>
+          <button class="emoji-btn" onclick="addEmoji('❤️')">❤️</button>
+          <button class="emoji-btn" onclick="addEmoji('⚽')">⚽</button>
+          <button class="emoji-btn" onclick="addEmoji('🏆')">🏆</button>
+          <button class="emoji-btn" onclick="addEmoji('🎉')">🎉</button>
+          <button class="emoji-btn" onclick="addEmoji('😎')">😎</button>
+          <button class="emoji-btn" onclick="addEmoji('😱')">😱</button>
+          <button class="emoji-btn" onclick="addEmoji('🤬')">🤬</button>
+          <button class="emoji-btn" onclick="addEmoji('👏')">👏</button>
+        </div>
+      </div>
+      
+      <!-- User Picker per Tag -->
+      <div id="userPicker" class="user-picker" style="display: none;">
+        <input type="text" id="userSearch" placeholder="Cerca utente..." class="input" style="margin-bottom: 10px;" />
+        <div id="userList"></div>
+      </div>
+    </div>
+
+    <!-- Posts Feed -->
+    <div id="postsFeed"></div>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-6"></script>
+  <script src="resources/firebase.js"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let currentUser = null;
+    let isAdmin = false;
+    let currentFilter = 'all';
+    let postsUnsubscribe = null;
+    let selectedImage = null;
+    let selectedVideoBlob = null; // compressed webm
+    const MAX_VIDEO_SIZE_MB = 25;
+    const MAX_VIDEO_DURATION_SEC = 60;
+
+    // Cropper for post images (16:9)
+    const postCropModal = document.createElement('div');
+    postCropModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;';
+    postCropModal.innerHTML = `
+      <div style="background:var(--card);padding:16px;border-radius:12px;max-width:95vw;max-height:95vh;display:flex;flex-direction:column;gap:10px;">
+        <div id="pCropStage" style="position:relative;background:#111;overflow:hidden;border-radius:8px;width:86vw;max-width:900px;height:480px;"></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <label>Zoom</label>
+          <input id="pCropZoom" type="range" min="0.5" max="3" step="0.01" value="1" />
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button id="pCropCancel" class="btn btn-secondary">Annulla</button>
+            <button id="pCropConfirm" class="btn">Ritaglia e usa</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(postCropModal);
+    let pImg, pPan={x:0,y:0}, pDrag=false, pStart={x:0,y:0};
+    function openPostCropper(file){
+      const st = postCropModal.querySelector('#pCropStage');
+      st.innerHTML='';
+      const img=document.createElement('img'); img.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);user-select:none;cursor:grab;'; img.draggable=false;
+      img.src = URL.createObjectURL(file);
+      pImg=img; pPan={x:0,y:0}; postCropModal.querySelector('#pCropZoom').value='1';
+      st.appendChild(img); postCropModal.style.display='flex';
+    }
+    function pApply(){ const z=parseFloat(postCropModal.querySelector('#pCropZoom').value); if(pImg){ pImg.style.transform=`translate(calc(-50% + ${pPan.x}px), calc(-50% + ${pPan.y}px)) scale(${z})`; } }
+    postCropModal.querySelector('#pCropZoom').addEventListener('input', pApply);
+    postCropModal.querySelector('#pCropCancel').addEventListener('click', ()=>{ postCropModal.style.display='none'; });
+    postCropModal.querySelector('#pCropStage').addEventListener('mousedown', (e)=>{ pDrag=true; pStart={x:e.clientX,y:e.clientY}; if(pImg) pImg.style.cursor='grabbing'; });
+    window.addEventListener('mousemove', (e)=>{ if(!pDrag) return; pPan.x+=(e.clientX-pStart.x); pPan.y+=(e.clientY-pStart.y); pStart={x:e.clientX,y:e.clientY}; pApply(); });
+    window.addEventListener('mouseup', ()=>{ pDrag=false; if(pImg) pImg.style.cursor='grab'; });
+    async function renderPostBlob(){
+      const canvas=document.createElement('canvas'); canvas.width=1200; canvas.height=675; const ctx=canvas.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,1200,675);
+      await new Promise(r=>{ if(pImg.complete) r(); else pImg.onload=r; });
+      const z=parseFloat(postCropModal.querySelector('#pCropZoom').value);
+      const dw=pImg.naturalWidth*z, dh=pImg.naturalHeight*z; const dx=(1200-dw)/2 + pPan.x; const dy=(675-dh)/2 + pPan.y;
+      ctx.imageSmoothingQuality='high'; ctx.drawImage(pImg, dx, dy, dw, dh);
+      return await new Promise(res=> canvas.toBlob(res, 'image/jpeg', 0.78));
+    }
+    postCropModal.querySelector('#pCropConfirm').addEventListener('click', async ()=>{
+      const blob = await renderPostBlob(); postCropModal.style.display='none';
+      const reader = new FileReader();        reader.onload = () => { 
+          selectedImage = reader.result;
+          
+          // Show preview
+          const preview = document.getElementById('imagePreview');
+          const container = document.getElementById('imagePreviewContainer');
+          const info = document.getElementById('imagePreviewInfo');
+          
+          preview.src = selectedImage;
+          container.style.display = 'block';
+          info.textContent = `${formatFileSize(file.size)} • ${file.name}`;
+          
+          showLoading(false);
+          showToast('Immagine caricata!', 'success');
+        };
+        reader.readAsDataURL(blob);
+      });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+      
+      currentUser = user;
+      
+      // Check if user is admin
+      try {
+        const adminDoc = await db.collection('admins').doc(user.uid).get();
+        isAdmin = adminDoc.exists;
+      } catch (e) {
+        console.log('Admin check failed:', e);
+        isAdmin = false;
+      }
+      
+      loadPosts();
+    });
+
+    function addEmoji(emoji) {
+      const textarea = document.getElementById('postContent');
+      textarea.value += emoji;
+      textarea.focus();
+    }
+    
+    function toggleEmojiPicker() {
+      const picker = document.getElementById('emojiPicker');
+      picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    function toggleUserPicker() {
+      const picker = document.getElementById('userPicker');
+      if (picker.style.display === 'none') {
+        picker.style.display = 'block';
+        loadUsers();
+      } else {
+        picker.style.display = 'none';
+      }
+    }
+    
+    async function loadUsers() {
+      try {
+        const usersSnapshot = await db.collection('users').get();
+        const userList = document.getElementById('userList');
+        userList.innerHTML = '';
+        
+        usersSnapshot.forEach(doc => {
+          const user = doc.data();
+          const displayName = user.displayName || user.nickname || user.email;
+          
+          const userItem = document.createElement('div');
+          userItem.className = 'user-item';
+          userItem.textContent = displayName;
+          userItem.onclick = () => {
+            const textarea = document.getElementById('postContent');
+            textarea.value += `@${displayName} `;
+            textarea.focus();
+            toggleUserPicker();
+          };
+          userList.appendChild(userItem);
+        });
+      } catch (error) {
+        console.error('Errore caricamento utenti:', error);
+      }
+    }
+    
+    function togglePostMenu(postId) {
+      const menu = document.getElementById(`menu-${postId}`);
+      // Chiudi tutti gli altri menu
+      document.querySelectorAll('.post-menu-dropdown').forEach(m => {
+        if (m.id !== `menu-${postId}`) m.classList.remove('show');
+      });
+      menu.classList.toggle('show');
+    }
+    
+    // Chiudi menu quando si clicca fuori
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.post-menu')) {
+        document.querySelectorAll('.post-menu-dropdown').forEach(m => m.classList.remove('show'));
+      }
+    });
+    
+    async function editPost(postId) {
+      const post = allPosts.find(p => p.id === postId);
+      if (!post) return;
+      
+      const newContent = prompt('Modifica il tuo post:', post.content);
+      if (!newContent || newContent === post.content) return;
+      
+      try {
+        await db.collection('posts').doc(postId).update({
+          content: newContent,
+          edited: true,
+          editedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('Post modificato!', 'success');
+      } catch (error) {
+        console.error('Errore modifica:', error);
+        showToast('Errore nella modifica del post', 'error');
+      }
+    }
+    
+    async function deletePost(postId) {
+      if (!confirm('Sei sicuro di voler eliminare questo post?')) return;
+      
+      try {
+        await db.collection('posts').doc(postId).delete();
+        showToast('Post eliminato!', 'success');
+      } catch (error) {
+        console.error('Errore eliminazione:', error);
+        showToast('Errore nell\'eliminazione del post', 'error');
+      }
+    }
+
+    // Toast Notifications
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+      toast.innerHTML = `<span style="font-size:20px;">${icon}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(400px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function showLoading(show, text = 'Caricamento in corso...') {
+      const loading = document.getElementById('uploadLoading');
+      const loadingText = document.getElementById('uploadLoadingText');
+      if (show) {
+        loading.classList.add('active');
+        loadingText.textContent = text;
+      } else {
+        loading.classList.remove('active');
+      }
+    }
+
+    function removeImagePreview() {
+      document.getElementById('imagePreviewContainer').style.display = 'none';
+      document.getElementById('imageInput').value = '';
+      selectedImage = null;
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function handleImageSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { 
+        showToast('Immagine troppo grande! Max 10MB', 'error'); 
+        return; 
+      }
+      
+      showLoading(true, 'Compressione immagine...');
+      openPostCropper(file);
+    }
+
+    async function handleVideoSelect(event){
+      const file = event.target.files[0];
+      if (!file) return;
+      // Limiti: max 25MB e durata consigliata <= 60s
+      if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) { alert('Video troppo grande! Max 25MB'); event.target.value=''; return; }
+
+      // Verifica durata prima della compressione
+      const metaUrl = URL.createObjectURL(file);
+      const metaVideo = document.createElement('video');
+      metaVideo.src = metaUrl; metaVideo.preload = 'metadata';
+      await new Promise(res=>{ metaVideo.onloadedmetadata = ()=> res(); });
+      const duration = metaVideo.duration || 0;
+      URL.revokeObjectURL(metaUrl);
+      if (duration > MAX_VIDEO_DURATION_SEC) { alert('Durata video troppo lunga! Max 60 secondi'); event.target.value=''; return; }
+
+      try {
+        const compressed = await compressVideoWebM(file, { width: 854, height: 480, videoBitsPerSecond: 1200000, maxSeconds: MAX_VIDEO_DURATION_SEC });
+        selectedVideoBlob = compressed;
+        // preview immagine poster opzionale: estrai un frame
+        document.getElementById('imagePreview').style.display = 'none';
+        const szMB = (selectedVideoBlob.size/1024/1024).toFixed(1);
+        alert(`✅ Video pronto (compresso ~${szMB} MB, max 60s).`);
+      } catch (e) {
+        console.error('Video compress error:', e);
+        alert('Errore nella preparazione del video');
+        selectedVideoBlob = null;
+      }
+    }
+
+    async function publishPost() {
+      const content = document.getElementById('postContent').value.trim();
+      if (!content && !selectedImage && !selectedVideoBlob) {
+        showToast('Scrivi qualcosa o aggiungi una foto!', 'info');
+        return;
+      }
+      
+      showLoading(true, 'Pubblicazione in corso...');
+
+      try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const userData = userDoc.data() || {};
+        const postAsTeam = document.getElementById('postAsTeam').checked;
+
+        let authorName, authorPhoto;
+        if (postAsTeam && userData.team_name) {
+          authorName = userData.team_name;
+          authorPhoto = userData.team_logo || 'resources/logo.png';
+        } else {
+          authorName = userData.display_name || userData.displayName || userData.nickname || 'Utente';
+          authorPhoto = userData.photoURL || null;
+        }
+
+        const postData = {
+          content: content,
+          authorUid: currentUser.uid,
+          authorName: authorName,
+          authorPhoto: authorPhoto,
+          postAsTeam: postAsTeam,
+          timestamp: firebase.firestore.Timestamp.now(),
+          reactions: {
+            fire: 0,
+            laugh: 0,
+            poop: 0,
+            crown: 0,
+            skull: 0
+          },
+          comments: [],
+          type: detectPostType(content)
+        };
+
+        // Crea doc (serve id per video su Storage)
+        const docRef = await db.collection('posts').add(postData);
+
+        // Se c'è immagine compressa, aggiorna doc con dataURL (resta sotto 1MB)
+        if (selectedImage) {
+          await docRef.update({ imageUrl: selectedImage });
+        }
+
+        // Se c'è video, carica su Storage e salva URL
+        if (selectedVideoBlob) {
+          const storage = firebase.storage();
+          const vref = storage.ref(`posts/${docRef.id}.webm`);
+          await vref.put(selectedVideoBlob, { contentType: 'video/webm' });
+          const vurl = await vref.getDownloadURL();
+          let poster = selectedImage;
+          if (!poster) {
+            try { poster = await extractPosterFromVideo(vurl, 800, 450); } catch {}
+          }
+          const updates = poster ? { videoUrl: vurl, imageUrl: poster } : { videoUrl: vurl };
+          await docRef.update(updates);
+        }
+
+        document.getElementById('postContent').value = '';
+        removeImagePreview();
+        selectedVideoBlob = null; document.getElementById('videoInput').value='';
+        showToast('Post pubblicato con successo!', 'success');
+        showLoading(false);
+      } catch (error) {
+        console.error('Errore pubblicazione:', error);
+        showToast('Errore nella pubblicazione del post', 'error');
+        showLoading(false);
+      }
+    }
+
+    function detectPostType(content) {
+      const lower = content.toLowerCase();
+      if (lower.includes('trash') || lower.includes('merda') || lower.includes('cesso')) {
+        return 'trash';
+      }
+      if (lower.includes('epic') || lower.includes('leggend') || lower.includes('god')) {
+        return 'epic';
+      }
+      if (lower.includes('ðŸ˜‚') || lower.includes('ðŸ¤£') || lower.includes('lol')) {
+        return 'meme';
+      }
+      return 'general';
+    }
+
+    async function loadPosts() {
+      if (postsUnsubscribe) postsUnsubscribe();
+
+      let query = db.collection('posts').orderBy('timestamp', 'desc').limit(50);
+      
+      if (currentFilter !== 'all') {
+        query = query.where('type', '==', currentFilter);
+      }
+
+      postsUnsubscribe = query.onSnapshot(async (snapshot) => {
+        const posts = [];
+        
+        // Carica i post e aggiorna i nomi utente
+        for (const doc of snapshot.docs) {
+          const postData = { id: doc.id, ...doc.data() };
+          
+          // Se authorName è un'email, prova a recuperare il vero nome
+          if (postData.authorName && postData.authorName.includes('@')) {
+            try {
+              const userDoc = await db.collection('users').doc(postData.authorUid).get();
+              if (userDoc.exists) {
+                const userData = userDoc.data();
+                postData.authorName = userData.display_name || userData.displayName || userData.nickname || postData.authorName.split('@')[0];
+              }
+            } catch (e) {
+              console.log('Errore caricamento nome utente:', e);
+            }
+          }
+          
+          posts.push(postData);
+        }
+        
+        renderPosts(posts);
+      });
+    }
+
+    function renderPosts(posts) {
+      const feed = document.getElementById('postsFeed');
+      
+      if (posts.length === 0) {
+        feed.innerHTML = '<h2 style="text-align: center; color: #999; padding: 40px;">Nessun post ancora. Sii il primo a scrivere qualcosa! 🚀</h2>';
+        return;
+      }
+
+      feed.innerHTML = posts.map(post => {
+        const time = post.timestamp ? formatTime(post.timestamp.toDate()) : 'Ora';
+        const badge = post.type === 'trash' ? '<span class="badge-trash">ðŸ”¥ TRASH</span>' :
+                      post.type === 'epic' ? '<span class="badge-epic">ðŸ‘‘ EPIC</span>' : '';
+        
+        return `
+          <div class="post">
+            <div class="post-header">
+              <img class="post-avatar" src="${post.authorPhoto || 'resources/logo.png'}" alt="Avatar" />
+              <div class="post-author">
+                <div class="post-author-name">${post.authorName}${badge}</div>
+                <div class="post-time">${time}</div>
+              </div>
+              ${(currentUser && (post.authorUid === currentUser.uid || isAdmin)) ? 
+                `<div class="post-menu">
+                  <button class="post-menu-btn" onclick="togglePostMenu('${post.id}')">⋮</button>
+                  <div class="post-menu-dropdown" id="menu-${post.id}">
+                    <div class="post-menu-item" onclick="editPost('${post.id}')">✏️ Modifica</div>
+                    <div class="post-menu-item delete" onclick="deletePost('${post.id}')">🗑️ Elimina</div>
+                  </div>
+                </div>` : ''}
+            </div>
+            <div class="post-content">${fixEmoji(escapeHtml(post.content))}</div>
+            ${post.imageUrl ? `<img class="post-image" src="${post.imageUrl}" alt="Post image" />` : ''}
+            ${post.videoUrl ? `<video controls style="width:100%;max-height:480px;border-radius:10px;background:#000;" src="${post.videoUrl}"></video>` : ''}
+            <div class="post-reactions">
+              <button class="reaction-btn ${hasReacted(post, 'fire') ? 'active' : ''}" onclick="toggleReaction('${post.id}', 'fire')">
+                <span class="reaction-emoji">\uD83D\uDD25</span>
+                <span class="reaction-count">${post.reactions?.fire || 0}</span>
+              </button>
+              <button class="reaction-btn ${hasReacted(post, 'laugh') ? 'active' : ''}" onclick="toggleReaction('${post.id}', 'laugh')">
+                <span class="reaction-emoji">\uD83D\uDE02</span>
+                <span class="reaction-count">${post.reactions?.laugh || 0}</span>
+              </button>
+              <button class="reaction-btn ${hasReacted(post, 'poop') ? 'active' : ''}" onclick="toggleReaction('${post.id}', 'poop')">
+                <span class="reaction-emoji">\uD83D\uDCA9</span>
+                <span class="reaction-count">${post.reactions?.poop || 0}</span>
+              </button>
+              <button class="reaction-btn ${hasReacted(post, 'crown') ? 'active' : ''}" onclick="toggleReaction('${post.id}', 'crown')">
+                <span class="reaction-emoji">\uD83D\uDC51</span>
+                <span class="reaction-count">${post.reactions?.crown || 0}</span>
+              </button>
+              <button class="reaction-btn ${hasReacted(post, 'skull') ? 'active' : ''}" onclick="toggleReaction('${post.id}', 'skull')">
+                <span class="reaction-emoji">\uD83D\uDC80</span>
+                <span class="reaction-count">${post.reactions?.skull || 0}</span>
+              </button>
+            </div>
+            <div class="comments-section">
+              ${renderComments(post.comments || [], post.id)}
+              <div class="comment-form">
+                <input type="text" class="comment-input" placeholder="Scrivi un commento..." id="comment-${post.id}" onkeypress="if(event.key==='Enter') addComment('${post.id}')" />
+                <button class="btn btn-sm" onclick="addComment('${post.id}')">💬</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderComments(comments, postId) {
+      if (!comments || comments.length === 0) return '';
+      
+      return comments.map((comment, index) => {
+        const canDelete = isAdmin || (currentUser && comment.authorUid === currentUser.uid);
+        return `
+        <div class="comment">
+          <img class="comment-avatar" src="${comment.authorPhoto || 'resources/logo.png'}" alt="Avatar" />
+          <div class="comment-content">
+            <div class="comment-author">${comment.authorName}</div>
+            <div class="comment-text">${escapeHtml(comment.text)}</div>
+            <div class="comment-time">${formatTime(new Date(comment.timestamp))}</div>
+          </div>
+          ${canDelete ? `<button class="comment-delete" onclick="deleteComment('${postId}', ${index})" title="Elimina commento">×</button>` : ''}
+        </div>
+      `;
+      }).join('');
+    }
+
+    async function addComment(postId) {
+      const input = document.getElementById(`comment-${postId}`);
+      const text = input.value.trim();
+      if (!text) return;
+
+      try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const userData = userDoc.data() || {};
+        
+        const postDoc = await db.collection('posts').doc(postId).get();
+        const post = postDoc.data();
+
+        await db.collection('posts').doc(postId).update({
+          comments: firebase.firestore.FieldValue.arrayUnion({
+            authorUid: currentUser.uid,
+            authorName: userData.display_name || userData.displayName || userData.nickname || 'Utente',
+            authorPhoto: userData.photoURL || null,
+            text: text,
+            timestamp: Date.now()
+          })
+        });
+
+        input.value = '';
+        
+        // NOTIFICA proprietario post
+        if (typeof window.notifyPostComment === 'function' && post.userId !== currentUser.uid) {
+          await window.notifyPostComment(postId, post.userId, currentUser.uid, userData.display_name || 'Utente');
+        }
+        
+        // NOTIFICA altri commentatori
+        if (typeof window.notifyOtherCommenters === 'function') {
+          const existingCommenters = (post.comments || []).map(c => c.authorUid).filter(uid => uid !== currentUser.uid);
+          await window.notifyOtherCommenters(postId, post.userId, currentUser.uid, userData.display_name || 'Utente', existingCommenters);
+        }
+      } catch (error) {
+        console.error('Errore commento:', error);
+        showToast('Funzione commenti temporaneamente disabilitata. Usa la bacheca per comunicare!', 'error');
+      }
+    }
+
+    async function deleteComment(postId, commentIndex) {
+      if (!confirm('Eliminare questo commento?')) return;
+      
+      try {
+        const postDoc = await db.collection('posts').doc(postId).get();
+        const post = postDoc.data();
+        const comments = post.comments || [];
+        
+        // Remove comment at index
+        comments.splice(commentIndex, 1);
+        
+        await db.collection('posts').doc(postId).update({ comments });
+        showToast('Commento eliminato', 'success');
+      } catch (error) {
+        console.error('Errore eliminazione commento:', error);
+        showToast('Errore nell\'eliminazione del commento', 'error');
+      }
+    }
+
+    async function toggleReaction(postId, reactionType) {
+      try {
+        const postRef = db.collection('posts').doc(postId);
+        const postDoc = await postRef.get();
+        const post = postDoc.data();
+        
+        const reactionKey = `reactions.${reactionType}`;
+        const userReactionsKey = `userReactions.${currentUser.uid}`;
+        
+        const currentReaction = post.userReactions?.[currentUser.uid];
+        
+        if (currentReaction === reactionType) {
+          // Remove reaction
+          await postRef.update({
+            [reactionKey]: firebase.firestore.FieldValue.increment(-1),
+            [userReactionsKey]: firebase.firestore.FieldValue.delete()
+          });
+        } else {
+          // Add/change reaction
+          const updates = {
+            [reactionKey]: firebase.firestore.FieldValue.increment(1),
+            [userReactionsKey]: reactionType
+          };
+          
+          if (currentReaction) {
+            updates[`reactions.${currentReaction}`] = firebase.firestore.FieldValue.increment(-1);
+          }
+          
+          await postRef.update(updates);
+          
+          // NOTIFICA proprietario post
+          if (typeof window.notifyPostReaction === 'function' && post.userId !== currentUser.uid) {
+            await window.notifyPostReaction(postId, post.userId, currentUser.uid, currentUser.displayName, reactionType);
+          }
+        }
+      } catch (error) {
+        console.error('Errore reaction:', error);
+      }
+    }
+
+    function hasReacted(post, reactionType) {
+      return post.userReactions?.[currentUser?.uid] === reactionType;
+    }
+
+    function filterPosts(type) {
+      currentFilter = type;
+      
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      loadPosts();
+    }
+
+    function formatTime(date) {
+      const now = new Date();
+      const diff = Math.floor((now - date) / 1000);
+      
+      if (diff < 60) return 'Ora';
+      if (diff < 3600) return Math.floor(diff / 60) + ' min fa';
+      if (diff < 86400) return Math.floor(diff / 3600) + ' ore fa';
+      if (diff < 604800) return Math.floor(diff / 86400) + ' giorni fa';
+      
+      return date.toLocaleDateString('it-IT');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function fixEmoji(text) {
+      // Fix emoji mal codificati - usa unicode escape
+      return text
+        .replace(/\uFFFD\uFFFD\uFFFD\uFFFD/g, '🔥') // Fire
+        .replace(/\uD83D[\uDE00-\uDE4F]/g, (match) => match) // Emoticons
+        .replace(/\u00F0\u009F[\u0080-\u00BF][\u0080-\u00BF]/g, (match) => {
+          // Decodifica UTF-8 mal interpretato
+          try {
+            return decodeURIComponent(escape(match));
+          } catch {
+            return match;
+          }
+        });
+    }
+  </script>
+      <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/lazy-load.js?v=20251020"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/league-invite-modal.js?v=2025102403"></script>
+  <script src="resources/social-notifications.js?v=2025102404"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+  
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scegli Squadra - Fanta Athletic</title>
+  <link rel="stylesheet" href="resources/sheet.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 32px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+    .teams-grid {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .team-card {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .team-card:hover {
+      border-color: #d91847;
+      transform: translateX(4px);
+    }
+    .team-card.selected {
+      border-color: #d91847;
+      background: linear-gradient(135deg, rgba(217,24,71,0.1), rgba(217,24,71,0.05));
+    }
+    .team-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d91847, #b91846);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .team-info {
+      flex: 1;
+    }
+    .team-name {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .team-members {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #d91847, #b91846);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(217,24,71,0.4);
+    }
+    .btn:disabled {
+      background: #334155;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚽ Scegli la Tua Squadra</h1>
+    <p class="subtitle">Seleziona una delle squadre disponibili per iniziare a giocare</p>
+    
+    <div id="teamsContainer" class="loading">
+      <p>⏳ Caricamento squadre...</p>
+    </div>
+    
+    <button id="confirmBtn" class="btn" onclick="confirmTeam()" disabled>
+      Conferma Squadra
+    </button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    
+    let selectedTeamId = null;
+    let teams = [];
+    let currentUser = null;
+    let currentLeagueId = null;
+
+    // Auth check
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+      
+      currentUser = user;
+      console.log('✅ User authenticated:', user.uid);
+      
+      // Get current league
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      currentLeagueId = userDoc.data()?.currentLeague;
+      
+      if (!currentLeagueId) {
+        alert('⚠️ Non sei ancora in una lega. Redirect a join-league...');
+        window.location.href = 'join-league.html';
+        return;
+      }
+      
+      console.log('✅ Current league:', currentLeagueId);
+      
+      // Check se già in una squadra (controlla team_index in user doc)
+      const userData = userDoc.data();
+      
+      if (userData && userData.team_index !== null && userData.team_index !== undefined) {
+        console.log('✅ User già in squadra:', userData.team_index);
+        // Redirect a index
+        alert('Sei già in una squadra! Redirect...');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+        return;
+      }
+      
+      await loadTeams();
+    });
+
+    async function loadTeams() {
+      try {
+        // Carica squadre da /teams collection
+        const teamsSnap = await db.collection('teams').get();
+        teams = teamsSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })).sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        
+        console.log('📊 Teams loaded:', teams.length);
+        
+        if (teams.length === 0) {
+          document.getElementById('teamsContainer').innerHTML = `
+            <p style="color:#ef4444;">❌ Nessuna squadra disponibile.</p>
+            <p style="color:#94a3b8;font-size:14px;margin-top:8px;">Contatta l'amministratore.</p>
+          `;
+          return;
+        }
+        
+        renderTeams();
+      } catch (error) {
+        console.error('Error loading teams:', error);
+        document.getElementById('teamsContainer').innerHTML = `
+          <p style="color:#ef4444;">❌ Errore caricamento squadre: ${error.message}</p>
+        `;
+      }
+    }
+
+    function renderTeams() {
+      const container = document.getElementById('teamsContainer');
+      
+      if (teams.length === 0) {
+        container.innerHTML = `
+          <p style="color:#ef4444;">❌ Nessuna squadra disponibile.</p>
+        `;
+        return;
+      }
+      
+      container.className = 'teams-grid';
+      container.innerHTML = teams.map(team => {
+        const membersCount = team.members?.length || 0;
+        const teamEmoji = getTeamEmoji(team.nome || team.name);
+        
+        return `
+          <div class="team-card" onclick="selectTeam('${team.id}')">
+            <div class="team-icon">${teamEmoji}</div>
+            <div class="team-info">
+              <div class="team-name">${team.nome || team.name || 'Squadra'}</div>
+              <div class="team-members">👥 ${membersCount} membri</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getTeamEmoji(teamName) {
+      const name = (teamName || '').toLowerCase();
+      if (name.includes('rossi') || name.includes('red')) return '🔴';
+      if (name.includes('blu') || name.includes('blue')) return '🔵';
+      if (name.includes('verd') || name.includes('green')) return '🟢';
+      if (name.includes('gial') || name.includes('yellow')) return '🟡';
+      if (name.includes('ner') || name.includes('black')) return '⚫';
+      if (name.includes('bianc') || name.includes('white')) return '⚪';
+      return '⚽';
+    }
+
+    function selectTeam(teamId) {
+      selectedTeamId = teamId;
+      
+      // Update UI
+      document.querySelectorAll('.team-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      event.currentTarget.classList.add('selected');
+      
+      // Enable button
+      document.getElementById('confirmBtn').disabled = false;
+      
+      console.log('✅ Team selected:', teamId);
+    }
+
+    async function confirmTeam() {
+      if (!selectedTeamId) {
+        alert('⚠️ Seleziona una squadra prima di confermare');
+        return;
+      }
+      
+      const btn = document.getElementById('confirmBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Assegnazione in corso...';
+      
+      try {
+        console.log('🔄 Assigning user to team:', selectedTeamId);
+        
+        // Salva team_index in /users/{uid}
+        await db.collection('users').doc(currentUser.uid).update({
+          team_index: parseInt(selectedTeamId)
+        });
+        
+        console.log('✅ User assigned to team');
+        
+        alert('✅ Sei stato assegnato alla squadra con successo!');
+        
+        // Redirect a index
+        window.location.href = 'index.html';
+      } catch (error) {
+        console.error('Error assigning team:', error);
+        alert('❌ Errore durante l\'assegnazione: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'Conferma Squadra';
+      }
+    }
+  </script>
+</body>
+</html>

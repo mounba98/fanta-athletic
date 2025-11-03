@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clear Service Worker - Fanta Athletic</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    .card {
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    button {
+      background: #dc143c;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 8px 0;
+      width: 100%;
+    }
+    button:hover {
+      background: #b91846;
+    }
+    .success {
+      background: #10b981;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      display: none;
+    }
+    .success.show {
+      display: block;
+    }
+    .info {
+      background: #3b82f6;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧹 Clear Cache & Service Worker</h1>
+    <p>Se hai problemi con file vecchi o errori infiniti, usa questi strumenti:</p>
+    
+    <div class="info">
+      <strong>Quando usare:</strong><br>
+      • Input bloccato (cursore disabled)<br>
+      • Errori "Failed to fetch" infiniti<br>
+      • Modifiche non visibili dopo deploy<br>
+      • Foto non appaiono anche se caricate
+    </div>
+    
+    <button onclick="clearAll()">🗑️ PULISCI TUTTO (Consigliato)</button>
+    <button onclick="unregisterSW()">❌ Disabilita Service Worker</button>
+    <button onclick="clearCache()">🧹 Svuota Cache Browser</button>
+    
+    <div id="success" class="success">
+      ✅ Operazione completata! Ricarica la pagina (F5)
+    </div>
+    
+    <hr style="border-color: #334155; margin: 24px 0;">
+    
+    <h3>🔧 Istruzioni Manuali</h3>
+    <ol>
+      <li>Premi <strong>CTRL + SHIFT + F5</strong> (hard refresh)</li>
+      <li>Apri DevTools (F12) → Application → Service Workers</li>
+      <li>Click "Unregister" su tutti i worker</li>
+      <li>Application → Cache Storage → Delete all</li>
+      <li>Ricarica pagina</li>
+    </ol>
+    
+    <a href="index.html">← Torna alla Home</a>
+  </div>
+
+  <script>
+    async function clearAll() {
+      await unregisterSW();
+      await clearCache();
+      document.getElementById('success').classList.add('show');
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+    
+    async function unregisterSW() {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+          await registration.unregister();
+          console.log('✅ Service Worker unregistered');
+        }
+        document.getElementById('success').classList.add('show');
+        document.getElementById('success').textContent = '✅ Service Worker disabilitato!';
+      }
+    }
+    
+    async function clearCache() {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        console.log('✅ Cache cleared');
+        document.getElementById('success').classList.add('show');
+        document.getElementById('success').textContent = '✅ Cache svuotata!';
+      }
+    }
+  </script>
+</body>
+</html>

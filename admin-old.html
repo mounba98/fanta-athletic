@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🔧 Admin Central Hub - Athletic Brescia</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .admin-container { max-width: 1200px; margin: 0 auto; }
+    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+    .admin-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--primary);
+      transition: transform 0.2s;
+    }
+    .admin-card:hover { transform: translateY(-2px); }
+    .admin-card h3 { margin-top: 0; color: var(--primary); }
+    .admin-card p { color: var(--muted); margin: 10px 0; }
+    .admin-link {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+    .admin-link:hover { background: #2980b9; transform: scale(1.05); }
+    .warning { background: #fff3cd; border-left-color: #ffc107; }
+    .warning .admin-link { background: #ffc107; }
+    .danger { background: #f8d7da; border-left-color: #dc3545; }
+    .danger .admin-link { background: #dc3545; }
+    .success { background: #d4edda; border-left-color: #28a745; }
+    .success .admin-link { background: #28a745; }
+    .info { background: #d1ecf1; border-left-color: #17a2b8; }
+    .info .admin-link { background: #17a2b8; }
+    .purple { background: #e7d9f5; border-left-color: #6f42c1; }
+    .purple .admin-link { background: #6f42c1; }
+    .hero {
+      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .hero h1 { margin: 0; font-size: 2.5rem; }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 30px 0 15px;
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 10px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 10px;
+    }
+    .badge-new { background: #10b981; color: white; }
+    .badge-important { background: #ef4444; color: white; }
+    .badge-utility { background: #6b7280; color: white; }
+  </style>
+</head>
+<body>
+  <!-- Hero -->
+  <div class="hero">
+    <h1>🔧 Admin Central Hub</h1>
+    <p>Pannello di controllo Athletic Brescia</p>
+  </div>
+  
+  <div class="admin-container">
+    <!-- ========== SETUP INIZIALE ========== -->
+    <h2 class="section-title">⚙️ Setup Iniziale <span class="badge badge-important">IMPORTANTE</span></h2>
+    <div class="admin-grid">
+      
+      <!-- Setup Database -->
+      <div class="admin-card danger">
+        <h3>🔥 Setup Database <span class="badge badge-new">NUOVO</span></h3>
+        <p>Inizializza tutto: regole, contest, calendario. <strong>Usa questo prima!</strong></p>
+        <a href="admin-setup.html" class="admin-link">Setup Completo →</a>
+      </div>
+      
+      <!-- Firestore Rules -->
+      <div class="admin-card warning">
+        <h3>🔐 Firestore Rules <span class="badge badge-important">RICHIESTO</span></h3>
+        <p>Configura permessi database. Leggi FIRESTORE_RULES.txt e copia in Firebase Console.</p>
+        <a href="https://console.firebase.google.com/project/fanta-athletic/firestore/rules" target="_blank" class="admin-link">Apri Console →</a>
+      </div>
+    </div>
+
+    <!-- ========== CALENDARIO & CONTEST ========== -->
+    <h2 class="section-title">📅 Calendario & Contest</h2>
+    <div class="admin-grid">
+      
+      <!-- Calendario Athletic -->
+      <div class="admin-card success">
+        <h3>📆 Gestione Calendario <span class="badge badge-new">NUOVO</span></h3>
+        <p>Aggiungi partite reali Athletic, inserisci risultati, sync con contest.</p>
+        <a href="admin-calendario.html" class="admin-link">Gestisci Calendario →</a>
+      </div>
+      
+      <!-- Contest Results -->
+      <div class="admin-card info">
+        <h3>🏆 Risultati Contest</h3>
+        <p>Inserisci risultati partite per calcolare punti pronostici.</p>
+        <a href="admin-calendario.html" class="admin-link">Inserisci Risultati →</a>
+      </div>
+    </div>
+
+    <!-- ========== FANTACALCIO ========== -->
+    <h2 class="section-title">⚽ Gestione Fantacalcio</h2>
+    <div class="admin-grid">
+      
+      <!-- Admin Squadre -->
+      <div class="admin-card">
+        <h3>👥 Gestione Squadre</h3>
+        <p>Crea, modifica squadre. Assegna allenatori, gestisci rosa giocatori.</p>
+        <a href="admin-squadre.html" class="admin-link">Gestisci Squadre →</a>
+      </div>
+      
+      <!-- Admin Giocatori -->
+      <div class="admin-card">
+        <h3>⚽ Gestione Giocatori</h3>
+        <p>Aggiungi, modifica giocatori. Gestisci statistiche e disponibilità.</p>
+        <a href="admin-giocatori.html" class="admin-link">Gestisci Giocatori →</a>
+      </div>
+
+      <!-- Gestione Giocatori (NUOVO COMPLETO) -->
+      <div class="admin-card success" style="border-left-color: #10b981;">
+        <h3>⚽ Gestione Giocatori Completa</h3>
+        <p>CRUD completo giocatori: aggiungi, modifica, elimina. Stats, import/export, sync JSON.</p>
+        <a href="admin-players.html" class="admin-link" style="background: #10b981;">Gestisci Giocatori</a>
+      </div>
+      
+      <!-- Admin Giornate -->
+      <div class="admin-card">
+        <h3>📅 Gestione Giornate Fanta</h3>
+        <p>Crea giornate fantacalcio, gestisci scontri, calcola punteggi.</p>
+        <a href="admin-giornate.html" class="admin-link">Gestisci Giornate →</a>
+      </div>
+
+      <!-- Force Refresh -->
+      <div class="admin-card info">
+        <h3>🔄 Force Refresh <span class="badge badge-new">NUOVO</span></h3>
+        <p>Forza aggiornamento cache su tutti i dispositivi dopo deploy.</p>
+        <button class="admin-link" onclick="forceRefresh()" style="border:none;cursor:pointer;">Force Update →</button>
+      </div>
+      
+      <!-- Firestore Console -->
+      <div class="admin-card warning">
+        <h3>🔥 Firestore Console</h3>
+        <p>Accedi direttamente al database per modifiche manuali.</p>
+        <a href="https://console.firebase.google.com/project/fanta-athletic/firestore" target="_blank" class="admin-link">Apri Console →</a>
+      </div>
+      
+      <!-- Logs & Debug -->
+      <div class="admin-card">
+        <h3>🐛 Logs & Debug</h3>
+        <p>Visualizza logs applicazione e debug console.</p>
+        <a href="https://console.firebase.google.com/project/fanta-athletic/overview" target="_blank" class="admin-link">Firebase Console →</a>
+      </div>
+
+      <!-- Debug & Monitor -->
+      <div class="admin-card info">
+        <h3>🔍 Debug & Monitor</h3>
+        <p>Monitora errori, performance e stato del sistema in tempo reale.</p>
+        <a href="admin-debug.html" class="admin-link">Vai al Debug</a>
+      </div>
+
+      <!-- Upload Regole -->
+      <div class="admin-card purple">
+        <h3>📋 Upload Regole <span class="badge badge-utility">LEGACY</span></h3>
+        <p>Tool specifico per caricare regole da JSON. (Ora in admin-setup)</p>
+        <a href="upload-rules-to-firestore.html" class="admin-link">Upload Regole →</a>
+      </div>
+    </div>
+
+    <!-- Utility & Tools -->
+    <div class="section" style="margin-top: 60px;">
+      <h2>🔧 Utility & Tools</h2>
+      <p>Strumenti di manutenzione, test, migrazione e debug per amministratori.</p>
+    </div>
+
+    <div class="admin-grid">
+      <!-- Sblocco Formazioni Rapido -->
+      <div class="admin-card warning" style="border-left-color: #ff6b6b;">
+        <h3>🔓 Sblocco Formazioni Rapido</h3>
+        <p>Estendi deadline formazioni fino alle 21:15 di oggi. Un click per sbloccare!</p>
+        <a href="sblocca-formazioni-temp.html" class="admin-link" style="background: #ff6b6b;">Sblocca Ora</a>
+      </div>
+
+      <!-- Gestione Deadline -->
+      <div class="admin-card warning">
+        <h3>⏰ Gestione Deadline</h3>
+        <p>Imposta deadline per ogni giornata. Preset rapidi disponibili.</p>
+        <a href="admin-deadline.html" class="admin-link">Gestisci Deadline</a>
+      </div>
+
+      <!-- Upload Foto Giocatori -->
+      <div class="admin-card success">
+        <h3>📸 Upload Foto Giocatori</h3>
+        <p>Carica foto profilo per i giocatori del roster. Supporta drag & drop e crop.</p>
+        <a href="upload-foto-giocatori.html" class="admin-link">Carica Foto</a>
+      </div>
+
+      <!-- Test Foto Live -->
+      <div class="admin-card info">
+        <h3>🔍 Test Foto Live</h3>
+        <p>Verifica quali giocatori hanno foto nel DB e se le foto si caricano correttamente.</p>
+        <a href="test-foto-live.html" class="admin-link">Test Foto</a>
+      </div>
+
+      <!-- Debug Foto DB -->
+      <div class="admin-card info">
+        <h3>🐛 Debug Foto Database</h3>
+        <p>Analizza statistiche foto giocatori e verifica integrità database.</p>
+        <a href="debug-foto-db.html" class="admin-link">Debug DB</a>
+      </div>
+
+      <!-- Clear Service Worker -->
+      <div class="admin-card danger">
+        <h3>🗑️ Clear Service Worker</h3>
+        <p>Pulisci cache Service Worker e forza reload. Usa se app non si aggiorna.</p>
+        <a href="clear-sw.html" class="admin-link">Clear Cache</a>
+      </div>
+
+      <!-- Verifica Squadre Utenti -->
+      <div class="admin-card success" style="border-left-color: #22c55e;">
+        <h3>✅ Verifica & Assegna Squadre</h3>
+        <p>Vedi utenti senza squadra e assegnali rapidamente. Tool visuale completo.</p>
+        <a href="verifica-squadre-utenti.html" class="admin-link" style="background: #22c55e;">Verifica Ora</a>
+      </div>
+
+      <!-- Gestione Leghe -->
+      <div class="admin-card purple">
+        <h3>🏆 Gestione Leghe</h3>
+        <p>Crea, modifica, elimina leghe. Gestisci membri e codici invito.</p>
+        <a href="admin-leghe.html" class="admin-link">Gestisci Leghe</a>
+      </div>
+
+      <!-- Genera Codici Invito -->
+      <div class="admin-card warning">
+        <h3>🔑 Genera Codici Invito Leghe</h3>
+        <p>Aggiunge campo inviteCode a leghe che non ce l'hanno. Da usare una volta sola.</p>
+        <a href="add-invite-code-to-leagues.html" class="admin-link">Genera Codici</a>
+      </div>
+
+      <!-- Fix Utenti-Leghe -->
+      <div class="admin-card info">
+        <h3>🔗 Fix Associazione Utenti-Leghe</h3>
+        <p>Associa utenti esistenti alla lega "Fanta Athletic" se non sono già membri.</p>
+        <a href="fix-users-leagues.html" class="admin-link">Fix Associazioni</a>
+      </div>
+
+      <!-- Migrazione Dati -->
+      <div class="admin-card danger">
+        <h3>📦 Migrazione Dati Legacy</h3>
+        <p>Migra squadre e giocatori da collection top-level a struttura multi-lega. ATTENZIONE: Operazione irreversibile!</p>
+        <a href="migrate-existing-data.html" class="admin-link">Migra Dati</a>
+      </div>
+
+      <!-- Popola Database -->
+      <div class="admin-card purple">
+        <h3>🌱 Popola Database Test</h3>
+        <p>Popola database con dati di esempio per testing. Usa su ambiente di sviluppo.</p>
+        <a href="populate-data.html" class="admin-link">Popola DB</a>
+      </div>
+
+      <!-- Test Penalità (già presente sopra, lo lascio qui per organizzazione) -->
+      <div class="admin-card info">
+        <h3>🧪 Test Sistema Penalità</h3>
+        <p>Verifica e applica penalità per formazioni mancanti. Check risultati H2H.</p>
+        <a href="test-penalties.html" class="admin-link">Test Penalità</a>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top: 40px;">
+      <h3>🔐 Gestione Permessi Admin</h3>
+      <p>Per aggiungere un nuovo admin, vai su Firebase Console → Firestore → Crea documento in collection "admins" con ID = UID utente.</p>
+      <a href="https://console.firebase.google.com/project/fanta-athletic/firestore/data/~2Fadmins" target="_blank" class="btn">Gestisci Admin</a>
+    </div>
+  </main>
+
+  <script src="resources/error-logger.js?v=20251018"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script>
+    // Init Firebase IMMEDIATAMENTE
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    window.storage = firebase.storage();
+    const db = window.db; // Alias locale per compatibilità
+  </script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/app-init.js"></script>
+  <script>
+    
+    // Verifica admin
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        alert('Accesso negato. Effettua il login.');
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      // Verifica se è admin
+      try {
+        const adminDoc = await db.collection('admins').doc(user.uid).get();
+        if (!adminDoc.exists) {
+          alert('Accesso negato. Solo gli admin possono accedere a questa pagina.');
+          window.location.href = 'index.html';
+        }
+      } catch (error) {
+        console.error('Errore verifica admin:', error);
+        alert('Errore verifica permessi');
+        window.location.href = 'index.html';
+      }
+    });
+
+    async function exportData() {
+      try {
+        const data = {
+          timestamp: new Date().toISOString(),
+          users: [],
+          posts: [],
+          teams: []
+        };
+
+        // Export users
+        const usersSnap = await db.collection('users').get();
+        usersSnap.forEach(doc => data.users.push({ id: doc.id, ...doc.data() }));
+
+        // Export posts
+        const postsSnap = await db.collection('posts').limit(100).get();
+        postsSnap.forEach(doc => data.posts.push({ id: doc.id, ...doc.data() }));
+
+        // Download JSON
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `fanta-athletic-backup-${Date.now()}.json`;
+        a.click();
+        
+        alert('✅ Backup completato!');
+      } catch (error) {
+        console.error('Errore export:', error);
+        alert('❌ Errore durante l\'export');
+      }
+    }
+  </script>
+  
+    <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+</body>
+</html>

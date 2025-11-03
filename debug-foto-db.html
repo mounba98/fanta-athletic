@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Foto DB - Fanta Athletic</title>
+  <style>
+    body {
+      font-family: monospace;
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #0f172a;
+      color: #00ff00;
+    }
+    .player {
+      background: #1e293b;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+    }
+    .player.has-photo {
+      border-left-color: #10b981;
+    }
+    .player.no-photo {
+      border-left-color: #ef4444;
+    }
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    button {
+      background: #dc143c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    .stats {
+      background: #1e293b;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📸 Debug Foto Database</h1>
+  
+  <div class="stats" id="stats">
+    Caricamento...
+  </div>
+  
+  <button onclick="loadPlayers()">🔄 Ricarica</button>
+  <button onclick="fixMissingPhotos()">🔧 Fix Placeholder per chi non ha foto</button>
+  
+  <div id="results"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+    
+    let currentLeagueId = null;
+    let allPlayers = [];
+    
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        document.body.innerHTML = '<h1>⚠️ Fai login prima!</h1><a href="auth.html">Vai al login</a>';
+        return;
+      }
+      
+      // Get user's league
+      const userLeagues = await db.collection('leagues')
+        .where('members', 'array-contains', user.uid)
+        .limit(1)
+        .get();
+      
+      if (userLeagues.empty) {
+        document.getElementById('stats').innerHTML = '❌ Non sei in nessuna lega';
+        return;
+      }
+      
+      currentLeagueId = userLeagues.docs[0].id;
+      loadPlayers();
+    });
+    
+    async function loadPlayers() {
+      const resultsDiv = document.getElementById('results');
+      const statsDiv = document.getElementById('stats');
+      
+      resultsDiv.innerHTML = '<p>🔍 Caricamento giocatori...</p>';
+      
+      try {
+        const snapshot = await db.collection('leagues')
+          .doc(currentLeagueId)
+          .collection('players')
+          .orderBy('cognome')
+          .get();
+        
+        allPlayers = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        const withPhoto = allPlayers.filter(p => p.photoURL);
+        const withoutPhoto = allPlayers.filter(p => !p.photoURL);
+        
+        statsDiv.innerHTML = `
+          <h3>📊 Statistiche</h3>
+          <div>Totale giocatori: <strong>${allPlayers.length}</strong></div>
+          <div>✅ Con foto: <strong>${withPhoto.length}</strong></div>
+          <div>❌ Senza foto: <strong>${withoutPhoto.length}</strong></div>
+          <div>📈 Percentuale: <strong>${((withPhoto.length / allPlayers.length) * 100).toFixed(1)}%</strong></div>
+        `;
+        
+        resultsDiv.innerHTML = '';
+        
+        allPlayers.forEach(player => {
+          const hasPhoto = !!player.photoURL;
+          const initials = (player.nome || player.cognome || '?').substring(0, 2).toUpperCase();
+          const fallbackSvg = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#1e3a8a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="16" font-weight="bold">${initials}</text></svg>`)}`;
+          
+          resultsDiv.innerHTML += `
+            <div class="player ${hasPhoto ? 'has-photo' : 'no-photo'}">
+              <img src="${hasPhoto ? player.photoURL : fallbackSvg}" onerror="this.src='${fallbackSvg}'" />
+              <strong>${player.cognome || 'N/A'}</strong> ${player.nome || ''}
+              (${player.ruolo || 'N/A'})
+              ${hasPhoto ? '✅ Foto presente' : '❌ Nessuna foto'}
+              ${hasPhoto ? `<br><small style="color: #60a5fa;">${player.photoURL}</small>` : ''}
+            </div>
+          `;
+        });
+        
+      } catch (error) {
+        resultsDiv.innerHTML = `<div style="color: #ef4444;">❌ Errore: ${error.message}</div>`;
+        console.error(error);
+      }
+    }
+    
+    async function fixMissingPhotos() {
+      if (!confirm('Vuoi verificare se ci sono foto in Storage non ancora collegate al DB?')) return;
+      
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<p>🔍 Controllo Storage...</p>';
+      
+      try {
+        const storageRef = storage.ref(`players/${currentLeagueId}`);
+        const files = await storageRef.listAll();
+        
+        let fixed = 0;
+        
+        for (const fileRef of files.items) {
+          const playerId = fileRef.name.replace('.jpg', '');
+          const player = allPlayers.find(p => p.id === playerId);
+          
+          if (player && !player.photoURL) {
+            const photoURL = await fileRef.getDownloadURL();
+            await db.collection('leagues')
+              .doc(currentLeagueId)
+              .collection('players')
+              .doc(playerId)
+              .update({ photoURL });
+            
+            console.log(`✅ Fixed ${player.cognome}: ${photoURL}`);
+            fixed++;
+          }
+        }
+        
+        alert(`✅ Completato! ${fixed} foto collegate al DB`);
+        loadPlayers();
+        
+      } catch (error) {
+        alert(`❌ Errore: ${error.message}`);
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Asta Giocatori - Fanta Athletic</title>
+  <meta name="description" content="Sistema di asta per l'acquisto dei giocatori" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .asta-container { max-width: 1400px; margin: 0 auto; }
+    .asta-layout { display: grid; grid-template-columns: 300px 1fr 300px; gap: 20px; }
+    
+    /* Player Card */
+    .player-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .player-card img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid white;
+      margin-bottom: 20px;
+      object-fit: cover;
+    }
+    .player-name { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+    .player-role { 
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    
+    /* Auction Info */
+    .auction-info {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .current-bid {
+      font-size: 48px;
+      font-weight: bold;
+      color: var(--primary);
+      text-align: center;
+      margin: 20px 0;
+    }
+    .bid-currency { font-size: 24px; color: #f39c12; }
+    
+    /* Timer */
+    .timer {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .timer.warning { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .timer.danger { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); animation: pulse 1s infinite; }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    /* Bid Controls */
+    .bid-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .bid-btn {
+      padding: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Admin Controls */
+    .admin-panel {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .admin-panel h3 {
+      color: white;
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .admin-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .admin-btn {
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+    }
+    .admin-btn.primary {
+      background: #e74c3c;
+      color: white;
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+    .admin-btn.primary:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
+    .admin-btn.secondary {
+      background: #34495e;
+      color: white;
+      box-shadow: 0 4px 12px rgba(52, 73, 94, 0.3);
+    }
+    .admin-btn.secondary:hover {
+      background: #2c3e50;
+      transform: translateY(-2px);
+    }
+    .admin-settings {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .admin-settings label {
+      color: white;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    .admin-settings input {
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 14px;
+      width: 80px;
+      text-align: center;
+    }
+    .bid-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .bid-btn:active { transform: translateY(0); }
+    .bid-btn.custom { background: #9b59b6; grid-column: span 3; }
+    
+    /* Teams Budget */
+    .teams-list {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .team-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      transition: background 0.3s;
+    }
+    .team-item:hover { background: #f8f9fa; }
+    .team-item.current-bidder { background: #e8f5e9; border-left: 4px solid #4caf50; }
+    .team-name { font-weight: 600; }
+    .team-budget { 
+      color: #f39c12; 
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    /* History */
+    .bid-history {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .bid-history-item {
+      padding: 10px;
+      border-left: 3px solid var(--primary);
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+    .bid-time { font-size: 12px; color: #666; }
+    
+    /* Players Queue */
+    .players-queue {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .queue-player {
+      background: var(--card);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    .queue-player:hover { border-color: var(--primary); transform: translateY(-3px); }
+    .queue-player.active { border-color: #4caf50; background: #e8f5e9; }
+    .queue-player img { width: 60px; height: 60px; border-radius: 50%; }
+    .queue-player-name { font-size: 12px; margin-top: 5px; }
+    
+    /* Status Messages */
+    .status-message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .status-waiting { background: #fff3cd; color: #856404; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-sold { background: #d1ecf1; color: #0c5460; }
+    
+    @media (max-width: 1024px) {
+      .asta-layout { grid-template-columns: 1fr; }
+      .player-card img { width: 120px; height: 120px; }
+      .current-bid { font-size: 36px; }
+      .timer { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🔨 Asta Giocatori</h1>
+    </header>
+
+  <main class="container asta-container">
+    <div id="statusMessage" class="status-message status-waiting">
+      ⏳ In attesa che l'admin avvii l'asta...
+    </div>
+
+    <div class="asta-layout">
+      <!-- Sidebar Sinistra: Budget Squadre -->
+      <div>
+        <h3>💰 Budget Squadre</h3>
+        <div class="teams-list" id="teamsList"></div>
+      </div>
+
+      <!-- Centro: Player Card e Controlli -->
+      <div>
+        <div class="timer" id="timer">--:--</div>
+        
+        <div class="player-card" id="playerCard">
+          <img src="resources/logo.png" alt="Player" id="playerImage" />
+          <div class="player-name" id="playerName">In attesa...</div>
+          <div class="player-role" id="playerRole">-</div>
+          <div class="player-stats" id="playerStats"></div>
+        </div>
+
+        <div class="auction-info">
+          <h3 style="text-align: center;">Offerta Corrente</h3>
+          <div class="current-bid">
+            <span id="currentBid">0</span>
+            <span class="bid-currency">Skrotz</span>
+          </div>
+          <p style="text-align: center; color: #666;" id="currentBidder">Nessuna offerta</p>
+        </div>
+
+        <div class="bid-controls" id="bidControls" style="display: none;">
+          <button class="bid-btn" onclick="placeBid(1)">+1</button>
+          <button class="bid-btn" onclick="placeBid(5)">+5</button>
+          <button class="bid-btn" onclick="placeBid(10)">+10</button>
+          <button class="bid-btn custom" onclick="customBid()">💰 Offerta Personalizzata</button>
+        </div>
+
+        <div class="bid-history">
+          <h4>📜 Cronologia Offerte</h4>
+          <div id="bidHistory"></div>
+        </div>
+      </div>
+
+      <!-- Sidebar Destra: Coda Giocatori -->
+      <div>
+        <h3>👥 Prossimi Giocatori</h3>
+        <div class="players-queue" id="playersQueue"></div>
+      </div>
+    </div>
+
+    <!-- Admin Controls -->
+    <div id="adminControls" class="admin-panel" style="display: none;">
+      <h3>🔧 Controlli Admin</h3>
+      <div class="admin-buttons">
+        <button class="admin-btn primary" onclick="startAuction()">
+          <span>▶️</span>
+          <span>Avvia Asta</span>
+        </button>
+        <button class="admin-btn secondary" onclick="pauseAuction()">
+          <span>⏸️</span>
+          <span>Pausa</span>
+        </button>
+        <button class="admin-btn secondary" onclick="nextPlayer()">
+          <span>⏭️</span>
+          <span>Prossimo Giocatore</span>
+        </button>
+        <button class="admin-btn secondary" onclick="resetAuction()">
+          <span>🔄</span>
+          <span>Reset Asta</span>
+        </button>
+        <button class="admin-btn primary" onclick="endAuction()">
+          <span>🛑</span>
+          <span>Termina Asta</span>
+        </button>
+      </div>
+      <div class="admin-settings">
+        <label>Tempo per offerta (secondi):</label>
+        <input type="number" id="auctionTime" value="30" min="10" max="120" />
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/notifications.js"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let currentUser = null;
+    let isAdmin = false;
+    let auctionState = null;
+    let timerInterval = null;
+    let unsubscribe = null;
+
+    // Inizializza
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+      
+      currentUser = user;
+      
+      // Verifica se admin
+      try {
+        const adminDoc = await db.collection('admins').doc(user.uid).get();
+        isAdmin = adminDoc.exists;
+      } catch (e) {
+        console.warn('Admin check failed:', e);
+        isAdmin = false;
+      }
+      
+      if (isAdmin) {
+        document.getElementById('adminControls').style.display = 'block';
+      }
+      
+      // Ascolta lo stato dell'asta in tempo reale
+      listenToAuction();
+    });
+
+    function listenToAuction() {
+      try {
+        unsubscribe = db.collection('auction').doc('current').onSnapshot((doc) => {
+          if (doc.exists) {
+            auctionState = doc.data();
+            updateUI();
+          }
+        }, (error) => {
+          console.warn('Auction listener error:', error);
+          // Fallback: mostra stato di default
+          auctionState = { status: 'waiting', teams: [] };
+          updateUI();
+        });
+      } catch (e) {
+        console.warn('Failed to start auction listener:', e);
+        auctionState = { status: 'waiting', teams: [] };
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      if (!auctionState) return;
+      
+      const { status, currentPlayer, currentBid, currentBidder, timeLeft, teams } = auctionState;
+      
+      // Status
+      const statusEl = document.getElementById('statusMessage');
+      if (status === 'waiting') {
+        statusEl.className = 'status-message status-waiting';
+        statusEl.textContent = '⏳ In attesa che l\'admin avvii l\'asta...';
+        document.getElementById('bidControls').style.display = 'none';
+      } else if (status === 'active') {
+        statusEl.className = 'status-message status-active';
+        statusEl.textContent = '🔥 Asta in corso!';
+        document.getElementById('bidControls').style.display = 'grid';
+      } else if (status === 'paused') {
+        statusEl.className = 'status-message status-waiting';
+        statusEl.textContent = '⏸️ Asta in pausa';
+        document.getElementById('bidControls').style.display = 'none';
+      }
+      
+      // Player
+      if (currentPlayer) {
+        document.getElementById('playerName').textContent = currentPlayer.nome_completo;
+        document.getElementById('playerRole').textContent = currentPlayer.role;
+        // TODO: Aggiungi immagine giocatore se disponibile
+      }
+      
+      // Current Bid
+      document.getElementById('currentBid').textContent = currentBid || 1;
+      document.getElementById('currentBidder').textContent = currentBidder ? 
+        `Offerta di ${currentBidder}` : 'Nessuna offerta';
+      
+      // Timer
+      updateTimer(timeLeft);
+      
+      // Teams
+      updateTeamsList(teams);
+    }
+
+    function updateTimer(seconds) {
+      const timerEl = document.getElementById('timer');
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+      
+      timerEl.className = 'timer';
+      if (seconds <= 10) {
+        timerEl.className = 'timer danger';
+      } else if (seconds <= 20) {
+        timerEl.className = 'timer warning';
+      }
+    }
+
+    function updateTeamsList(teams) {
+      if (!teams) return;
+      
+      const html = Object.entries(teams).map(([teamName, data]) => `
+        <div class="team-item ${data.isCurrentBidder ? 'current-bidder' : ''}">
+          <span class="team-name">${teamName}</span>
+          <span class="team-budget">${data.budget} Skrotz</span>
+        </div>
+      `).join('');
+      
+      document.getElementById('teamsList').innerHTML = html;
+    }
+
+    async function placeBid(amount) {
+      if (!auctionState || auctionState.status !== 'active') return;
+      
+      const newBid = (auctionState.currentBid || 0) + amount;
+      
+      try {
+        await db.collection('auction').doc('current').update({
+          currentBid: newBid,
+          currentBidder: currentUser.displayName || currentUser.email,
+          currentBidderUid: currentUser.uid,
+          timeLeft: 30, // Reset timer
+          lastBidTime: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Log bid
+        await db.collection('auction').doc('current').collection('bids').add({
+          bidder: currentUser.displayName || currentUser.email,
+          bidderUid: currentUser.uid,
+          amount: newBid,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (error) {
+        console.error('Errore offerta:', error);
+        alert('Errore nell\'invio dell\'offerta');
+      }
+    }
+
+    function customBid() {
+      const amount = prompt('Inserisci l\'importo dell\'offerta:');
+      if (!amount || isNaN(amount)) return;
+      
+      const numAmount = parseInt(amount);
+      const currentBid = auctionState.currentBid || 0;
+      
+      if (numAmount <= currentBid) {
+        alert('L\'offerta deve essere superiore all\'offerta corrente!');
+        return;
+      }
+      
+      placeBid(numAmount - currentBid);
+    }
+
+    // Admin Functions
+    async function startAuction() {
+      // TODO: Implementa logica completa
+      alert('Funzione in sviluppo');
+    }
+
+    async function pauseAuction() {
+      await db.collection('auction').doc('current').update({
+        status: 'paused'
+      });
+    }
+
+    async function nextPlayer() {
+      alert('Funzione in sviluppo');
+    }
+
+    async function resetAuction() {
+      if (!confirm('Sei sicuro di voler resettare l\'asta?')) return;
+      alert('Funzione in sviluppo');
+    }
+
+    async function endAuction() {
+      if (!confirm('Sei sicuro di voler terminare l\'asta?')) return;
+      alert('Funzione in sviluppo');
+    }
+  </script>
+      <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+</body>
+</html>

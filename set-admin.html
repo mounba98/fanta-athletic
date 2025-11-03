@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Set Admin - Fanta Athletic</title>
+  <style>
+    body { font-family: system-ui; max-width: 600px; margin: 50px auto; padding: 20px; }
+    .btn { padding: 12px 24px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+    .btn:hover { background: #2980b9; }
+    input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 100%; margin: 10px 0; font-size: 14px; }
+    .success { color: #27ae60; font-weight: bold; }
+    .error { color: #e74c3c; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🛠️ Set Admin</h1>
+  <p>Imposta un utente come amministratore</p>
+  
+  <div>
+    <label>Email utente:</label>
+    <input type="email" id="emailInput" placeholder="babaali2808@gmail.com" value="babaali2808@gmail.com" />
+    <button class="btn" onclick="setAdmin()">Imposta come Admin</button>
+  </div>
+  
+  <div id="result" style="margin-top: 20px;"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDnQMuPvx_Gr8VjBJf_Hrx39O8w2dm67co",
+      authDomain: "fanta-athletic.firebaseapp.com",
+      projectId: "fanta-athletic",
+      storageBucket: "fanta-athletic.firebasestorage.app",
+      messagingSenderId: "845950461193",
+      appId: "1:845950461193:web:04475bb0eaa2dc459a9fd8",
+      measurementId: "G-289T0N4D8L"
+    };
+    
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    async function setAdmin(){
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const result = document.getElementById('result');
+      
+      if (!email) {
+        result.innerHTML = '<p class="error">❌ Inserisci un\'email</p>';
+        return;
+      }
+      
+      result.innerHTML = '<p>⏳ Ricerca utente...</p>';
+      
+      try {
+        // Find user by email
+        const usersSnap = await db.collection('users').where('email', '==', email).get();
+        
+        if (usersSnap.empty) {
+          result.innerHTML = `<p class="error">❌ Utente con email ${email} non trovato</p>`;
+          return;
+        }
+        
+        const userDoc = usersSnap.docs[0];
+        const uid = userDoc.id;
+        const userData = userDoc.data();
+        
+        result.innerHTML = `<p>✅ Utente trovato: ${userData.display_name || email}<br>UID: ${uid}</p><p>⏳ Impostazione admin...</p>`;
+        
+        // Set as admin
+        await db.collection('admins').doc(uid).set({
+          email: email,
+          display_name: userData.display_name || '',
+          addedAt: Date.now(),
+          addedBy: 'system'
+        });
+        
+        result.innerHTML = `<p class="success">✅ Utente ${email} impostato come admin!<br>UID: ${uid}<br><br>Fai logout e login per vedere le sezioni admin.</p>`;
+        
+      } catch (error) {
+        console.error('Errore:', error);
+        result.innerHTML = `<p class="error">❌ Errore: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

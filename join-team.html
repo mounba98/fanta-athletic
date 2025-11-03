@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unisciti alla Squadra</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css" />
+  <style>
+    .join-container { 
+      max-width: 600px; 
+      margin: 80px auto; 
+      padding: 40px; 
+      background: var(--card); 
+      border-radius: 16px; 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+    .join-icon { font-size: 80px; margin-bottom: 20px; }
+    .code-input { 
+      width: 100%; 
+      padding: 16px; 
+      font-size: 20px; 
+      text-align: center; 
+      text-transform: uppercase; 
+      letter-spacing: 4px;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .join-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    .join-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="join-container">
+    <div class="join-icon">👥</div>
+    <h1>Unisciti alla Squadra</h1>
+    <p>Inserisci il codice invito che hai ricevuto</p>
+    
+    <input type="text" id="codeInput" class="code-input" placeholder="T-XXXXXX" maxlength="8">
+    
+    <button class="join-btn" onclick="joinTeam()">🚀 Unisciti</button>
+    
+    <div id="result" style="margin-top: 20px;"></div>
+  </div>
+
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script>
+    if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+  <script src="resources/team-invite-system.js"></script>
+  <script>
+    // Check URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromURL = urlParams.get('code');
+    
+    if (codeFromURL) {
+      document.getElementById('codeInput').value = codeFromURL;
+    }
+    
+    async function joinTeam() {
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const resultDiv = document.getElementById('result');
+      
+      if (!code) {
+        resultDiv.innerHTML = '<div style="color: #f44336;">❌ Inserisci un codice</div>';
+        return;
+      }
+      
+      // Check if logged in
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        // Redirect to auth with return URL
+        localStorage.setItem('join_team_code', code);
+        location.href = 'auth.html?return=join-team';
+        return;
+      }
+      
+      resultDiv.innerHTML = '<div>⏳ Verifica in corso...</div>';
+      
+      const result = await TeamInviteSystem.useTeamInvite(code, user.uid);
+      
+      if (result.success) {
+        resultDiv.innerHTML = `
+          <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 20px;">
+            <h3 style="color: #4caf50; margin-top: 0;">✅ Benvenuto nella Squadra!</h3>
+            <p>Ti sei unito con successo come <strong>${result.role === 'head' ? 'Allenatore' : 'Vice-Allenatore'}</strong></p>
+            <p>Redirect in 3 secondi...</p>
+          </div>
+        `;
+        
+        // Save league ID and redirect
+        localStorage.setItem('last_league_id', result.leagueId);
+        setTimeout(() => {
+          location.href = 'index.html';
+        }, 3000);
+      } else {
+        resultDiv.innerHTML = `
+          <div style="background: #ffebee; padding: 20px; border-radius: 8px; margin-top: 20px; color: #f44336;">
+            <strong>❌ Errore:</strong> ${result.error}
+          </div>
+        `;
+      }
+    }
+    
+    // Check if returning from auth
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        const savedCode = localStorage.getItem('join_team_code');
+        if (savedCode) {
+          localStorage.removeItem('join_team_code');
+          document.getElementById('codeInput').value = savedCode;
+          joinTeam();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

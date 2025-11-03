@@ -1,0 +1,351 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OSM Manager - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .osm-container { max-width: 1200px; margin: 0 auto; }
+    .pitch {
+      background: linear-gradient(180deg, #2d5f2e 0%, #3a7d3a 50%, #2d5f2e 100%);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      aspect-ratio: 16/10;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    
+    .pitch::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+    }
+    
+    .pitch::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 100%;
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .formation-line {
+      display: flex;
+      justify-content: space-around;
+      margin: 16px 0;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .player-slot {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .player-slot:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+    
+    .player-slot.empty {
+      background: rgba(255,255,255,0.3);
+      border: 2px dashed rgba(255,255,255,0.5);
+    }
+    
+    .player-photo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .player-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: #333;
+      margin-top: 4px;
+      text-align: center;
+    }
+    
+    .player-rating {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ffd700;
+      color: #000;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      border: 2px solid white;
+    }
+    
+    .stats-panel {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+    
+    .formation-selector {
+      display: flex;
+      gap: 8px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .formation-btn {
+      padding: 10px 20px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .formation-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .formation-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .match-simulator {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .simulate-btn {
+      background: #ffd700;
+      color: #000;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: all 0.2s;
+    }
+    
+    .simulate-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>⚽ OSM Manager</h1>
+  </header>
+
+  <main class="osm-container" style="padding: 20px;">
+    <div class="section">
+      <h2>Gestione Tattica</h2>
+      <p>Scegli la formazione e simula le partite con l'intelligenza artificiale.</p>
+    </div>
+
+    <!-- Formation Selector -->
+    <div class="stats-panel">
+      <h3>Modulo di Gioco</h3>
+      <div class="formation-selector">
+        <button class="formation-btn active" onclick="setFormation('4-3-3')">4-3-3</button>
+        <button class="formation-btn" onclick="setFormation('4-4-2')">4-4-2</button>
+        <button class="formation-btn" onclick="setFormation('3-5-2')">3-5-2</button>
+        <button class="formation-btn" onclick="setFormation('4-2-3-1')">4-2-3-1</button>
+        <button class="formation-btn" onclick="setFormation('5-3-2')">5-3-2</button>
+        <button class="formation-btn" onclick="setFormation('3-4-3')">3-4-3</button>
+      </div>
+    </div>
+
+    <!-- Pitch -->
+    <div class="pitch" id="pitchContainer">
+      <!-- ATT -->
+      <div class="formation-line" id="attackLine">
+        <div class="player-slot empty" onclick="selectPlayer(0)">
+          <span style="color: white; font-size: 24px;">+</span>
+        </div>
+      </div>
+
+      <!-- CEN -->
+      <div class="formation-line" id="midfieldLine">
+        <div class="player-slot empty" onclick="selectPlayer(1)">
+          <span style="color: white; font-size: 24px;">+</span>
+        </div>
+        <div class="player-slot empty" onclick="selectPlayer(2)">
+          <span style="color: white; font-size: 24px;">+</span>
+        </div>
+      </div>
+
+      <!-- DIF -->
+      <div class="formation-line" id="defenseLine">
+        <div class="player-slot empty" onclick="selectPlayer(3)">
+          <span style="color: white; font-size: 24px;">+</span>
+        </div>
+        <div class="player-slot empty" onclick="selectPlayer(4)">
+          <span style="color: white; font-size: 24px;">+</span>
+        </div>
+      </div>
+
+      <!-- POR -->
+      <div class="formation-line" style="justify-content: center;">
+        <div class="player-slot empty" onclick="selectPlayer(9)">
+        <div class="player-slot empty" onclick="selectPlayer(10)">
+          <span style="color: white; font-size: 32px;">+</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Match Simulator -->
+    <div class="match-simulator">
+      <h2>🎮 Simulatore Partite AI</h2>
+      <p>Simula una partita contro un'altra squadra usando l'intelligenza artificiale</p>
+      <button class="simulate-btn" onclick="simulateMatch()">
+        ▶️ SIMULA PARTITA
+      </button>
+      <div id="matchResult" style="margin-top: 20px; font-size: 24px; font-weight: 700;"></div>
+    </div>
+
+    <!-- Stats Panel -->
+    <div class="stats-panel">
+      <h3>Statistiche Squadra</h3>
+      <div class="stat-row">
+        <span>⚡ Attacco</span>
+        <span id="attackStat">0</span>
+      </div>
+      <div class="stat-row">
+        <span>🛡️ Difesa</span>
+        <span id="defenseStat">0</span>
+      </div>
+      <div class="stat-row">
+        <span>🏃 Centrocampo</span>
+        <span id="midfieldStat">0</span>
+      </div>
+      <div class="stat-row">
+        <span>⭐ Rating Medio</span>
+        <span id="avgRating">0.0</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+
+  <script>
+    let currentFormation = '4-3-3';
+    let lineup = Array(11).fill(null);
+
+    function setFormation(formation) {
+      currentFormation = formation;
+      
+      // Update buttons
+      document.querySelectorAll('.formation-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === formation) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // TODO: Rearrange pitch based on formation
+      alert('Modulo ' + formation + ' selezionato!\n\n(Logica di riorganizzazione campo in sviluppo)');
+    }
+
+    function selectPlayer(position) {
+      alert(`Seleziona giocatore per posizione ${position + 1}\n\n(Player picker UI in sviluppo)`);
+    }
+
+    function simulateMatch() {
+      const result = document.getElementById('matchResult');
+      result.innerHTML = '<div style="opacity: 0.6;">Simulazione in corso...</div>';
+      
+      setTimeout(() => {
+        // AI Simulation (placeholder)
+        const homeScore = Math.floor(Math.random() * 4);
+        const awayScore = Math.floor(Math.random() * 4);
+        
+        result.innerHTML = `
+          <div style="font-size: 32px; margin-top: 16px;">
+            ${homeScore} - ${awayScore}
+          </div>
+          <div style="font-size: 14px; margin-top: 8px; opacity: 0.8;">
+            ${homeScore > awayScore ? '🏆 VITTORIA!' : homeScore < awayScore ? '😢 SCONFITTA' : '🤝 PAREGGIO'}
+          </div>
+        `;
+      }, 2000);
+    }
+
+    // Auth check
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+      }
+    });
+  </script>
+</body>
+</html>

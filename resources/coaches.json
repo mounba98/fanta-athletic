@@ -1,0 +1,7 @@
+{
+  "coaches": [
+    { "coach_id": "T1", "nome": "Tommy" },
+    { "coach_id": "T2", "nome": "Trendiu" },
+    { "coach_id": "T3", "nome": "Mario" }
+  ]
+}

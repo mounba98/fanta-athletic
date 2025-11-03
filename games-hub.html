@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Games Hub - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .games-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin: 24px 0;
+    }
+    
+    .game-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    
+    .game-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      border-color: var(--primary);
+    }
+    
+    .game-icon {
+      font-size: 64px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .game-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    
+    .game-description {
+      font-size: 14px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .game-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .status-live {
+      background: #10b981;
+      color: white;
+    }
+    
+    .status-beta {
+      background: #f59e0b;
+      color: white;
+    }
+    
+    .status-soon {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .btn-play {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-play:hover {
+      background: #b91c3a;
+    }
+    
+    .btn-play:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🎮 Games Hub</h1>
+  </header>
+
+  <main class="games-container">
+    <div class="section">
+      <h2>Mini-Giochi Disponibili</h2>
+      <p>Divertiti con i nostri mini-giochi mentre gestisci la tua lega!</p>
+    </div>
+
+    <div class="games-grid">
+      <!-- WIRC SNAP MARVEL -->
+      <div class="game-card featured" onclick="window.open('wirc-snap-marvel.html', '_blank')">
+        <div class="game-icon">⚡</div>
+        <div class="game-title">WIRC Snap</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">🔥 NEW MARVEL STYLE</span>
+        </div>
+        <div class="game-description">
+          Card Battle Game stile Marvel Snap! 24 personaggi WIRC, 3 location, mobile-first, neon UI.
+        </div>
+        <button class="btn-play" onclick="event.stopPropagation(); window.open('wirc-snap-marvel.html', '_blank')">⚡ Gioca Ora</button>
+      </div>
+
+      <!-- Athletic Manager -->
+      <div class="game-card" onclick="window.location.href='athletic-manager.html'">
+        <div class="game-icon">⚽</div>
+        <div class="game-title">Athletic Manager</div>
+        <div style="text-align:center;">
+          <span class="game-status status-beta">🔧 BETA</span>
+        </div>
+        <div class="game-description">
+          Gestionale OSM-style! Allena giocatori, upgrada stadio, crea lega, simula partite. Sistema XP completo.
+        </div>
+        <button class="btn-play">🎮 Gestisci</button>
+      </div>
+
+      <!-- Athletic Quiz -->
+      <div class="game-card" onclick="window.location.href='athletic-quiz.html'">
+        <div class="game-icon">❓</div>
+        <div class="game-title">Athletic Quiz</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">✅ LIVE</span>
+        </div>
+        <div class="game-description">
+          Quiz sulla storia dell'Athletic Brescia! Testa le tue conoscenze sui giocatori, partite e record.
+        </div>
+        <button class="btn-play">🧠 Gioca Ora</button>
+      </div>
+
+      <!-- Memory Match -->
+      <div class="game-card" onclick="window.location.href='memory-game.html'">
+        <div class="game-icon">🧩</div>
+        <div class="game-title">Memory Match</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">✅ LIVE</span>
+        </div>
+        <div class="game-description">
+          Memory game classico con le facce dei giocatori Athletic! Quante coppie riesci a trovare?
+        </div>
+        <button class="btn-play">🎮 Gioca Ora</button>
+      </div>
+
+      <!-- Penalty Shootout -->
+      <div class="game-card" onclick="window.location.href='penalty-shootout.html'">
+        <div class="game-icon">⚽</div>
+        <div class="game-title">Penalty Shootout</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">✅ LIVE</span>
+        </div>
+        <div class="game-description">
+          Sfida ai rigori contro il portiere! Scegli angolo e potenza. Riesci a segnare 5 su 5?
+        </div>
+        <button class="btn-play">⚽ Tira Ora</button>
+      </div>
+
+      <!-- Athletic Cards Battle -->
+      <div class="game-card" onclick="window.location.href='athletic-cards-battle.html'">
+        <div class="game-icon">🎴</div>
+        <div class="game-title">Athletic Cards Battle</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">✅ LIVE</span>
+        </div>
+        <div class="game-description">
+          Battaglia con le carte dei giocatori Athletic! Sistema HP/Energy, attacco, difesa e strategia.
+        </div>
+        <button class="btn-play">🎮 Gioca Ora</button>
+      </div>
+
+      <!-- OSM Manager -->
+      <div class="game-card" onclick="window.location.href='osm-manager-v2.html'">
+        <div class="game-icon">⚽</div>
+        <div class="game-title">OSM Manager v2</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">✅ LIVE</span>
+        </div>
+        <div class="game-description">
+          Crea 6 formazioni tattiche e simula partite con cronaca live realistica. Stile Online Soccer Manager!
+        </div>
+        <button class="btn-play">🎮 Gioca Ora</button>
+      </div>
+
+      <!-- Wirc Battle Arena -->
+      <div class="game-card" onclick="window.location.href='wirc-battle-v2.html'">
+        <div class="game-icon">⚔️</div>
+        <div class="game-title">Wirc Battle Arena</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">✅ LIVE</span>
+        </div>
+        <div class="game-description">
+          Battaglia con carte stile Clash Royale! Scegli il tuo deck e distruggi le torri avversarie.
+        </div>
+        <button class="btn-play">⚔️ Entra in Arena</button>
+      </div>
+
+      <!-- Wirc Card Gallery -->
+      <div class="game-card" onclick="window.location.href='wirc-card-gallery.html'">
+        <div class="game-icon">🃏</div>
+        <div class="game-title">Wirc Card Gallery</div>
+        <div style="text-align:center;">
+          <span class="game-status status-live">✅ LIVE</span>
+        </div>
+        <div class="game-description">
+          Esplora tutte le carte Wirc con filtri, ricerca e dettagli completi. Collezionale tutte!
+        </div>
+        <button class="btn-play">🔍 Esplora Carte</button>
+      </div>
+
+      <!-- Wirc Royale (Landing) -->
+      <div class="game-card" onclick="window.location.href='wirc-royale.html'">
+        <div class="game-icon">👑</div>
+        <div class="game-title">Wirc Royale</div>
+        <div style="text-align:center;">
+          <span class="game-status status-soon">🔜 PRESTO</span>
+        </div>
+        <div class="game-description">
+          Versione completa di Wirc con 40+ carte, modalità multiplayer e ranking. In sviluppo!
+        </div>
+        <button class="btn-play" disabled>📖 In Arrivo</button>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:48px;">
+      <h3>📊 Statistiche Giochi</h3>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-top:16px;">
+        <div style="background:var(--card); padding:20px; border-radius:12px; text-align:center;">
+          <div>
+            <div style="font-size:32px; font-weight:700; color:var(--primary);">8</div>
+            <div style="font-size:14px; color:var(--muted);">Giochi Live (1 NEW!)</div>
+          </div>
+        </div>
+        <div style="background:var(--card); padding:20px; border-radius:12px; text-align:center;">
+          <div style="font-size:32px; font-weight:700; color:#f59e0b;">1</div>
+          <div style="font-size:14px; color:var(--muted);">In Beta</div>
+        </div>
+        <div style="background:var(--card); padding:20px; border-radius:12px; text-align:center;">
+          <div style="font-size:32px; font-weight:700; color:#6b7280;">1</div>
+          <div style="font-size:14px; color:var(--muted);">In Arrivo</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-6"></script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/mobile-menu.js?v=2025101901"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+
+  <script>
+    // Auth check SOLO - NO league required per games
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        const currentUrl = encodeURIComponent(window.location.href);
+        window.location.href = `auth.html?redirect=${currentUrl}`;
+      } else {
+        console.log('✅ User authenticated:', user.uid);
+      }
+    });
+  </script>
+  
+  <script>
+    // Toast helper
+    function toast(msg, duration = 2000) {
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#2d6cdf;color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:9999;font-weight:600;';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), duration);
+    }
+  </script>
+</body>
+</html>

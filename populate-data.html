@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Popola Database</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 800px; margin: 0 auto; }
+    .btn { padding: 12px 20px; background: #dc143c; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 10px 5px; font-size: 16px; }
+    .btn:hover { background: #b01030; }
+    .log { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>🔧 Popola Database Firestore</h1>
+  <p>Questo script carica giocatori e regole da JSON nel database Firestore.</p>
+  
+  <button class="btn" onclick="populatePlayers()">📥 Carica Giocatori</button>
+  <button class="btn" onclick="populateRules()">📥 Carica Regole</button>
+  <button class="btn" onclick="populateAll()">📥 Carica Tutto</button>
+  <button class="btn" onclick="clearLog()" style="background:#666;">🗑️ Pulisci Log</button>
+  
+  <div id="log" class="log"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/rules-loader.js?v=2025110301"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    function log(msg, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+      logDiv.innerHTML += `<div class="${className}">[${time}] ${msg}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    async function populatePlayers() {
+      log('📥 Caricamento giocatori...');
+      try {
+        const response = await fetch('resources/players.json');
+        const data = await response.json();
+        
+        log(`Trovati ${data.players.length} giocatori`);
+        
+        for (const player of data.players) {
+          const parts = player.nome_completo.split(' ');
+          const nome = parts[0];
+          const cognome = parts.slice(1).join(' ');
+          
+          await db.collection('players').doc(player.player_id).set({
+            name: player.nome_completo,
+            nome: nome,
+            cognome: cognome,
+            role: player.role,
+            soprannome: player.nickname || '',
+            secondary_roles: player.secondary_roles || [],
+            image_url: player.image_url || '',
+            total_points: player.total_points || 0,
+            is_dead: player.is_dead || false,
+            is_ambulance: player.is_ambulance || false,
+            createdAt: Date.now()
+          });
+          
+          log(`✅ ${player.nome_completo} (${player.role})`, 'success');
+        }
+        
+        log(`🎉 ${data.players.length} giocatori caricati con successo!`, 'success');
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+      }
+    }
+
+    async function populateRules() {
+      log('📥 Caricamento regole...');
+      try {
+        const data = await (window.loadRulesJSON ? window.loadRulesJSON() : Promise.resolve({ rules: [] }));
+        
+        log(`Trovate ${data.rules.length} regole`);
+        
+        for (const rule of data.rules) {
+          await db.collection('rules').doc(rule.rule_id).set({
+            rule_id: rule.rule_id,
+            nome_bonus: rule.nome_bonus,
+            descrizione: rule.descrizione,
+            tipo: rule.tipo,
+            soggetto: rule.soggetto,
+            valore: rule.valore,
+            player_ids: rule.player_ids || [],
+            coach_ids: rule.coach_ids || [],
+            note: rule.note || '',
+            attivo: true,
+            visible: true,
+            ordine: 0,
+            createdAt: Date.now()
+          });
+          
+          log(`✅ ${rule.rule_id}: ${rule.nome_bonus} (${rule.valore})`, 'success');
+        }
+        
+        log(`🎉 ${data.rules.length} regole caricate con successo!`, 'success');
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+      }
+    }
+
+    async function populateAll() {
+      await populatePlayers();
+      await populateRules();
+      log('✅ COMPLETATO! Database popolato.', 'success');
+    }
+  </script>
+</body>
+</html>

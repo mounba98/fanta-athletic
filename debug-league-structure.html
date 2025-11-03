@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug League Structure</title>
+  <link rel="stylesheet" href="resources/sheet.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    h1 { text-align: center; margin-bottom: 32px; }
+    .section {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    pre {
+      background: #000;
+      color: #0f0;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .btn {
+      padding: 12px 24px;
+      background: #d91847;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      margin-right: 12px;
+    }
+    .btn:hover { background: #b91846; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Debug League Structure</h1>
+    
+    <div class="section">
+      <h2>📊 League ID</h2>
+      <div id="leagueId">Caricamento...</div>
+    </div>
+
+    <div class="section">
+      <h2>📋 Full League Document</h2>
+      <button class="btn" onclick="loadLeague()">🔄 Carica Lega</button>
+      <button class="btn" style="background:#22c55e;" onclick="copyToClipboard()">📋 Copia JSON</button>
+      <pre id="leagueData">Click "Carica Lega" per vedere i dati...</pre>
+    </div>
+
+    <div class="section">
+      <h2>⚽ Teams Field</h2>
+      <pre id="teamsData">...</pre>
+    </div>
+
+    <div class="section">
+      <h2>📊 Analysis</h2>
+      <div id="analysis"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    
+    let currentLeagueId = null;
+    let leagueData = null;
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      const checkLeague = setInterval(() => {
+        if (window.currentLeague && window.currentLeague.id) {
+          clearInterval(checkLeague);
+          currentLeagueId = window.currentLeague.id;
+          document.getElementById('leagueId').innerHTML = `
+            <div style="background: #334155; padding: 16px; border-radius: 8px;">
+              <strong>League ID:</strong> ${currentLeagueId}
+            </div>
+          `;
+        }
+      }, 500);
+    });
+
+    async function loadLeague() {
+      if (!currentLeagueId) {
+        alert('⚠️ Aspetta che la lega si carichi...');
+        return;
+      }
+
+      try {
+        console.log('📥 Loading league:', currentLeagueId);
+        
+        const leagueDoc = await db.collection('leagues').doc(currentLeagueId).get();
+        
+        if (!leagueDoc.exists) {
+          alert('❌ Lega non trovata!');
+          return;
+        }
+        
+        leagueData = leagueDoc.data();
+        
+        console.log('✅ League data loaded:', leagueData);
+        
+        // Show full document
+        document.getElementById('leagueData').textContent = JSON.stringify(leagueData, null, 2);
+        
+        // Show teams specifically
+        const teams = leagueData.teams;
+        document.getElementById('teamsData').textContent = JSON.stringify(teams, null, 2);
+        
+        // Analysis
+        analyzeData(teams);
+        
+      } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Errore: ' + error.message);
+        document.getElementById('leagueData').textContent = 'ERROR: ' + error.message;
+      }
+    }
+
+    function analyzeData(teams) {
+      let html = '';
+      
+      // Type
+      const type = Array.isArray(teams) ? 'ARRAY' : (typeof teams === 'object' && teams !== null ? 'OBJECT' : typeof teams);
+      html += `<div style="background: #334155; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+        <strong>Type:</strong> <span style="color: ${type === 'ARRAY' ? '#3b82f6' : type === 'OBJECT' ? '#22c55e' : '#ef4444'}">${type}</span>
+      </div>`;
+      
+      // Is null/undefined
+      if (teams === null || teams === undefined) {
+        html += `<div style="background: #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 12px; color: white;">
+          <strong>⚠️ TEAMS IS ${teams === null ? 'NULL' : 'UNDEFINED'}!</strong><br>
+          Il campo "teams" non esiste o è nullo nel documento Firestore.
+        </div>`;
+      }
+      
+      // Count
+      if (Array.isArray(teams)) {
+        html += `<div style="background: #334155; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+          <strong>Length:</strong> ${teams.length}
+        </div>`;
+      } else if (typeof teams === 'object' && teams !== null) {
+        const keys = Object.keys(teams);
+        html += `<div style="background: #334155; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+          <strong>Keys count:</strong> ${keys.length}<br>
+          <strong>Keys:</strong> ${keys.join(', ')}
+        </div>`;
+      }
+      
+      // Empty check
+      const isEmpty = !teams || (Array.isArray(teams) && teams.length === 0) || (typeof teams === 'object' && Object.keys(teams).length === 0);
+      
+      if (isEmpty) {
+        html += `<div style="background: #ef4444; padding: 16px; border-radius: 8px; color: white; margin-bottom: 12px;">
+          <strong>❌ TEAMS IS EMPTY!</strong><br>
+          Il campo teams esiste ma è vuoto. Devi creare le squadre.
+        </div>`;
+      } else {
+        html += `<div style="background: #22c55e; padding: 16px; border-radius: 8px; color: white; margin-bottom: 12px;">
+          <strong>✅ TEAMS HAS DATA!</strong>
+        </div>`;
+      }
+      
+      // Members check
+      if (Array.isArray(teams) && teams.length > 0) {
+        let withMembers = 0;
+        let withoutMembers = 0;
+        teams.forEach(team => {
+          if (team.members && team.members.length > 0) {
+            withMembers++;
+          } else {
+            withoutMembers++;
+          }
+        });
+        
+        html += `<div style="background: #334155; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+          <strong>Squadre con membri:</strong> ${withMembers}<br>
+          <strong>Squadre senza membri:</strong> ${withoutMembers}
+        </div>`;
+      }
+      
+      document.getElementById('analysis').innerHTML = html;
+    }
+
+    function copyToClipboard() {
+      if (!leagueData) {
+        alert('Carica prima i dati!');
+        return;
+      }
+      
+      const text = JSON.stringify(leagueData, null, 2);
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ JSON copiato negli appunti!');
+      }).catch(err => {
+        alert('❌ Errore copia: ' + err.message);
+      });
+    }
+  </script>
+  
+  <script src="resources/league-selector.js?v=2025101905"></script>
+</body>
+</html>

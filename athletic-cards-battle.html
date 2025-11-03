@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Athletic Cards Battle - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; overflow: hidden; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    
+    .game-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header */
+    .game-header {
+      background: rgba(0,0,0,0.3);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: white;
+    }
+
+    .player-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 3px solid white;
+    }
+
+    .player-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .stat-bar {
+      background: rgba(0,0,0,0.3);
+      height: 20px;
+      width: 150px;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stat-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .stat-fill.hp { background: linear-gradient(90deg, #f87171 0%, #ef4444 100%); }
+    .stat-fill.energy { background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%); }
+
+    /* Battlefield */
+    .battlefield {
+      flex: 1;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .player-zone {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    .player-zone.opponent { transform: rotate(180deg); }
+    .player-zone.opponent .card { transform: rotate(180deg); }
+
+    /* Cards */
+    .card {
+      width: 140px;
+      height: 200px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      border: 3px solid transparent;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .card.selected {
+      border-color: #fbbf24;
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.8);
+    }
+
+    .card.attacking {
+      animation: attack 0.6s ease-out;
+    }
+
+    @keyframes attack {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-30px) scale(1.2); }
+      100% { transform: translateY(0); }
+    }
+
+    .card.damaged {
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      padding: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-image {
+      height: 80px;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      position: relative;
+    }
+
+    .card-stats {
+      padding: 10px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .card-stat {
+      text-align: center;
+    }
+
+    .card-stat-label {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .card-stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .card-role {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(255,255,255,0.9);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* Hand */
+    .hand {
+      background: rgba(0,0,0,0.4);
+      padding: 15px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      overflow-x: auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .hand .card {
+      flex-shrink: 0;
+    }
+
+    /* Controls */
+    .controls {
+      position: absolute;
+      bottom: 220px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .btn-game {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+    }
+
+    .btn-game:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    }
+
+    .btn-game:active {
+      transform: translateY(0);
+    }
+
+    .btn-attack {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .btn-defend {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+    }
+
+    .btn-end-turn {
+      background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+      color: white;
+    }
+
+    .btn-game:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Messages */
+    .message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px 50px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -60%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    /* Turn Indicator */
+    .turn-indicator {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.9);
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .turn-number {
+      font-size: 32px;
+      color: #6366f1;
+    }
+
+    .turn-label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    /* Win/Lose Screen */
+    .end-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .end-screen.show { display: flex; }
+
+    .end-content {
+      text-align: center;
+      color: white;
+    }
+
+    .end-content h1 {
+      font-size: 72px;
+      margin: 0 0 20px;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .end-content p {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+
+    .btn-restart {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      border: none;
+      padding: 20px 40px;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 15px;
+      cursor: pointer;
+      margin-top: 30px;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5);
+    }
+
+    .btn-restart:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(34, 197, 94, 0.7);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card { width: 100px; height: 150px; }
+      .card-header { font-size: 11px; padding: 8px; height: 40px; }
+      .card-image { height: 60px; font-size: 30px; }
+      .card-stat-value { font-size: 16px; }
+      .btn-game { padding: 10px 20px; font-size: 14px; }
+      .stat-bar { width: 100px; }
+    }
+    /* Tutorial Overlay */
+    .tutorial-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+    
+    .tutorial-content {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    
+    .tutorial-content h2 {
+      font-size: 32px;
+      color: #6366f1;
+      margin: 0 0 20px;
+    }
+    
+    .tutorial-step {
+      text-align: left;
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border-left: 4px solid #6366f1;
+    }
+    
+    .tutorial-step strong {
+      color: #6366f1;
+      display: block;
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+    
+    .btn-start {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    }
+    
+    .card-cost-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #3b82f6;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.6);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tutorial Overlay -->
+  <div class="tutorial-overlay" id="tutorialOverlay">
+    <div class="tutorial-content">
+      <h2>⚔️ Athletic Cards Battle</h2>
+      <p style="font-size: 18px; margin-bottom: 20px;">Come si gioca?</p>
+      
+      <div class="tutorial-step">
+        <strong>1️⃣ Scegli una Carta</strong>
+        Clicca una carta dalla tua mano per selezionarla. Ogni carta ha COSTO (blu), ATTACCO (rosso) e DIFESA (verde).
+      </div>
+      
+      <div class="tutorial-step">
+        <strong>2️⃣ Gioca la Carta</strong>
+        Le carte vengono giocate automaticamente sul campo. Usa la tua ENERGIA (⚡) per giocare.
+      </div>
+      
+      <div class="tutorial-step">
+        <strong>3️⃣ Attacca o Difendi</strong>
+        - <strong>⚔️ Attacca</strong>: La tua carta attacca l'avversario direttamente (danno = ATTACCO)
+        - <strong>🛡️ Difendi</strong>: Blocca l'attacco nemico con la DIFESA della tua carta
+      </div>
+      
+      <div class="tutorial-step">
+        <strong>4️⃣ Vinci la Partita</strong>
+        Riduci gli HP dell'avversario a 0 prima che lui faccia lo stesso con te!
+      </div>
+      
+      <p style="margin-top: 20px; font-size: 14px; color: #64748b;">
+        💡 <strong>Tip</strong>: Carte con alta DIFESA sono ottime per bloccare, carte con alto ATTACCO per infliggere danno!
+      </p>
+      
+      <button class="btn-start" onclick="startGame()">🎮 Inizia a Giocare!</button>
+    </div>
+  </div>
+
+  <div class="game-container">
+    <!-- Header -->
+    <div class="game-header">
+      <div class="player-info">
+        <div class="player-avatar">🧑</div>
+        <div class="player-stats">
+          <div class="stat-bar">
+            <div class="stat-fill hp" id="playerHP">❤️ 100</div>
+          </div>
+          <div class="stat-bar">
+            <div class="stat-fill energy" id="playerEnergy">⚡ 3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-info">
+        <div class="player-stats">
+          <div class="stat-bar">
+            <div class="stat-fill hp" id="opponentHP">❤️ 100</div>
+          </div>
+          <div class="stat-bar">
+            <div class="stat-fill energy" id="opponentEnergy">⚡ 3</div>
+          </div>
+        </div>
+        <div class="player-avatar">🤖</div>
+      </div>
+    </div>
+
+    <!-- Turn Indicator -->
+    <div class="turn-indicator">
+      <div class="turn-label">Turno</div>
+      <div class="turn-number" id="turnNumber">1</div>
+    </div>
+
+    <!-- Battlefield -->
+    <div class="battlefield">
+      <!-- Opponent Zone -->
+      <div class="player-zone opponent" id="opponentZone">
+        <div class="message" id="opponentMsg" style="display:none;">Turno Avversario...</div>
+      </div>
+
+      <!-- Player Zone -->
+      <div class="player-zone" id="playerZone">
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn-game btn-attack" id="btnAttack" disabled>⚔️ Attacca</button>
+      <button class="btn-game btn-defend" id="btnDefend" disabled>🛡️ Difendi</button>
+      <button class="btn-game btn-end-turn" id="btnEndTurn">▶️ Fine Turno</button>
+    </div>
+
+    <!-- Hand -->
+    <div class="hand" id="hand"></div>
+  </div>
+
+  <!-- End Screen -->
+  <div class="end-screen" id="endScreen">
+    <div class="end-content">
+      <h1 id="endTitle">🏆 VITTORIA!</h1>
+      <p id="endMessage">Hai sconfitto l'avversario!</p>
+      <button class="btn-restart" onclick="location.reload()">🔄 Gioca Ancora</button>
+      <br><br>
+      <a href="index.html" style="color: white; text-decoration: underline;">← Torna alla Home</a>
+    </div>
+  </div>
+
+  <script>
+    // Game State
+    const game = {
+      turn: 1,
+      currentPlayer: 'player',
+      player: {
+        hp: 100,
+        maxHP: 100,
+        energy: 3,
+        maxEnergy: 3,
+        deck: [],
+        hand: [],
+        field: []
+      },
+      opponent: {
+        hp: 100,
+        maxHP: 100,
+        energy: 3,
+        maxEnergy: 3,
+        deck: [],
+        hand: [],
+        field: []
+      },
+      selectedCard: null
+    };
+
+    // Card Database
+    const cardDatabase = [
+      { id: 1, name: 'Lorenzo Pucci', role: 'Portiere', attack: 3, defense: 8, cost: 2, emoji: '🧤' },
+      { id: 2, name: 'Jacopo Pinzauti', role: 'Portiere', attack: 4, defense: 7, cost: 2, emoji: '🥅' },
+      { id: 3, name: 'Andrea Sarri', role: 'Difensore', attack: 5, defense: 7, cost: 3, emoji: '🛡️' },
+      { id: 4, name: 'Daniele Sbragi', role: 'Difensore', attack: 6, defense: 6, cost: 3, emoji: '⚔️' },
+      { id: 5, name: 'Gabriele Cecchi', role: 'Difensore', attack: 5, defense: 8, cost: 3, emoji: '🏰' },
+      { id: 6, name: 'Tommaso Matucci', role: 'Centrocampista', attack: 7, defense: 5, cost: 3, emoji: '⚡' },
+      { id: 7, name: 'Lorenzo Corsi', role: 'Centrocampista', attack: 6, defense: 6, cost: 3, emoji: '🎯' },
+      { id: 8, name: 'Tiziano Ferretti', role: 'Centrocampista', attack: 8, defense: 4, cost: 4, emoji: '💨' },
+      { id: 9, name: 'Moreno Fantechi', role: 'Attaccante', attack: 9, defense: 3, cost: 4, emoji: '🔥' },
+      { id: 10, name: 'Lorenzo Roti', role: 'Attaccante', attack: 10, defense: 2, cost: 5, emoji: '⚽' }
+    ];
+
+    // Start Game (close tutorial)
+    function startGame() {
+      document.getElementById('tutorialOverlay').style.display = 'none';
+      initGame();
+    }
+    
+    // Initialize Game
+    function initGame() {
+      // Shuffle and create decks
+      game.player.deck = shuffleArray([...cardDatabase, ...cardDatabase]);
+      game.opponent.deck = shuffleArray([...cardDatabase, ...cardDatabase]);
+
+      // Draw initial hands
+      for (let i = 0; i < 4; i++) {
+        drawCard('player');
+        drawCard('opponent');
+      }
+
+      renderGame();
+    }
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function drawCard(player) {
+      const p = game[player];
+      if (p.deck.length > 0 && p.hand.length < 10) {
+        p.hand.push(p.deck.pop());
+      }
+    }
+
+    // Render Game
+    function renderGame() {
+      renderHand();
+      renderField('player');
+      renderField('opponent');
+      renderStats();
+    }
+
+    function renderHand() {
+      const hand = document.getElementById('hand');
+      hand.innerHTML = game.player.hand.map((card, idx) => createCardHTML(card, idx)).join('');
+      
+      // Add click handlers
+      game.player.hand.forEach((card, idx) => {
+        document.getElementById(`card-hand-${idx}`).onclick = () => playCard(idx);
+      });
+    }
+
+    function renderField(player) {
+      const zone = player === 'player' ? document.getElementById('playerZone') : document.getElementById('opponentZone');
+      const cards = game[player].field;
+      
+      zone.innerHTML = cards.map((card, idx) => createCardHTML(card, idx, player + '-field')).join('');
+      
+      // Add click handlers for player cards
+      if (player === 'player') {
+        cards.forEach((card, idx) => {
+          document.getElementById(`card-${player}-field-${idx}`).onclick = () => selectCard(idx);
+        });
+      }
+    }
+
+    function createCardHTML(card, idx, prefix = 'hand') {
+      return `
+        <div class="card" id="card-${prefix}-${idx}">
+          <div class="card-cost-badge">${card.cost}</div>
+          <div class="card-header">${card.name}</div>
+          <div class="card-image">
+            ${card.emoji}
+            <div class="card-role">${card.role}</div>
+          </div>
+          <div class="card-stats">
+            <div class="card-stat">
+              <div class="card-stat-label">ATK</div>
+              <div class="card-stat-value" style="color: #ef4444;">${card.attack}</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-label">DEF</div>
+              <div class="card-stat-value" style="color: #22c55e;">${card.defense}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStats() {
+      // Player
+      updateStat('playerHP', game.player.hp, game.player.maxHP, '❤️');
+      updateStat('playerEnergy', game.player.energy, game.player.maxEnergy, '⚡');
+      
+      // Opponent
+      updateStat('opponentHP', game.opponent.hp, game.opponent.maxHP, '❤️');
+      updateStat('opponentEnergy', game.opponent.energy, game.opponent.maxEnergy, '⚡');
+      
+      // Turn
+      document.getElementById('turnNumber').textContent = game.turn;
+    }
+
+    function updateStat(id, value, max, emoji) {
+      const el = document.getElementById(id);
+      const percent = (value / max) * 100;
+      el.style.width = percent + '%';
+      el.textContent = `${emoji} ${value}`;
+    }
+
+    // Game Actions
+    function playCard(idx) {
+      const card = game.player.hand[idx];
+      
+      if (game.player.energy < card.cost) {
+        showMessage('Energia insufficiente!');
+        return;
+      }
+      
+      if (game.player.field.length >= 3) {
+        showMessage('Campo pieno!');
+        return;
+      }
+      
+      game.player.energy -= card.cost;
+      game.player.field.push(card);
+      game.player.hand.splice(idx, 1);
+      
+      renderGame();
+    }
+
+    function selectCard(idx) {
+      // Deselect previous
+      if (game.selectedCard !== null) {
+        const prev = document.getElementById(`card-player-field-${game.selectedCard}`);
+        if (prev) prev.classList.remove('selected');
+      }
+      
+      // Select new
+      game.selectedCard = idx;
+      const card = document.getElementById(`card-player-field-${idx}`);
+      card.classList.add('selected');
+      
+      // Enable buttons
+      document.getElementById('btnAttack').disabled = false;
+      document.getElementById('btnDefend').disabled = false;
+    }
+
+    function attack() {
+      if (game.selectedCard === null) return;
+      
+      const attackerCard = game.player.field[game.selectedCard];
+      const el = document.getElementById(`card-player-field-${game.selectedCard}`);
+      el.classList.add('attacking');
+      
+      setTimeout(() => {
+        el.classList.remove('attacking');
+        
+        if (game.opponent.field.length > 0) {
+          // Attack opponent card
+          const targetIdx = Math.floor(Math.random() * game.opponent.field.length);
+          const targetCard = game.opponent.field[targetIdx];
+          const targetEl = document.getElementById(`card-opponent-field-${targetIdx}`);
+          
+          targetEl.classList.add('damaged');
+          
+          const damage = Math.max(1, attackerCard.attack - targetCard.defense);
+          targetCard.defense -= damage;
+          
+          if (targetCard.defense <= 0) {
+            game.opponent.field.splice(targetIdx, 1);
+          }
+          
+          setTimeout(() => {
+            renderGame();
+          }, 500);
+        } else {
+          // Direct attack
+          game.opponent.hp -= attackerCard.attack;
+          checkWin();
+        }
+        
+        game.selectedCard = null;
+        document.getElementById('btnAttack').disabled = true;
+        document.getElementById('btnDefend').disabled = true;
+        renderGame();
+      }, 600);
+    }
+
+    function defend() {
+      if (game.selectedCard === null) return;
+      
+      const card = game.player.field[game.selectedCard];
+      card.defense += 3;
+      
+      showMessage(`${card.name} si difende! +3 DEF`);
+      
+      game.selectedCard = null;
+      document.getElementById('btnAttack').disabled = true;
+      document.getElementById('btnDefend').disabled = true;
+      renderGame();
+    }
+
+    function endTurn() {
+      // Reset player
+      game.player.energy = Math.min(game.player.maxEnergy, game.player.energy + 1);
+      game.player.maxEnergy = Math.min(10, game.player.maxEnergy + 1);
+      drawCard('player');
+      
+      game.selectedCard = null;
+      renderGame();
+      
+      // Opponent turn
+      setTimeout(() => {
+        opponentTurn();
+      }, 1000);
+    }
+
+    function opponentTurn() {
+      showMessage('Turno Avversario...', 2000);
+      
+      setTimeout(() => {
+        // Opponent AI
+        game.opponent.energy = Math.min(game.opponent.maxEnergy, game.opponent.energy + 1);
+        game.opponent.maxEnergy = Math.min(10, game.opponent.maxEnergy + 1);
+        drawCard('opponent');
+        
+        // Play cards
+        for (let i = 0; i < game.opponent.hand.length; i++) {
+          const card = game.opponent.hand[i];
+          if (game.opponent.energy >= card.cost && game.opponent.field.length < 3) {
+            game.opponent.energy -= card.cost;
+            game.opponent.field.push(card);
+            game.opponent.hand.splice(i, 1);
+            i--;
+          }
+        }
+        
+        // Attack
+        if (game.opponent.field.length > 0) {
+          const attacker = game.opponent.field[0];
+          
+          if (game.player.field.length > 0) {
+            const target = game.player.field[0];
+            const damage = Math.max(1, attacker.attack - target.defense);
+            target.defense -= damage;
+            
+            if (target.defense <= 0) {
+              game.player.field.splice(0, 1);
+            }
+          } else {
+            game.player.hp -= attacker.attack;
+            checkWin();
+          }
+        }
+        
+        game.turn++;
+        renderGame();
+      }, 2000);
+    }
+
+    function checkWin() {
+      if (game.player.hp <= 0) {
+        showEndScreen(false);
+      } else if (game.opponent.hp <= 0) {
+        showEndScreen(true);
+      }
+    }
+
+    function showEndScreen(won) {
+      const screen = document.getElementById('endScreen');
+      const title = document.getElementById('endTitle');
+      const message = document.getElementById('endMessage');
+      
+      if (won) {
+        title.textContent = '🏆 VITTORIA!';
+        message.textContent = 'Hai sconfitto l\'avversario!';
+      } else {
+        title.textContent = '💀 SCONFITTA';
+        message.textContent = 'Sei stato sconfitto...';
+      }
+      
+      screen.classList.add('show');
+    }
+
+    function showMessage(text, duration = 1500) {
+      const msg = document.createElement('div');
+      msg.className = 'message';
+      msg.textContent = text;
+      document.querySelector('.game-container').appendChild(msg);
+      
+      setTimeout(() => {
+        msg.remove();
+      }, duration);
+    }
+
+    // Event Listeners
+    window.onload = () => {
+      // Show tutorial first - game starts when user clicks "Inizia a Giocare!"
+      document.getElementById('tutorialOverlay').style.display = 'flex';
+      
+      document.getElementById('btnAttack').onclick = attack;
+      document.getElementById('btnDefend').onclick = defend;
+      document.getElementById('btnEndTurn').onclick = endTurn;
+    };
+
+    // Start Game
+    function initGame() {
+      // ... (rest of the initGame function remains the same)
+    }
+  </script>
+</body>
+</html>

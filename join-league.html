@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unisciti alla Lega - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .join-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    
+    .join-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    
+    .join-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .join-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    
+    .join-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    
+    .join-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .code-input-group {
+      margin: 24px 0;
+    }
+    
+    .code-input {
+      width: 100%;
+      padding: 16px;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      border: 3px solid var(--primary);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.02);
+    }
+    
+    .code-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.2);
+    }
+    
+    .league-info {
+      background: rgba(0,0,0,0.03);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      display: none;
+    }
+    
+    .league-info.active {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .league-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    
+    .league-detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .btn-join {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, #b91c3a 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 24px;
+    }
+    
+    .btn-join:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(220, 20, 60, 0.4);
+    }
+    
+    .btn-join:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      display: none;
+    }
+    
+    .error-message.active {
+      display: block;
+    }
+    
+    .success-message {
+      background: #efe;
+      color: #3c3;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      display: none;
+      text-align: center;
+    }
+    
+    .success-message.active {
+      display: block;
+    }
+    
+    .teams-list {
+      margin-top: 16px;
+    }
+    
+    .team-item {
+      padding: 12px;
+      background: white;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .team-item:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+    
+    .team-item.selected {
+      border-color: var(--primary);
+      background: rgba(220, 20, 60, 0.05);
+    }
+    
+    .team-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .team-owner {
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Unisciti alla Lega</h1>
+  </header>
+
+  <main class="join-container">
+    <div class="join-card">
+      <div class="join-header">
+        <div class="join-icon">🏆</div>
+        <h2 class="join-title">Entra in una Lega</h2>
+        <p class="join-subtitle">Inserisci il codice invito che hai ricevuto</p>
+      </div>
+
+      <div class="code-input-group">
+        <input type="text" id="codeInput" placeholder="CODICE (ES. ABC123)" maxlength="6" style="text-transform: uppercase;" />
+      </div>
+
+      <div id="errorMessage" class="error-message"></div>
+      <div id="successMessage" class="success-message"></div>
+
+      <div id="leagueInfo" class="league-info">
+        <div class="league-name" id="leagueName"></div>
+        <div class="league-detail">
+          <span>👥</span>
+          <span id="leagueMembers"></span>
+        </div>
+        <div class="league-detail">
+          <span>⚽</span>
+          <span id="leagueTeams"></span>
+        </div>
+        <div class="league-detail">
+          <span>📅</span>
+          <span id="leagueCreated"></span>
+        </div>
+
+        <div id="teamsList" class="teams-list" style="display:none;">
+          <h4 style="margin: 16px 0 8px 0;">Seleziona una squadra disponibile:</h4>
+          <div id="teamsContainer"></div>
+        </div>
+      </div>
+
+      <button id="joinBtn" class="btn-join" onclick="joinLeague()" disabled>
+        🚀 Unisciti alla Lega
+      </button>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="index.html" style="color: var(--muted); text-decoration: none; font-size: 14px;">
+          ← Torna alla Home
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-4"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+
+  <script>
+    let currentLeague = null;
+    let selectedTeamId = null;
+    let availableTeams = [];
+
+    async function checkCode() {
+      const input = document.getElementById('codeInput');
+      const code = input.value.trim().toUpperCase();
+      input.value = code; // Force uppercase in UI
+      const errorMsg = document.getElementById('errorMessage');
+      const leagueInfo = document.getElementById('leagueInfo');
+      const joinBtn = document.getElementById('joinBtn');
+
+      errorMsg.classList.remove('active');
+      leagueInfo.classList.remove('active');
+      joinBtn.disabled = true;
+      selectedTeamId = null;
+
+      if (code.length !== 6) return;
+
+      try {
+        const db = firebase.firestore();
+        const user = firebase.auth().currentUser;
+
+        if (!user) {
+          showError('Devi effettuare il login prima di unirti a una lega');
+          return;
+        }
+
+        // Cerca lega per codice invito
+        console.log('🔍 Searching for code:', code, 'Length:', code.length);
+        const snapshot = await db.collection('leagues')
+          .where('inviteCode', '==', code)
+          .limit(1)
+          .get();
+
+        console.log('📊 Query results:', snapshot.size);
+        
+        if (snapshot.empty) {
+          console.log('❌ Code not found with .where(), trying client-side filter...');
+          // Fallback: carica tutte le leghe e filtra client-side
+          const allLeagues = await db.collection('leagues').get();
+          console.log('📋 All leagues in DB:', allLeagues.size);
+          
+          let foundLeague = null;
+          allLeagues.docs.forEach(doc => {
+            const data = doc.data();
+            const storedCode = (data.inviteCode || '').trim().toUpperCase();
+            console.log(`  - ${doc.id}: inviteCode="${data.inviteCode}" (stored: "${storedCode}", searching: "${code}")`);
+            
+            if (storedCode === code) {
+              console.log('✅ FOUND via client-side filter!');
+              foundLeague = { doc, data };
+            }
+          });
+          
+          if (!foundLeague) {
+            showError('Codice invito non valido');
+            return;
+          }
+          
+          // Usa lega trovata con filtro client-side
+          currentLeague = { id: foundLeague.doc.id, ...foundLeague.data };
+        } else {
+          const leagueDoc = snapshot.docs[0];
+          currentLeague = { id: leagueDoc.id, ...leagueDoc.data() };
+        }
+
+        // Verifica se già membro
+        if (currentLeague.members && currentLeague.members.includes(user.uid)) {
+          showError('Sei già membro di questa lega!');
+          return;
+        }
+
+        // Mostra info lega
+        document.getElementById('leagueName').textContent = currentLeague.name || 'Lega Senza Nome';
+        document.getElementById('leagueMembers').textContent = `${(currentLeague.members || []).length} membri`;
+        
+        // Carica squadre da /teams collection
+        const teamsSnapshot = await db.collection('teams').get();
+        
+        // Carica tutti gli users per vedere chi ha già una squadra
+        const usersSnapshot = await db.collection('users')
+          .where('currentLeague', '==', currentLeague.id)
+          .get();
+        
+        const usedTeamIndexes = new Set();
+        usersSnapshot.docs.forEach(doc => {
+          const teamIdx = doc.data().team_index;
+          if (teamIdx !== null && teamIdx !== undefined) {
+            usedTeamIndexes.add(teamIdx);
+          }
+        });
+        
+        availableTeams = teamsSnapshot.docs
+          .filter(doc => !usedTeamIndexes.has(parseInt(doc.id)))
+          .map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        document.getElementById('leagueTeams').textContent = `${teamsSnapshot.size} squadre (${availableTeams.length} disponibili)`;
+        
+        // Fix: gestisci createdAt che potrebbe non esistere
+        const createdDate = currentLeague.createdAt?.toDate ? 
+          new Date(currentLeague.createdAt.toDate()).toLocaleDateString('it-IT') : 
+          'Data sconosciuta';
+        document.getElementById('leagueCreated').textContent = `Creata il ${createdDate}`;
+
+        if (availableTeams.length > 0) {
+          renderTeams();
+          document.getElementById('teamsList').style.display = 'block';
+        } else {
+          showError('Nessuna squadra disponibile in questa lega');
+          return;
+        }
+
+        leagueInfo.classList.add('active');
+
+      } catch (error) {
+        console.error('Error checking code:', error);
+        showError(`Errore durante la verifica: ${error.message || 'Riprova'}`);
+      }
+    }
+
+    function renderTeams() {
+      const container = document.getElementById('teamsContainer');
+      container.innerHTML = availableTeams.map(team => `
+        <div class="team-item" onclick="selectTeam('${team.id}')">
+          <div class="team-name">${team.name || 'Squadra Senza Nome'}</div>
+          <div class="team-owner">Disponibile</div>
+        </div>
+      `).join('');
+    }
+
+    function selectTeam(teamId) {
+      selectedTeamId = teamId;
+      
+      // Update UI
+      document.querySelectorAll('.team-item').forEach(item => {
+        item.classList.remove('selected');
+      });
+      event.target.closest('.team-item').classList.add('selected');
+
+      // Enable join button
+      document.getElementById('joinBtn').disabled = false;
+    }
+
+    async function joinLeague() {
+      if (!currentLeague || !selectedTeamId) {
+        showError('Seleziona una squadra prima di unirti');
+        return;
+      }
+
+      const joinBtn = document.getElementById('joinBtn');
+      joinBtn.disabled = true;
+      joinBtn.textContent = '⏳ Unione in corso...';
+
+      try {
+        const db = firebase.firestore();
+        const user = firebase.auth().currentUser;
+
+        if (!user) {
+          throw new Error('Utente non autenticato');
+        }
+
+        console.log('Joining league:', currentLeague.id, 'Team:', selectedTeamId, 'User:', user.uid);
+
+        // 1. Update lega: aggiungi membro
+        await db.collection('leagues').doc(currentLeague.id).update({
+          members: firebase.firestore.FieldValue.arrayUnion(user.uid)
+        }).catch(err => {
+          console.error('Error updating league members:', err);
+          throw new Error('Impossibile aggiornare la lega');
+        });
+
+        // 2. Update user: aggiungi lega + team_index
+        await db.collection('users').doc(user.uid).set({
+          leagues: firebase.firestore.FieldValue.arrayUnion(currentLeague.id),
+          currentLeague: currentLeague.id,
+          team_index: parseInt(selectedTeamId),
+          email: user.email || '',
+          displayName: user.displayName || user.email || 'Utente'
+        }, { merge: true }).catch(err => {
+          console.error('Error updating user:', err);
+          throw new Error('Impossibile aggiornare profilo utente');
+        });
+
+        console.log('✅ Join league success!');
+
+        // Success!
+        showSuccess('✅ Ti sei unito alla lega con successo!');
+        
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2000);
+
+      } catch (error) {
+        console.error('Error joining league:', error);
+        showError(`Errore nell'unirsi alla competizione: ${error.message || 'Riprova'}`);
+        joinBtn.disabled = false;
+        joinBtn.textContent = '🚀 Unisciti alla Lega';
+      }
+    }
+
+    function showError(message) {
+      const errorMsg = document.getElementById('errorMessage');
+      errorMsg.textContent = '❌ ' + message;
+      errorMsg.classList.add('active');
+    }
+
+    function showSuccess(message) {
+      const successMsg = document.getElementById('successMessage');
+      successMsg.textContent = message;
+      successMsg.classList.add('active');
+    }
+
+    // Auth check
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        // Salva URL corrente per redirect dopo login
+        const currentUrl = window.location.href;
+        window.location.href = `auth.html?redirect=${encodeURIComponent(currentUrl)}`;
+        return;
+      }
+      
+      console.log('User authenticated:', user.uid, user.email);
+      
+      // Check se utente è già in una lega (e non ha codice URL)
+      const urlParams = new URLSearchParams(window.location.search);
+      const codeParam = urlParams.get('code');
+      const joinedParam = urlParams.get('joined');
+      
+      // Non redirectare se utente ha appena fatto join (evita loop)
+      if (!codeParam && !joinedParam) {
+        console.log('🔍 Checking if user already in league...');
+        const userLeagues = await firebase.firestore().collection('leagues')
+          .where('members', 'array-contains', user.uid)
+          .limit(1)
+          .get();
+        
+        console.log('📊 User leagues found:', userLeagues.size);
+        
+        if (!userLeagues.empty) {
+          // Già in una lega, redirect a index
+          console.log('✅ Utente già in lega, redirect...');
+          window.location.href = 'index.html';
+          return;
+        } else {
+          console.log('✅ User not in any league, show join form');
+        }
+      }
+        
+      // Check URL params per codice precompilato (già definito sopra)
+      if (codeParam) {
+          document.getElementById('codeInput').value = codeParam.toUpperCase();
+          console.log('✅ Codice precompilato da URL:', codeParam);
+          // Aspetta che Firebase sia completamente inizializzato
+          setTimeout(() => {
+            console.log('🔍 Verifica automatica codice...');
+            checkCode().catch(err => console.error('Error in checkCode:', err));
+          }, 1000);
+        }
+        
+      // Listener input per verifica automatica quando utente digita 6 caratteri
+      const codeInput = document.getElementById('codeInput');
+      codeInput.addEventListener('input', (e) => {
+        const code = e.target.value.trim().toUpperCase();
+        e.target.value = code; // Force uppercase
+        if (code.length === 6) {
+          console.log('✅ 6 caratteri inseriti, verifico codice...');
+          setTimeout(() => checkCode().catch(err => console.error('Error in checkCode:', err)), 300);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Penalità Formazione - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .test-section { background: var(--card); padding: 20px; margin: 20px 0; border-radius: 12px; box-shadow: var(--shadow); }
+    .btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+    .btn:hover { opacity: 0.9; }
+    .btn-secondary { background: #6c757d; }
+    .btn-danger { background: #dc3545; }
+    .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary); }
+    .error { border-left-color: #dc3545; background: #f8d7da; }
+    .success { border-left-color: #28a745; background: #d4edda; }
+    .warning { border-left-color: #ffc107; background: #fff3cd; }
+    .team-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0; }
+    .team-item { padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white; }
+    .team-item.missing { border-color: #dc3545; background: #f8d7da; }
+    .team-item.complete { border-color: #28a745; background: #d4edda; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🧪 Test Penalità Formazione</h1>
+  </header>
+
+  <main class="container">
+    <div class="test-section">
+      <h2>Test 1: Verifica Squadre e Formazioni</h2>
+      <p>Controlla quali squadre hanno formazioni salvate per la giornata selezionata.</p>
+      <div style="margin: 10px 0;">
+        <label>Giornata: </label>
+        <select id="giornataSelect">
+          <option value="G1">Giornata 1</option>
+          <option value="G2">Giornata 2</option>
+          <option value="G3">Giornata 3</option>
+          <option value="G4">Giornata 4</option>
+          <option value="G5">Giornata 5</option>
+        </select>
+        <button class="btn" onclick="checkFormations()">🔍 Controlla Formazioni</button>
+      </div>
+      <div id="formationsResult"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test 2: Simula Penalità</h2>
+      <p>Simula l'applicazione delle penalità per formazione mancante.</p>
+      <button class="btn" onclick="simulatePenalties()">⚡ Simula Penalità</button>
+      <div id="penaltiesResult"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test 3: Verifica Risultati H2H</h2>
+      <p>Controlla i risultati H2H per verificare l'applicazione delle penalità.</p>
+      <button class="btn" onclick="checkH2HResults()">📊 Verifica H2H</button>
+      <div id="h2hResult"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Test 4: Reset Test Data</h2>
+      <p>Rimuove i dati di test per ripartire da zero.</p>
+      <button class="btn btn-danger" onclick="resetTestData()">🗑️ Reset Dati Test</button>
+      <div id="resetResult"></div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const SEASON = '2024-25';
+    const FORFEIT_WIN_SCORE = 3;
+    const FORFEIT_LOSS_SCORE = -10;
+
+    let teamNames = [];
+    let isAdmin = false;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        location.href = 'auth.html';
+        return;
+      }
+      
+      try {
+        const adminDoc = await db.collection('admins').doc(user.uid).get();
+        isAdmin = adminDoc.exists;
+        if (!isAdmin) {
+          document.body.innerHTML = '<div class="container"><div class="test-section error"><h2>❌ Accesso Negato</h2><p>Solo gli admin possono accedere a questa pagina di test.</p></div></div>';
+          return;
+        }
+        
+        await loadTeamNames();
+        console.log('Test page loaded for admin:', user.email);
+      } catch (error) {
+        console.error('Auth error:', error);
+        location.href = 'auth.html';
+      }
+    });
+
+    async function loadTeamNames() {
+      try {
+        const teamsSnap = await db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
+        teamNames = teamsSnap.docs.map((d, i) => d.data().name || `Squadra ${i + 1}`);
+        console.log('Team names loaded:', teamNames);
+      } catch (error) {
+        console.error('Error loading team names:', error);
+        teamNames = Array.from({ length: 19 }, (_, i) => `Squadra ${i + 1}`);
+      }
+    }
+
+    async function checkFormations() {
+      const giornata = document.getElementById('giornataSelect').value;
+      const resultDiv = document.getElementById('formationsResult');
+      
+      try {
+        resultDiv.innerHTML = '<div class="result">🔄 Controllo in corso...</div>';
+        
+        const teamsSnap = await db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
+        const teamDocs = teamsSnap.docs;
+        
+        let missingCount = 0;
+        let completeCount = 0;
+        const teamStatus = [];
+        
+        for (let i = 0; i < teamDocs.length; i++) {
+          const doc = teamDocs[i];
+          try {
+            const savedSnap = await db.collection('teams').doc(doc.id).collection('saved').doc(giornata).get();
+            const lineup = savedSnap.exists ? savedSnap.data()?.lineup : null;
+            const starters = Array.isArray(lineup) ? lineup.filter(Boolean) : [];
+            const hasFormation = starters.length >= 5;
+            
+            teamStatus.push({
+              index: i,
+              name: teamNames[i] || `Squadra ${i + 1}`,
+              hasFormation,
+              starters: starters.length
+            });
+            
+            if (hasFormation) {
+              completeCount++;
+            } else {
+              missingCount++;
+            }
+          } catch (e) {
+            console.warn('Error checking team', doc.id, e);
+            teamStatus.push({
+              index: i,
+              name: teamNames[i] || `Squadra ${i + 1}`,
+              hasFormation: false,
+              starters: 0
+            });
+            missingCount++;
+          }
+        }
+        
+        const teamListHtml = teamStatus.map(team => `
+          <div class="team-item ${team.hasFormation ? 'complete' : 'missing'}">
+            <strong>${team.name}</strong><br>
+            <small>${team.hasFormation ? '✅' : '❌'} ${team.starters}/5 giocatori</small>
+          </div>
+        `).join('');
+        
+        resultDiv.innerHTML = `
+          <div class="result ${missingCount === 0 ? 'success' : 'warning'}">
+            <strong>Risultato:</strong> ${completeCount} squadre con formazione completa, ${missingCount} squadre senza formazione
+          </div>
+          <div class="team-list">${teamListHtml}</div>
+        `;
+        
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ Errore: ${error.message}</div>`;
+      }
+    }
+
+    async function simulatePenalties() {
+      const giornata = document.getElementById('giornataSelect').value;
+      const resultDiv = document.getElementById('penaltiesResult');
+      
+      try {
+        resultDiv.innerHTML = '<div class="result">🔄 Simulazione in corso...</div>';
+        
+        // Simula la logica di applyForfeitPenalties
+        const [teamsSnap, scheduleSnap, resultsSnap] = await Promise.all([
+          db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get(),
+          db.collection('h2h_schedule').doc(SEASON).collection('giornate').doc(giornata).get(),
+          db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornata).get()
+        ]);
+
+        if (!scheduleSnap.exists) {
+          resultDiv.innerHTML = '<div class="result error">❌ Nessun calendario trovato per questa giornata</div>';
+          return;
+        }
+
+        const teamDocs = teamsSnap.docs;
+        const missingSet = new Set();
+
+        // Controlla formazioni
+        for (let i = 0; i < teamDocs.length; i++) {
+          try {
+            const savedSnap = await db.collection('teams').doc(teamDocs[i].id).collection('saved').doc(giornata).get();
+            const lineup = savedSnap.exists ? savedSnap.data()?.lineup : null;
+            const starters = Array.isArray(lineup) ? lineup.filter(Boolean) : [];
+            if (starters.length < 5) {
+              missingSet.add(i);
+            }
+          } catch (e) {
+            console.warn('Error checking team', teamDocs[i].id, e);
+            missingSet.add(i);
+          }
+        }
+
+        const schedule = scheduleSnap.data() || {};
+        const existingMatches = new Map();
+        if (resultsSnap.exists) {
+          const data = resultsSnap.data() || {};
+          (data.matches || []).forEach(m => {
+            if (typeof m.home === 'number' && typeof m.away === 'number') {
+              existingMatches.set(`${m.home}-${m.away}`, { ...m });
+            }
+          });
+        }
+
+        const updatedMatches = [];
+        (schedule.matches || []).forEach(match => {
+          if (typeof match.home !== 'number' || typeof match.away !== 'number') return;
+          const key = `${match.home}-${match.away}`;
+          const base = existingMatches.get(key) || { home: match.home, away: match.away };
+          const homeMissing = missingSet.has(match.home);
+          const awayMissing = missingSet.has(match.away);
+
+          if (homeMissing || awayMissing) {
+            if (homeMissing && !awayMissing) {
+              base.scoreHome = FORFEIT_LOSS_SCORE;
+              base.scoreAway = base.scoreAway != null ? base.scoreAway : FORFEIT_WIN_SCORE;
+              if (base.scoreAway < FORFEIT_WIN_SCORE) base.scoreAway = FORFEIT_WIN_SCORE;
+            } else if (!homeMissing && awayMissing) {
+              base.scoreAway = FORFEIT_LOSS_SCORE;
+              base.scoreHome = base.scoreHome != null ? base.scoreHome : FORFEIT_WIN_SCORE;
+              if (base.scoreHome < FORFEIT_WIN_SCORE) base.scoreHome = FORFEIT_WIN_SCORE;
+            } else {
+              base.scoreHome = FORFEIT_LOSS_SCORE;
+              base.scoreAway = FORFEIT_LOSS_SCORE;
+            }
+            base.forfeitHome = homeMissing;
+            base.forfeitAway = awayMissing;
+            base.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+          }
+
+          existingMatches.set(key, base);
+        });
+
+        existingMatches.forEach(m => updatedMatches.push(m));
+
+        // Mostra preview dei risultati
+        const previewHtml = updatedMatches.map(match => {
+          const homeName = teamNames[match.home] || `Squadra ${match.home + 1}`;
+          const awayName = teamNames[match.away] || `Squadra ${match.away + 1}`;
+          const homeForfeit = match.forfeitHome ? ' ⚠️' : '';
+          const awayForfeit = match.forfeitAway ? ' ⚠️' : '';
+          
+          return `
+            <div style="padding: 8px; margin: 4px 0; border: 1px solid #ddd; border-radius: 4px; background: ${match.forfeitHome || match.forfeitAway ? '#fff3cd' : '#f8f9fa'};">
+              <strong>${homeName}${homeForfeit}</strong> vs <strong>${awayName}${awayForfeit}</strong><br>
+              <small>Punteggio: ${match.scoreHome} - ${match.scoreAway}</small>
+            </div>
+          `;
+        }).join('');
+
+        resultDiv.innerHTML = `
+          <div class="result ${missingSet.size === 0 ? 'success' : 'warning'}">
+            <strong>Simulazione completata:</strong> ${missingSet.size} squadre senza formazione
+          </div>
+          <div style="margin-top: 10px;">
+            <h4>Preview Risultati:</h4>
+            ${previewHtml}
+          </div>
+          <div style="margin-top: 10px;">
+            <button class="btn" onclick="applyPenalties()">💾 Applica Penalità</button>
+            <button class="btn btn-secondary" onclick="simulatePenalties()">🔄 Ricalcola</button>
+          </div>
+        `;
+        
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ Errore: ${error.message}</div>`;
+      }
+    }
+
+    async function applyPenalties() {
+      const giornata = document.getElementById('giornataSelect').value;
+      const resultDiv = document.getElementById('penaltiesResult');
+      
+      try {
+        resultDiv.innerHTML = '<div class="result">🔄 Applicazione penalità in corso...</div>';
+        
+        // Usa la stessa logica di matchday.html
+        const [teamsSnap, scheduleSnap, resultsSnap] = await Promise.all([
+          db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get(),
+          db.collection('h2h_schedule').doc(SEASON).collection('giornate').doc(giornata).get(),
+          db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornata).get()
+        ]);
+
+        if (!scheduleSnap.exists) {
+          resultDiv.innerHTML = '<div class="result error">❌ Nessun calendario trovato per questa giornata</div>';
+          return;
+        }
+
+        const teamDocs = teamsSnap.docs;
+        const missingSet = new Set();
+
+        await Promise.all(teamDocs.map(async (doc, idx) => {
+          try {
+            const savedSnap = await db.collection('teams').doc(doc.id).collection('saved').doc(giornata).get();
+            const lineup = savedSnap.exists ? savedSnap.data()?.lineup : null;
+            const starters = Array.isArray(lineup) ? lineup.filter(Boolean) : [];
+            if (starters.length < 5) missingSet.add(idx);
+          } catch (e) {
+            console.warn('Impossibile leggere formazione per team', doc.id, e);
+            missingSet.add(idx);
+          }
+        }));
+
+        const schedule = scheduleSnap.data() || {};
+        const existingMatches = new Map();
+        if (resultsSnap.exists) {
+          const data = resultsSnap.data() || {};
+          (data.matches || []).forEach(m => {
+            if (typeof m.home === 'number' && typeof m.away === 'number') {
+              existingMatches.set(`${m.home}-${m.away}`, { ...m });
+            }
+          });
+        }
+
+        const updatedMatches = [];
+        (schedule.matches || []).forEach(match => {
+          if (typeof match.home !== 'number' || typeof match.away !== 'number') return;
+          const key = `${match.home}-${match.away}`;
+          const base = existingMatches.get(key) || { home: match.home, away: match.away };
+          const homeMissing = missingSet.has(match.home);
+          const awayMissing = missingSet.has(match.away);
+
+          if (homeMissing || awayMissing) {
+            if (homeMissing && !awayMissing) {
+              base.scoreHome = FORFEIT_LOSS_SCORE;
+              base.scoreAway = base.scoreAway != null ? base.scoreAway : FORFEIT_WIN_SCORE;
+              if (base.scoreAway < FORFEIT_WIN_SCORE) base.scoreAway = FORFEIT_WIN_SCORE;
+            } else if (!homeMissing && awayMissing) {
+              base.scoreAway = FORFEIT_LOSS_SCORE;
+              base.scoreHome = base.scoreHome != null ? base.scoreHome : FORFEIT_WIN_SCORE;
+              if (base.scoreHome < FORFEIT_WIN_SCORE) base.scoreHome = FORFEIT_WIN_SCORE;
+            } else {
+              base.scoreHome = FORFEIT_LOSS_SCORE;
+              base.scoreAway = FORFEIT_LOSS_SCORE;
+            }
+            base.forfeitHome = homeMissing;
+            base.forfeitAway = awayMissing;
+            base.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+          }
+
+          existingMatches.set(key, base);
+        });
+
+        existingMatches.forEach(m => updatedMatches.push(m));
+
+        // Salva su Firestore
+        await db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornata).set({ matches: updatedMatches }, { merge: true });
+
+        const penaltyPayload = Array.from(missingSet).map(idx => ({
+          teamIndex: idx,
+          teamName: teamNames[idx] || `Squadra ${idx + 1}`,
+          penalty: FORFEIT_LOSS_SCORE
+        }));
+
+        await db.collection('days').doc(giornata).set({
+          penalties: {
+            missingLineups: penaltyPayload,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }
+        }, { merge: true });
+
+        resultDiv.innerHTML = `
+          <div class="result success">
+            ✅ Penalità applicate con successo!<br>
+            <small>${missingSet.size} squadre penalizzate per formazione mancante</small>
+          </div>
+        `;
+        
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ Errore: ${error.message}</div>`;
+      }
+    }
+
+    async function checkH2HResults() {
+      const giornata = document.getElementById('giornataSelect').value;
+      const resultDiv = document.getElementById('h2hResult');
+      
+      try {
+        resultDiv.innerHTML = '<div class="result">🔄 Controllo risultati H2H...</div>';
+        
+        const resultsSnap = await db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornata).get();
+        
+        if (!resultsSnap.exists) {
+          resultDiv.innerHTML = '<div class="result warning">⚠️ Nessun risultato trovato per questa giornata</div>';
+          return;
+        }
+        
+        const data = resultsSnap.data() || {};
+        const matches = data.matches || [];
+        
+        const forfeitMatches = matches.filter(m => m.forfeitHome || m.forfeitAway);
+        const normalMatches = matches.filter(m => !m.forfeitHome && !m.forfeitAway);
+        
+        const forfeitHtml = forfeitMatches.map(match => {
+          const homeName = teamNames[match.home] || `Squadra ${match.home + 1}`;
+          const awayName = teamNames[match.away] || `Squadra ${match.away + 1}`;
+          const homeForfeit = match.forfeitHome ? ' ⚠️' : '';
+          const awayForfeit = match.forfeitAway ? ' ⚠️' : '';
+          
+          return `
+            <div style="padding: 8px; margin: 4px 0; border: 1px solid #dc3545; border-radius: 4px; background: #f8d7da;">
+              <strong>${homeName}${homeForfeit}</strong> vs <strong>${awayName}${awayForfeit}</strong><br>
+              <small>Punteggio: ${match.scoreHome} - ${match.scoreAway} (PENALITÀ)</small>
+            </div>
+          `;
+        }).join('');
+        
+        const normalHtml = normalMatches.map(match => {
+          const homeName = teamNames[match.home] || `Squadra ${match.home + 1}`;
+          const awayName = teamNames[match.away] || `Squadra ${match.away + 1}`;
+          
+          return `
+            <div style="padding: 8px; margin: 4px 0; border: 1px solid #28a745; border-radius: 4px; background: #d4edda;">
+              <strong>${homeName}</strong> vs <strong>${awayName}</strong><br>
+              <small>Punteggio: ${match.scoreHome} - ${match.scoreAway}</small>
+            </div>
+          `;
+        }).join('');
+        
+        resultDiv.innerHTML = `
+          <div class="result ${forfeitMatches.length > 0 ? 'warning' : 'success'}">
+            <strong>Risultati H2H per ${giornata}:</strong><br>
+            <small>${matches.length} partite totali, ${forfeitMatches.length} con penalità, ${normalMatches.length} normali</small>
+          </div>
+          ${forfeitMatches.length > 0 ? `
+            <div style="margin-top: 10px;">
+              <h4>Partite con Penalità:</h4>
+              ${forfeitHtml}
+            </div>
+          ` : ''}
+          ${normalMatches.length > 0 ? `
+            <div style="margin-top: 10px;">
+              <h4>Partite Normali:</h4>
+              ${normalHtml}
+            </div>
+          ` : ''}
+        `;
+        
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ Errore: ${error.message}</div>`;
+      }
+    }
+
+    async function resetTestData() {
+      const resultDiv = document.getElementById('resetResult');
+      
+      try {
+        resultDiv.innerHTML = '<div class="result">🔄 Reset in corso...</div>';
+        
+        // Rimuovi risultati H2H per le giornate di test
+        const testGiornate = ['G1', 'G2', 'G3', 'G4', 'G5'];
+        const batch = db.batch();
+        
+        for (const giornata of testGiornate) {
+          const ref = db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornata);
+          batch.delete(ref);
+        }
+        
+        await batch.commit();
+        
+        resultDiv.innerHTML = '<div class="result success">✅ Dati di test resettati con successo!</div>';
+        
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ Errore: ${error.message}</div>`;
+      }
+    }
+  </script>
+  
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+</body>
+</html>

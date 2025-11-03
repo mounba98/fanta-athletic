@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recap Giornata - Fanta Athletic</title>
+  <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
+  <style>
+    .recap-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .recap-header {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+      border-radius: 16px;
+      color: white;
+      margin-bottom: 30px;
+    }
+    
+    .recap-header h1 {
+      font-size: 48px;
+      margin: 0 0 10px 0;
+    }
+    
+    .recap-header p {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+    
+    .classifica-giornata {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .classifica-giornata h2 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .team-row {
+      display: grid;
+      grid-template-columns: 50px 1fr 100px 120px;
+      gap: 15px;
+      padding: 15px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      align-items: center;
+      transition: background 0.2s;
+    }
+    
+    .team-row:hover {
+      background: rgba(0,0,0,0.02);
+    }
+    
+    .team-row:last-child {
+      border-bottom: none;
+    }
+    
+    .position {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    .position.first { color: #FFD700; }
+    .position.second { color: #C0C0C0; }
+    .position.third { color: #CD7F32; }
+    
+    .team-name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .team-points {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: center;
+    }
+    
+    .breakdown {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+    }
+    
+    .breakdown span {
+      background: rgba(0,0,0,0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    @media (max-width: 768px) {
+      .recap-header h1 { font-size: 32px; }
+      .team-row {
+        grid-template-columns: 40px 1fr 80px;
+        gap: 10px;
+      }
+      .breakdown { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Recap Giornata</h1>
+  </header>
+
+  <main class="recap-container">
+    <div class="recap-header">
+      <h1 id="giornataTitle">📊 Giornata 1</h1>
+      <p id="giornataSubtitle">Classifica della giornata</p>
+    </div>
+
+    <div class="classifica-giornata">
+      <h2>🏆 Classifica Giornata</h2>
+      <div id="classificaList">
+        <div style="text-align: center; padding: 40px; color: var(--muted);">
+          Caricamento...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+  </script>
+  
+  <script>
+    async function loadRecap() {
+      const params = new URLSearchParams(window.location.search);
+      const giornata = params.get('g') || 'G1';
+      
+      document.getElementById('giornataTitle').textContent = `📊 ${giornata}`;
+      
+      try {
+        // Carica risultati giornata
+        const snapshot = await window.db.collection('results').doc(giornata).collection('teams').orderBy('points', 'desc').get();
+        
+        if (snapshot.empty) {
+          document.getElementById('classificaList').innerHTML = `
+            <div style="text-align: center; padding: 40px; color: var(--muted);">
+              Nessun risultato disponibile per ${giornata}
+            </div>
+          `;
+          return;
+        }
+        
+        const teams = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        let html = '';
+        teams.forEach((team, index) => {
+          const position = index + 1;
+          let positionClass = '';
+          let medal = '';
+          
+          if (position === 1) {
+            positionClass = 'first';
+            medal = '🥇';
+          } else if (position === 2) {
+            positionClass = 'second';
+            medal = '🥈';
+          } else if (position === 3) {
+            positionClass = 'third';
+            medal = '🥉';
+          }
+          
+          const breakdown = team.breakdown || {};
+          
+          html += `
+            <div class="team-row">
+              <div class="position ${positionClass}">${medal || position}</div>
+              <div class="team-name">${team.teamName || 'Squadra ' + (parseInt(team.id) + 1)}</div>
+              <div class="team-points">${team.points.toFixed(1)}</div>
+              <div class="breakdown">
+                <span title="Punti Curva">🎺 Curva: ${breakdown.curva || 0}</span>
+                <span title="Punti Giocatori">⚽ Giocatori: ${breakdown.players || 0}</span>
+                <span title="Bonus Capitano">👑 Capitano: ${breakdown.captain || 0}</span>
+                <span title="Punti Allenatore">👔 Coach: ${breakdown.coach || 0}</span>
+              </div>
+            </div>
+          `;
+        });
+        
+        document.getElementById('classificaList').innerHTML = html;
+        
+      } catch (error) {
+        console.error('Errore caricamento recap:', error);
+        document.getElementById('classificaList').innerHTML = `
+          <div style="text-align: center; padding: 40px; color: #e53e3e;">
+            ❌ Errore caricamento dati
+          </div>
+        `;
+      }
+    }
+    
+    loadRecap();
+  </script>
+  
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+</body>
+</html>

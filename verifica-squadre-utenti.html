@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifica Squadre & Utenti</title>
+  <link rel="stylesheet" href="resources/sheet.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    h1 { text-align: center; margin-bottom: 32px; }
+    .section {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .user-card {
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-card.no-team { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+    .user-card.has-team { border-color: #22c55e; }
+    .btn {
+      padding: 8px 16px;
+      background: #d91847;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn:hover { background: #b91846; }
+    .btn.assign { background: #22c55e; }
+    select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 2px solid #334155;
+      background: #0f172a;
+      color: white;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Verifica Squadre & Utenti</h1>
+    
+    <div class="section">
+      <h2>📊 Statistiche</h2>
+      <div id="stats"></div>
+    </div>
+
+    <div class="section">
+      <h2>👥 Utenti Senza Squadra</h2>
+      <div id="usersWithoutTeam"></div>
+    </div>
+
+    <div class="section">
+      <h2>⚽ Squadre</h2>
+      <div id="teamsList"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    
+    let currentLeagueId = null;
+    let teams = [];
+    let users = [];
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      const adminDoc = await db.collection('admins').doc(user.uid).get();
+      if (!adminDoc.exists) {
+        alert('⚠️ Solo admin!');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const checkLeague = setInterval(() => {
+        if (window.currentLeague && window.currentLeague.id) {
+          clearInterval(checkLeague);
+          currentLeagueId = window.currentLeague.id;
+          loadData();
+        }
+      }, 500);
+    });
+
+    async function loadData() {
+      try {
+        console.log('🔄 Loading data...');
+        
+        // Carica squadre da /teams collection (NON da leagues.teams)
+        const teamsSnap = await db.collection('teams').get();
+        teams = teamsSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })).sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        
+        console.log('⚽ Teams loaded:', teams.length, teams);
+        
+        if (teams.length === 0) {
+          alert('⚠️ Nessuna squadra trovata!\n\nCrea squadre in admin.html → Gestione Squadre');
+          document.getElementById('stats').innerHTML = `
+            <div style="background: #ef4444; color: white; padding: 24px; border-radius: 12px; text-align: center;">
+              <h2 style="margin: 0 0 12px 0;">❌ Nessuna Squadra</h2>
+              <p>Crea squadre prima di assegnare utenti.</p>
+              <a href="admin-teams.html" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: white; color: #ef4444; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Gestione Squadre
+              </a>
+            </div>
+          `;
+          return;
+        }
+        
+        // Carica lega per members
+        const leagueDoc = await db.collection('leagues').doc(currentLeagueId).get();
+        const leagueMembers = leagueDoc.data()?.members || [];
+        
+        // Carica utenti
+        const usersSnap = await db.collection('users').get();
+        users = usersSnap.docs.map(doc => ({
+          uid: doc.id,
+          ...doc.data()
+        }));
+        
+        // Filtra solo utenti nella lega
+        users = users.filter(u => leagueMembers.includes(u.uid));
+        
+        console.log('👥 Users loaded:', users.length, users);
+        
+        render();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Errore: ' + error.message);
+      }
+    }
+
+    function render() {
+      // Trova utenti senza squadra (campo team_index null o undefined)
+      const usersWithoutTeam = users.filter(u => 
+        u.team_index === null || u.team_index === undefined
+      );
+      
+      // Stats
+      document.getElementById('stats').innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div style="background: #334155; padding: 16px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 32px; font-weight: 700; color: #22c55e;">${users.length}</div>
+            <div style="color: #94a3b8;">Utenti Totali</div>
+          </div>
+          <div style="background: #334155; padding: 16px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">${teams.length}</div>
+            <div style="color: #94a3b8;">Squadre</div>
+          </div>
+          <div style="background: #334155; padding: 16px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 32px; font-weight: 700; color: ${usersWithoutTeam.length > 0 ? '#ef4444' : '#22c55e'}">${usersWithoutTeam.length}</div>
+            <div style="color: #94a3b8;">Senza Squadra</div>
+          </div>
+        </div>
+      `;
+      
+      // Users without team
+      if (usersWithoutTeam.length === 0) {
+        document.getElementById('usersWithoutTeam').innerHTML = `
+          <div style="text-align: center; padding: 32px; color: #22c55e;">
+            ✅ Tutti gli utenti sono assegnati a una squadra!
+          </div>
+        `;
+      } else {
+        document.getElementById('usersWithoutTeam').innerHTML = usersWithoutTeam.map(user => `
+          <div class="user-card no-team">
+            <div>
+              <strong>${user.displayName || user.email || 'User'}</strong><br>
+              <span style="color: #94a3b8; font-size: 13px;">${user.email || user.uid}</span>
+            </div>
+            <div>
+              <select id="team_${user.uid}">
+                <option value="">Seleziona squadra...</option>
+                ${teams.map(team => 
+                  `<option value="${team.id}">${team.name || team.nome || `Team ${team.id}`}</option>`
+                ).join('')}
+              </select>
+              <button class="btn assign" onclick="assignUser('${user.uid}')">
+                ✅ Assegna
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Teams list
+      document.getElementById('teamsList').innerHTML = teams.map(team => {
+        const teamMembers = users.filter(u => u.team_index === parseInt(team.id));
+        
+        return `
+          <div style="background: #0f172a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+            <h3 style="margin-top: 0;">
+              ${getTeamEmoji(team.name || team.nome)} ${team.name || team.nome || `Team ${team.id}`}
+            </h3>
+            <div style="color: #94a3b8; margin-bottom: 12px;">
+              👥 ${teamMembers.length} membri
+            </div>
+            ${teamMembers.length > 0 ? `
+              <div style="display: grid; gap: 8px;">
+                ${teamMembers.map(user => `
+                  <div class="user-card has-team">
+                    <div>
+                      <strong>${user.displayName || user.email || 'User'}</strong><br>
+                      <span style="color: #94a3b8; font-size: 13px;">${user.email || user.uid}</span>
+                    </div>
+                    <button class="btn" onclick="removeUser('${user.uid}')">
+                      ❌ Rimuovi
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+            ` : '<div style="color: #94a3b8; font-style: italic;">Nessun membro</div>'}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getTeamEmoji(teamName) {
+      const name = (teamName || '').toLowerCase();
+      if (name.includes('rossi') || name.includes('red')) return '🔴';
+      if (name.includes('blu') || name.includes('blue')) return '🔵';
+      if (name.includes('verd') || name.includes('green')) return '🟢';
+      if (name.includes('gial') || name.includes('yellow')) return '🟡';
+      return '⚽';
+    }
+
+    async function assignUser(uid) {
+      const teamId = document.getElementById(`team_${uid}`).value;
+      
+      if (!teamId) {
+        alert('⚠️ Seleziona una squadra!');
+        return;
+      }
+      
+      try {
+        // Salva team_index in /users/{uid}
+        await db.collection('users').doc(uid).update({
+          team_index: parseInt(teamId)
+        });
+        
+        console.log(`✅ User ${uid} assigned to team ${teamId}`);
+        alert('✅ Utente assegnato!');
+        await loadData();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Errore: ' + error.message);
+      }
+    }
+
+    async function removeUser(uid) {
+      if (!confirm('Rimuovere questo utente dalla squadra?')) return;
+      
+      try {
+        // Rimuovi team_index da /users/{uid}
+        await db.collection('users').doc(uid).update({
+          team_index: null
+        });
+        
+        console.log(`✅ User ${uid} removed from team`);
+        alert('✅ Utente rimosso!');
+        await loadData();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Errore: ' + error.message);
+      }
+    }
+  </script>
+  
+  <script src="resources/league-selector.js?v=2025101905"></script>
+</body>
+</html>

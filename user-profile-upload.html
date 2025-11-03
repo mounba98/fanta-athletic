@@ -1,0 +1,421 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Foto Profilo - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+  <style>
+    .upload-container { max-width: 600px; margin: 0 auto; }
+    .upload-card { background: var(--card); border-radius: 16px; padding: 32px; margin: 20px 0; box-shadow: var(--shadow); }
+    
+    .current-photo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .photo-preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid var(--primary);
+      object-fit: cover;
+      margin: 0 auto 16px;
+      display: block;
+    }
+    
+    .drop-zone {
+      border: 3px dashed rgba(0,0,0,0.2);
+      border-radius: 16px;
+      padding: 60px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(0,0,0,0.02);
+      margin: 24px 0;
+    }
+    
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--primary);
+      background: rgba(220, 20, 60, 0.05);
+    }
+    
+    .crop-container {
+      max-width: 100%;
+      max-height: 500px;
+      margin: 20px 0;
+      display: none;
+    }
+    
+    .crop-container.active {
+      display: block;
+    }
+    
+    #cropImage {
+      max-width: 100%;
+      display: block;
+    }
+    
+    .crop-controls {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .crop-preview {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .crop-preview h4 {
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    
+    .crop-preview-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto;
+      border: 4px solid var(--primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .crop-preview-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>📸 Foto Profilo</h1>
+  </header>
+
+  <main class="upload-container">
+    <div class="section">
+      <h2>Gestisci la Tua Foto</h2>
+      <p>Carica e modifica la tua foto profilo.</p>
+    </div>
+
+    <div class="upload-card">
+      <div class="current-photo">
+        <h3 style="margin-bottom: 16px;">Foto Attuale</h3>
+        <img src="resources/logo.png" class="photo-preview" id="currentPhoto" alt="Foto profilo" />
+        <div style="color: var(--muted); font-size: 14px;" id="photoInfo">Nessuna foto caricata</div>
+      </div>
+
+      <div class="drop-zone" id="dropZone">
+        <div style="font-size: 48px; margin-bottom: 16px;">📷</div>
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+          Trascina un'immagine qui
+        </div>
+        <div style="font-size: 14px; color: var(--muted); margin-bottom: 16px;">
+          oppure clicca per selezionare
+        </div>
+        <div style="font-size: 12px; color: var(--muted);">
+          Formati: JPG, PNG (max 2MB)
+        </div>
+      </div>
+      
+      <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+
+      <div class="crop-container" id="cropContainer">
+        <h4 style="margin-bottom: 12px;">✂️ Ritaglia e Regola</h4>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">Trascina il box di selezione sull'area desiderata</p>
+        <div style="background: #000; border-radius: 8px; overflow: hidden;">
+          <img id="cropImage" />
+        </div>
+        
+        <div class="crop-preview">
+          <h4>👁️ Anteprima Circolare</h4>
+          <div class="crop-preview-circle">
+            <img id="previewImage" src="" alt="Preview" />
+          </div>
+        </div>
+        
+        <div class="crop-controls">
+          <button class="btn btn-secondary" onclick="cropper.zoom(0.1)">🔍 Zoom +</button>
+          <button class="btn btn-secondary" onclick="cropper.zoom(-0.1)">🔍 Zoom -</button>
+          <button class="btn btn-secondary" onclick="cropper.rotate(90)">🔄 Ruota</button>
+          <button class="btn btn-secondary" onclick="cropper.reset()">↺ Reset</button>
+          <button class="btn btn-success" onclick="saveCroppedImage()">✅ Salva Foto</button>
+          <button class="btn btn-secondary" onclick="cancelCrop()">✖ Annulla</button>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="deletePhoto()" style="flex: 1;">
+          🗑️ Rimuovi Foto
+        </button>
+        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="flex: 1;">
+          📤 Carica Nuova
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-3"></script>
+  <script src="resources/app-check-config.js?v=20251021-3"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    
+    // Attiva App Check (dev: debug token, prod: reCAPTCHA v3)
+    activateAppCheck();
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+
+  <script>
+    let cropper = null;
+    let currentUser = null;
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      currentUser = user;
+      await loadCurrentPhoto();
+      setupDropZone();
+    });
+
+    async function loadCurrentPhoto() {
+      try {
+        const db = firebase.firestore();
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          if (data.photoURL) {
+            document.getElementById('currentPhoto').src = data.photoURL;
+            document.getElementById('photoInfo').textContent = 'Ultimo aggiornamento: ' + new Date(data.photoUpdatedAt?.toDate() || Date.now()).toLocaleDateString('it-IT');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading photo:', error);
+      }
+    }
+
+    function setupDropZone() {
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFileSelect(files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+    }
+
+    function handleFileSelect(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Seleziona un file immagine valido!');
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File troppo grande! Max 2MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const cropImage = document.getElementById('cropImage');
+        cropImage.src = e.target.result;
+
+        document.getElementById('cropContainer').classList.add('active');
+
+        if (cropper) {
+          cropper.destroy();
+        }
+
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1,
+          viewMode: 2,
+          dragMode: 'move',
+          cropBoxResizable: false,
+          cropBoxMovable: false,
+          autoCropArea: 1,
+          restore: false,
+          guides: false,
+          center: true,
+          highlight: false,
+          background: false,
+          movable: true,
+          zoomable: true,
+          rotatable: true,
+          scalable: true,
+          toggleDragModeOnDblclick: false,
+          crop: updatePreview,
+          ready: function() {
+            // Crop box fisso, immagine mobile
+            this.cropper.setCropBoxData({
+              width: 300,
+              height: 300
+            });
+          }
+        });
+        
+        updatePreview();
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function updatePreview() {
+      if (!cropper) return;
+      
+      const canvas = cropper.getCroppedCanvas({
+        width: 200,
+        height: 200
+      });
+      
+      if (canvas) {
+        document.getElementById('previewImage').src = canvas.toDataURL();
+      }
+    }
+
+    async function saveCroppedImage() {
+      if (!cropper) {
+        alert('Nessuna immagine da salvare');
+        return;
+      }
+
+      try {
+        const canvas = cropper.getCroppedCanvas({
+          width: 400,
+          height: 400,
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high'
+        });
+
+        canvas.toBlob(async (blob) => {
+          try {
+            const storage = firebase.storage();
+            const storageRef = storage.ref();
+            const fileRef = storageRef.child(`avatars/${currentUser.uid}/profile.jpg`);
+            
+            await fileRef.put(blob, {
+              contentType: 'image/jpeg'
+            });
+
+            const photoURL = await fileRef.getDownloadURL();
+
+            const db = firebase.firestore();
+            await db.collection('users').doc(currentUser.uid).set({
+              photoURL,
+              photoUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            alert('✅ Foto salvata con successo!');
+
+            cancelCrop();
+            await loadCurrentPhoto();
+          } catch (error) {
+            console.error('Error saving photo:', error);
+            alert('❌ Errore durante il salvataggio: ' + error.message);
+          }
+        }, 'image/jpeg', 0.9);
+      } catch (error) {
+        console.error('Error cropping image:', error);
+        alert('❌ Errore durante il crop: ' + error.message);
+      }
+    }
+
+    function cancelCrop() {
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      document.getElementById('cropContainer').classList.remove('active');
+      document.getElementById('fileInput').value = '';
+    }
+
+    async function deletePhoto() {
+      if (!confirm('Sei sicuro di voler eliminare la tua foto profilo?')) return;
+
+      try {
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const photoURL = userDoc.data()?.photoURL;
+
+        if (photoURL) {
+          try {
+            const fileRef = storage.refFromURL(photoURL);
+            await fileRef.delete();
+          } catch (e) {
+            console.warn('Storage delete error:', e);
+          }
+        }
+
+        await db.collection('users').doc(currentUser.uid).update({
+          photoURL: firebase.firestore.FieldValue.delete()
+        });
+
+        alert('✅ Foto eliminata!');
+        await loadCurrentPhoto();
+      } catch (error) {
+        console.error('Error deleting photo:', error);
+        alert('❌ Errore durante l\'eliminazione: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

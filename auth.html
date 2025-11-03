@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Accesso</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .card { max-width: 420px; margin: 40px auto; background: var(--card); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 20px; }
+    .row { display:flex; gap:10px; align-items:center; }
+    .col { display:flex; flex-direction:column; gap:10px; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .input { padding: 12px 14px; border:1px solid #dbe1e8; border-radius: 10px; }
+    .input:focus { outline: none; box-shadow: 0 0 0 4px var(--ring); border-color: var(--primary); }
+    .btn { padding: 12px 14px; border-radius: 10px; font-weight: 600; }
+    .btn-google { background:#fff; color:#2c3e50; border:1px solid #dbe1e8; }
+    .btn-google:hover { background:#f7f9fc; }
+    .divider { display:flex; align-items:center; gap:10px; color: var(--muted); font-size:12px; margin: 6px 0; }
+    .divider::before, .divider::after { content:""; height:1px; background:#e7edf3; flex:1; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Accesso</h1>
+  </header>
+
+  <main>
+    <!-- LOGIN CARD -->
+    <section class="card" id="cardLogin">
+      <h2>Accedi</h2>
+      <div class="col">
+        <button class="btn btn-google" id="googleBtn">Accedi con Google</button>
+        <div class="divider">oppure</div>
+        <input id="loginEmail" class="input" placeholder="Email o Nome utente" />
+        <input id="loginPassword" class="input" type="password" placeholder="Password" />
+        <button class="btn" id="loginBtn">Accedi</button>
+        <div style="text-align: center; margin-top: 12px;">
+          <button id="resetPasswordBtn" style="background: none; border: none; color: var(--primary); cursor: pointer; text-decoration: underline; font-size: 14px;">Password dimenticata?</button>
+        </div>
+        <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e7edf3;">
+          <button id="toggleRegisterBtn" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px;">Non sei registrato? <strong style="color: var(--primary);">Registrati qui</strong></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTRATION CARD (nascosta di default) -->
+    <section class="card" id="cardRegister" style="display: none;">
+      <h2>Registrazione</h2>
+      <div class="col">
+        <input id="regFirstName" type="text" class="input" placeholder="Nome" required />
+        <input id="regLastName" type="text" class="input" placeholder="Cognome" required />
+        <input id="regEmail" type="email" class="input" placeholder="Email" required />
+        <input id="regPassword" type="password" class="input" placeholder="Password (min 6 caratteri)" required />
+        <button id="registerBtn" class="btn" style="background:var(--primary); color:#fff;">Registrati</button>
+        <div class="muted" style="font-size:12px; margin-top:8px;">Dopo la registrazione, unisciti a una lega con il codice invito.</div>
+        <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e7edf3;">
+          <button id="toggleLoginBtn" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px;">Hai già un account? <strong style="color: var(--primary);">Accedi qui</strong></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/firebase.js"></script>
+    <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script>
+    function toast(msg){ const el=document.createElement('div'); el.textContent=msg; el.style.position='fixed'; el.style.bottom='16px'; el.style.right='16px'; el.style.background='#2d6cdf'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.boxShadow='var(--shadow)'; el.style.zIndex='9999'; document.body.appendChild(el); setTimeout(()=> el.remove(), 2000); }
+    const $ = s=>document.querySelector(s);
+    const loginBtn = document.getElementById('loginBtn');
+    const googleBtn = document.getElementById('googleBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const regTeamSel = document.getElementById('regTeam');
+
+    async function resolveEmailFromInput(input){
+      if (!input) return '';
+      const raw = input.trim();
+      if (!raw) return '';
+      if (raw.includes('@')) {
+        return raw.toLowerCase();
+      }
+
+      if (!window.db) {
+        console.warn('DB non inizializzato per username lookup');
+        return '';
+      }
+
+      const key = raw.toLowerCase();
+      const variants = new Set([
+        key,
+        key.replace(/\s+/g, ''),
+        key.replace(/\s+/g, '.'),
+        key.replace(/\s+/g, '-'),
+        key.replace(/\.+/g, ''),
+        key.replace(/_/g, '')
+      ].filter(Boolean));
+
+      const ensureMapping = async (email, uid) => {
+        try {
+          await window.db.collection('usernames').doc(key).set({ email, uid }, { merge: true });
+        } catch (mapErr) {
+          console.warn('Impossibile aggiornare cache username', mapErr);
+        }
+      };
+
+      for (const variant of variants) {
+        if (!variant) continue;
+        try {
+          const doc = await window.db.collection('usernames').doc(variant).get();
+          if (doc.exists) {
+            const data = doc.data() || {};
+            if (data.email) {
+              if (data.uid) await ensureMapping(data.email, data.uid);
+              return String(data.email);
+            }
+            if (data.uid) {
+              const userDoc = await window.db.collection('users').doc(data.uid).get();
+              if (userDoc.exists) {
+                const email = userDoc.data()?.email;
+                if (email) {
+                  await ensureMapping(email, data.uid);
+                  return String(email);
+                }
+              }
+            }
+          }
+        } catch(e) {
+          console.warn('username lookup failed', variant, e);
+        }
+      }
+
+      const fallbackUserQuery = async (field, value) => {
+        if (!value) return '';
+        try {
+          const snap = await window.db.collection('users').where(field, '==', value).limit(1).get();
+          if (!snap.empty) {
+            const userDoc = snap.docs[0];
+            const data = userDoc.data() || {};
+            if (data.email) {
+              await ensureMapping(data.email, userDoc.id);
+              return String(data.email);
+            }
+          }
+        } catch (err) {
+          console.warn(`Lookup ${field} fallita`, err);
+        }
+        return '';
+      };
+
+      // Prova exact displayName (case-sensitive) e varianti comuni
+      let email = await fallbackUserQuery('displayName', raw);
+      if (email) return email;
+
+      email = await fallbackUserQuery('displayNameLower', key);
+      if (email) return email;
+
+      email = await fallbackUserQuery('username', key);
+      if (email) return email;
+
+      email = await fallbackUserQuery('username', key.replace(/\s+/g, ''));
+      if (email) return email;
+
+      // Prova con nome squadra
+      try {
+        const teamSnap = await window.db.collection('teams').where('name', '==', raw).limit(1).get();
+        if (!teamSnap.empty) {
+          const teamDoc = teamSnap.docs[0];
+          const teamData = teamDoc.data() || {};
+          const ownerId = teamData.owner || teamData.ownerId;
+          if (ownerId) {
+            const ownerDoc = await window.db.collection('users').doc(ownerId).get();
+            if (ownerDoc.exists) {
+              const ownerData = ownerDoc.data() || {};
+              if (ownerData.email) {
+                await ensureMapping(ownerData.email, ownerDoc.id);
+                return String(ownerData.email);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Team lookup fallito', err);
+      }
+
+      return '';
+    }
+    if (loginBtn){
+      const submitLogin = async ()=>{
+        const raw = (document.getElementById('loginEmail').value||'').trim();
+        const password = (document.getElementById('loginPassword').value||'').trim();
+        if (!raw || !password) { toast('Inserisci email/nome utente e password'); return; }
+        const email = await resolveEmailFromInput(raw);
+        if (!email){ toast('Utente non trovato'); return; }
+        try { 
+          await window.signIn(email, password); 
+          toast('Accesso effettuato'); 
+          setTimeout(()=>{ 
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+            window.location.href = redirectUrl ? decodeURIComponent(redirectUrl) : 'index.html';
+          }, 300); 
+        } catch(e){ toast(`Login fallito: ${e?.message||''}`); console.warn(e); }
+      };
+      loginBtn.onclick = submitLogin;
+      document.getElementById('loginEmail').addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ submitLogin(); } });
+      document.getElementById('loginPassword').addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ submitLogin(); } });
+    }
+    
+    // Reset password
+    const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+    if (resetPasswordBtn) {
+      resetPasswordBtn.onclick = async () => {
+        const raw = (document.getElementById('loginEmail').value||'').trim();
+        if (!raw) { 
+          toast('Inserisci la tua email prima'); 
+          return; 
+        }
+        const email = await resolveEmailFromInput(raw);
+        if (!email) { 
+          toast('Email non trovata'); 
+          return; 
+        }
+        try {
+          await firebase.auth().sendPasswordResetEmail(email);
+          toast('✅ Email di reset inviata! Controlla la tua casella.');
+        } catch(e) {
+          toast('Errore: ' + (e?.message || 'Riprova'));
+          console.error(e);
+        }
+      };
+    }
+    if (googleBtn){
+      googleBtn.onclick = async ()=>{
+        try{
+          const provider = new firebase.auth.GoogleAuthProvider();
+          await firebase.auth().signInWithPopup(provider);
+          toast('Accesso effettuato');
+          setTimeout(()=>{ 
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+            window.location.href = redirectUrl ? decodeURIComponent(redirectUrl) : 'index.html';
+          }, 300);
+        }catch(e){ console.warn(e); toast('Login Google fallito'); }
+      };
+    }
+
+    if (registerBtn){
+      registerBtn.onclick = async ()=>{
+        const firstName = (document.getElementById('regFirstName').value||'').trim();
+        const lastName = (document.getElementById('regLastName').value||'').trim();
+        const email = (document.getElementById('regEmail').value||'').trim();
+        const password = (document.getElementById('regPassword').value||'').trim();
+        
+        // Validazioni
+        if (!firstName || !lastName || !email || !password){ 
+          toast('Compila tutti i campi'); 
+          return; 
+        }
+        
+        if (password.length < 6){ 
+          toast('Password deve essere almeno 6 caratteri'); 
+          return; 
+        }
+        
+        // Verifica formato email RIGOROSO
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)){ 
+          toast('❌ Email non valida. Usa formato: nome@dominio.com'); 
+          return; 
+        }
+        
+        // Verifica dominio email valido (no caratteri strani)
+        const domain = email.split('@')[1];
+        if (!domain || domain.includes('..') || domain.startsWith('.') || domain.endsWith('.')) {
+          toast('❌ Dominio email non valido');
+          return;
+        }
+        
+        try{
+          // CHECK EMAIL ESISTENTE PRIMA
+          const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+          if (methods && methods.length > 0) {
+            toast('❌ Email già registrata! Usa il login.');
+            return;
+          }
+          
+          const displayName = `${firstName} ${lastName}`;
+          
+          // Registra utente
+          const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+          const uid = userCred.user.uid;
+          
+          // Update profile
+          await userCred.user.updateProfile({ displayName });
+          
+          // Crea documento utente
+          const displayNameLower = displayName.toLowerCase();
+          const primaryUsername = displayNameLower.replace(/\s+/g, '');
+          const usernameVariants = new Set([
+            `${firstName}.${lastName}`.toLowerCase().replace(/\s+/g, ''),
+            `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, ''),
+            primaryUsername,
+            displayNameLower,
+            `${firstName}_${lastName}`.toLowerCase(),
+            `${firstName}-${lastName}`.toLowerCase()
+          ].filter(Boolean));
+
+          await window.db.collection('users').doc(uid).set({
+            email,
+            firstName,
+            lastName,
+            displayName,
+            displayNameLower,
+            username: primaryUsername,
+            role: 'user',
+            leagues: [],
+            currentLeague: null,
+            usernameVariants: Array.from(usernameVariants),
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+          
+          try {
+            await Promise.all(Array.from(usernameVariants).map(variant => window.db.collection('usernames').doc(variant).set({ uid, email }, { merge: true })));
+          } catch(usernameErr) {
+            console.warn('Username mapping failed:', usernameErr);
+          }
+          
+          toast('✅ Registrazione completata! Unisciti a una lega per iniziare.');
+          
+          setTimeout(()=>{ 
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+            // Se c'è un redirect (es. join-league.html?code=XXX), usalo, altrimenti join-league generico
+            window.location.href = redirectUrl ? decodeURIComponent(redirectUrl) : 'join-league.html';
+          }, 1500);
+          
+        }catch(e){ 
+          console.error('Registration error:', e); 
+          
+          let errorMsg = 'Registrazione fallita';
+          if (e.code === 'auth/email-already-in-use') {
+            errorMsg = 'Email già registrata';
+          } else if (e.code === 'auth/invalid-email') {
+            errorMsg = 'Email non valida';
+          } else if (e.code === 'auth/weak-password') {
+            errorMsg = 'Password troppo debole';
+          }
+          
+          toast(errorMsg);
+        }
+      };
+    }
+
+  </script>
+  
+  <script>
+    // Toggle tra login e registrazione
+    const toggleRegisterBtn = document.getElementById('toggleRegisterBtn');
+    const toggleLoginBtn = document.getElementById('toggleLoginBtn');
+    const cardLogin = document.getElementById('cardLogin');
+    const cardRegister = document.getElementById('cardRegister');
+    
+    if (toggleRegisterBtn) {
+      toggleRegisterBtn.addEventListener('click', () => {
+        cardLogin.style.display = 'none';
+        cardRegister.style.display = 'block';
+      });
+    }
+    
+    if (toggleLoginBtn) {
+      toggleLoginBtn.addEventListener('click', () => {
+        cardRegister.style.display = 'none';
+        cardLogin.style.display = 'block';
+      });
+    }
+    
+    // Redirect se già loggato
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        console.log('User logged in:', user.uid);
+        
+        // Check per redirect URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        
+        if (redirectUrl) {
+          console.log('Redirecting to:', redirectUrl);
+          window.location.href = decodeURIComponent(redirectUrl);
+        } else {
+          window.location.href = 'index.html';
+        }
+      }
+    });
+  </script>
+  
+    <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Invita Membri - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .invite-container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    
+    .invite-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+    
+    .invite-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .invite-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    
+    .code-display {
+      background: linear-gradient(135deg, var(--primary) 0%, #b91c3a 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      margin: 24px 0;
+    }
+    
+    .code-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    
+    .code-value {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      font-family: monospace;
+    }
+    
+    .share-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    
+    .btn-share {
+      padding: 16px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    
+    .btn-share:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .link-box {
+      background: rgba(0,0,0,0.03);
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    
+    .link-text {
+      flex: 1;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      color: var(--muted);
+    }
+    
+    .qr-code {
+      text-align: center;
+      padding: 24px;
+      background: white;
+      border-radius: 12px;
+      margin: 24px 0;
+    }
+    
+    .qr-code canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .stat-box {
+      text-align: center;
+      padding: 16px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 8px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Invita Membri</h1>
+  </header>
+
+  <main class="invite-container">
+    <div class="invite-card">
+      <div class="invite-header">
+        <div class="invite-icon">📨</div>
+        <h2>Invita Amici alla Tua Lega</h2>
+        <p style="color: var(--muted); font-size: 14px;">Condividi il codice invito o il link diretto</p>
+      </div>
+
+      <div id="leagueInfo" style="display:none;">
+        <h3 id="leagueName" style="text-align:center; margin-bottom:16px;"></h3>
+
+        <div class="code-display">
+          <div class="code-label">Codice Invito</div>
+          <div class="code-value" id="inviteCode">------</div>
+        </div>
+
+        <div class="share-buttons">
+          <button class="btn-share" onclick="copyCode()">
+            📋 Copia Codice
+          </button>
+          <button class="btn-share" onclick="copyLink()">
+            🔗 Copia Link
+          </button>
+          <button class="btn-share" onclick="shareWhatsApp()">
+            💬 WhatsApp
+          </button>
+        </div>
+
+        <div class="link-box">
+          <div class="link-text" id="inviteLink"></div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value" id="membersCount">0</div>
+            <div class="stat-label">Membri</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="teamsCount">0</div>
+            <div class="stat-label">Squadre</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="availableCount">0</div>
+            <div class="stat-label">Disponibili</div>
+          </div>
+        </div>
+
+        <div class="qr-code" id="qrCode" style="display:none;">
+          <h4 style="margin-bottom:16px;">QR Code</h4>
+          <canvas id="qrCanvas"></canvas>
+          <p style="font-size:12px; color:var(--muted); margin-top:8px;">Scansiona per unirti</p>
+        </div>
+      </div>
+
+      <div id="loading" style="text-align:center; padding:40px;">
+        <div style="font-size:48px; margin-bottom:16px;">⏳</div>
+        <div>Caricamento...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-4"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/league-context.js?v=2025101901"></script>
+
+  <script>
+    let currentLeague = null;
+
+    async function loadLeagueInfo() {
+      try {
+        // Aspetta che league-selector carichi
+        await new Promise(resolve => {
+          const check = setInterval(() => {
+            if (window.currentLeague && window.currentLeague.id) {
+              clearInterval(check);
+              resolve();
+            }
+          }, 100);
+        });
+
+        currentLeague = window.currentLeague;
+        const db = firebase.firestore();
+
+        // Carica squadre
+        const teamsSnapshot = await db.collection('leagues')
+          .doc(currentLeague.id)
+          .collection('teams')
+          .get();
+
+        const teams = teamsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const availableTeams = teams.filter(t => !t.owner || t.owner === '');
+
+        // Update UI
+        document.getElementById('leagueName').textContent = currentLeague.name || 'La Tua Lega';
+        document.getElementById('inviteCode').textContent = currentLeague.inviteCode || 'N/A';
+        
+        const baseUrl = window.location.origin;
+        const inviteLink = `${baseUrl}/join-league.html?code=${currentLeague.inviteCode}`;
+        document.getElementById('inviteLink').textContent = inviteLink;
+
+        document.getElementById('membersCount').textContent = (currentLeague.members || []).length;
+        document.getElementById('teamsCount').textContent = teams.length;
+        document.getElementById('availableCount').textContent = availableTeams.length;
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('leagueInfo').style.display = 'block';
+
+      } catch (error) {
+        console.error('Error loading league info:', error);
+        document.getElementById('loading').innerHTML = '<div style="color:#dc2626;">❌ Errore caricamento</div>';
+      }
+    }
+
+    function copyCode() {
+      const code = document.getElementById('inviteCode').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('✅ Codice copiato negli appunti!');
+      });
+    }
+
+    function copyLink() {
+      const link = document.getElementById('inviteLink').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        alert('✅ Link copiato negli appunti!');
+      });
+    }
+
+    function shareWhatsApp() {
+      const code = document.getElementById('inviteCode').textContent;
+      const leagueName = document.getElementById('leagueName').textContent;
+      const link = document.getElementById('inviteLink').textContent;
+      
+      const message = `🏆 Unisciti alla mia lega Fanta Athletic!\n\n` +
+                     `Lega: ${leagueName}\n` +
+                     `Codice: ${code}\n\n` +
+                     `Link diretto: ${link}`;
+      
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // Auth check
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+      } else {
+        loadLeagueInfo();
+      }
+    });
+  </script>
+</body>
+</html>

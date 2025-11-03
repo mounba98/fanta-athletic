@@ -1,0 +1,36 @@
+{
+  "sport": "volley",
+  "name": "Fanta Volley",
+  "positions": ["P", "S", "O", "C", "L"],
+  "lineup_slots": {
+    "P": 1,
+    "S": 2,
+    "O": 1,
+    "C": 1,
+    "L": 1,
+    "BENCH": 3
+  },
+  "captain_multiplier": 1.2,
+  "scoring": [
+    { "code": "ATT_KILL", "label": "Punto in attacco", "value": 3, "input": "counter" },
+    { "code": "ACE", "label": "Ace", "value": 3, "input": "counter" },
+    { "code": "BLK", "label": "Muro punto", "value": 3, "input": "counter" },
+    { "code": "DIG", "label": "Difesa (dig)", "value": 1, "input": "counter" },
+    { "code": "REC_PERF", "label": "Ricezione perfetta", "value": 1, "input": "counter", "eligible": ["S", "L"] },
+    { "code": "REC_NEG", "label": "Ricezione negativa", "value": -1, "input": "counter", "eligible": ["S", "L"] },
+    { "code": "ATT_ERR", "label": "Errore in attacco", "value": -1, "input": "counter" },
+    { "code": "SERV_ERR", "label": "Errore al servizio", "value": -1, "input": "counter" },
+    { "code": "TEAM_WIN", "label": "Vittoria match (titolari)", "value": 3, "input": "checkbox", "apply": "starter" },
+    { "code": "SET_WON", "label": "Set vinto (titolari)", "value": 1, "input": "counter", "apply": "starter" },
+    { "code": "MVP", "label": "MVP di squadra", "value": 3, "input": "checkbox" },
+    { "code": "YELLOW", "label": "Cartellino giallo", "value": -1, "input": "checkbox" },
+    { "code": "RED", "label": "Cartellino rosso", "value": -3, "input": "checkbox" }
+  ],
+  "waivers_per_week": 2,
+  "trades_deadline_days_before_playoffs": 1,
+  "roster_size": { "min": 8, "max": 10 },
+  "draft": {
+    "type": "snake",
+    "budget": 200
+  }
+}

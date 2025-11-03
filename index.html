@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Home</title>
+  <script>
+    // Carica tema IMMEDIATAMENTE per evitare flash
+    (function() {
+      const savedTheme = localStorage.getItem('fantaAthletic_theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+  <meta name="description" content="Gestisci giocatori, allenatori e tifosi della tua Fanta Athletic." />
+  <meta name="theme-color" content="#dc143c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Athletic 2018" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="resources/logo.png" />
+  <link rel="apple-touch-startup-image" href="resources/logo.png" />
+  <style>
+    @media (max-width: 640px){ .nav a.m-hide { display: none; } }
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(5, 1fr); 
+      gap: 24px; 
+      padding: 30px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    @media (max-width: 1400px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+    
+    .section { 
+      background: var(--card); 
+      padding: 30px 20px; 
+      border-radius: 12px; 
+      box-shadow: var(--shadow); 
+      transition: transform 0.3s;
+      text-align: center;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .section:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+    .section h2 { color: var(--primary); margin-top: 0; font-size: 22px; }
+    .section p { font-size: 14px; color: var(--muted); margin: 10px 0; }
+    .home-main { padding: 24px 20px 80px; }
+    @media (max-width: 768px) {
+      .home-main { padding: 14px 14px 80px; }
+    }
+    #myTeamCard { width: 100%; }
+    @media (max-width: 600px) {
+      #myTeamCard { padding: 18px !important; }
+      #myTeamName { font-size: 20px !important; }
+    }
+    .recent-results-card {
+      max-width: 820px;
+      margin: 0 auto 20px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .recent-results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .recent-results-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    .recent-result-item {
+      border-radius: 14px;
+      padding: 16px;
+      background: linear-gradient(145deg, rgba(99,102,241,0.12), rgba(236,72,153,0.1));
+      border: 1px solid rgba(99,102,241,0.18);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .recent-result-round {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(30,41,59,0.65);
+    }
+    .recent-result-points {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .recent-result-meta {
+      font-size: 12px;
+      color: rgba(30,41,59,0.6);
+    }
+    .recent-results-placeholder {
+      text-align: center;
+      padding: 18px;
+      font-size: 13px;
+      color: rgba(30,41,59,0.55);
+      background: rgba(148,163,184,0.15);
+      border-radius: 12px;
+    }
+    @media (max-width: 600px) {
+      .recent-result-points { font-size: 24px; }
+      .recent-results-card { padding: 16px; }
+    }
+    :root.dark .recent-results-card {
+      background: rgba(15,23,42,0.75);
+      box-shadow: 0 12px 32px rgba(2,6,23,0.6);
+      border: 1px solid rgba(99,102,241,0.25);
+    }
+    :root.dark .recent-result-item {
+      background: linear-gradient(155deg, rgba(99,102,241,0.28), rgba(236,72,153,0.24));
+      border-color: rgba(129,140,248,0.32);
+    }
+    :root.dark .recent-result-round {
+      color: rgba(226,232,240,0.7);
+    }
+    :root.dark .recent-result-points {
+      color: #f8fafc;
+    }
+    :root.dark .recent-result-meta {
+      color: rgba(203,213,225,0.75);
+    }
+    :root.dark .recent-results-placeholder {
+      background: rgba(99,102,241,0.18);
+      color: rgba(226,232,240,0.75);
+    }
+    .match-summary-card {
+      background: linear-gradient(145deg, rgba(99, 102, 241, 0.12), rgba(236, 72, 153, 0.12));
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+      margin: 0 auto 24px;
+      max-width: 960px;
+      border: 1px solid rgba(99, 102, 241, 0.16);
+    }
+    .match-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .match-summary-header h2 {
+      margin: 0;
+      font-size: 22px;
+      color: #1e293b;
+    }
+    #lastMatchLabel {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(30,41,59,0.7);
+    }
+    #lastMatchLabel .match-summary-team {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111827;
+    }
+    #lastMatchLabel .match-summary-giornata {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(99,102,241,0.15);
+      color: #312e81;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .match-summary-body {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(280px, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .match-summary-total {
+      background: linear-gradient(145deg, rgba(99,102,241,0.18), rgba(236,72,153,0.14));
+      border-radius: 20px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #0f172a;
+      border: 1px solid rgba(99,102,241,0.18);
+      min-height: 190px;
+    }
+    .match-summary-total-label {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,0.6);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .match-summary-total-value {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .match-summary-total-meta {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .match-summary-total-meta .meta-label {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,0.55);
+    }
+    .match-summary-total-meta .meta-text {
+      font-size: 13px;
+      color: rgba(15,23,42,0.75);
+      line-height: 1.45;
+    }
+    .match-summary-breakdown {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(150px, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+    .match-pill {
+      background: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      color: #1e293b;
+      border: 1px solid rgba(99,102,241,0.08);
+    }
+    .match-pill span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(30,41,59,0.65);
+    }
+    .match-pill strong {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .match-summary-footer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .match-summary-footer button {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(99,102,241,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .match-summary-footer button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 28px rgba(99,102,241,0.35);
+    }
+    .match-summary-empty {
+      color: rgba(30,41,59,0.7);
+      font-size: 14px;
+    }
+    @media (max-width: 768px) {
+      .match-summary-card {
+        margin: 0 0 20px;
+        padding: 24px 20px;
+      }
+      .match-summary-body {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .match-summary-breakdown {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+      }
+      .match-summary-footer {
+        justify-content: center;
+      }
+      .match-summary-footer button {
+        width: 100%;
+      }
+    }
+    :root.dark .match-summary-card {
+      background: linear-gradient(160deg, rgba(12,18,33,0.95), rgba(30,41,59,0.9));
+      border: 1px solid rgba(99,102,241,0.32);
+      box-shadow: 0 26px 55px rgba(2,6,23,0.65);
+    }
+    :root.dark .match-summary-header h2 {
+      color: #e2e8f0;
+    }
+    :root.dark #lastMatchLabel {
+      color: rgba(226,232,240,0.75);
+    }
+    :root.dark #lastMatchLabel .match-summary-team {
+      color: #f8fafc;
+    }
+    :root.dark #lastMatchLabel {
+      color: rgba(226,232,240,0.85);
+    }
+    :root.dark #lastMatchLabel .match-summary-giornata {
+      background: rgba(99,102,241,0.35);
+      color: #f8fafc;
+    }
+    :root.dark .match-summary-total {
+      background: linear-gradient(165deg, rgba(99,102,241,0.35), rgba(236,72,153,0.28));
+      color: #f8fafc;
+      border: 1px solid rgba(129,140,248,0.35);
+    }
+    :root.dark .match-summary-total-label {
+      color: rgba(226,232,240,0.7);
+    }
+    :root.dark .match-summary-total-meta .meta-label {
+      color: rgba(226,232,240,0.78);
+    }
+    :root.dark .match-summary-total-meta .meta-text {
+      color: rgba(203,213,225,0.8);
+    }
+    :root.dark .match-pill {
+      background: rgba(15,23,42,0.6);
+      color: #e2e8f0;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: none;
+    }
+    :root.dark .match-pill span {
+      color: rgba(148,163,184,0.85);
+    }
+    :root.dark .match-summary-footer button {
+      box-shadow: 0 16px 34px rgba(99,102,241,0.45);
+    }
+    /* PWA install prompt gestito da pwa-install.js */
+  </style>
+</head>
+<body data-disable-mobile-dashboard="true">
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Benvenuti in Fanta Athletic</h1>
+    <div class="auth-buttons" id="authButtons" style="display:none;">
+      <a href="auth.html" class="btn" style="background:#28a745;">🔐 Accedi</a>
+    </div>
+  </header>
+
+  <main class="home-main">
+    <!-- La Mia Squadra Card -->
+    <div id="myTeamCard" style="max-width: 800px; margin: 0 auto 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s;" onclick="window.location.href='formazioni.html'">
+      <div style="display: flex; align-items: center; justify-content: space-between; color: white;">
+        <div>
+          <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">La Mia Squadra</div>
+          <div id="myTeamName" style="font-size: 24px; font-weight: 800;">Caricamento...</div>
+        </div>
+        <div style="font-size: 48px;">⚽</div>
+      </div>
+    </div>
+
+    <!-- Ultimo Risultato -->
+    <section id="lastMatchCard" class="match-summary-card" aria-live="polite">
+      <div class="match-summary-header">
+        <h2>Ultimo Risultato</h2>
+        <div id="lastMatchLabel" style="font-size:14px;font-weight:600;color:rgba(30,41,59,0.65);">Caricamento…</div>
+      </div>
+      <div id="lastMatchContent" class="match-summary-body">
+        <div class="match-pill">
+          <span>Stato</span>
+          <strong class="match-summary-empty">In attesa dati</strong>
+        </div>
+      </div>
+      <div class="match-summary-footer" style="display:none;" id="lastMatchAction">
+        <button type="button" id="lastMatchDetailBtn">Dettaglio giornata</button>
+      </div>
+    </section>
+
+    <section class="recent-results-card" aria-live="polite">
+      <div class="recent-results-header">
+        <h2>Ultimi 3 risultati</h2>
+      </div>
+      <div id="recentResults" class="recent-results-grid">
+        <div class="recent-results-placeholder">Caricamento…</div>
+      </div>
+    </section>
+    
+    <!-- Classifiche: blocco centrale unico -->
+    <section class="section" style="max-width: 800px; margin: 0 auto 20px; min-height: 480px; display: flex; flex-direction: column;">
+      <h2>🏆 Classifica</h2>
+      <p style="margin-bottom: 16px;">TOP 5 della tua lega</p>
+      <div id="classifichePreview" style="flex: 1; margin: 0 0 16px; font-size: 14px; overflow-y: auto;">
+        <div style="text-align: center; color: var(--muted); padding: 20px;">⏳ Caricamento...</div>
+      </div>
+      <a href="classifiche.html" class="btn" style="margin-top: auto;">📊 Vai alle Classifiche</a>
+    </section>
+    
+    <!-- Grid card secondarie: 3 colonne fisse -->
+    <div class="home-cards" style="max-width: 1400px; margin: 20px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; grid-auto-rows: 1fr;">
+      <style>
+        .home-cards .section {
+          display: flex;
+          flex-direction: column;
+          min-height: 100%;
+        }
+        .home-cards .section .btn {
+          margin-top: auto;
+        }
+        @media (max-width: 900px) {
+          .home-layout { grid-template-columns: 1fr !important; }
+          .home-cards { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 600px) {
+          .home-cards { grid-template-columns: 1fr !important; }
+        }
+      </style>
+      
+      <section class="section">
+        <h2>⚽ Formazioni</h2>
+        <p>Gestisci la formazione della tua squadra.</p>
+        <a href="formazioni.html" class="btn">Vai alle Formazioni</a>
+      </section>
+      
+      <section class="section">
+        <h2>🏆 Squadre</h2>
+        <p>Visualizza info e statistiche delle squadre.</p>
+        <a href="squadre.html" class="btn">Vai alle Squadre</a>
+      </section>
+      
+      <section class="section">
+        <h2>🎮 Giornate</h2>
+        <p>Inserisci i punteggi delle giornate.</p>
+        <a href="matchday.html" class="btn">Vai alle Giornate</a>
+      </section>
+      
+      <section class="section">
+        <h2>🔨 Asta</h2>
+        <p>Partecipa all'asta per acquistare giocatori.</p>
+        <a href="asta.html" class="btn">Vai all'Asta</a>
+      </section>
+      
+      <section class="section">
+        <h2>💬 Bacheca</h2>
+        <p>Trash talk, meme e goliardate varie.</p>
+        <a href="bacheca.html" class="btn">Vai alla Bacheca</a>
+      </section>
+      
+      <section class="section">
+        <h2>👤 Profilo</h2>
+        <p>Gestisci il tuo profilo e le impostazioni.</p>
+        <a href="profile.html" class="btn">Vai al Profilo</a>
+      </section>
+      
+      <section class="section">
+        <h2>📈 Statistiche</h2>
+        <p>Analizza le statistiche avanzate.</p>
+        <a href="statistiche.html" class="btn">Vai alle Statistiche</a>
+      </section>
+      
+      <section class="section">
+        <h2>📅 Calendario</h2>
+        <p>Visualizza calendario partite e scontri.</p>
+        <a href="calendario.html" class="btn">Vai al Calendario</a>
+      </section>
+      
+      <section class="section">
+        <h2>🛒 Store</h2>
+        <p>Acquista gadget e merchandising ufficiale.</p>
+        <a href="#" class="btn" onclick="alert('Store in arrivo!'); return false;">Prossimamente</a>
+      </section>
+      
+    </div><!-- Fine home-cards -->
+  </main>
+
+  <!-- Install Prompt gestito da pwa-install.js -->
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Nicola Mocci - All Rights Reserved</small>
+    <small style="display: block; margin-top: 4px; opacity: 0.7;">Developed by Nicola Mocci</small>
+  </footer>
+
+  <!-- Firebase SDKs - DA CARICARE PRIMA DI TUTTO -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script>
+    // Init Firebase IMMEDIATAMENTE
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    window.storage = firebase.storage();
+  </script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/feature-flags.js?v=20251103"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // PWA Install gestito da pwa-install.js
+
+    // Registra Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registrato'))
+        .catch(err => console.log('Errore Service Worker:', err));
+    }
+
+    // Mostra tasto Accedi se non loggato
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+      firebase.auth().onAuthStateChanged((user) => {
+        const authButtons = document.getElementById('authButtons');
+        if (!user && authButtons) {
+          authButtons.style.display = 'block';
+        }
+      });
+    }
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/matchday-summary.js?v=20251103"></script>
+  <!-- dashboard-widgets.js RIMOSSO - causava duplicati -->
+  <script src="resources/push-notifications.js"></script>
+  <script src="resources/pwa-install.js"></script>
+  <script src="resources/error-logger.js?v=20251018"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/mobile-dashboard.js?v=2025101804"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+  <script src="resources/league-invite-modal.js?v=2025102403"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/league-context.js?v=2025101901"></script>
+  <script src="resources/notifications.js?v=2025101706"></script>
+  <script src="resources/classifiche-preview.js?v=2025102408"></script>
+  <script>
+    // Carica nome squadra utente - usa team_index da users collection
+    async function loadMyTeamName() {
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        document.getElementById('myTeamName').textContent = 'Accedi';
+        return;
+      }
+      
+      console.log('🔍 Dashboard: Carico squadra per user', user.uid);
+      
+      try {
+        // Leggi team_index da /users/{uid}
+        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        
+        if (!userDoc.exists) {
+          document.getElementById('myTeamName').textContent = 'Nessuna squadra';
+          console.warn('⚠️ Dashboard: User doc non esiste');
+          return;
+        }
+        
+        const userData = userDoc.data();
+        const teamIndex = userData.team_index;
+        
+        console.log('📊 Dashboard: User team_index:', teamIndex);
+        
+        if (teamIndex === null || teamIndex === undefined) {
+          document.getElementById('myTeamName').textContent = 'Nessuna squadra';
+          console.warn('⚠️ Dashboard: team_index non impostato');
+          return;
+        }
+        
+        // Leggi squadra da /teams/{teamIndex}
+        const teamDoc = await firebase.firestore().collection('teams').doc(String(teamIndex)).get();
+        
+        if (!teamDoc.exists) {
+          document.getElementById('myTeamName').textContent = 'Nessuna squadra';
+          console.warn('⚠️ Dashboard: Team', teamIndex, 'non esiste');
+          return;
+        }
+        
+        const teamData = teamDoc.data();
+        document.getElementById('myTeamName').textContent = teamData.name || 'La Mia Squadra';
+        console.log('✅ Dashboard: Nome squadra:', teamData.name);
+        
+      } catch (error) {
+        console.error('❌ Dashboard error:', error);
+        document.getElementById('myTeamName').textContent = 'Errore: ' + error.message;
+      }
+    }
+    
+    // Esegui quando auth è pronta
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) loadMyTeamName();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "cards": [
+    {
+      "card_id": "C001",
+      "player_id": "P001",
+      "variant": "social",
+      "image_url": "",
+      "description": "Foto profilo social",
+      "is_active": true
+    },
+    {
+      "card_id": "C002",
+      "player_id": "P001",
+      "variant": "cartoon",
+      "image_url": "",
+      "description": "Versione cartoon stilizzata",
+      "is_active": false
+    },
+    {
+      "card_id": "C003",
+      "player_id": "P002",
+      "variant": "social",
+      "image_url": "",
+      "description": "Foto profilo social",
+      "is_active": true
+    },
+    {
+      "card_id": "C004",
+      "player_id": "P002",
+      "variant": "cartoon",
+      "image_url": "",
+      "description": "Versione cartoon stilizzata",
+      "is_active": false
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-10-24",
+    "total_cards": 4,
+    "variants": ["social", "cartoon", "action", "celebration"]
+  }
+}
+

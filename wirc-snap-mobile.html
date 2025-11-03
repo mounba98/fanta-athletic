@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WIRC SNAP Mobile</title>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  <link rel="stylesheet" href="wirc-snap-mobile-styles.css">
+</head>
+<body>
+  <!-- AUTH -->
+  <div id="authScreen" class="screen">
+    <div class="auth-container">
+      <h1>⚡ WIRC SNAP</h1>
+      <button id="loginBtn" class="btn-primary">Login</button>
+      <div id="userInfo" style="display:none;">
+        <p id="userName"></p>
+        <button id="deckBtn" class="btn-secondary">I Miei Mazzi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECK MANAGER -->
+  <div id="deckScreen" class="screen" style="display:none;">
+    <div class="deck-header">
+      <button id="backToAuth" class="btn-back">←</button>
+      <h2>I Miei Mazzi</h2>
+    </div>
+    <div id="decksList"></div>
+    <button id="newDeckBtn" class="btn-primary">+ Nuovo Mazzo</button>
+  </div>
+
+  <!-- DECK BUILDER -->
+  <div id="builderScreen" class="screen" style="display:none;">
+    <div class="builder-header">
+      <button id="backToDecks" class="btn-back">←</button>
+      <input id="deckNameInput" placeholder="Nome mazzo" maxlength="20">
+      <button id="saveDeckBtn" class="btn-save">💾</button>
+    </div>
+    <div class="builder-content">
+      <div class="cards-collection" id="cardsCollection"></div>
+      <div class="deck-current">
+        <h3>Mazzo (<span id="deckCounter">0</span>/12)</h3>
+        <div id="currentDeck"></div>
+      </div>
+    </div>
+    <button id="startGameBtn" class="btn-primary">🎮 Gioca</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="screen" style="display:none;">
+    <!-- Top: Opponent -->
+    <div class="game-header">
+      <div class="player-info opponent">
+        <div class="avatar">🤖</div>
+        <div class="player-name">AI</div>
+      </div>
+      <div class="game-stats">
+        <div class="stat">TURNO <span id="turnDisplay">1/6</span></div>
+        <div class="cubes"><span id="cubesDisplay">1</span> 🎲</div>
+      </div>
+    </div>
+
+    <!-- Locations -->
+    <div class="locations-container">
+      <div class="location" data-loc="0">
+        <div class="loc-cards opponent" data-zone="opp-0"></div>
+        <div class="loc-info">
+          <div class="loc-name">???</div>
+          <div class="loc-effect">Hidden</div>
+          <div class="loc-scores">
+            <span class="score opp" id="score-opp-0">0</span>
+            <span class="score player" id="score-player-0">0</span>
+          </div>
+        </div>
+        <div class="loc-cards player" data-zone="player-0"></div>
+      </div>
+
+      <div class="location" data-loc="1">
+        <div class="loc-cards opponent" data-zone="opp-1"></div>
+        <div class="loc-info">
+          <div class="loc-name">???</div>
+          <div class="loc-effect">Hidden</div>
+          <div class="loc-scores">
+            <span class="score opp" id="score-opp-1">0</span>
+            <span class="score player" id="score-player-1">0</span>
+          </div>
+        </div>
+        <div class="loc-cards player" data-zone="player-1"></div>
+      </div>
+
+      <div class="location" data-loc="2">
+        <div class="loc-cards opponent" data-zone="opp-2"></div>
+        <div class="loc-info">
+          <div class="loc-name">???</div>
+          <div class="loc-effect">Hidden</div>
+          <div class="loc-scores">
+            <span class="score opp" id="score-opp-2">0</span>
+            <span class="score player" id="score-player-2">0</span>
+          </div>
+        </div>
+        <div class="loc-cards player" data-zone="player-2"></div>
+      </div>
+    </div>
+
+    <!-- Player Hand -->
+    <div class="hand-container">
+      <div class="energy-display">
+        <span class="energy-icon">⚡</span>
+        <span id="energyDisplay">1/6</span>
+      </div>
+      <div class="hand-cards" id="handCards"></div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="game-actions">
+      <button id="snapBtn" class="btn-snap">⚡ SNAP</button>
+      <button id="endTurnBtn" class="btn-end-turn">END TURN</button>
+      <button id="retreatBtn" class="btn-retreat">Ritirati</button>
+    </div>
+  </div>
+
+  <!-- CARD ZOOM MODAL -->
+  <div id="cardModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <button class="modal-close">×</button>
+      <div class="card-zoom" id="cardZoom">
+        <div class="card-face front" id="cardFront"></div>
+        <div class="card-face back" id="cardBack">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect fill='%230A0D18' width='200' height='300'/%3E%3Ctext x='100' y='150' text-anchor='middle' fill='%2300BFFF' font-size='24' font-weight='900'%3EWIRC%3C/text%3E%3C/svg%3E" alt="Back">
+        </div>
+      </div>
+      <button id="flipBtn" class="btn-flip">🔄 Gira</button>
+    </div>
+  </div>
+
+  <!-- GAME OVER MODAL -->
+  <div id="gameOverModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2 id="resultTitle">Victory!</h2>
+      <div id="resultStats"></div>
+      <button id="newGameBtn" class="btn-primary">Nuova Partita</button>
+    </div>
+  </div>
+
+  <script src="wirc-snap-mobile-engine.js"></script>
+  <script src="wirc-snap-mobile-ui.js"></script>
+</body>
+</html>

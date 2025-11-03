@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>WIRC Snap - Marvel Style</title>
+  <link rel="icon" href="/favicon.svg" />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="wirc-snap-marvel-styles.css" />
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles-bg" id="particlesBg"></div>
+
+  <!-- AUTH SCREEN -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-content">
+      <div class="auth-logo">⚡ WIRC SNAP ⚡</div>
+      <div class="auth-subtitle">CARD BATTLE ARENA</div>
+      <button class="auth-btn" id="loginBtn">🎮 PLAY NOW</button>
+      <div class="auth-user" id="authUser" style="display:none;">
+        <div id="userName"></div>
+        <div id="userEmail" style="opacity: 0.7; font-size: 14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="game-screen" id="gameScreen">
+    <!-- HUD TOP -->
+    <div class="hud-top">
+      <div class="hud-left">
+        <div class="hud-item turn-display">
+          <div class="hud-label">TURN</div>
+          <div class="hud-value turn-number" id="turnNumber">1</div>
+        </div>
+        <div class="hud-item energy-display">
+          <div class="hud-label">ENERGY</div>
+          <div class="hud-value energy-value" id="energyValue">1/1</div>
+        </div>
+        <div class="hud-item timer-display">
+          <div class="hud-label">TIMER</div>
+          <div class="timer-bar">
+            <div class="timer-fill" id="timerFill"></div>
+          </div>
+          <div class="hud-value timer-value" id="timerValue">60</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <button class="hud-btn snap-btn" id="snapBtn">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">SNAP</span>
+        </button>
+        <button class="hud-btn retreat-btn" id="retreatBtn">
+          <span class="btn-icon">🏃</span>
+          <span class="btn-text">RETREAT</span>
+        </button>
+        <button class="hud-btn end-btn" id="endBtn">
+          <span class="btn-icon">✅</span>
+          <span class="btn-text">END TURN</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- LOCATIONS BOARD -->
+    <div class="locations-board">
+      <!-- Location 1 -->
+      <div class="location" id="location0">
+        <div class="location-header">
+          <div class="location-name" id="loc0Name">???</div>
+          <div class="location-effect" id="loc0Effect">Hidden</div>
+        </div>
+        <div class="location-cards">
+          <!-- Opponent Cards -->
+          <div class="cards-zone opponent-zone" id="opponentLoc0"></div>
+          <!-- Player Cards -->
+          <div class="cards-zone player-zone" id="playerLoc0"></div>
+        </div>
+        <div class="location-scores">
+          <div class="score-opponent" id="scoreOpp0">0</div>
+          <div class="score-player" id="scorePlayer0">0</div>
+        </div>
+      </div>
+
+      <!-- Location 2 -->
+      <div class="location" id="location1">
+        <div class="location-header">
+          <div class="location-name" id="loc1Name">???</div>
+          <div class="location-effect" id="loc1Effect">Hidden</div>
+        </div>
+        <div class="location-cards">
+          <div class="cards-zone opponent-zone" id="opponentLoc1"></div>
+          <div class="cards-zone player-zone" id="playerLoc1"></div>
+        </div>
+        <div class="location-scores">
+          <div class="score-opponent" id="scoreOpp1">0</div>
+          <div class="score-player" id="scorePlayer1">0</div>
+        </div>
+      </div>
+
+      <!-- Location 3 -->
+      <div class="location" id="location2">
+        <div class="location-header">
+          <div class="location-name" id="loc2Name">???</div>
+          <div class="location-effect" id="loc2Effect">Hidden</div>
+        </div>
+        <div class="location-cards">
+          <div class="cards-zone opponent-zone" id="opponentLoc2"></div>
+          <div class="cards-zone player-zone" id="playerLoc2"></div>
+        </div>
+        <div class="location-scores">
+          <div class="score-opponent" id="scoreOpp2">0</div>
+          <div class="score-player" id="scorePlayer2">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAND -->
+    <div class="hand-container">
+      <div class="hand" id="hand"></div>
+    </div>
+  </div>
+
+  <!-- TURN END BANNER -->
+  <div class="turn-banner" id="turnBanner">
+    <div class="banner-text">FINE DEL TURNO</div>
+  </div>
+
+  <!-- MATCH END SCREEN -->
+  <div class="match-end-screen" id="matchEndScreen">
+    <div class="match-end-content">
+      <div class="match-result" id="matchResult">VITTORIA!</div>
+      <div class="match-scores">
+        <div class="match-score-item">
+          <div class="score-label">YOU</div>
+          <div class="score-value" id="finalPlayerScore">2</div>
+        </div>
+        <div class="score-divider">-</div>
+        <div class="match-score-item">
+          <div class="score-label">OPPONENT</div>
+          <div class="score-value" id="finalOpponentScore">1</div>
+        </div>
+      </div>
+      <div class="match-cubes">
+        <div class="cubes-label">CUBES WON</div>
+        <div class="cubes-value" id="cubesWon">+2</div>
+      </div>
+      <div class="match-actions">
+        <button class="match-btn play-again-btn" onclick="location.reload()">🔄 PLAY AGAIN</button>
+        <button class="match-btn home-btn" onclick="location.href='games-hub.html'">🏠 GAMES HUB</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD DETAIL MODAL -->
+  <div class="card-modal" id="cardModal">
+    <div class="modal-overlay" onclick="closeCardModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeCardModal()">×</button>
+      <div class="modal-card">
+        <div class="modal-card-cost" id="modalCost">3</div>
+        <div class="modal-card-header">
+          <div class="modal-card-emoji" id="modalEmoji">⚡</div>
+          <div class="modal-card-name" id="modalName">Nome Carta</div>
+        </div>
+        <div class="modal-card-power" id="modalPower">5</div>
+        <div class="modal-card-effect" id="modalEffect">ONGOING</div>
+        <div class="modal-card-description" id="modalDescription">Descrizione effetto della carta</div>
+      </div>
+      <button class="modal-btn" onclick="closeCardModal()">✓ CLOSE</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-6"></script>
+  <script>
+    // Init Firebase immediately
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.auth = firebase.auth();
+    window.firebase = firebase;
+    console.log('🔥 Firebase initialized for WIRC Snap');
+  </script>
+
+  <!-- Game Script -->
+  <script src="wirc-snap-marvel-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>🔄 Force Update | Admin</title>
+  <style>
+    body {
+      font-family: system-ui;
+      max-width: 600px;
+      margin: 100px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { color: #2d6cdf; }
+    .btn {
+      background: #2d6cdf;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .btn:hover { background: #1e5bbf; }
+    .btn-danger { background: #ef4444; }
+    .btn-danger:hover { background: #dc2626; }
+    .info {
+      background: #eff6ff;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border-left: 4px solid #2d6cdf;
+      text-align: left;
+    }
+    .success {
+      background: #d1fae5;
+      padding: 15px;
+      border-radius: 8px;
+      color: #065f46;
+      margin-top: 20px;
+      display: none;
+    }
+    .version {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #2d6cdf;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔄 Force Update</h1>
+  <p>Forza aggiornamento su tutti i dispositivi</p>
+
+  <div class="info">
+    <h3>Come funziona:</h3>
+    <ol style="text-align:left;">
+      <li>Clicca "Force Update"</li>
+      <li>Viene creata una nuova versione su Firestore</li>
+      <li>Ogni dispositivo che apre l'app controlla la versione</li>
+      <li>Se versione vecchia → auto-reload con cache clear</li>
+    </ol>
+  </div>
+
+  <div class="version" id="currentVersion">...</div>
+
+  <button class="btn" id="forceButton" onclick="forceUpdate()" disabled>🔄 Force Update</button>
+  <button class="btn btn-danger" onclick="clearLocalVersion()">🗑️ Reset Versione Locale</button>
+
+  <div class="success" id="success"></div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    let currentUser = null;
+    const forceBtn = document.getElementById('forceButton');
+
+    function requireAdmin() {
+      if (!currentUser) {
+        alert('Per utilizzare questo tool devi effettuare l\'accesso come admin.');
+        window.location.href = 'auth.html';
+        return false;
+      }
+      return true;
+    }
+
+    async function ensureAdminAccess(user) {
+      try {
+        const adminDoc = await db.collection('admins').doc(user.uid).get();
+        if (!adminDoc.exists) {
+          alert('❌ Non hai i permessi per eseguire il Force Update.');
+          window.location.href = 'index.html';
+          return false;
+        }
+        return true;
+      } catch (error) {
+        alert('Errore verifica permessi: ' + (error.message || error));
+        return false;
+      }
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        alert('Devi effettuare il login per usare Force Update.');
+        window.location.href = 'auth.html';
+        return;
+      }
+      if (await ensureAdminAccess(user)) {
+        currentUser = user;
+        if (forceBtn) {
+          forceBtn.disabled = false;
+        }
+        loadCurrentVersion();
+      }
+    });
+
+    async function loadCurrentVersion() {
+      try {
+        const doc = await db.collection('app_config').doc('version').get();
+        const version = doc.exists ? doc.data().version : 'N/A';
+        document.getElementById('currentVersion').textContent = `Versione: ${version}`;
+      } catch (e) {
+        document.getElementById('currentVersion').textContent = 'Versione: Error';
+      }
+    }
+
+    async function forceUpdate() {
+      if (!requireAdmin()) return;
+      if (!confirm('Forzare l\'aggiornamento su tutti i dispositivi?')) return;
+
+      try {
+        const newVersion = Date.now();
+        
+        await db.collection('app_config').doc('version').set({
+          version: newVersion,
+          updated_at: new Date().toISOString()
+        });
+
+        const successEl = document.getElementById('success');
+        successEl.textContent = `✅ Versione aggiornata! Nuovo ID: ${newVersion}`;
+        successEl.style.display = 'block';
+
+        await loadCurrentVersion();
+      } catch (e) {
+        alert('❌ Errore: ' + e.message);
+      }
+    }
+
+    function clearLocalVersion() {
+      localStorage.removeItem('app_version');
+      alert('✅ Versione locale cancellata! Ricarica la pagina per testare auto-update.');
+    }
+
+    loadCurrentVersion();
+  </script>
+</body>
+</html>

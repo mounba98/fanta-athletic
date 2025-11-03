@@ -1,0 +1,74 @@
+[
+  {
+    "nome": "Bar",
+    "effetto": "Festaioli +1 ogni turno",
+    "bonusCategorie": ["Festaiolo"],
+    "bonusValore": 1,
+    "tipo": "Continuo"
+  },
+  {
+    "nome": "Sala Grande",
+    "effetto": "Carte con forza 6+ ottengono +3",
+    "bonusCategorie": [],
+    "bonusValore": 3,
+    "tipo": "Condizionale",
+    "condizione": "forza >= 6"
+  },
+  {
+    "nome": "Palestra",
+    "effetto": "Atleti +2 Forza",
+    "bonusCategorie": ["Atleta"],
+    "bonusValore": 2,
+    "tipo": "Continuo"
+  },
+  {
+    "nome": "Veranda",
+    "effetto": "Creativi raddoppiano gli effetti",
+    "bonusCategorie": ["Creativo"],
+    "bonusValore": 0,
+    "tipo": "Moltiplicatore",
+    "moltiplicatore": 2
+  },
+  {
+    "nome": "Chiringuito",
+    "effetto": "Relaxati guadagnano +1 a fine turno",
+    "bonusCategorie": ["Relaxato"],
+    "bonusValore": 1,
+    "tipo": "Fine Turno"
+  },
+  {
+    "nome": "Sala Carte",
+    "effetto": "Politici ottengono +2 Forza",
+    "bonusCategorie": ["Politico"],
+    "bonusValore": 2,
+    "tipo": "Continuo"
+  },
+  {
+    "nome": "Doccia",
+    "effetto": "Atleti +1 Forza",
+    "bonusCategorie": ["Atleta"],
+    "bonusValore": 1,
+    "tipo": "Continuo"
+  },
+  {
+    "nome": "Sala Musica",
+    "effetto": "Creativi +2 Forza",
+    "bonusCategorie": ["Creativo"],
+    "bonusValore": 2,
+    "tipo": "Continuo"
+  },
+  {
+    "nome": "Angolo Rotture",
+    "effetto": "Tutte le carte -1 Forza ogni turno",
+    "bonusCategorie": [],
+    "bonusValore": -1,
+    "tipo": "Universale"
+  },
+  {
+    "nome": "Misericordia",
+    "effetto": "Le carte Festaioli perdono -1 Forza",
+    "bonusCategorie": ["Festaiolo"],
+    "bonusValore": -1,
+    "tipo": "Continuo"
+  }
+]

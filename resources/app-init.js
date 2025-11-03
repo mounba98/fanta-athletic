@@ -1,0 +1,70 @@
+/**
+ * App Initialization Script
+ * Include questo dopo Firebase init per setup completo app
+ * v2025101905
+ */
+
+// Verifica che Firebase sia inizializzato
+if (typeof firebase === 'undefined' || !firebase.apps.length) {
+  console.warn('⚠️ Firebase not initialized! Include firebase scripts before app-init.js');
+} else {
+  console.log('✅ Firebase initialized successfully');
+}
+
+function ensureHeaderStructure() {
+  if (document.body && document.body.dataset.disableAutoHeader === 'true') {
+    return;
+  }
+
+  if (document.querySelector('header')) {
+    return;
+  }
+
+  if (!document.body) {
+    return;
+  }
+
+  const header = document.createElement('header');
+  header.className = 'auto-header';
+
+  const logo = document.createElement('a');
+  logo.className = 'logo-home';
+  logo.href = 'index.html';
+  logo.setAttribute('aria-label', 'Home');
+  logo.innerHTML = '<img src="resources/logo.png" alt="Fanta Athletic" />';
+
+  const titleText = document.body.dataset.headerTitle || document.title || 'Fanta Athletic';
+  const subtitleText = document.body.dataset.headerSubtitle || '';
+
+  const title = document.createElement('h1');
+  title.textContent = titleText;
+
+  header.appendChild(logo);
+  header.appendChild(title);
+
+  if (subtitleText) {
+    const subtitle = document.createElement('p');
+    subtitle.textContent = subtitleText;
+    header.appendChild(subtitle);
+  }
+
+  document.body.insertBefore(header, document.body.firstChild);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', ensureHeaderStructure);
+} else {
+  ensureHeaderStructure();
+}
+
+// Load auth-guard (login obbligatorio)
+const authGuardScript = document.createElement('script');
+authGuardScript.src = 'resources/auth-guard.js?v=2025101905';
+document.head.appendChild(authGuardScript);
+
+// Load league-selector (dropdown navbar)
+const leagueSelectorScript = document.createElement('script');
+leagueSelectorScript.src = 'resources/league-selector.js?v=2025101905';
+document.head.appendChild(leagueSelectorScript);
+
+console.log('✅ App initialization scripts loaded');

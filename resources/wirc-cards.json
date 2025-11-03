@@ -1,0 +1,362 @@
+[
+  {
+    "id": "fracks",
+    "nome": "Fracks",
+    "costo": 4,
+    "forza": 6,
+    "categorie": ["Strategico", "Politico"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+1 Forza a tutte le tue carte in questo campo."
+    },
+    "descrizione": "Leader carismatico del circolo, risolve tutto con decisioni discutibili ma convincenti."
+  },
+  {
+    "id": "tommy",
+    "nome": "Tommy",
+    "costo": 5,
+    "forza": 8,
+    "categorie": ["Allenatore", "Competitivo"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "Riduce di 1 la Forza di tutte le carte avversarie nel campo."
+    },
+    "descrizione": "Allenatore dell'Athletic, ciccione ma letale tatticamente."
+  },
+  {
+    "id": "bosi",
+    "nome": "Bosi",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Relaxato"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "Rigenera +1 Forza a fine turno."
+    },
+    "descrizione": "Fattone chill per eccellenza, risolve ogni problema con 'tranquillo bro'."
+  },
+  {
+    "id": "dux",
+    "nome": "Dux",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Relaxato"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "+2 Forza se in mano hai un'altra carta Relaxata."
+    },
+    "descrizione": "Maestro del relax, vive in modalità vibrazioni basse."
+  },
+  {
+    "id": "chep",
+    "nome": "Chep",
+    "costo": 3,
+    "forza": 2,
+    "categorie": ["Strategico", "Politico"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Disattiva l'effetto continuo di una carta avversaria nel campo."
+    },
+    "descrizione": "Pelato idealista, taglia corto con logica e ideologia."
+  },
+  {
+    "id": "toti",
+    "nome": "Toti",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Strategico", "Realista"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+1 Forza a ogni carta Allenatore alleata."
+    },
+    "descrizione": "Uomo d'onore e caffè, tiene unito il bar e il gruppo."
+  },
+  {
+    "id": "paolino",
+    "nome": "Paolino",
+    "costo": 1,
+    "forza": 1,
+    "categorie": ["Scout", "Cervellone"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Pesca una carta casuale dal mazzo."
+    },
+    "descrizione": "Scout pragmatico, analizza tutto prima di giocare."
+  },
+  {
+    "id": "pippo",
+    "nome": "Pippo Bongia",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Scout", "Festaiolo"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "+1 Forza a ogni Scout in gioco."
+    },
+    "descrizione": "Ex scout, ama le serate ma con moderazione."
+  },
+  {
+    "id": "giulietto",
+    "nome": "Giulietto",
+    "costo": 2,
+    "forza": 2,
+    "categorie": ["Scout", "Cervellone"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+1 Forza a ogni carta con costo 1."
+    },
+    "descrizione": "Ragazzo preciso, conosce tutti e nessuno allo stesso tempo."
+  },
+  {
+    "id": "wabione",
+    "nome": "Wabione",
+    "costo": 4,
+    "forza": 7,
+    "categorie": ["Collezionista", "Relaxato"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+3 Forza se nel mazzo ci sono almeno 2 carte Relaxate."
+    },
+    "descrizione": "Spendaccione seriale, crede che il lego salverà il mondo."
+  },
+  {
+    "id": "calosi",
+    "nome": "Calosi",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Creativo", "Festaiolo"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+2 Forza se giochi una carta dopo di lui."
+    },
+    "descrizione": "Ricciolino imprevedibile, artista del calcino e delle birre."
+  },
+  {
+    "id": "giabba",
+    "nome": "Giabba",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Creativo", "Relaxato"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+2 Forza se in gioco c'è un'altra carta Creativa."
+    },
+    "descrizione": "Chitarrista rock del circolo, canta, fuma e filosofeggia."
+  },
+  {
+    "id": "santo",
+    "nome": "Santo",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Competitivo", "Creativo"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "+2 Forza a ogni carta Creativa alleata."
+    },
+    "descrizione": "Musicista biondo, potente quanto inconsapevole."
+  },
+  {
+    "id": "trendiu",
+    "nome": "Trendiu",
+    "costo": 2,
+    "forza": 2,
+    "categorie": ["Creativo", "Comico"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Raddoppia l'effetto di una carta amica a caso."
+    },
+    "descrizione": "Genio o pazzo, nessuno lo sa, ma funziona."
+  },
+  {
+    "id": "pato",
+    "nome": "Pato",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Competitivo", "Atleta"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+2 Forza a ogni carta Competitiva."
+    },
+    "descrizione": "Macchina da guerra in palestra, mente semplice, muscoli tanti."
+  },
+  {
+    "id": "beppe",
+    "nome": "Beppe",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Competitivo", "Atleta"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+1 Forza a ogni carta Atleta alleata."
+    },
+    "descrizione": "Calciatore tecnico, zero parole, solo colpi di tacco."
+  },
+  {
+    "id": "gcazzi",
+    "nome": "G Cazzi",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Competitivo", "Trainer"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "+3 Forza se nel campo c'è un'altra carta Atleta."
+    },
+    "descrizione": "Personal trainer del gruppo, bilancia fisico e follia."
+  },
+  {
+    "id": "cocci",
+    "nome": "Cocci",
+    "costo": 1,
+    "forza": 1,
+    "categorie": ["Relaxato", "Ansioso"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "Se subisce un effetto nemico, ottiene +2 Forza."
+    },
+    "descrizione": "Nanerottolo ipersensibile, si offende anche con l'aria ma resiste a tutto."
+  },
+  {
+    "id": "meme",
+    "nome": "Meme",
+    "costo": 3,
+    "forza": 3,
+    "categorie": ["Strategico", "Politico"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Copia l'effetto continuo di una carta nemica casuale."
+    },
+    "descrizione": "Bancario comunista moderato, in equilibrio tra ideali e scadenze."
+  },
+  {
+    "id": "flondi",
+    "nome": "Flondi",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Relaxato", "Creativo"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+1 Forza ogni turno, ma perde -3 se viene attaccato."
+    },
+    "descrizione": "Prof di fisica e fumo, alterna genio e svacco."
+  },
+  {
+    "id": "andreino",
+    "nome": "Andreino",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Competitivo", "Allenatore"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "+2 Forza se c'è almeno una carta Allenatore in campo."
+    },
+    "descrizione": "Buono come il pane, forte come un traliccio."
+  },
+  {
+    "id": "tommasolabanca",
+    "nome": "Tommaso Labanca",
+    "costo": 2,
+    "forza": 2,
+    "categorie": ["Festaiolo", "Caotico"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+2 Forza se giochi dopo una carta Relaxata."
+    },
+    "descrizione": "Sempre fatto, ma con grande cuore e zero filtri."
+  },
+  {
+    "id": "momo",
+    "nome": "Momo",
+    "costo": 4,
+    "forza": 6,
+    "categorie": ["Festaiolo", "Don Giovanni"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Disattiva il continuo di una carta avversaria casuale."
+    },
+    "descrizione": "Figo, simpatico e imprevedibile: incubo dei fidanzati."
+  },
+  {
+    "id": "titti",
+    "nome": "Titti",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Competitivo", "Allenatore"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+2 Forza a tutte le carte Atleta."
+    },
+    "descrizione": "Buon giocatore, pensa di avere sempre ragione (e spesso ce l'ha)."
+  },
+  {
+    "id": "nicolamocci",
+    "nome": "Nicola Mocci",
+    "costo": 4,
+    "forza": 6,
+    "categorie": ["Tecnologico", "Strategico"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Duplica l'effetto 'Alla Scoperta' della prossima carta che giochi."
+    },
+    "descrizione": "Smanettone e mente del gruppo, trasforma tutto in un gioco."
+  },
+  {
+    "id": "wengi",
+    "nome": "Wengi",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Competitivo", "Festaiolo"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+1 Forza ogni volta che un avversario gioca una carta."
+    },
+    "descrizione": "Testatore di testate. Più colpisce, più si carica."
+  },
+  {
+    "id": "leomori",
+    "nome": "Leo Mori",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Tecnologico", "Competitivo"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "+1 Forza se giochi in un campo esterno."
+    },
+    "descrizione": "Pilota di tamarrate, fratello minore con grandi piani e zero freni."
+  },
+  {
+    "id": "boro",
+    "nome": "Boro",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Festaiolo", "Bartender"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Aumenta di +1 la tua Birra massima."
+    },
+    "descrizione": "Barman e showman, serve drink e caos in egual misura."
+  },
+  {
+    "id": "calo",
+    "nome": "Calo",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Creativo", "Festaiolo"],
+    "effetto": {
+      "tipo": "Alla Scoperta",
+      "descrizione": "Pesca una carta e scarta una a caso."
+    },
+    "descrizione": "Ricciolino esplosivo, genio del calcino e delle cene alcoliche."
+  },
+  {
+    "id": "canni",
+    "nome": "Canni",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Tecnologico", "Relaxato"],
+    "effetto": {
+      "tipo": "Continuo",
+      "descrizione": "+2 Forza se non hai giocato carte nel turno precedente."
+    },
+    "descrizione": "Operaio del Pignone, maestro del pulsante e del tempismo perfetto."
+  }
+]

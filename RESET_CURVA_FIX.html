@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Reset Curva Fix</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f0f4f8;
+    }
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+    }
+    h1 { color: #dc143c; margin-top: 0; }
+    button {
+      background: #dc143c;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 8px;
+    }
+    button:hover { background: #b91c1c; }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      display: none;
+    }
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔧 Fix Curva 52 Punti Fantasma</h1>
+    
+    <p><strong>Problema</strong>: Quando aggiungi il primo bonus a un giocatore, la curva va a 52 punti senza motivo.</p>
+    
+    <p><strong>Causa</strong>: localStorage ha dati corrotti della curva.</p>
+    
+    <button onclick="showCurrentData()">🔍 Mostra Dati Attuali</button>
+    <div id="currentData" style="margin-top:12px;"></div>
+    
+    <button onclick="resetCurva()" style="background:#ef4444; margin-top:16px;">🗑️ RESETTA CURVA (Tutte le Giornate)</button>
+    <div id="success" class="success">✅ Curva resettata! Ricarica matchday.html</div>
+  </div>
+  
+  <div class="card">
+    <h3>📋 Dati Salvati per Giornata</h3>
+    <div id="allData"></div>
+  </div>
+
+  <script>
+    function showCurrentData() {
+      const container = document.getElementById('currentData');
+      const allContainer = document.getElementById('allData');
+      
+      // Trova tutte le chiavi della curva
+      const curvaKeys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('curva_')) {
+          curvaKeys.push(key);
+        }
+      }
+      
+      if (curvaKeys.length === 0) {
+        container.innerHTML = '<p style="color:#64748b;">Nessun dato curva trovato in localStorage.</p>';
+        return;
+      }
+      
+      let html = '<h4>Dati Curva per Giornata:</h4>';
+      curvaKeys.forEach(key => {
+        const data = localStorage.getItem(key);
+        const giornata = key.replace('curva_', '');
+        html += `<div style="margin-bottom:12px;">
+          <strong>${giornata}</strong>:
+          <pre>${data}</pre>
+        </div>`;
+      });
+      
+      container.innerHTML = html;
+      
+      // Mostra tutti i dati salvati
+      const allKeys = ['players_G1', 'coaches_G1', 'curva_G1', 'giornata_meta_G1'];
+      let allHtml = '';
+      allKeys.forEach(key => {
+        const data = localStorage.getItem(key);
+        if (data) {
+          allHtml += `<div style="margin-bottom:12px;">
+            <strong>${key}</strong>:
+            <pre>${data.substring(0, 200)}${data.length > 200 ? '...' : ''}</pre>
+          </div>`;
+        }
+      });
+      allContainer.innerHTML = allHtml || '<p style="color:#64748b;">Nessun dato trovato.</p>';
+    }
+    
+    function resetCurva() {
+      if (!confirm('Sei sicuro? Questo cancellerà TUTTI i dati della curva per tutte le giornate.')) {
+        return;
+      }
+      
+      // Trova e rimuovi tutte le chiavi curva
+      const toRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('curva_')) {
+          toRemove.push(key);
+        }
+      }
+      
+      toRemove.forEach(key => localStorage.removeItem(key));
+      
+      document.getElementById('success').style.display = 'block';
+      console.log('✅ Rimossi', toRemove.length, 'chiavi curva');
+      
+      setTimeout(() => {
+        showCurrentData();
+      }, 500);
+    }
+    
+    // Auto-show data on load
+    window.addEventListener('DOMContentLoaded', showCurrentData);
+  </script>
+</body>
+</html>

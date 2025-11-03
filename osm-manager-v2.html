@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OSM Manager - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .osm-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    
+    .formations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      margin: 24px 0;
+    }
+    
+    .formation-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+    
+    .formation-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .formation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .formation-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .formation-module {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .mini-pitch {
+      background: linear-gradient(180deg, #2d5f2e 0%, #3a7d3a 50%, #2d5f2e 100%);
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+      aspect-ratio: 3/4;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+    
+    .mini-pitch::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+    }
+    
+    .pitch-line {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .player-mini {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      padding: 4px;
+      line-height: 1.1;
+    }
+    
+    .player-mini:hover {
+      transform: scale(1.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    
+    .player-mini.empty {
+      background: rgba(255,255,255,0.2);
+      border: 2px dashed rgba(255,255,255,0.4);
+      color: white;
+      font-size: 20px;
+    }
+    
+    .formation-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .btn-action {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+    
+    .btn-copy {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .btn-copy:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    
+    .btn-simulate {
+      background: #10b981;
+      color: white;
+    }
+    
+    .btn-simulate:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+    
+    .stats-mini {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .stat-mini {
+      text-align: center;
+      font-size: 11px;
+    }
+    
+    .stat-mini-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      display: block;
+    }
+    
+    .player-picker-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .player-picker-modal.active {
+      display: flex;
+    }
+    
+    .picker-content {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .picker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .picker-close {
+      background: #ef4444;
+      color: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .players-list {
+      display: grid;
+      gap: 8px;
+    }
+    
+    .player-item {
+      padding: 12px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .player-item:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateX(4px);
+    }
+    
+    @media (max-width: 768px) {
+      .formations-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Help Panel */
+    .help-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+      max-width: 350px;
+      z-index: 1000;
+      animation: slideInUp 0.5s ease-out;
+    }
+    
+    @keyframes slideInUp {
+      from {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .help-panel h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .help-panel p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .help-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px;
+    }
+    
+    .help-steps li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+      font-size: 13px;
+    }
+    
+    .help-steps li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #22c55e;
+      font-weight: 700;
+    }
+    
+    .btn-close-help {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .btn-close-help:hover {
+      background: rgba(255,255,255,0.3);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>⚽ OSM Manager</h1>
+  </header>
+
+  <main class="osm-container">
+    <div class="section">
+      <h2>Gestione Formazioni Athletic</h2>
+      <p>Crea 6 formazioni da 5 giocatori ciascuna (30 giocatori totali). Copia i nomi da Formazioni e simula partite.</p>
+    </div>
+
+    <div id="formationsContainer" class="formations-grid"></div>
+  </main>
+
+  <!-- Help Panel -->
+  <div id="helpPanel" class="help-panel" style="display: none;">
+    <h3>💡 Cosa Fare Ora?</h3>
+    <p>Hai completato una formazione! Ecco i prossimi passi:</p>
+    <ul class="help-steps">
+      <li><strong>Copia Nomi</strong>: Click "📋 Copia Nomi" per copiare i giocatori negli appunti</li>
+      <li><strong>Simula Partita</strong>: Click "🎮 Simula" per vedere una partita simulata con questa formazione</li>
+      <li><strong>Crea Altre</strong>: Completa le altre 5 formazioni per avere un roster completo!</li>
+    </ul>
+    <button class="btn-close-help" onclick="closeHelp()">✓ Ho Capito</button>
+  </div>
+
+  <!-- Player Picker Modal -->
+  <div id="playerPickerModal" class="player-picker-modal">
+    <div class="picker-content">
+      <div class="picker-header">
+        <h3 id="pickerTitle">Seleziona Giocatore</h3>
+        <button class="picker-close" onclick="closePlayerPicker()">×</button>
+      </div>
+      <input type="text" id="playerSearch" class="input" placeholder="🔍 Cerca giocatore..." style="margin-bottom: 16px;" oninput="filterPlayers()">
+      <div id="playersList" class="players-list"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-6"></script>
+  <script>
+    // Init Firebase IMMEDIATAMENTE
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+  </script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/mobile-menu.js?v=2025101901"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script>
+    const FORMATIONS = [
+      { name: 'Formazione 1', module: '1-2-2', positions: [1, 2, 2] },
+      { name: 'Formazione 2', module: '1-2-2', positions: [1, 2, 2] },
+      { name: 'Formazione 3', module: '1-2-2', positions: [1, 2, 2] },
+      { name: 'Formazione 4', module: '1-2-2', positions: [1, 2, 2] },
+      { name: 'Formazione 5', module: '1-2-2', positions: [1, 2, 2] },
+      { name: 'Formazione 6', module: '1-2-2', positions: [1, 2, 2] }
+    ];
+
+    let formations = FORMATIONS.map(f => ({
+      ...f,
+      players: Array(5).fill(null)
+    }));
+
+    let allPlayers = [];
+    let currentFormationIdx = null;
+    let currentSlotIdx = null;
+
+    // Load players from Firestore (all leagues)
+    async function loadPlayers() {
+      try {
+        const db = firebase.firestore();
+        
+        // Carica tutti i giocatori da tutte le leghe
+        const leaguesSnapshot = await db.collection('leagues').get();
+        const allPlayersMap = new Map();
+        
+        for (const leagueDoc of leaguesSnapshot.docs) {
+          const leagueId = leagueDoc.id;
+          // FIX: Path corretto /leagues/{leagueId}/players/{playerId}
+          const playersSnapshot = await db.collection('leagues').doc(leagueId).collection('players').get();
+          
+          playersSnapshot.docs.forEach(doc => {
+            const player = { id: doc.id, leagueId, ...doc.data() };
+            // Usa cognome come chiave unica per evitare duplicati
+            const key = `${player.cognome}_${player.nome}`;
+            if (!allPlayersMap.has(key)) {
+              allPlayersMap.set(key, player);
+            }
+          });
+        }
+        
+        allPlayers = Array.from(allPlayersMap.values())
+          .sort((a, b) => (a.cognome || '').localeCompare(b.cognome || ''));
+        
+        console.log(`✅ Caricati ${allPlayers.length} giocatori da Firestore`);
+        
+        // Se 0 giocatori, carica fallback
+        if (allPlayers.length === 0) {
+          console.warn('⚠️ Nessun giocatore trovato, uso fallback mock');
+          throw new Error('No players found');
+        }
+        
+        renderFormations();
+      } catch (error) {
+        console.error('Error loading players:', error);
+        // Fallback a mock players se Firestore fallisce
+        allPlayers = [
+          { id: '1', nome: 'Marco', cognome: 'Rossi', ruolo: 'P' },
+          { id: '2', nome: 'Luca', cognome: 'Bianchi', ruolo: 'D' },
+          { id: '3', nome: 'Andrea', cognome: 'Verdi', ruolo: 'D' },
+          { id: '4', nome: 'Paolo', cognome: 'Gialli', ruolo: 'C' },
+          { id: '5', nome: 'Simone', cognome: 'Neri', ruolo: 'C' },
+          { id: '6', nome: 'Davide', cognome: 'Blu', ruolo: 'A' },
+          { id: '7', nome: 'Matteo', cognome: 'Viola', ruolo: 'A' }
+        ];
+        console.warn('⚠️ Usando giocatori mock per OSM Manager');
+        renderFormations();
+      }
+    }
+
+    function renderFormations() {
+      const container = document.getElementById('formationsContainer');
+      container.innerHTML = formations.map((formation, idx) => `
+        <div class="formation-card">
+          <div class="formation-header">
+            <div class="formation-title">${formation.name}</div>
+            <div class="formation-module">${formation.module}</div>
+          </div>
+          
+          <div class="mini-pitch">
+            ${renderPitchLines(formation, idx)}
+          </div>
+          
+          <div class="stats-mini">
+            <div class="stat-mini">
+              <span class="stat-mini-value">${formation.players.filter(Boolean).length}</span>
+              <span>Giocatori</span>
+            </div>
+            <div class="stat-mini">
+              <span class="stat-mini-value">${calculateAvgRating(formation)}</span>
+              <span>Rating</span>
+            </div>
+            <div class="stat-mini">
+              <span class="stat-mini-value">${formation.players.filter(Boolean).length === 5 ? '✅' : '⏳'}</span>
+              <span>Status</span>
+            </div>
+          </div>
+          
+          <div class="formation-actions">
+            <button class="btn-action btn-copy" onclick="copyFormation(${idx})">
+              📋 Copia Nomi
+            </button>
+            <button class="btn-action btn-simulate" onclick="simulateFormation(${idx})" ${formation.players.filter(Boolean).length < 5 ? 'disabled' : ''}>
+              🎮 Simula
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderPitchLines(formation, formationIdx) {
+      const positions = formation.positions;
+      let html = '';
+      let playerIdx = 0;
+
+      // ATT
+      html += '<div class="pitch-line">';
+      for (let i = 0; i < positions[2]; i++) {
+        html += renderPlayerSlot(formation.players[playerIdx], formationIdx, playerIdx);
+        playerIdx++;
+      }
+      html += '</div>';
+
+      // MID
+      html += '<div class="pitch-line">';
+      for (let i = 0; i < positions[1]; i++) {
+        html += renderPlayerSlot(formation.players[playerIdx], formationIdx, playerIdx);
+        playerIdx++;
+      }
+      html += '</div>';
+
+      // DEF
+      html += '<div class="pitch-line">';
+      for (let i = 0; i < positions[0]; i++) {
+        html += renderPlayerSlot(formation.players[playerIdx], formationIdx, playerIdx);
+        playerIdx++;
+      }
+      html += '</div>';
+
+      return html;
+    }
+
+    function renderPlayerSlot(player, formationIdx, slotIdx) {
+      if (player) {
+        const name = `${player.cognome || ''} ${(player.nome || '').charAt(0)}.`;
+        return `<div class="player-mini" onclick="openPlayerPicker(${formationIdx}, ${slotIdx})">${name}</div>`;
+      } else {
+        return `<div class="player-mini empty" onclick="openPlayerPicker(${formationIdx}, ${slotIdx})">+</div>`;
+      }
+    }
+
+    function calculateAvgRating(formation) {
+      const players = formation.players.filter(Boolean);
+      if (players.length === 0) return '0.0';
+      const avg = players.reduce((sum, p) => sum + (p.rating || 6.0), 0) / players.length;
+      return avg.toFixed(1);
+    }
+
+    function openPlayerPicker(formationIdx, slotIdx) {
+      currentFormationIdx = formationIdx;
+      currentSlotIdx = slotIdx;
+      
+      document.getElementById('pickerTitle').textContent = `Seleziona Giocatore - ${formations[formationIdx].name} (Slot ${slotIdx + 1})`;
+      document.getElementById('playerPickerModal').classList.add('active');
+      document.getElementById('playerSearch').value = '';
+      
+      renderPlayersList(allPlayers);
+    }
+
+    function closePlayerPicker() {
+      document.getElementById('playerPickerModal').classList.remove('active');
+      currentFormationIdx = null;
+      currentSlotIdx = null;
+    }
+
+    function filterPlayers() {
+      const search = document.getElementById('playerSearch').value.toLowerCase();
+      const filtered = allPlayers.filter(p => 
+        (p.cognome || '').toLowerCase().includes(search) ||
+        (p.nome || '').toLowerCase().includes(search)
+      );
+      renderPlayersList(filtered);
+    }
+
+    function renderPlayersList(players) {
+      const list = document.getElementById('playersList');
+      list.innerHTML = players.map(p => `
+        <div class="player-item" onclick="selectPlayer('${p.id}')">
+          <span>${p.cognome || 'Sconosciuto'} ${p.nome || ''}</span>
+          <span style="opacity: 0.6;">${p.ruolo || 'N/A'}</span>
+        </div>
+      `).join('');
+    }
+
+    function selectPlayer(playerId) {
+      const player = allPlayers.find(p => p.id === playerId);
+      if (!player) return;
+
+      formations[currentFormationIdx].players[currentSlotIdx] = player;
+      closePlayerPicker();
+      renderFormations();
+      
+      // Check if formation is complete (5 players) - show help
+      const formation = formations[currentFormationIdx];
+      const completedCount = formation.players.filter(Boolean).length;
+      if (completedCount === 5) {
+        showHelp();
+      }
+    }
+    
+    function showHelp() {
+      document.getElementById('helpPanel').style.display = 'block';
+      // Auto-hide after 10 seconds
+      setTimeout(() => {
+        closeHelp();
+      }, 10000);
+    }
+    
+    function closeHelp() {
+      document.getElementById('helpPanel').style.display = 'none';
+    }
+
+    function copyFormation(idx) {
+      const formation = formations[idx];
+      const names = formation.players
+        .filter(Boolean)
+        .map(p => `${p.cognome || ''} ${p.nome || ''}`.trim())
+        .join('\n');
+
+      if (!names) {
+        alert('Nessun giocatore da copiare!');
+        return;
+      }
+
+      navigator.clipboard.writeText(names).then(() => {
+        alert('✅ Nomi copiati negli appunti!\n\nIncollali in Formazioni.');
+      }).catch(() => {
+        alert('❌ Errore copia. Nomi:\n\n' + names);
+      });
+    }
+
+    function simulateFormation(idx) {
+      const formation = formations[idx];
+      const players = formation.players.filter(Boolean);
+      
+      if (players.length < 5) {
+        alert('Completa la formazione prima di simulare!');
+        return;
+      }
+
+      // Crea modal simulazione
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      
+      const content = document.createElement('div');
+      content.style.cssText = 'background:var(--card);border-radius:12px;padding:24px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;';
+      
+      content.innerHTML = `
+        <h2 style="margin:0 0 16px 0;">⚽ Simulazione ${formation.name}</h2>
+        <div id="matchLog" style="font-family:monospace;font-size:13px;line-height:1.8;"></div>
+        <div id="matchScore" style="font-size:32px;font-weight:700;text-align:center;margin:20px 0;"></div>
+        <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Chiudi</button>
+      `;
+      
+      modal.appendChild(content);
+      document.body.appendChild(modal);
+      
+      const log = document.getElementById('matchLog');
+      const scoreDiv = document.getElementById('matchScore');
+      
+      // Eventi partita
+      const events = [
+        '{p} prende palla a centrocampo',
+        '{p} lancia lungo verso {p2}',
+        '{p} controlla e avanza',
+        '{p} prova il dribbling... {result}',
+        '{p} tiro da fuori! {result}',
+        '{p} cross in area per {p2}',
+        '{p} colpo di testa! {result}',
+        '{p} recupera palla e riparte',
+        '{p} passaggio filtrante per {p2}',
+        '{p} uno-due con {p2}',
+        '{p} sbaglia miserabilmente il passaggio',
+        '{p} perde palla in modo imbarazzante',
+        'Fallo su {p}, punizione',
+        '{p} calcia la punizione... {result}',
+        'Corner per la squadra',
+        '{p} batte il corner',
+        '{p} salva sulla linea!',
+        'Occasione sprecata da {p}',
+        '{p} para miracolosamente!',
+        '{p} prende il palo!'
+      ];
+      
+      let homeScore = 0;
+      let awayScore = 0;
+      let minute = 0;
+      
+      const addLog = (text) => {
+        log.innerHTML += `<div>${minute}' - ${text}</div>`;
+        log.scrollTop = log.scrollHeight;
+      };
+      
+      const getRandomPlayer = () => players[Math.floor(Math.random() * players.length)];
+      const getPlayerName = (p) => `${p.cognome || 'Giocatore'} ${(p.nome || '').charAt(0)}.`;
+      
+      // Simula 90 minuti
+      const interval = setInterval(() => {
+        minute += Math.floor(Math.random() * 5) + 3;
+        
+        if (minute >= 90) {
+          minute = 90;
+          clearInterval(interval);
+          
+          const result = homeScore > awayScore ? '🏆 VITTORIA!' : homeScore < awayScore ? '😢 SCONFITTA' : '🤝 PAREGGIO';
+          addLog(`<strong>FISCHIO FINALE! ${result}</strong>`);
+          scoreDiv.innerHTML = `${homeScore} - ${awayScore}<br><span style="font-size:18px;">${result}</span>`;
+          return;
+        }
+        
+        const p1 = getRandomPlayer();
+        const p2 = getRandomPlayer();
+        let event = events[Math.floor(Math.random() * events.length)];
+        
+        event = event.replace('{p}', getPlayerName(p1));
+        event = event.replace('{p2}', getPlayerName(p2));
+        
+        // Goal random (20% chance)
+        if (Math.random() < 0.2) {
+          if (Math.random() < 0.5) {
+            homeScore++;
+            event = event.replace('{result}', `<strong style="color:#10b981;">⚽ GOOOOOL di ${getPlayerName(p1)}!</strong>`);
+          } else {
+            awayScore++;
+            event = event.replace('{result}', '<strong style="color:#ef4444;">Goal avversario</strong>');
+          }
+        } else {
+          const results = ['fuori di poco', 'parato', 'alto', 'respinto', 'riesce!', 'fallisce'];
+          event = event.replace('{result}', results[Math.floor(Math.random() * results.length)]);
+        }
+        
+        addLog(event);
+        scoreDiv.textContent = `${homeScore} - ${awayScore}`;
+      }, 800);
+    }
+
+    // Auth check SOLO - NO league required
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        const currentUrl = encodeURIComponent(window.location.href);
+        window.location.href = `auth.html?redirect=${currentUrl}`;
+      } else {
+        console.log('✅ User authenticated for OSM Manager:', user.uid);
+        loadPlayers();
+      }
+    });
+  </script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+</body>
+</html>

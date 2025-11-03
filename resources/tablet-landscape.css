@@ -1,0 +1,223 @@
+/* Tablet Landscape Support */
+/* Supporto rotazione landscape per tablet */
+
+/* iPad e tablet in landscape (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  /* Riduci header */
+  header {
+    padding: 12px 20px !important;
+    min-height: 60px !important;
+  }
+
+  header h1 {
+    font-size: 20px !important;
+  }
+
+  header p {
+    font-size: 13px !important;
+  }
+
+  /* Ottimizza main content */
+  main {
+    padding: 12px !important;
+    min-height: calc(100vh - 140px) !important;
+  }
+
+  /* Grid layouts più compatti */
+  .grid2 {
+    gap: 12px !important;
+  }
+
+  /* Card più compatte */
+  .card {
+    padding: 14px !important;
+  }
+
+  /* Formazioni: campo più piccolo */
+  .pitch-grid {
+    max-width: 400px !important;
+    margin: 0 auto;
+  }
+
+  .pitch-grid .slot {
+    min-height: 70px !important;
+    padding: 8px !important;
+    font-size: 13px !important;
+  }
+
+  /* Lista giocatori più compatta */
+  .strip {
+    gap: 6px !important;
+  }
+
+  .draggable {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Buttons più piccoli */
+  .btn {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+  }
+
+  /* Tables responsive */
+  table {
+    font-size: 13px !important;
+  }
+
+  table th,
+  table td {
+    padding: 8px !important;
+  }
+
+  /* Riduci spaziature */
+  .sectionh {
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Navbar compatta */
+  .navbar {
+    padding: 8px 16px !important;
+  }
+
+  /* Footer compatto */
+  .footer {
+    padding: 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* Ottimizza modals */
+  .modal-content {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Input più piccoli */
+  input,
+  select,
+  textarea {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+  }
+
+  /* Stats cards */
+  .stat-card {
+    padding: 12px !important;
+  }
+
+  .stat-card h3 {
+    font-size: 22px !important;
+  }
+
+  .stat-card p {
+    font-size: 12px !important;
+  }
+
+  /* Admin grids */
+  .admin-grid {
+    gap: 16px !important;
+  }
+
+  /* Role sections */
+  .role-section {
+    margin-bottom: 10px !important;
+  }
+
+  .role-header {
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+  }
+
+  .role-body {
+    padding: 10px !important;
+  }
+
+  /* Accordion più compatto */
+  .accordion-header {
+    padding: 10px 14px !important;
+  }
+
+  .accordion-body {
+    padding: 12px !important;
+  }
+}
+
+/* iPad Pro e tablet grandi in landscape (1024px+) */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+  /* Ottimizzazioni minori per tablet grandi */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .pitch-grid {
+    max-width: 500px !important;
+  }
+}
+
+/* Fix specifici per Safari iOS in landscape */
+@supports (-webkit-touch-callout: none) {
+  @media (orientation: landscape) {
+    body {
+      min-height: -webkit-fill-available;
+    }
+
+    main {
+      min-height: calc(100vh - 140px);
+      min-height: -webkit-fill-available;
+    }
+  }
+}
+
+/* Previeni zoom su input focus in landscape */
+@media (orientation: landscape) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important; /* Previene zoom iOS */
+  }
+}
+
+/* Ottimizza scrolling in landscape */
+@media (orientation: landscape) {
+  body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Sticky elements più bassi */
+  .sticky-header {
+    top: 60px !important;
+  }
+}
+
+/* Orientamento prompt per mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .orientation-hint {
+    display: none; /* Nascondi hint su mobile landscape */
+  }
+
+  /* Mobile landscape: layout compatto */
+  header {
+    padding: 8px 16px !important;
+  }
+
+  header h1 {
+    font-size: 18px !important;
+  }
+
+  main {
+    padding: 8px !important;
+  }
+
+  .card {
+    padding: 12px !important;
+  }
+}

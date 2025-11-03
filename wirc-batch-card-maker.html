@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WIRC Batch Card Maker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      font-size: 36px;
+      color: #667eea;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 18px;
+    }
+    .section {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin: 5px;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .file-input {
+      display: block;
+      margin: 15px 0;
+      padding: 12px;
+      border: 2px dashed #667eea;
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+    }
+    .progress {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      display: none;
+    }
+    .progress-bar {
+      height: 30px;
+      background: #e9ecef;
+      border-radius: 15px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      width: 0%;
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+    .log {
+      max-height: 400px;
+      overflow-y: auto;
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .log-item {
+      margin: 3px 0;
+    }
+    .log-success { color: #00ff00; }
+    .log-error { color: #ff4444; }
+    .log-info { color: #00bfff; }
+    .log-warning { color: #ffa500; }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .preview-card {
+      position: relative;
+      aspect-ratio: 2/3;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .preview-card:hover {
+      transform: scale(1.05);
+    }
+    .preview-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .preview-card .name {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎴 WIRC Batch Card Maker</h1>
+    <p class="subtitle">Processa automaticamente tutte le immagini dalla cartella</p>
+
+    <div class="section">
+      <h2>📂 Step 1: Seleziona Immagini</h2>
+      <p style="margin-bottom:10px;">Seleziona tutte le immagini PNG dalla cartella <code>C:\Users\nicol\Desktop\wirk royale\png wirc</code></p>
+      <input type="file" id="imageInput" class="file-input" accept="image/*" multiple>
+      <p style="color:#666;font-size:14px;margin-top:10px;">
+        ✅ Immagini riconosciute: <strong id="fileCount">0</strong>
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>⚙️ Step 2: Configurazione</h2>
+      <label style="display:block;margin:10px 0;">
+        <input type="checkbox" id="showEffectCheckbox" checked>
+        <strong>Mostra effetto sulla carta</strong>
+      </label>
+    </div>
+
+    <div class="section">
+      <h2>📤 Upload Foto</h2>
+      <input type="file" id="imageInput" class="file-input" accept="image/*" multiple>
+      <p style="color:#666;margin-top:10px;">Seleziona foto dei personaggi (JPG/PNG) - Singola o Multiple</p>
+      <p id="fileCount" style="font-weight:700;color:#667eea;margin-top:10px;">0 file selezionati</p>
+    </div>
+
+    <div class="section" id="cardSelectionSection" style="display:none;">
+      <h2>✅ Seleziona Carte da Processare</h2>
+      <div style="margin-bottom:15px;">
+        <button class="btn" onclick="selectAll()" style="background:#22c55e;">✓ Seleziona Tutte</button>
+        <button class="btn" onclick="deselectAll()" style="background:#ef4444;">✗ Deseleziona Tutte</button>
+      </div>
+      <div id="cardCheckboxes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-height:400px;overflow-y:auto;background:#fff;padding:15px;border-radius:10px;"></div>
+    </div>
+
+    <div class="section">
+      <button class="btn" id="processBtn" disabled>🚀 Processa Carte Selezionate</button>
+      <button class="btn" id="downloadAllBtn" style="display:none;">📦 Download ZIP</button>
+      <button class="btn" id="downloadSingleBtn" style="display:none;background:#10b981;">💾 Download Singola</button>
+      
+      <div class="progress" id="progressContainer">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill">0%</div>
+        </div>
+        <p id="progressText">Pronto...</p>
+      </div>
+      
+      <div class="log" id="logContainer"></div>
+    </div>
+
+    <div class="section">
+      <h2>📋 Log Processamento</h2>
+      <div class="log" id="logContainer">
+        <div class="log-item log-info">⏳ In attesa di immagini...</div>
+      </div>
+    </div>
+
+    <div class="section" id="previewSection" style="display:none;">
+      <h2>👁️ Preview Carte Generate</h2>
+      <div class="preview-grid" id="previewGrid"></div>
+    </div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const processBtn = document.getElementById('processBtn');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const logContainer = document.getElementById('logContainer');
+    const previewGrid = document.getElementById('previewGrid');
+    const previewSection = document.getElementById('previewSection');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let cardsData = [];
+    let selectedFiles = [];
+    let generatedCards = [];
+
+    // Load cards JSON
+    fetch('data/wirc-snap-cards-full.json')
+      .then(res => res.json())
+      .then(cards => {
+        cardsData = cards;
+        log('✅ Caricati ' + cards.length + ' personaggi dal database', 'success');
+      })
+      .catch(err => {
+        log('❌ Errore caricamento database: ' + err.message, 'error');
+      });
+
+    // File input
+    imageInput.addEventListener('change', (e) => {
+      selectedFiles = Array.from(e.target.files);
+      document.getElementById('fileCount').textContent = selectedFiles.length;
+      processBtn.disabled = selectedFiles.length === 0;
+      
+      log(`📂 Selezionate ${selectedFiles.length} immagini`, 'info');
+      
+      // Match files with cards
+      selectedFiles.forEach(file => {
+        const matched = matchFileToCard(file.name);
+        if (matched) {
+          log(`✓ ${file.name} → ${matched.name} (${matched.cost}/${matched.power})`, 'success');
+        } else {
+          log(`⚠️ ${file.name} → Nessuna corrispondenza trovata`, 'warning');
+        }
+      });
+    });
+
+    // Process button
+    processBtn.addEventListener('click', async () => {
+      processBtn.disabled = true;
+      progressContainer.style.display = 'block';
+      previewSection.style.display = 'block';
+      previewGrid.innerHTML = '';
+      generatedCards = [];
+
+      log('🚀 Inizio processamento batch...', 'info');
+
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const progress = ((i + 1) / selectedFiles.length * 100).toFixed(0);
+        
+        progressFill.style.width = progress + '%';
+        progressFill.textContent = progress + '%';
+        progressText.textContent = `Processando ${i + 1}/${selectedFiles.length}: ${file.name}`;
+
+        try {
+          const cardData = await processCard(file);
+          if (cardData) {
+            generatedCards.push(cardData);
+            addPreview(cardData);
+            log(`✅ [${i + 1}/${selectedFiles.length}] ${cardData.name} completata`, 'success');
+          }
+        } catch (err) {
+          log(`❌ [${i + 1}/${selectedFiles.length}] Errore ${file.name}: ${err.message}`, 'error');
+        }
+
+        // Small delay to prevent UI freeze
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      progressText.textContent = `✅ Completate ${generatedCards.length}/${selectedFiles.length} carte!`;
+      downloadAllBtn.style.display = 'inline-block';
+      log(`🎉 Processamento completato! ${generatedCards.length} carte generate`, 'success');
+    });
+
+    // Download all as ZIP
+    downloadAllBtn.addEventListener('click', async () => {
+      log('📦 Creazione archivio ZIP...', 'info');
+      const zip = new JSZip();
+      
+      generatedCards.forEach(card => {
+        const base64Data = card.blob.split(',')[1];
+        zip.file(`wirc-${card.filename}.png`, base64Data, {base64: true});
+      });
+
+      const content = await zip.generateAsync({type: 'blob'});
+      const url = URL.createObjectURL(content);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `wirc-cards-batch-${Date.now()}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      log('✅ Download ZIP completato!', 'success');
+    });
+
+    // Process single card
+    async function processCard(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = async (event) => {
+          const img = new Image();
+          
+          img.onload = () => {
+            const card = matchFileToCard(file.name);
+            if (!card) {
+              reject(new Error('Carta non trovata nel database'));
+              return;
+            }
+
+            // Set canvas size
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Draw image
+            ctx.drawImage(img, 0, 0);
+
+            // Draw badges
+            const badgeSize = canvas.width * 0.12;
+            const badgeRadius = badgeSize / 2;
+            const badgePadding = canvas.width * 0.03;
+
+            // Cost badge (orange)
+            drawBadge(
+              badgePadding + badgeRadius,
+              badgePadding + badgeRadius,
+              badgeRadius,
+              card.cost,
+              ['#FF6B35', '#F7931E']
+            );
+
+            // Power badge (blue)
+            drawBadge(
+              canvas.width - badgePadding - badgeRadius,
+              badgePadding + badgeRadius,
+              badgeRadius,
+              card.power,
+              ['#4A90E2', '#357ABD']
+            );
+
+            // Name overlay
+            const nameY = canvas.height * 0.55;
+            const nameOverlayHeight = canvas.height * 0.14;
+            const nameGradient = ctx.createLinearGradient(0, nameY - nameOverlayHeight/2, 0, nameY + nameOverlayHeight/2);
+            nameGradient.addColorStop(0, 'rgba(0,0,0,0)');
+            nameGradient.addColorStop(0.5, 'rgba(0,0,0,0.85)');
+            nameGradient.addColorStop(1, 'rgba(0,0,0,0)');
+            
+            ctx.fillStyle = nameGradient;
+            ctx.fillRect(0, nameY - nameOverlayHeight/2, canvas.width, nameOverlayHeight);
+
+            // Name text
+            const nameFontSize = canvas.width * 0.11;
+            ctx.font = `900 ${nameFontSize}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'white';
+            ctx.shadowColor = 'rgba(0,0,0,1)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetY = 4;
+            ctx.fillText(card.name.toUpperCase(), canvas.width / 2, nameY);
+            ctx.shadowBlur = 40;
+            ctx.shadowOffsetY = 0;
+            ctx.fillText(card.name.toUpperCase(), canvas.width / 2, nameY);
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Effect overlay (if checkbox checked)
+            const showEffect = document.getElementById('showEffectCheckbox').checked;
+            
+            if (showEffect && card.effect) {
+              const effectOverlayHeight = canvas.height * 0.18;
+              const effectGradient = ctx.createLinearGradient(0, canvas.height - effectOverlayHeight, 0, canvas.height);
+              effectGradient.addColorStop(0, 'rgba(0,0,0,0)');
+              effectGradient.addColorStop(0.3, 'rgba(0,0,0,0.8)');
+              effectGradient.addColorStop(1, 'rgba(0,0,0,0.95)');
+              
+              ctx.fillStyle = effectGradient;
+              ctx.fillRect(0, canvas.height - effectOverlayHeight, canvas.width, effectOverlayHeight);
+
+              // Effect type
+              const effectTypeFontSize = canvas.width * 0.045;
+              ctx.font = `900 ${effectTypeFontSize}px Arial, sans-serif`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'top';
+              ctx.fillStyle = '#fbbf24';
+              ctx.shadowColor = 'rgba(0,0,0,0.9)';
+              ctx.shadowBlur = 8;
+              ctx.fillText(
+                card.type.replace('_', ' ').toUpperCase(),
+                canvas.width / 2,
+                canvas.height - effectOverlayHeight + 15
+              );
+
+              // Effect text
+              if (card.effect) {
+                const effectTextFontSize = canvas.width * 0.038;
+                ctx.font = `600 ${effectTextFontSize}px Arial, sans-serif`;
+                ctx.fillStyle = 'white';
+                ctx.shadowBlur = 6;
+                
+                // Word wrap
+                const maxWidth = canvas.width * 0.92;
+                const lineHeight = effectTextFontSize * 1.5;
+                const words = card.effect.split(' ');
+                let line = '';
+                let y = canvas.height - effectOverlayHeight + 55;
+                
+                for (let i = 0; i < words.length; i++) {
+                  const testLine = line + words[i] + ' ';
+                  const metrics = ctx.measureText(testLine);
+                  if (metrics.width > maxWidth && i > 0) {
+                    ctx.fillText(line, canvas.width / 2, y);
+                    line = words[i] + ' ';
+                    y += lineHeight;
+                  } else {
+                    line = testLine;
+                  }
+                }
+                ctx.fillText(line, canvas.width / 2, y);
+              }
+            }
+
+            // Convert to blob
+            const dataUrl = canvas.toDataURL('image/png');
+            const filename = card.name.toLowerCase().replace(/\s+/g, '-');
+            
+            resolve({
+              name: card.name,
+              filename: filename,
+              blob: dataUrl,
+              card: card
+            });
+          };
+
+          img.onerror = () => reject(new Error('Errore caricamento immagine'));
+          img.src = event.target.result;
+        };
+
+        reader.onerror = () => reject(new Error('Errore lettura file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function drawBadge(x, y, radius, text, colors) {
+      // White border
+      ctx.beginPath();
+      ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+
+      // Gradient
+      const gradient = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
+      gradient.addColorStop(0, colors[0]);
+      gradient.addColorStop(1, colors[1]);
+
+      // Badge circle
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Shadow
+      ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 4;
+
+      // Text
+      const fontSize = radius * 0.8;
+      ctx.font = `bold ${fontSize}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'white';
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 4;
+      ctx.fillText(text, x, y);
+
+      // Reset
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+    }
+
+    function matchFileToCard(filename) {
+      const normalized = filename
+        .toLowerCase()
+        .replace(/\.png$/i, '')
+        .replace(/[_\s]+/g, ' ')
+        .trim();
+
+      // Exact match
+      let card = cardsData.find(c => c.name.toLowerCase() === normalized);
+      if (card) return card;
+
+      // Partial match
+      card = cardsData.find(c => {
+        const cardName = c.name.toLowerCase();
+        return cardName.includes(normalized) || normalized.includes(cardName);
+      });
+      if (card) return card;
+
+      // Special cases
+      const specialCases = {
+        'angeòonp': 'Angelino',
+        'ale lapi': 'Ale Lapi',
+        'tommy lachangas': 'Tommy Lachangas',
+        'tommy guardu': 'Tommy Guardu',
+        'tommy_guardu': 'Tommy Guardu',
+        'pippo bongia': 'Pippo Bongia',
+        'pippo colza': 'Pippo Colza',
+        'mini blortz': 'Mini Blortz',
+        'mini boro': 'Mini Boro',
+        'gorgonzola boys': 'Gorgonzola Boys',
+        'g-cazzi': 'G-Cazzi',
+        'toti ': 'Toti'
+      };
+
+      if (specialCases[normalized]) {
+        return cardsData.find(c => c.name === specialCases[normalized]);
+      }
+
+      return null;
+    }
+
+    function addPreview(cardData) {
+      const div = document.createElement('div');
+      div.className = 'preview-card';
+      div.innerHTML = `
+        <img src="${cardData.blob}" alt="${cardData.name}">
+        <div class="name">${cardData.name}</div>
+      `;
+      div.onclick = () => {
+        const a = document.createElement('a');
+        a.href = cardData.blob;
+        a.download = `wirc-${cardData.filename}.png`;
+        a.click();
+      };
+      previewGrid.appendChild(div);
+    }
+
+    function log(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `log-item log-${type}`;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logContainer.appendChild(div);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+  </script>
+</body>
+</html>

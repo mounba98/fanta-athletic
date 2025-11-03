@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Responsive - Fanta Athletic</title>
+    <link rel="stylesheet" href="resources/sheet.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #dbe1e8;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .test-item {
+            background: var(--bg);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .device-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .test-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .test-tab {
+            padding: 10px 16px;
+            border: 1px solid #dbe1e8;
+            background: var(--card);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .test-tab:hover {
+            background: var(--bg);
+            border-color: var(--primary);
+        }
+        
+        .test-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .test-role-section {
+            border: 1px solid #dbe1e8;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        
+        .test-role-header {
+            background: var(--bg);
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .test-role-body {
+            padding: 16px;
+            display: none;
+        }
+        
+        .test-role-section:not(.collapsed) .test-role-body {
+            display: block;
+        }
+        
+        .test-item-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #dbe1e8;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .test-item-card:hover {
+            background: var(--bg);
+            border-color: var(--primary);
+        }
+        
+        .test-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .test-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+        }
+        
+        .test-chip {
+            padding: 6px 12px;
+            border: 1px solid #dbe1e8;
+            background: var(--card);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .test-chip:hover {
+            background: var(--bg);
+            border-color: var(--primary);
+        }
+        
+        .test-chip.on {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="device-info" id="deviceInfo">
+        Loading...
+    </div>
+    
+    <header>
+        <h1>🏆 Fanta Athletic - Test Responsive</h1>
+        <div class="logo-right">
+            <img src="resources/logo.png" alt="Fanta Athletic" style="height: 50px;">
+        </div>
+    </header>
+    
+    <div class="test-container">
+        <div class="test-section">
+            <h2>📱 Test Navbar Responsive</h2>
+            <p>Questa sezione testa la navbar su diverse risoluzioni:</p>
+            <ul>
+                <li><strong>Desktop (1024px+):</strong> Navbar completa con tutti i link</li>
+                <li><strong>Tablet (768px-1023px):</strong> Navbar compatta con icone e label ridotte</li>
+                <li><strong>Mobile (768px-):</strong> Bottom navigation + navbar nascosta</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 Test Tab Navigation</h2>
+            <div class="test-tabs">
+                <div class="test-tab active">Giocatori</div>
+                <div class="test-tab">Allenatori</div>
+                <div class="test-tab">Curva</div>
+                <div class="test-tab">Squadre</div>
+            </div>
+            <p>Le tab dovrebbero adattarsi al contenitore e diventare più piccole su mobile.</p>
+        </div>
+        
+        <div class="test-section">
+            <h2>⚽ Test Sezioni Ruoli</h2>
+            <div class="test-role-section">
+                <div class="test-role-header">
+                    <div>
+                        <span>Portieri</span>
+                        <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px;">3</span>
+                    </div>
+                    <span>▾</span>
+                </div>
+                <div class="test-role-body">
+                    <div class="test-item-card">
+                        <div class="test-photo">GK</div>
+                        <div>
+                            <div style="font-weight: 700;">Gianluigi Donnarumma</div>
+                            <div class="muted">Portiere</div>
+                        </div>
+                        <div class="muted">6.50 pt</div>
+                    </div>
+                    <div class="test-item-card">
+                        <div class="test-photo">GK</div>
+                        <div>
+                            <div style="font-weight: 700;">Alisson Becker</div>
+                            <div class="muted">Portiere</div>
+                        </div>
+                        <div class="muted">7.00 pt</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="test-role-section collapsed">
+                <div class="test-role-header">
+                    <div>
+                        <span>Difensori</span>
+                        <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px;">8</span>
+                    </div>
+                    <span>▾</span>
+                </div>
+                <div class="test-role-body">
+                    <div class="test-item-card">
+                        <div class="test-photo">DF</div>
+                        <div>
+                            <div style="font-weight: 700;">Virgil van Dijk</div>
+                            <div class="muted">Difensore</div>
+                        </div>
+                        <div class="muted">8.50 pt</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔍 Test Filtri</h2>
+            <div class="test-filters">
+                <div class="test-chip on">Tutti</div>
+                <div class="test-chip">Portieri</div>
+                <div class="test-chip">Difensori</div>
+                <div class="test-chip">Centrocampisti</div>
+                <div class="test-chip">Attaccanti</div>
+            </div>
+            <p>I filtri dovrebbero adattarsi e diventare più piccoli su mobile.</p>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Test Griglia Responsive</h2>
+            <div class="test-grid">
+                <div class="test-item">
+                    <h3>Desktop</h3>
+                    <p>3 colonne su desktop</p>
+                </div>
+                <div class="test-item">
+                    <h3>Tablet</h3>
+                    <p>2 colonne su tablet</p>
+                </div>
+                <div class="test-item">
+                    <h3>Mobile</h3>
+                    <p>1 colonna su mobile</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📱 Informazioni Dispositivo</h2>
+            <div id="deviceDetails">
+                <p><strong>Larghezza:</strong> <span id="width"></span>px</p>
+                <p><strong>Altezza:</strong> <span id="height"></span>px</p>
+                <p><strong>Tipo:</strong> <span id="deviceType"></span></p>
+                <p><strong>Orientamento:</strong> <span id="orientation"></span></p>
+                <p><strong>Touch:</strong> <span id="touch"></span></p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="resources/mobile-detect.js"></script>
+    <script src="resources/navbar.js"></script>
+    <script src="resources/bottom-nav.js"></script>
+    <script>
+        function updateDeviceInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const deviceType = window.deviceInfo ? 
+                (window.deviceInfo.isSmartphone ? 'Smartphone' : 
+                 window.deviceInfo.isTablet ? 'Tablet' : 'Desktop') : 'Unknown';
+            const orientation = window.deviceInfo ? window.deviceInfo.orientation : 'Unknown';
+            const touch = window.deviceInfo ? window.deviceInfo.hasTouch : 'Unknown';
+            
+            document.getElementById('deviceInfo').textContent = 
+                `${width}x${height} - ${deviceType}`;
+            
+            document.getElementById('width').textContent = width;
+            document.getElementById('height').textContent = height;
+            document.getElementById('deviceType').textContent = deviceType;
+            document.getElementById('orientation').textContent = orientation;
+            document.getElementById('touch').textContent = touch ? 'Sì' : 'No';
+        }
+        
+        // Aggiorna info dispositivo
+        updateDeviceInfo();
+        window.addEventListener('resize', updateDeviceInfo);
+        window.addEventListener('orientationchange', updateDeviceInfo);
+        
+        // Test tab functionality
+        document.querySelectorAll('.test-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.test-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+        
+        // Test role sections
+        document.querySelectorAll('.test-role-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const section = header.parentElement;
+                section.classList.toggle('collapsed');
+            });
+        });
+        
+        // Test chips
+        document.querySelectorAll('.test-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('on');
+            });
+        });
+    </script>
+</body>
+</html>

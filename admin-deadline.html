@@ -1,0 +1,486 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestione Deadline - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .deadline-container { max-width: 800px; margin: 0 auto; }
+    .deadline-card { background: var(--card); border-radius: 12px; padding: 24px; margin: 20px 0; box-shadow: var(--shadow); }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+    }
+    
+    .datetime-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .current-deadline {
+      background: linear-gradient(135deg, rgba(220, 20, 60, 0.1), rgba(220, 20, 60, 0.05));
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .current-deadline h3 {
+      margin: 0 0 8px 0;
+      color: var(--primary);
+    }
+    
+    .deadline-time {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 8px 0;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    
+    .btn-full { width: 100%; }
+    
+    .alert {
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    
+    .alert-warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      color: #856404;
+    }
+    
+    .quick-presets {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .preset-btn {
+      padding: 12px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .preset-btn:hover {
+      border-color: var(--primary);
+      background: rgba(220, 20, 60, 0.05);
+    }
+    
+    .history-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .history-item {
+      padding: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>⏰ Gestione Deadline Giornate</h1>
+  </header>
+
+  <main class="deadline-container">
+    <div class="section">
+      <h2>Imposta Deadline Flessibile</h2>
+      <p>Definisci quando bloccare le formazioni per ogni giornata (domenica, mercoledì, giovedì, etc.)</p>
+    </div>
+
+    <!-- Current Deadline -->
+    <div class="deadline-card">
+      <div id="currentDeadlineInfo" class="current-deadline">
+        <h3>📅 Deadline Corrente</h3>
+        <div class="deadline-time" id="currentDeadlineTime">Caricamento...</div>
+        <div style="color: var(--muted); font-size: 14px;" id="currentDeadlineRelative"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="giornataSelect">Giornata:</label>
+        <select id="giornataSelect" class="form-control">
+          <option value="">Caricamento...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Data e Ora Deadline:</label>
+        <div class="datetime-grid">
+          <input type="date" id="deadlineDate" class="form-control" />
+          <input type="time" id="deadlineTime" class="form-control" value="15:00" />
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <strong>⚠️ Attenzione:</strong> La deadline blocca automaticamente la possibilità di modificare le formazioni. 
+        Gli utenti vedranno un messaggio se tentano di salvare dopo la deadline.
+      </div>
+
+      <div class="form-group">
+        <label>Preset Veloci:</label>
+        <div class="quick-presets">
+          <button class="preset-btn" onclick="setPreset('sunday')">
+            🏟️ Domenica<br>15:00
+          </button>
+          <button class="preset-btn" onclick="setPreset('wednesday')">
+            📺 Mercoledì<br>20:45
+          </button>
+          <button class="preset-btn" onclick="setPreset('thursday')">
+            🌙 Giovedì<br>20:45
+          </button>
+          <button class="preset-btn" onclick="setPreset('monday')">
+            ⚽ Lunedì<br>20:45
+          </button>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary btn-full" onclick="saveDeadline()">
+          ✅ Salva Deadline
+        </button>
+        <button class="btn btn-secondary" onclick="clearDeadline()">
+          🗑️ Rimuovi
+        </button>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="deadline-card">
+      <h3>📜 Storico Deadline</h3>
+      <div id="historyList" class="history-list">
+        <div style="text-align: center; color: var(--muted); padding: 20px;">
+          Caricamento...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+
+  <script>
+    let currentLeagueId = null;
+    let currentGiornata = null;
+
+    // Auth + Admin check
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      const adminDoc = await firebase.firestore().collection('admins').doc(user.uid).get();
+      if (!adminDoc.exists) {
+        alert('Solo gli admin possono accedere.');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Wait for league
+      const checkLeague = setInterval(() => {
+        if (window.currentLeague && window.currentLeague.id) {
+          clearInterval(checkLeague);
+          currentLeagueId = window.currentLeague.id;
+          init();
+        }
+      }, 500);
+    });
+
+    async function init() {
+      await loadGiornate();
+      await loadCurrentDeadline();
+      await loadHistory();
+      updateCurrentDeadlineDisplay();
+      
+      // Auto-update every minute
+      setInterval(updateCurrentDeadlineDisplay, 60000);
+    }
+
+    async function loadGiornate() {
+      const select = document.getElementById('giornataSelect');
+      
+      // Genera 38 giornate
+      let options = '';
+      for (let i = 1; i <= 38; i++) {
+        options += `<option value="${i}">Giornata ${i}</option>`;
+      }
+      select.innerHTML = options;
+      select.value = '1';
+      currentGiornata = '1';
+      
+      select.addEventListener('change', async (e) => {
+        currentGiornata = e.target.value;
+        await loadCurrentDeadline();
+      });
+    }
+
+    async function loadCurrentDeadline() {
+      if (!currentLeagueId || !currentGiornata) return;
+
+      const db = firebase.firestore();
+      const doc = await db.collection('leagues')
+        .doc(currentLeagueId)
+        .collection('deadlines')
+        .doc(`giornata_${currentGiornata}`)
+        .get();
+
+      if (doc.exists) {
+        const data = doc.data();
+        const deadline = data.deadline.toDate();
+        
+        document.getElementById('deadlineDate').value = deadline.toISOString().split('T')[0];
+        document.getElementById('deadlineTime').value = deadline.toTimeString().substr(0, 5);
+        
+        updateCurrentDeadlineDisplay();
+      } else {
+        // Default: prossima domenica 15:00
+        const nextSunday = getNextDayOfWeek(0, 15, 0);
+        document.getElementById('deadlineDate').value = nextSunday.toISOString().split('T')[0];
+        document.getElementById('deadlineTime').value = '15:00';
+        
+        document.getElementById('currentDeadlineTime').textContent = 'Nessuna deadline impostata';
+        document.getElementById('currentDeadlineRelative').textContent = '';
+      }
+    }
+
+    function updateCurrentDeadlineDisplay() {
+      const dateVal = document.getElementById('deadlineDate').value;
+      const timeVal = document.getElementById('deadlineTime').value;
+      
+      if (!dateVal || !timeVal) return;
+      
+      const deadline = new Date(`${dateVal}T${timeVal}`);
+      const now = new Date();
+      const diff = deadline - now;
+      
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      };
+      
+      document.getElementById('currentDeadlineTime').textContent = 
+        deadline.toLocaleDateString('it-IT', options);
+      
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        let relativeText = '';
+        if (days > 0) relativeText += `${days}g `;
+        if (hours > 0) relativeText += `${hours}h `;
+        relativeText += `${minutes}m rimanenti`;
+        
+        document.getElementById('currentDeadlineRelative').textContent = relativeText;
+        document.getElementById('currentDeadlineRelative').style.color = '#28a745';
+      } else {
+        document.getElementById('currentDeadlineRelative').textContent = 'Scaduta';
+        document.getElementById('currentDeadlineRelative').style.color = '#dc3545';
+      }
+    }
+
+    function setPreset(type) {
+      let targetDate;
+      const now = new Date();
+      
+      switch(type) {
+        case 'sunday':
+          targetDate = getNextDayOfWeek(0, 15, 0); // Domenica 15:00
+          break;
+        case 'wednesday':
+          targetDate = getNextDayOfWeek(3, 20, 45); // Mercoledì 20:45
+          break;
+        case 'thursday':
+          targetDate = getNextDayOfWeek(4, 20, 45); // Giovedì 20:45
+          break;
+        case 'monday':
+          targetDate = getNextDayOfWeek(1, 20, 45); // Lunedì 20:45
+          break;
+      }
+      
+      document.getElementById('deadlineDate').value = targetDate.toISOString().split('T')[0];
+      document.getElementById('deadlineTime').value = targetDate.toTimeString().substr(0, 5);
+      updateCurrentDeadlineDisplay();
+    }
+
+    function getNextDayOfWeek(dayOfWeek, hour, minute) {
+      const now = new Date();
+      const result = new Date(now);
+      result.setDate(now.getDate() + (dayOfWeek + 7 - now.getDay()) % 7);
+      result.setHours(hour, minute, 0, 0);
+      
+      // Se è già passato questa settimana, vai alla prossima
+      if (result <= now) {
+        result.setDate(result.getDate() + 7);
+      }
+      
+      return result;
+    }
+
+    async function saveDeadline() {
+      const dateVal = document.getElementById('deadlineDate').value;
+      const timeVal = document.getElementById('deadlineTime').value;
+      
+      if (!dateVal || !timeVal) {
+        alert('Inserisci data e ora!');
+        return;
+      }
+      
+      const deadline = new Date(`${dateVal}T${timeVal}`);
+      
+      if (deadline < new Date()) {
+        if (!confirm('La deadline è nel passato. Confermi comunque?')) return;
+      }
+      
+      try {
+        const db = firebase.firestore();
+        await db.collection('leagues')
+          .doc(currentLeagueId)
+          .collection('deadlines')
+          .doc(`giornata_${currentGiornata}`)
+          .set({
+            giornata: parseInt(currentGiornata),
+            deadline: firebase.firestore.Timestamp.fromDate(deadline),
+            createdBy: firebase.auth().currentUser.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        
+        alert('✅ Deadline salvata con successo!');
+        await loadHistory();
+      } catch (error) {
+        console.error('Error saving deadline:', error);
+        alert('❌ Errore: ' + error.message);
+      }
+    }
+
+    async function clearDeadline() {
+      if (!confirm('Rimuovere la deadline per questa giornata?')) return;
+      
+      try {
+        const db = firebase.firestore();
+        await db.collection('leagues')
+          .doc(currentLeagueId)
+          .collection('deadlines')
+          .doc(`giornata_${currentGiornata}`)
+          .delete();
+        
+        alert('✅ Deadline rimossa!');
+        await loadCurrentDeadline();
+        await loadHistory();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Errore: ' + error.message);
+      }
+    }
+
+    async function loadHistory() {
+      const db = firebase.firestore();
+      const snapshot = await db.collection('leagues')
+        .doc(currentLeagueId)
+        .collection('deadlines')
+        .orderBy('giornata', 'desc')
+        .limit(20)
+        .get();
+      
+      const historyList = document.getElementById('historyList');
+      
+      if (snapshot.empty) {
+        historyList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">Nessuna deadline storica</div>';
+        return;
+      }
+      
+      historyList.innerHTML = snapshot.docs.map(doc => {
+        const data = doc.data();
+        const deadline = data.deadline.toDate();
+        const isPast = deadline < new Date();
+        
+        return `
+          <div class="history-item">
+            <div>
+              <strong>Giornata ${data.giornata}</strong><br>
+              <span style="color: var(--muted); font-size: 13px;">
+                ${deadline.toLocaleDateString('it-IT', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric', 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </span>
+            </div>
+            <div style="text-align: right;">
+              <span style="color: ${isPast ? '#dc3545' : '#28a745'}; font-weight: 600;">
+                ${isPast ? '⏱️ Scaduta' : '✅ Attiva'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario Athletic | Stagione 2024/25</title>
+  <link rel="icon" href="resources/favicon.ico">
+  <link rel="stylesheet" href="resources/theme.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    
+    .hero h1 {
+      font-size: 2.5rem;
+      margin: 0 0 10px;
+      font-weight: 900;
+    }
+    
+    .season-badge {
+      background: rgba(255,255,255,0.2);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 20px auto 40px;
+      padding: 0 20px;
+    }
+    
+    .month-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .month-btn {
+      padding: 12px 24px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .month-btn:hover {
+      border-color: #2d6cdf;
+      background: #eff6ff;
+    }
+    
+    .month-btn.active {
+      background: #2d6cdf;
+      color: white;
+      border-color: #2d6cdf;
+    }
+    
+    .matches-grid {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .match-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: var(--shadow);
+      border-left: 6px solid #2d6cdf;
+      transition: transform 0.2s;
+    }
+    
+    .match-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .giornata-badge {
+      background: #2d6cdf;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    
+    .match-date {
+      color: #6b7280;
+      font-weight: 600;
+    }
+    
+    .match-teams {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 20px;
+      align-items: center;
+      margin: 20px 0;
+    }
+    
+    .team {
+      text-align: center;
+    }
+    
+    .team-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+    
+    .team-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 10px;
+      background: linear-gradient(135deg, #dc2626, #2d6cdf);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 1.8rem;
+    }
+    
+    .team.home .team-logo {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+    }
+    
+    .team.away .team-logo {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+    }
+    
+    .team-score {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #2d6cdf;
+    }
+    
+    .team.winner .team-score {
+      color: #10b981;
+    }
+    
+    .vs {
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #9ca3af;
+    }
+    
+    .match-info {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    
+    .match-info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+      font-size: 0.9rem;
+    }
+    
+    .match-info-label {
+      color: #6b7280;
+      font-weight: 600;
+    }
+    
+    .match-info-value {
+      font-weight: 700;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    
+    .status-played {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-upcoming {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-postponed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+    }
+    
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    
+    @media (max-width: 768px) {
+      .match-teams {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .vs {
+        transform: rotate(90deg);
+        margin: 10px 0;
+      }
+      .team-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.3rem;
+      }
+      .team-score {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero -->
+  <div class="hero">
+    <h1>📅 Calendario Athletic</h1>
+    <div class="season-badge">Stagione 2024/25</div>
+  </div>
+
+  <!-- Container -->
+  <div class="container">
+    <!-- Month Selector -->
+    <div class="month-selector" id="monthSelector"></div>
+
+    <!-- Matches Grid -->
+    <div class="matches-grid" id="matchesGrid">
+      <div class="empty-state">
+        <h3>Caricamento partite...</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+
+  <script>
+    const months = [
+      'Settembre', 'Ottobre', 'Novembre', 'Dicembre',
+      'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno'
+    ];
+    
+    let state = {
+      selectedMonth: 'Ottobre',
+      matches: []
+    };
+
+    async function init() {
+      // Wait for Firebase
+      let retries = 0;
+      while ((!window.db) && retries < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+      }
+
+      if (!window.db) {
+        console.error('Firebase non disponibile');
+        return;
+      }
+
+      renderMonthSelector();
+      await loadMatches();
+    }
+
+    function renderMonthSelector() {
+      const container = document.getElementById('monthSelector');
+      let html = '';
+      
+      months.forEach(month => {
+        const active = month === state.selectedMonth ? 'active' : '';
+        html += `<button class="month-btn ${active}" onclick="selectMonth('${month}')">
+          ${month}
+        </button>`;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    function selectMonth(month) {
+      state.selectedMonth = month;
+      renderMonthSelector();
+      renderMatches();
+    }
+
+    async function loadMatches() {
+      try {
+        const snapshot = await window.db.collection('athletic_calendar').orderBy('giornata', 'asc').get();
+        
+        state.matches = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        console.log(`Caricate ${state.matches.length} partite`);
+        renderMatches();
+      } catch (e) {
+        console.error('Errore caricamento:', e);
+        document.getElementById('matchesGrid').innerHTML = `
+          <div class="empty-state">
+            <h3>❌ Errore caricamento</h3>
+            <p>Impossibile caricare le partite</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderMatches() {
+      const container = document.getElementById('matchesGrid');
+      
+      // Filter by month
+      const filtered = state.matches.filter(m => m.month === state.selectedMonth);
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>📭 Nessuna partita</h3>
+            <p>Non ci sono partite programmate per ${state.selectedMonth}</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      
+      filtered.forEach(match => {
+        const isHome = match.homeTeam === 'Athletic Brescia';
+        const opponent = isHome ? match.awayTeam : match.homeTeam;
+        const location = isHome ? '🏠 Casa' : '✈️ Trasferta';
+        
+        const hasResult = match.homeScore !== null && match.awayScore !== null;
+        const status = hasResult ? 'played' : match.postponed ? 'postponed' : 'upcoming';
+        const statusText = hasResult ? 'Giocata' : match.postponed ? 'Rimandata' : 'Da giocare';
+        
+        let winnerClass = '';
+        if (hasResult) {
+          if (isHome && match.homeScore > match.awayScore) winnerClass = 'winner';
+          if (!isHome && match.awayScore > match.homeScore) winnerClass = 'winner';
+        }
+        
+        const homeClass = isHome ? winnerClass : (hasResult && match.awayScore < match.homeScore ? '' : winnerClass);
+        const awayClass = !isHome ? winnerClass : (hasResult && match.homeScore < match.awayScore ? '' : winnerClass);
+        
+        html += `
+          <div class="match-card">
+            <div class="match-header">
+              <span class="giornata-badge">Giornata ${match.giornata}</span>
+              <span class="match-date">${match.date}</span>
+            </div>
+            
+            <div class="match-teams">
+              <div class="team home ${homeClass}">
+                <div class="team-logo">ATH</div>
+                <div class="team-name">${match.homeTeam}</div>
+                ${hasResult ? `<div class="team-score">${match.homeScore}</div>` : ''}
+              </div>
+              
+              <div class="vs">VS</div>
+              
+              <div class="team away ${awayClass}">
+                <div class="team-logo">${opponent.substring(0, 3).toUpperCase()}</div>
+                <div class="team-name">${match.awayTeam}</div>
+                ${hasResult ? `<div class="team-score">${match.awayScore}</div>` : ''}
+              </div>
+            </div>
+            
+            <div class="match-info">
+              <div class="match-info-row">
+                <span class="match-info-label">Luogo</span>
+                <span class="match-info-value">${location}</span>
+              </div>
+              <div class="match-info-row">
+                <span class="match-info-label">Ora</span>
+                <span class="match-info-value">${match.time || 'TBD'}</span>
+              </div>
+              <div class="match-info-row">
+                <span class="match-info-label">Status</span>
+                <span class="status-badge status-${status}">${statusText}</span>
+              </div>
+              ${match.location ? `
+                <div class="match-info-row">
+                  <span class="match-info-label">Campo</span>
+                  <span class="match-info-value">${match.location}</span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    init();
+  </script>
+</body>
+</html>

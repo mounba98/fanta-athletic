@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Statistiche</title>
+  <meta name="description" content="Statistiche aggregate su giocatori, allenatori e curva dalle giornate salvate (locale)." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <style>
+    .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
+    .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+    .tab { padding:8px 12px; border:1px solid #dbe1e8; border-radius:999px; background:#fff; cursor:pointer; }
+    .tab.active { background:#e8f3fc; border-color: var(--primary); color: var(--primary); }
+    .filters-row button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .table { width:100%; border-collapse: collapse; overflow-x: auto; display: block; }
+    .table th, .table td { padding:8px 10px; border-bottom:1px solid #eef2f6; text-align:left; white-space: nowrap; }
+    .grid { display:grid; gap:16px; }
+
+    .inline-detail {
+      margin-top: 10px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+      .card { padding: 12px; max-width: 100vw; overflow-x: hidden; }
+      
+      .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: calc(100vw - 40px); }
+      .table { font-size: 11px; min-width: 600px; display: table; width: 100%; }
+      .table th, .table td { padding: 6px 3px; font-size: 10px; }
+      
+      /* Nomi su 2 righe: cognome sopra, nome sotto */
+      .player-name { display: flex; flex-direction: column; line-height: 1.2; }
+      .player-surname { font-weight: 700; font-size: 12px; }
+      .player-firstname { font-size: 10px; opacity: 0.8; }
+      
+      #playersGrid { grid-template-columns: 1fr !important; font-size: 13px; }
+      #coachesGrid { grid-template-columns: 1fr !important; font-size: 13px; }
+      #curvaGrid { grid-template-columns: 1fr !important; font-size: 13px; }
+      
+      #playersGrid > *, #coachesGrid > *, #curvaGrid > *, #teamsGrid > * {
+        font-size: 14px !important;
+        padding: 10px !important;
+      }
+
+      .inline-detail {
+        margin-top: 8px;
+        padding: 12px;
+      }
+      
+      .tabs { gap: 4px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+      .tab { padding: 8px 12px; font-size: 12px; min-height: 40px; flex-shrink: 0; white-space: nowrap; }
+    }
+    
+    @media (max-width: 480px) {
+      #playersGrid > *, #coachesGrid > *, #curvaGrid > *, #teamsGrid > * {
+        font-size: 13px !important;
+        padding: 8px !important;
+      }
+      
+      .tabs { gap: 3px; }
+      .tab { padding: 6px 10px; font-size: 11px; min-height: 36px; }
+    }
+    
+    /* Ingrandisci nomi e colori alternati */
+    #playersGrid > *, #coachesGrid > *, #curvaGrid > *, #teamsGrid > * {
+      font-size: 18px;
+      font-weight: 700;
+      padding: 14px;
+      border-radius: 8px;
+      transition: all 0.3s;
+      color: var(--text);
+      cursor: pointer;
+    }
+    #playersGrid > *:nth-child(odd) { 
+      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
+      border-left: 4px solid #dc143c; 
+    }
+    #playersGrid > *:nth-child(even) { 
+      background: linear-gradient(135deg, rgba(30,58,138,0.15), rgba(30,58,138,0.25)); 
+      border-left: 4px solid #1e3a8a; 
+    }
+    #coachesGrid > *:nth-child(odd) { 
+      background: linear-gradient(135deg, rgba(30,58,138,0.15), rgba(30,58,138,0.25)); 
+      border-left: 4px solid #1e3a8a; 
+    }
+    #coachesGrid > *:nth-child(even) { 
+      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
+      border-left: 4px solid #dc143c; 
+    }
+    #curvaGrid > *:nth-child(odd) { 
+      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
+      border-left: 4px solid #dc143c; 
+    }
+    #curvaGrid > *:nth-child(even) { 
+      background: linear-gradient(135deg, rgba(30,58,138,0.15), rgba(30,58,138,0.25)); 
+      border-left: 4px solid #1e3a8a; 
+    }
+    #teamsGrid > *:nth-child(odd) { 
+      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
+      border-left: 4px solid #dc143c; 
+    }
+    #teamsGrid > *:nth-child(even) { 
+      background: linear-gradient(135deg, rgba(30,58,138,0.15), rgba(30,58,138,0.25)); 
+      border-left: 4px solid #1e3a8a; 
+    }
+    #playersGrid > *:hover, #coachesGrid > *:hover, #curvaGrid > *:hover, #teamsGrid > *:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Dark mode filters */
+    :root.dark .filters-row {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Statistiche</h1>
+  </header>
+  
+  <nav id="navbar"></nav>
+
+  <main style="display:grid; grid-template-columns: 0.85fr 500px; gap:16px; align-items:start;">
+    <style>
+      @media (max-width: 1024px) {
+        main { grid-template-columns: 1fr !important; }
+        #detailPanel { display: none !important; }
+      }
+    </style>
+    <section class="card">
+      <h2>Statistiche giocatori per ruolo</h2>
+      <div id="playersGridFilters" class="row filters-row" style="display:flex; gap:10px; margin:8px 0 12px 0; width:100%; align-items:center; padding:10px; background:var(--card); border:1px solid rgba(0,0,0,0.1); border-radius:10px;">
+        <button class="btn btn-secondary" data-role="All" title="Tutti i ruoli">Tutti</button>
+        <button class="btn btn-secondary" data-role="Portiere" title="Portieri">P</button>
+        <button class="btn btn-secondary" data-role="Difensore" title="Difensori">D</button>
+        <button class="btn btn-secondary" data-role="Centrocampista" title="Centrocampisti">C</button>
+        <button class="btn btn-secondary" data-role="Attaccante" title="Attaccanti">A</button>
+        <input id="searchPlayers" class="input" placeholder="Cerca giocatore..." style="flex:1; min-width:0;" />
+      </div>
+      <div id="playersGrid" style="display:grid; gap:10px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-auto-rows: minmax(40px, auto);"></div>
+      <hr style="border:none;border-top:1px solid #eef2f6; margin:16px 0;"/>
+      <h2>Statistiche allenatori</h2>
+      <div id="coachesGrid" style="display:grid; gap:10px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
+      <hr style="border:none;border-top:1px solid #eef2f6; margin:16px 0;"/>
+      <h2>Curva Morello</h2>
+      <div id="curvaGrid" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+
+      <hr style="border:none;border-top:1px solid #eef2f6; margin:16px 0;"/>
+      <h2>Statistiche squadre</h2>
+      <div id="teamsGrid" style="display:grid; gap:10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));"></div>
+    </section>
+    <aside class="card" id="detailPanel" style="position:sticky; top:12px;" hidden></aside>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const $ = (s)=>document.querySelector(s);
+    const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+    const REPEATABLE_PLAYERS = new Set(['R040','R041','R042','R072','R075','R089','R097','R044','R045','R056','R057','R058','R061','R070','R063','R073','R092']);
+    const REPEATABLE_COACH = new Set(['R020','R036']);
+    const REPEATABLE_CURVA = new Set(['R008','R027','R028','R029','R015','R003','R002']);
+
+    function normalizeRules(rules, soggetto, repeatables){
+      return rules.filter(r=>r.soggetto===soggetto).map(r=>({ ...r, input: repeatables.has(r.rule_id)? 'counter':'toggle' }));
+    }
+
+    function addScoreFromSelection(selection, rulesArr){
+      // selection: {rule_id:value,...}; rulesArr: normalized rules of a given soggetto
+      return rulesArr.reduce((acc,r)=>{
+        if (!(r.rule_id in selection)) return acc;
+        const v = selection[r.rule_id];
+        const w = Number(r.valore);
+        return acc + (r.input==='counter'? Number(v||0)*w : (v? w:0));
+      },0);
+    }
+
+    async function boot(){
+      const rulesSource = window.loadRulesJSON
+        ? await window.loadRulesJSON()
+        : await (await fetch('resources/rules.json')).json();
+      const players = (await (await fetch('resources/players.json')).json()).players||[];
+      const rules = Array.isArray(rulesSource.rules) ? rulesSource.rules : [];
+
+      const PR = normalizeRules(rules,'Giocatore', REPEATABLE_PLAYERS);
+      const ruleById = new Map(PR.map(r=>[r.rule_id, r]));
+      const CR = normalizeRules(rules,'Allenatore', REPEATABLE_COACH);
+      const VR = normalizeRules(rules,'Curva', REPEATABLE_CURVA);
+
+      // aggregate counts per player across G1..G24
+      const counts = new Map(); // player_id -> { rule_id: total }
+      for (let i=1;i<=24;i++){
+        const p = JSON.parse(localStorage.getItem(`players_G${i}`)||'{}');
+        Object.entries(p).forEach(([pid, sel])=>{
+          const acc = counts.get(pid) || {};
+          Object.entries(sel||{}).forEach(([rid, v])=>{
+            const rule = ruleById.get(rid);
+            if (!rule) return;
+            const add = rule.input==='counter' ? Number(v||0) : (v? 1:0);
+            acc[rid] = (acc[rid]||0) + add;
+          });
+          counts.set(pid, acc);
+        });
+      }
+
+      // Teams aggregation (cumulative across giornate)
+      const teams = (()=>{ try { return JSON.parse(localStorage.getItem('teams_data')||'[]'); } catch { return []; } })();
+      if (!Array.isArray(teams) || teams.length!==19){
+        while ((teams||[]).length<19){ teams.push({ name:`Squadra ${teams.length+1}`, coach_ids:[], roster:[], lineup:[null,null,null,null,null], captain:null }); }
+      }
+
+      function scoreFromSelection(sel, rulesArr){
+        return rulesArr.reduce((sum,r)=>{
+          if (!(r.rule_id in sel)) return sum;
+          const v = sel[r.rule_id]; const w = Number(r.valore);
+          return sum + (r.input==='counter' ? Number(v||0)*w : ((v?1:0)*w));
+        },0);
+      }
+
+      function computeTeamsCumulative(){
+        const perTeam = Array.from({length:teams.length}, ()=> ({ curva:0, players:0, cap:0, coach:0 }));
+        for (let i=1;i<=24;i++){
+          const gkey = `G${i}`;
+          const p = JSON.parse(localStorage.getItem(`players_${gkey}`)||'{}');
+          const csel = JSON.parse(localStorage.getItem(`coaches_${gkey}`)||'{}');
+          const v = JSON.parse(localStorage.getItem(`curva_${gkey}`)||'{}');
+          let saved = {};
+          try { saved = JSON.parse(localStorage.getItem(`teams_saved_${gkey}`)||'{}'); } catch { saved = {}; }
+          const curvaBase = scoreFromSelection(v, VR);
+          teams.forEach((t,idx)=>{
+            const snap = saved[idx]||null;
+            const starters = ((snap?.lineup)||t.lineup||[]).filter(Boolean);
+            const playerPts = starters.reduce((acc,pid)=> acc + scoreFromSelection(p[pid]||{}, PR), 0);
+            let capPts = 0; const capId = (snap?.captain) ?? t.captain; if (capId){ capPts = scoreFromSelection(p[capId]||{}, PR); }
+            let coachPts = 0; const coachId = (t.coach_ids&&t.coach_ids[0])||null; if (coachId){ coachPts = scoreFromSelection(csel[coachId]||{}, CR); }
+            perTeam[idx].curva += curvaBase;
+            perTeam[idx].players += playerPts;
+            perTeam[idx].cap += capPts;
+            perTeam[idx].coach += coachPts;
+          });
+        }
+        return perTeam.map((x,idx)=> ({ idx, name: teams[idx].name||`Squadra ${idx+1}`, ...x, total: x.curva+x.players+x.cap+x.coach }));
+      }
+
+      function renderTeamsGrid(){
+        const data = computeTeamsCumulative();
+        const mount = document.getElementById('teamsGrid');
+        data.sort((a,b)=> b.total-a.total || a.name.localeCompare(b.name,'it'));
+        mount.innerHTML = data.map(d=> `<button class="btn" data-team-idx="${d.idx}">${d.name}</button>`).join('') || '<div class="muted">Nessuna squadra</div>';
+        mount.querySelectorAll('[data-team-idx]').forEach(btn=> btn.addEventListener('click', ()=> openTeamDetail(Number(btn.getAttribute('data-team-idx')))));
+      }
+
+      function openTeamDetail(idx){
+        const data = computeTeamsCumulative()[idx];
+        const panel = document.getElementById('detailPanel');
+        panel.hidden = false;
+        panel.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div>
+              <div style="font-weight:800;">${data.name}</div>
+              <div class="muted">Totale cumulato</div>
+            </div>
+            <button class="btn btn-secondary" id="closePanel">Chiudi</button>
+          </div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+          <div style="display:grid; gap:8px;">
+            <div style="display:flex; justify-content:space-between;"><span class="muted">Curva</span><strong>${data.curva.toFixed(2)}</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span class="muted">Giocatori</span><strong>${data.players.toFixed(2)}</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span class="muted">Capitano</span><strong>${data.cap.toFixed(2)}</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span class="muted">Coach</span><strong>${data.coach.toFixed(2)}</strong></div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid #eee; padding-top:6px;"><span class="muted">Totale</span><strong>${data.total.toFixed(2)}</strong></div>
+          </div>`;
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+      }
+
+      const ROLE_ORDER = ['Portiere','Difensore','Centrocampista','Attaccante'];
+      let filterRole = 'All';
+      let filterQuery = '';
+
+      function surname(s){ const parts = (s||'').trim().split(/\s+/); return parts[parts.length-1]; }
+
+      function renderPlayersGrid(){
+        const mount = document.getElementById('playersGrid');
+        let list = players.slice();
+        if (filterRole!=='All') list = list.filter(p=> p.role===filterRole);
+        if (filterQuery){ const q = filterQuery.toLowerCase(); list = list.filter(p=> (p.nome_completo||'').toLowerCase().includes(q)); }
+        list.sort((a,b)=> surname(a.nome_completo).localeCompare(surname(b.nome_completo),'it'));
+        mount.innerHTML = list.map(p=> `<button class="btn btn-secondary" data-player-id="${p.player_id}">${p.nome_completo}</button>`).join('') || '<div class="muted">Nessun giocatore</div>';
+        mount.querySelectorAll('[data-player-id]').forEach(btn=> btn.addEventListener('click', ()=> openPlayerDetail(btn.getAttribute('data-player-id'))));
+      }
+
+      function openPlayerDetail(pid){
+        const player = players.find(pp=>pp.player_id===pid); if (!player) return;
+        const c = counts.get(pid)||{};
+        const isGK = player.role==='Portiere';
+        const prim = isGK
+          ? [
+              { k:'R043', label:'Clean sheet', val:c['R043']||0 },
+              { k:'R072', label:'Gol subiti', val:c['R072']||0 },
+              { k:'R044', label:'Rigori parati', val:c['R044']||0 },
+              { k:'R045', label:'Parate decisive', val:c['R045']||0 }
+            ]
+          : [
+              { k:'R040_R041', label:'Gol', val:(c['R040']||0)+(c['R041']||0) },
+              { k:'R042', label:'Assist', val:c['R042']||0 }
+            ];
+        const used = new Set(['R041']); prim.forEach(x=>{ if (x.k!=='R040_R041') used.add(x.k); });
+        const others = Object.entries(c)
+          .filter(([rid,val])=> val>0 && !used.has(rid))
+          .map(([rid,val])=> ({ rid, name: (ruleById.get(rid)?.nome_bonus||rid), val }))
+          .sort((a,b)=> b.val - a.val || a.name.localeCompare(b.name,'it'));
+        const totalPts = Object.entries(c).reduce((sum,[rid,val])=>{
+          const rule = ruleById.get(rid); if (!rule) return sum;
+          const w = Number(rule.valore);
+          const contrib = (rule.input==='counter') ? Number(val||0)*w : ((val?1:0)*w);
+          return sum + contrib;
+        }, 0);
+        // Get player photo URL from Firestore
+        const photoUrl = player.image_url || player.photoURL || 'resources/logo.png';
+        
+        const panel = document.getElementById('detailPanel');
+        panel.hidden = false;
+        panel.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px; flex:1;">
+              <img src="${photoUrl}" 
+                   alt="${player.nome_completo}" 
+                   style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--primary); box-shadow:0 4px 12px rgba(0,0,0,0.2);"
+                   onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Crect fill=\\'%23e5e7eb\\' width=\\'100\\' height=\\'100\\'/%3E%3Ctext x=\\'50\\' y=\\'50\\' text-anchor=\\'middle\\' dy=\\'.3em\\' fill=\\'%236b7280\\' font-size=\\'40\\' font-weight=\\'700\\'%3E${player.nome_completo.charAt(0)}%3C/text%3E%3C/svg%3E';">
+              <div style="flex:1;">
+                <div style="font-weight:800; font-size:18px;">${player.nome_completo}</div>
+                <div class="muted">${player.role}${player.secondary_roles&&player.secondary_roles.length? ' (2°: '+player.secondary_roles.join(', ')+')':''}</div>
+              </div>
+            </div>
+            <button class="btn btn-secondary" id="closePanel">Chiudi</button>
+          </div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div class="muted">Totale punti</div>
+            <div style="font-weight:800;">${totalPts.toFixed(2)}</div>
+          </div>
+          <div style="display:grid; gap:10px;">
+            <div>
+              <div class="muted">Statistiche principali</div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
+                ${prim.filter(x=>x.val>0).map(x=>`<span class=\"pill\">${x.label}: ${x.val}</span>`).join('') || '<span class="muted">—</span>'}
+              </div>
+            </div>
+            <div>
+              <div class="muted">Altri bonus/malus</div>
+              <div style="display:grid; gap:6px; margin-top:6px;">
+                ${others.map(o=>`<div style=\"display:flex;justify-content:space-between;\"><span>${o.name}</span><strong>${o.val}</strong></div>`).join('') || '<span class="muted">—</span>'}
+              </div>
+            </div>
+          </div>`;
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+      }
+
+      // Coaches aggregation
+      const coachCounts = new Map(); // coach_id -> { rule_id: total }
+      for (let i=1;i<=24;i++){
+        const csel = JSON.parse(localStorage.getItem(`coaches_G${i}`)||'{}');
+        Object.entries(csel).forEach(([cid, sel])=>{
+          const acc = coachCounts.get(cid)||{};
+          Object.entries(sel||{}).forEach(([rid,v])=>{
+            const rule = CR.find(r=>r.rule_id===rid); if (!rule) return;
+            const add = rule.input==='counter' ? Number(v||0) : (v?1:0);
+            acc[rid] = (acc[rid]||0) + add;
+          });
+          coachCounts.set(cid, acc);
+        });
+      }
+
+      function renderCoachesGrid(){
+        const mount = document.getElementById('coachesGrid');
+        const coaches = Array.from(new Set([
+          ...Object.keys(Object.fromEntries(coachCounts)),
+          // also include static list if needed later
+        ]));
+        // Fallback: read coaches.json to list all
+        fetch('resources/coaches.json').then(r=>r.json()).then(data=>{
+          const all = (data.coaches||[]);
+          mount.innerHTML = all.map(c=> `<button class="btn btn-secondary" data-coach-id="${c.coach_id}">${c.nome}</button>`).join('') || '<div class="muted">Nessun allenatore</div>';
+          mount.querySelectorAll('[data-coach-id]').forEach(btn=> btn.addEventListener('click', ()=> openCoachDetail(btn.getAttribute('data-coach-id'), all)));
+        });
+      }
+
+      function openCoachDetail(cid, all){
+        const coach = (all||[]).find(cc=>cc.coach_id===cid) || { coach_id: cid, nome: cid };
+        const c = coachCounts.get(cid)||{};
+        const totalPts = Object.entries(c).reduce((sum,[rid,val])=>{
+          const rule = CR.find(r=>r.rule_id===rid); if (!rule) return sum;
+          const w = Number(rule.valore);
+          const contrib = (rule.input==='counter') ? Number(val||0)*w : ((val?1:0)*w);
+          return sum + contrib;
+        }, 0);
+        const rows = Object.entries(c).map(([rid,val])=>{
+          const rule = CR.find(r=>r.rule_id===rid);
+          const name = rule?.nome_bonus||rid;
+          return `<div style=\"display:flex;justify-content:space-between;\"><span>${name}</span><strong>${val}</strong></div>`;
+        }).sort().join('') || '<span class="muted">—</span>';
+        const panel = document.getElementById('detailPanel');
+        panel.hidden = false;
+        panel.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div>
+              <div style="font-weight:800;">${coach.nome}</div>
+              <div class="muted">Allenatore • ID: ${coach.coach_id}</div>
+            </div>
+            <button class="btn btn-secondary" id="closePanel">Chiudi</button>
+          </div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div class="muted">Totale punti</div>
+            <div style="font-weight:800;">${totalPts.toFixed(2)}</div>
+          </div>
+          <div>
+            <div class="muted">Dettaglio bonus/malus</div>
+            <div style="display:grid; gap:6px; margin-top:6px;">${rows}</div>
+          </div>`;
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+      }
+
+      // Curva aggregation
+      const curvaCounts = {};
+      for (let i=1;i<=24;i++){
+        const vsel = JSON.parse(localStorage.getItem(`curva_G${i}`)||'{}');
+        Object.entries(vsel).forEach(([rid,v])=>{ curvaCounts[rid] = (curvaCounts[rid]||0) + Number(v||0); });
+      }
+      function renderCurvaGrid(){
+        const mount = document.getElementById('curvaGrid');
+        mount.innerHTML = `<button class="btn" id="btnCurva">Apri Curva Morello</button>`;
+        mount.querySelector('#btnCurva').addEventListener('click', openCurvaDetail);
+      }
+      function openCurvaDetail(){
+        const totalPts = VR.reduce((sum,r)=>{
+          const count = Number(curvaCounts[r.rule_id]||0);
+          const w = Number(r.valore);
+          return sum + (r.input==='counter'? count*w : ((count>0?1:0)*w));
+        }, 0);
+        const rows = VR.map(r=>{
+          const count = Number(curvaCounts[r.rule_id]||0);
+          if (!count) return '';
+          return `<div style=\"display:flex;justify-content:space-between;\"><span>${r.nome_bonus}</span><strong>${count}</strong></div>`;
+        }).filter(Boolean).join('') || '<span class="muted">—</span>';
+        const panel = document.getElementById('detailPanel');
+        panel.hidden = false;
+        panel.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div>
+              <div style="font-weight:800;">Curva Morello</div>
+              <div class="muted">Eventi totali su tutte le giornate</div>
+            </div>
+            <button class="btn btn-secondary" id="closePanel">Chiudi</button>
+          </div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div class="muted">Totale punti</div>
+            <div style="font-weight:800;">${totalPts.toFixed(2)}</div>
+          </div>
+          <div>
+            <div class="muted">Dettaglio bonus/malus</div>
+            <div style="display:grid; gap:6px; margin-top:6px;">${rows}</div>
+          </div>`;
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+      }
+
+      // initial render and filters binding
+      renderPlayersGrid();
+      renderCoachesGrid();
+      renderCurvaGrid();
+      renderTeamsGrid();
+      document.querySelectorAll('[data-role]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          document.querySelectorAll('[data-role]').forEach(b=> b.classList.remove('active'));
+          btn.classList.add('active');
+          filterRole = btn.getAttribute('data-role');
+          renderPlayersGrid();
+        });
+      });
+      const searchBox = document.getElementById('searchPlayers');
+      searchBox.addEventListener('input', ()=>{ filterQuery = searchBox.value||''; renderPlayersGrid(); });
+    }
+
+    // boot disabilitato: nuova logica definita nello script successivo
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script src="resources/rules-loader.js?v=2025110301"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+  </script>
+  <script src="resources/firebase.js"></script>
+  <script>
+    const $stats = (selector) => document.querySelector(selector);
+    const $$stats = (selector) => Array.from(document.querySelectorAll(selector));
+
+    const STAT_REPEATABLE_PLAYERS = new Set(['R040','R041','R042','R072','R075','R089','R097','R044','R045','R056','R057','R058','R061','R070','R063','R073','R092']);
+    const STAT_REPEATABLE_COACH = new Set(['R020','R036']);
+    const STAT_REPEATABLE_CURVA = new Set(['R008','R027','R028','R029','R015','R003','R002','R011C','infortunati_squalificati_curva']);
+    const STAT_CURVA_ALIASES = {
+      infortunati_squalificati_curva: {
+        rule_id: 'infortunati_squalificati_curva',
+        nome_bonus: 'Giocatore squalificato presente in curva',
+        soggetto: 'Curva',
+        valore: 1,
+        input: 'counter',
+        legacy: true
+      }
+    };
+
+    const statsState = {
+      players: [],
+      playerCounts: new Map(),
+      playerRules: [],
+      coaches: [],
+      coachCounts: new Map(),
+      coachRules: [],
+      curvaCounts: new Map(),
+      curvaRules: [],
+      ruleById: new Map(),
+      teams: [],
+      teamStats: new Map(),
+      curvaSummary: []
+    };
+
+    let statsFilterRole = 'All';
+    let statsFilterQuery = '';
+
+    const playersGrid = document.getElementById('playersGrid');
+    const coachesGrid = document.getElementById('coachesGrid');
+    const curvaGrid = document.getElementById('curvaGrid');
+    const teamsGrid = document.getElementById('teamsGrid');
+    const detailPanel = document.getElementById('detailPanel');
+    let inlineDetail = null;
+
+    function isMobileLayout() {
+      if (window.matchMedia && window.matchMedia('(max-width: 900px)').matches) return true;
+      return !!(window.deviceInfo && (window.deviceInfo.isSmartphone || window.deviceInfo.isTablet));
+    }
+
+    function clearInlineDetail() {
+      if (inlineDetail && inlineDetail.parentNode) {
+        inlineDetail.parentNode.remove();
+      }
+      inlineDetail = null;
+    }
+
+    function handleClose(detailEl) {
+      if (detailEl === inlineDetail) {
+        clearInlineDetail();
+      } else if (detailEl === detailPanel) {
+        detailPanel.hidden = true;
+        detailPanel.innerHTML = '';
+      }
+    }
+
+    function renderDetail(content, originEl) {
+      if (isMobileLayout()) {
+        if (detailPanel) {
+          detailPanel.hidden = true;
+          detailPanel.innerHTML = '';
+        }
+        clearInlineDetail();
+        const wrapper = document.createElement('div');
+        wrapper.className = 'inline-detail';
+        wrapper.innerHTML = content;
+        inlineDetail = wrapper;
+        const anchor = originEl && originEl.parentNode ? originEl : null;
+        if (anchor) {
+          anchor.insertAdjacentElement('afterend', wrapper);
+        } else if (playersGrid) {
+          playersGrid.appendChild(wrapper);
+        } else {
+          document.body.appendChild(wrapper);
+        }
+        const closeBtn = wrapper.querySelector('[data-close-detail]');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => handleClose(wrapper));
+        }
+        setTimeout(() => {
+          wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 60);
+      } else {
+        clearInlineDetail();
+        if (!detailPanel) return;
+        detailPanel.hidden = false;
+        detailPanel.innerHTML = content;
+        const closeBtn = detailPanel.querySelector('[data-close-detail]');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => handleClose(detailPanel));
+        }
+      }
+    }
+
+    if (window.matchMedia) {
+      const mq = window.matchMedia('(max-width: 900px)');
+      const mqHandler = () => {
+        if (!mq.matches) {
+          clearInlineDetail();
+          if (detailPanel) {
+            detailPanel.hidden = true;
+            detailPanel.innerHTML = '';
+          }
+        }
+      };
+      if (mq.addEventListener) mq.addEventListener('change', mqHandler);
+      else if (mq.addListener) mq.addListener(mqHandler);
+    }
+
+    function setStatsLoading() {
+      playersGrid.innerHTML = '<div class="loading">Caricamento…</div>';
+      coachesGrid.innerHTML = '<div class="loading">Caricamento…</div>';
+      curvaGrid.innerHTML = '<div class="loading">Caricamento…</div>';
+      teamsGrid.innerHTML = '<div class="loading">Caricamento…</div>';
+    }
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html?redirect=' + encodeURIComponent('statistiche.html');
+        return;
+      }
+      await statsBoot();
+    });
+
+    async function statsBoot() {
+      setStatsLoading();
+      try {
+        const rulesSource = window.loadRulesJSON
+          ? await window.loadRulesJSON()
+          : await (await fetch('resources/rules.json')).json();
+
+        const [playersRes, baseCoachesRes] = await Promise.all([
+          fetch('resources/players.json'),
+          fetch('resources/coaches.json').catch(() => ({ json: async () => ({ coaches: [] }) }))
+        ]);
+
+        const rules = Array.isArray(rulesSource.rules) ? rulesSource.rules : [];
+        statsState.players = (await playersRes.json()).players || [];
+        const baseCoaches = (await baseCoachesRes.json()).coaches || [];
+
+        const [teamsSnap, firestoreCoachesSnap, daysSnap] = await Promise.all([
+          window.db.collection('teams').get(),
+          window.db.collection('coaches').get().catch(() => null),
+          window.db.collection('days').get()
+        ]);
+
+        statsState.playerRules = normalizeStatRules(rules, 'Giocatore', STAT_REPEATABLE_PLAYERS);
+        statsState.coachRules = normalizeStatRules(rules, 'Allenatore', STAT_REPEATABLE_COACH);
+        statsState.curvaRules = normalizeStatRules(rules, 'Curva', STAT_REPEATABLE_CURVA);
+
+        Object.values(STAT_CURVA_ALIASES).forEach(alias => {
+          if (!statsState.curvaRules.some(rule => rule.rule_id === alias.rule_id)) {
+            statsState.curvaRules.push({ ...alias });
+          }
+        });
+
+        statsState.ruleById.clear();
+        [...statsState.playerRules, ...statsState.coachRules, ...statsState.curvaRules].forEach(rule => {
+          statsState.ruleById.set(rule.rule_id, rule);
+        });
+
+        Object.values(STAT_CURVA_ALIASES).forEach(alias => {
+          statsState.ruleById.set(alias.rule_id, alias);
+        });
+
+        statsState.teams = teamsSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() || {}) }));
+
+        const coachMap = new Map(baseCoaches.map(c => [c.coach_id || c.nome, { ...c, coach_id: c.coach_id || c.nome }]));
+        if (firestoreCoachesSnap) {
+          firestoreCoachesSnap.docs.forEach(doc => {
+            const id = doc.id;
+            coachMap.set(id, { ...(coachMap.get(id) || {}), coach_id: id, ...(doc.data() || {}) });
+          });
+        }
+        statsState.coaches = Array.from(coachMap.values());
+
+        statsState.playerCounts.clear();
+        statsState.coachCounts.clear();
+        statsState.curvaCounts.clear();
+        statsState.teamStats.clear();
+
+        const dayDocs = daysSnap.docs;
+        await Promise.all(dayDocs.map(doc => aggregateDayStats(doc)));
+        await Promise.all(dayDocs.map(doc => aggregateTeamStats(doc.id)));
+
+        renderPlayers();
+        renderCoaches();
+        renderCurva();
+        renderTeams();
+        bindStatsFilters();
+      } catch (error) {
+        console.error('Errore caricamento statistiche:', error);
+        playersGrid.innerHTML = `<div class="muted">Errore caricamento: ${escapeHtml(error.message)}</div>`;
+        coachesGrid.innerHTML = '';
+        curvaGrid.innerHTML = '';
+        teamsGrid.innerHTML = '';
+      }
+    }
+
+    function normalizeStatRules(rules, soggetto, repeatables) {
+      return rules
+        .filter(rule => rule.soggetto === soggetto)
+        .map(rule => ({ ...rule, input: repeatables.has(rule.rule_id) ? 'counter' : 'toggle' }));
+    }
+
+    function ensureAccumulator(map, key) {
+      if (!map.has(key)) {
+        map.set(key, {});
+      }
+      return map.get(key);
+    }
+
+    function resolveSelectionValue(raw) {
+      if (raw === undefined || raw === null) return raw;
+      if (typeof raw === 'object') {
+        if (raw.value !== undefined) return raw.value;
+        if (raw.count !== undefined) return raw.count;
+        if (raw.qty !== undefined) return raw.qty;
+      }
+      return raw;
+    }
+
+    async function aggregateDayStats(doc) {
+      const data = doc.data() || {};
+
+      Object.entries(data.players || {}).forEach(([pid, selections]) => {
+        const bucket = ensureAccumulator(statsState.playerCounts, pid);
+        Object.entries(selections || {}).forEach(([rid, raw]) => {
+          const rule = statsState.ruleById.get(rid);
+          if (!rule) return;
+          const resolved = resolveSelectionValue(raw);
+          const inc = rule.input === 'counter' ? Number(resolved || 0) : (resolved ? 1 : 0);
+          if (!inc) return;
+          bucket[rid] = (bucket[rid] || 0) + inc;
+        });
+      });
+
+      Object.entries(data.coaches || {}).forEach(([cid, selections]) => {
+        const bucket = ensureAccumulator(statsState.coachCounts, cid);
+        Object.entries(selections || {}).forEach(([rid, raw]) => {
+          const rule = statsState.ruleById.get(rid);
+          if (!rule) return;
+          const resolved = resolveSelectionValue(raw);
+          const inc = rule.input === 'counter' ? Number(resolved || 0) : (resolved ? 1 : 0);
+          if (!inc) return;
+          bucket[rid] = (bucket[rid] || 0) + inc;
+        });
+      });
+
+      Object.entries(data.curva || {}).forEach(([rid, raw]) => {
+        let rule = statsState.ruleById.get(rid);
+        if (!rule) {
+          const alias = STAT_CURVA_ALIASES[rid];
+          if (alias) {
+            rule = alias;
+            statsState.ruleById.set(rid, alias);
+            if (!statsState.curvaRules.some(entry => entry.rule_id === rid)) {
+              statsState.curvaRules.push(alias);
+            }
+          } else {
+            return;
+          }
+        }
+        const resolved = resolveSelectionValue(raw);
+        const inc = rule.input === 'counter' ? Number(resolved || 0) : (resolved ? 1 : 0);
+        if (!inc) return;
+        statsState.curvaCounts.set(rid, (statsState.curvaCounts.get(rid) || 0) + inc);
+      });
+    }
+
+    async function aggregateTeamStats(giornataId) {
+      try {
+        const snap = await window.db.collection('results').doc(giornataId).collection('teams').get();
+        snap.forEach(doc => {
+          const data = doc.data() || {};
+          const breakdown = data.breakdown || {};
+          const teamId = doc.id;
+          const entry = statsState.teamStats.get(teamId) || {
+            teamId,
+            name: data.teamName || `Squadra ${teamId}`,
+            curva: 0,
+            players: 0,
+            captain: 0,
+            coach: 0,
+            formation: 0,
+            total: 0
+          };
+
+          entry.curva += Number(breakdown.curva || 0);
+          entry.players += Number(breakdown.players || 0);
+          entry.captain += Number(breakdown.captain || 0);
+          entry.coach += Number(breakdown.coach || 0);
+          entry.formation += Number(breakdown.formation || 0);
+          entry.total = entry.curva + entry.players + entry.captain + entry.coach + entry.formation;
+
+          const teamMeta = statsState.teams.find(team => team.id === teamId);
+          if (teamMeta) {
+            entry.name = teamMeta.name || entry.name;
+          }
+
+          statsState.teamStats.set(teamId, entry);
+        });
+      } catch (error) {
+        console.warn('aggregateTeamStats', giornataId, error);
+      }
+    }
+
+    function renderPlayers() {
+      let list = statsState.players.slice();
+      if (statsFilterRole !== 'All') list = list.filter(player => player.role === statsFilterRole);
+      if (statsFilterQuery) {
+        const query = statsFilterQuery.toLowerCase();
+        list = list.filter(player => (player.nome_completo || '').toLowerCase().includes(query));
+      }
+      list.sort((a, b) => statSurname(a.nome_completo).localeCompare(statSurname(b.nome_completo), 'it'));
+
+      if (!list.length) {
+        playersGrid.innerHTML = '<div class="muted">Nessun giocatore</div>';
+        return;
+      }
+
+      clearInlineDetail();
+      if (detailPanel) {
+        detailPanel.hidden = true;
+        detailPanel.innerHTML = '';
+      }
+
+      playersGrid.innerHTML = list
+        .map(player => `<button class="btn btn-secondary" data-player-id="${player.player_id}">${escapeHtml(player.nome_completo)}</button>`)
+        .join('');
+
+      playersGrid.querySelectorAll('[data-player-id]').forEach(button => {
+        button.addEventListener('click', () => openPlayerStats(button.getAttribute('data-player-id'), button));
+      });
+    }
+
+    function renderCoaches() {
+      if (!statsState.coaches.length) {
+        coachesGrid.innerHTML = '<div class="muted">Nessun allenatore</div>';
+        return;
+      }
+
+      clearInlineDetail();
+      if (detailPanel) {
+        detailPanel.hidden = true;
+        detailPanel.innerHTML = '';
+      }
+
+      coachesGrid.innerHTML = statsState.coaches
+        .map(coach => `<button class="btn btn-secondary" data-coach-id="${coach.coach_id}">${escapeHtml(coach.nome || coach.name || coach.coach_id)}</button>`)
+        .join('');
+
+      coachesGrid.querySelectorAll('[data-coach-id]').forEach(button => {
+        button.addEventListener('click', () => openCoachStats(button.getAttribute('data-coach-id'), button));
+      });
+    }
+
+    function renderCurva() {
+      const items = Array.from(statsState.curvaCounts.entries())
+        .map(([rid, total]) => ({ rid, total, label: statsState.ruleById.get(rid)?.nome_bonus || rid }))
+        .filter(item => item.total > 0)
+        .sort((a, b) => b.total - a.total || a.label.localeCompare(b.label, 'it'));
+
+      if (!items.length) {
+        curvaGrid.innerHTML = '<div class="muted">Nessun bonus/malus curva registrato</div>';
+        statsState.curvaSummary = [];
+        return;
+      }
+
+      statsState.curvaSummary = items;
+
+      clearInlineDetail();
+      if (detailPanel) {
+        detailPanel.hidden = true;
+        detailPanel.innerHTML = '';
+      }
+
+      curvaGrid.innerHTML = `
+        <button class="btn btn-secondary" data-curva-summary style="display:flex; align-items:center; gap:8px;">
+          <span>Curva Morello</span>
+          <span style="margin-left:auto; font-size:18px; line-height:1;">›</span>
+        </button>
+      `;
+
+      const summaryBtn = curvaGrid.querySelector('[data-curva-summary]');
+      if (summaryBtn) {
+        summaryBtn.addEventListener('click', () => openCurvaSummary(summaryBtn));
+      }
+    }
+
+    function renderTeams() {
+      const rows = Array.from(statsState.teamStats.values());
+      if (!rows.length) {
+        teamsGrid.innerHTML = '<div class="muted">Nessun dato squadra disponibile</div>';
+        return;
+      }
+
+      rows.sort((a, b) => b.total - a.total || (a.name || '').localeCompare(b.name || '', 'it'));
+      teamsGrid.innerHTML = rows
+        .map(team => `<button class="btn" data-team-id="${team.teamId}">${escapeHtml(team.name || team.teamId)}</button>`)
+        .join('');
+
+      clearInlineDetail();
+      if (detailPanel) {
+        detailPanel.hidden = true;
+        detailPanel.innerHTML = '';
+      }
+
+      teamsGrid.querySelectorAll('[data-team-id]').forEach(button => {
+        button.addEventListener('click', () => openTeamStats(button.getAttribute('data-team-id'), button));
+      });
+    }
+
+    function openPlayerStats(playerId, originEl) {
+      const player = statsState.players.find(p => p.player_id === playerId);
+      if (!player) return;
+
+      const selection = statsState.playerCounts.get(playerId) || {};
+      const isGoalkeeper = player.role === 'Portiere';
+      const primaryStats = isGoalkeeper
+        ? [
+            { rid: 'R043', label: 'Clean sheet', value: selection['R043'] || 0 },
+            { rid: 'R072', label: 'Gol subiti', value: selection['R072'] || 0 },
+            { rid: 'R044', label: 'Rigori parati', value: selection['R044'] || 0 },
+            { rid: 'R045', label: 'Parate decisive', value: selection['R045'] || 0 }
+          ]
+        : [
+            { rid: 'R040_R041', label: 'Gol', value: (selection['R040'] || 0) + (selection['R041'] || 0) },
+            { rid: 'R042', label: 'Assist', value: selection['R042'] || 0 }
+          ];
+
+      const primaryRuleIds = new Set(['R041']);
+      primaryStats.forEach(stat => {
+        if (stat.rid === 'R040_R041') {
+          primaryRuleIds.add('R040');
+          primaryRuleIds.add('R041');
+        } else {
+          primaryRuleIds.add(stat.rid);
+        }
+      });
+
+      const otherStats = Object.entries(selection)
+        .map(([rid, val]) => ({ rid, value: val, label: statsState.ruleById.get(rid)?.nome_bonus || rid }))
+        .filter(item => item.value > 0 && !primaryRuleIds.has(item.rid))
+        .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'it'));
+
+      const totalPoints = Object.entries(selection).reduce((sum, [rid, val]) => {
+        const rule = statsState.ruleById.get(rid);
+        if (!rule) return sum;
+        const amount = rule.input === 'counter' ? Number(val || 0) : (val ? 1 : 0);
+        return sum + amount * Number(rule.valore || 0);
+      }, 0);
+
+      const photo = player.image_url || player.photoUrl || player.photo || '';
+      const trigger = originEl || document.querySelector(`[data-player-id="${playerId}"]`);
+
+      const content = `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px; flex:1;">
+            <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid var(--primary);box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+              ${photo ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(player.nome_completo)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='resources/logo.png'"/>` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(148,163,184,0.35);font-weight:800;color:#1e293b;">${escapeHtml((player.nome_completo || '?').charAt(0))}</div>`}
+            </div>
+            <div>
+              <div style="font-weight:800; font-size:18px;">${escapeHtml(player.nome_completo)}</div>
+              <div class="muted">${escapeHtml(player.role || '')}${player.secondary_roles && player.secondary_roles.length ? ' (2°: ' + player.secondary_roles.map(escapeHtml).join(', ') + ')' : ''}</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" data-close-detail>Chiudi</button>
+        </div>
+        <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <div class="muted">Totale punti</div>
+          <div style="font-weight:800;">${totalPoints.toFixed(2)}</div>
+        </div>
+        <div style="display:grid; gap:14px;">
+          <div>
+            <div class="muted">Statistiche principali</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
+              ${primaryStats.filter(stat => stat.value > 0).map(stat => `<span class="pill">${escapeHtml(stat.label)}: ${stat.value}</span>`).join('') || '<span class="muted">—</span>'}
+            </div>
+          </div>
+          <div>
+            <div class="muted">Altri bonus/malus</div>
+            <div style="display:grid; gap:6px; margin-top:6px;">
+              ${otherStats.map(stat => `<div style="display:flex; justify-content:space-between;"><span>${escapeHtml(stat.label)}</span><strong>${stat.value}</strong></div>`).join('') || '<span class="muted">—</span>'}
+            </div>
+          </div>
+        </div>`;
+
+      renderDetail(content, trigger);
+    }
+
+    function openCoachStats(coachId, originEl) {
+      const coach = statsState.coaches.find(c => c.coach_id === coachId) || { coach_id: coachId, nome: coachId };
+      const selection = statsState.coachCounts.get(coachId) || {};
+
+      const totalPoints = Object.entries(selection).reduce((sum, [rid, val]) => {
+        const rule = statsState.ruleById.get(rid);
+        if (!rule) return sum;
+        const amount = rule.input === 'counter' ? Number(val || 0) : (val ? 1 : 0);
+        return sum + amount * Number(rule.valore || 0);
+      }, 0);
+
+      const items = Object.entries(selection)
+        .map(([rid, val]) => ({ label: statsState.ruleById.get(rid)?.nome_bonus || rid, value: val }))
+        .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, 'it'));
+
+      const photo = coach.photo_url || coach.photoUrl || coach.image_url || '';
+      const trigger = originEl || document.querySelector(`[data-coach-id="${coachId}"]`);
+
+      const content = `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px; flex:1;">
+            <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid var(--primary);box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+              ${photo ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(coach.nome || coach.name || coachId)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='resources/logo.png'"/>` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(148,163,184,0.35);font-weight:800;color:#1e293b;">${escapeHtml((coach.nome || coach.name || coachId).charAt(0) || '?')}</div>`}
+            </div>
+            <div>
+              <div style="font-weight:800; font-size:18px;">${escapeHtml(coach.nome || coach.name || coachId)}</div>
+              ${coach.nickname ? `<div class="muted">${escapeHtml(coach.nickname)}</div>` : ''}
+            </div>
+          </div>
+          <button class="btn btn-secondary" data-close-detail>Chiudi</button>
+        </div>
+        <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <div class="muted">Totale punti</div>
+          <div style="font-weight:800;">${totalPoints.toFixed(2)}</div>
+        </div>
+        <div style="display:grid; gap:6px;">
+          ${items.map(item => `<div style="display:flex; justify-content:space-between;"><span>${escapeHtml(item.label)}</span><strong>${item.value}</strong></div>`).join('') || '<span class="muted">—</span>'}
+        </div>`;
+
+      renderDetail(content, trigger);
+    }
+
+    function openCurvaSummary(originEl) {
+      if (!statsState.curvaSummary.length) return;
+
+      const totalEvents = statsState.curvaSummary.reduce((sum, item) => sum + item.total, 0);
+      const totalPoints = statsState.curvaSummary.reduce((sum, item) => {
+        const rule = statsState.ruleById.get(item.rid);
+        const unit = Number(rule?.valore || 0);
+        return sum + (item.total * unit);
+      }, 0);
+
+      const rows = statsState.curvaSummary.map(item => {
+        const rule = statsState.ruleById.get(item.rid);
+        const unit = Number(rule?.valore || 0);
+        const formula = `${item.total} × ${unit.toFixed(2)}`;
+        const points = (item.total * unit).toFixed(2);
+        return `
+          <div class="curva-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(16,185,129,0.12);border-radius:10px;padding:8px 12px;">
+            <div>
+              <strong>${escapeHtml(rule?.nome_bonus || item.label || item.rid)}</strong>
+              <div style="font-size:12px;color:rgba(15,23,42,0.65);">${formula}</div>
+            </div>
+            <div style="font-weight:700;">+${points}</div>
+          </div>`;
+      }).join('');
+
+      const trigger = originEl || curvaGrid?.querySelector('[data-curva-summary]') || null;
+      const content = `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div>
+            <div style="font-weight:800; font-size:18px;">Curva Morello</div>
+            <div class="muted">${totalEvents} eventi registrati</div>
+          </div>
+          <button class="btn btn-secondary" data-close-detail>Chiudi</button>
+        </div>
+        <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <div class="muted">Totale punti</div>
+          <div style="font-weight:800;">${totalPoints.toFixed(2)}</div>
+        </div>
+        <div style="display:grid; gap:8px;">
+          ${rows}
+        </div>`;
+
+      renderDetail(content, trigger);
+    }
+
+    function openTeamStats(teamId, originEl) {
+      const team = statsState.teamStats.get(teamId);
+      if (!team) return;
+
+      const trigger = originEl || document.querySelector(`[data-team-id="${teamId}"]`);
+      const content = `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div>
+            <div style="font-weight:800; font-size:18px;">${escapeHtml(team.name || team.teamId)}</div>
+            <div class="muted">Totale cumulato</div>
+          </div>
+          <button class="btn btn-secondary" data-close-detail>Chiudi</button>
+        </div>
+        <hr style="border:none;border-top:1px solid #eee;margin:12px 0;"/>
+        <div style="display:grid; gap:8px;">
+          <div style="display:flex; justify-content:space-between;"><span class="muted">Curva</span><strong>${team.curva.toFixed(2)}</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span class="muted">Giocatori</span><strong>${team.players.toFixed(2)}</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span class="muted">Capitano</span><strong>${team.captain.toFixed(2)}</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span class="muted">Coach</span><strong>${team.coach.toFixed(2)}</strong></div>
+          ${team.formation ? `<div style="display:flex; justify-content:space-between;"><span class="muted">Formazione pubblicata</span><strong>${team.formation.toFixed(2)}</strong></div>` : ''}
+          <div style="display:flex; justify-content:space-between; border-top:1px solid #eee; padding-top:6px;"><span class="muted">Totale</span><strong>${team.total.toFixed(2)}</strong></div>
+        </div>`;
+
+      renderDetail(content, trigger);
+    }
+
+    function bindStatsFilters() {
+      const filterContainer = $stats('#playersGridFilters');
+      if (filterContainer) {
+        filterContainer.querySelectorAll('[data-role]').forEach(button => {
+          button.addEventListener('click', () => {
+            filterContainer.querySelectorAll('[data-role]').forEach(b => b.classList.toggle('active', b === button));
+            statsFilterRole = button.getAttribute('data-role');
+            renderPlayers();
+          });
+        });
+        const allButton = filterContainer.querySelector('[data-role="All"]');
+        if (allButton) {
+          allButton.classList.add('active');
+        }
+      }
+
+      const searchInput = document.getElementById('searchPlayers');
+      if (searchInput) {
+        searchInput.addEventListener('input', (event) => {
+          statsFilterQuery = event.target.value;
+          renderPlayers();
+        });
+      }
+    }
+
+    function statSurname(fullName) {
+      const parts = (fullName || '').trim().split(/\s+/);
+      return parts[parts.length - 1] || '';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+    <script src="resources/error-logger.js?v=20251018"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/lazy-load.js?v=20251020"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+</body>
+</html>

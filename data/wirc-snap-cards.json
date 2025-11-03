@@ -1,0 +1,202 @@
+[
+  {
+    "nome": "Fracks",
+    "costo": 4,
+    "forza": 6,
+    "categorie": ["Blortz", "Politico"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Le tue carte Blortz in questo campo ottengono +1 Forza." },
+    "descrizione": "Leader del circolo, razionale e deciso. La calma prima della birra."
+  },
+  {
+    "nome": "Tommy Guardu",
+    "costo": 5,
+    "forza": 8,
+    "categorie": ["Blortz", "Allenatore"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Riduce di 1 la forza delle carte avversarie in questo campo." },
+    "descrizione": "Allenatore e pilastro dell'Athletic, resistente come un kebab dopo serata."
+  },
+  {
+    "nome": "Bosi",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Relaxato"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Rigenera +1 Forza alla fine di ogni turno." },
+    "descrizione": "Fattone sereno. Il mondo cade, ma lui accende un'altra."
+  },
+  {
+    "nome": "Dux",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Relaxato"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Se controlli un'altra carta Relaxata, ottiene +2 Forza." },
+    "descrizione": "Filosofo del nulla, tutto scorre con una canna in mano."
+  },
+  {
+    "nome": "Chep",
+    "costo": 3,
+    "forza": 2,
+    "categorie": ["Politico"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Disattiva un effetto Continuo di una carta avversaria in questo campo." },
+    "descrizione": "Pelato logico, distrugge ogni argomento come un dibattito su Twitter."
+  },
+  {
+    "nome": "Toti",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Blortz"],
+    "effetto": { "tipo": "Continuo", "descrizione": "+1 Forza a ogni carta Allenatore alleata." },
+    "descrizione": "Uomo d'onore e di caffè, l'anima equilibrata del Bar."
+  },
+  {
+    "nome": "Paolino",
+    "costo": 1,
+    "forza": 1,
+    "categorie": ["Scout", "Bratz"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Pesca una carta casuale dal mazzo." },
+    "descrizione": "Mini-scout analitico, studia ogni mossa come fosse un teorema."
+  },
+  {
+    "nome": "Pippo Bongia",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Scout"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Le carte Scout alleate ottengono +1 Forza." },
+    "descrizione": "Ex-scout, ancora cerca la bussola dopo l'ennesima birra."
+  },
+  {
+    "nome": "Giulietto",
+    "costo": 2,
+    "forza": 2,
+    "categorie": ["Scout"],
+    "effetto": { "tipo": "Continuo", "descrizione": "+1 Forza a ogni carta con costo 1 nel campo." },
+    "descrizione": "Piccolo genio con grande concentrazione (finché non passa un cane)."
+  },
+  {
+    "nome": "Wabione",
+    "costo": 4,
+    "forza": 7,
+    "categorie": ["Blortz", "Relaxato", "Collezionista"],
+    "effetto": { "tipo": "Continuo", "descrizione": "+3 Forza se hai almeno due Relaxati in gioco." },
+    "descrizione": "Spende tanto in LEGO, ma ancora non ha costruito la serenità."
+  },
+  {
+    "nome": "Calosi",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Creativo", "Festaiolo"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Se giochi dopo una carta Festaiola, ottieni +2 Forza." },
+    "descrizione": "Ricciolino geniale e casinista: metà artista, metà hangover."
+  },
+  {
+    "nome": "Giabba",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Creativo", "Relaxato"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Ottiene +1 Forza ogni turno se c'è un'altra carta Creativa." },
+    "descrizione": "Chitarrista del circolo, fumo, filosofia e rock anni '80."
+  },
+  {
+    "nome": "Santo",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Creativo", "Blortz"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "+2 Forza a ogni Creativo alleato." },
+    "descrizione": "Musicista alto, dolce e devastante, nel suono e nella vita."
+  },
+  {
+    "nome": "Trendiu",
+    "costo": 2,
+    "forza": 2,
+    "categorie": ["Creativo", "Comico"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Duplica l'effetto di una carta alleata casuale in campo." },
+    "descrizione": "Non sai se scherza o se ha ragione, ma ridi comunque."
+  },
+  {
+    "nome": "Pato",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Atleta", "Blortz"],
+    "effetto": { "tipo": "Continuo", "descrizione": "+2 Forza se c'è un'altra carta Atleta in questo campo." },
+    "descrizione": "Spinge in palestra e nella vita, zero compromessi."
+  },
+  {
+    "nome": "Beppe",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Atleta"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Le altre carte Atleta in questo campo ottengono +1 Forza." },
+    "descrizione": "Giocatore di classe, parla con i piedi (e le birre)."
+  },
+  {
+    "nome": "G Cazzi",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Trainer", "Atleta"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Ottiene +3 Forza se in campo c'è un'altra carta Atleta." },
+    "descrizione": "PT del gruppo, trasforma birra in muscolo e muscolo in scuse."
+  },
+  {
+    "nome": "Cocci",
+    "costo": 1,
+    "forza": 1,
+    "categorie": ["Relaxato"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Quando subisce un effetto nemico, ottiene +2 Forza." },
+    "descrizione": "Piccolo ma indistruttibile: più lo tocchi, più esplode."
+  },
+  {
+    "nome": "Meme",
+    "costo": 3,
+    "forza": 3,
+    "categorie": ["Politico", "Tecnologico"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Copia un effetto Continuo di una carta avversaria casuale." },
+    "descrizione": "Bancario riflessivo, ragiona come un Excel ma sogna come Marx."
+  },
+  {
+    "nome": "Momo",
+    "costo": 4,
+    "forza": 6,
+    "categorie": ["Festaiolo", "Blortz"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Disattiva un effetto Continuo di una carta nemica casuale." },
+    "descrizione": "Figo e imprevedibile, il Casanova del calcino."
+  },
+  {
+    "nome": "Titti",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Blortz", "Allenatore"],
+    "effetto": { "tipo": "Continuo", "descrizione": "+2 Forza a tutte le carte Atleta alleate." },
+    "descrizione": "Allenatore carismatico, sa tutto (o almeno crede)."
+  },
+  {
+    "nome": "Nicola Mocci",
+    "costo": 4,
+    "forza": 6,
+    "categorie": ["Tecnologico", "Strategico"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Duplica l'effetto Alla Scoperta della prossima carta che giochi." },
+    "descrizione": "Smanettone supremo. Costruisce giochi anche dentro altri giochi."
+  },
+  {
+    "nome": "Wengi",
+    "costo": 3,
+    "forza": 4,
+    "categorie": ["Atleta", "Blortz"],
+    "effetto": { "tipo": "Continuo", "descrizione": "Ogni volta che l'avversario gioca una carta, guadagna +1 Forza." },
+    "descrizione": "Testatore di testate: più colpisce, più diventa forte."
+  },
+  {
+    "nome": "Canni",
+    "costo": 2,
+    "forza": 3,
+    "categorie": ["Blortz", "Tecnologico"],
+    "effetto": { "tipo": "Continuo", "descrizione": "+2 Forza se non giochi carte nel turno precedente." },
+    "descrizione": "Uomo macchina, pulsante e birra in perfetta sinergia."
+  },
+  {
+    "nome": "Boro",
+    "costo": 3,
+    "forza": 5,
+    "categorie": ["Festaiolo", "Bartender"],
+    "effetto": { "tipo": "Alla Scoperta", "descrizione": "Aumenta di +1 la tua Energia massima." },
+    "descrizione": "Barman e showman: ti serve un drink e un discorso insieme."
+  }
+]

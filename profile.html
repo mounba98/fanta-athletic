@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Profilo</title>
+  <meta name="description" content="Gestisci il tuo profilo utente" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <style>
+    .profile-container { max-width: 800px; margin: 0 auto; }
+    .profile-header {
+      position: relative;
+      text-align: center;
+      padding: 40px 20px 20px;
+      background: transparent;
+      color: white;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      min-height: 140px;
+      overflow: hidden;
+    }
+    /* Rimosse cover photo & button */
+    .profile-avatar {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid white;
+      object-fit: cover;
+      margin: 0 auto 12px;
+      cursor: pointer;
+      z-index: 1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.3s;
+    }
+    .profile-avatar:hover::after {
+      content: '📷 Cambia foto';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .profile-avatar:hover { transform: scale(1.05); }
+    .profile-section { 
+      background: var(--card); 
+      border-radius: 12px; 
+      padding: 24px; 
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .profile-section h3 { 
+      margin-top: 0; 
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 10px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-weight: 600;
+      color: var(--text);
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #dbe1e8;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .stats-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, var(--primary) 0%, #2980b9 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .stat-value { font-size: 32px; font-weight: bold; }
+    .stat-label { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 5px;
+    }
+    .badge-admin { background: #e74c3c; color: white; }
+    .badge-user { background: #3498db; color: white; }
+    .badge-premium { background: #f39c12; color: white; }
+    @media (max-width: 640px) {
+      .profile-container { padding: 10px; }
+      .profile-section { padding: 16px; }
+      .btn-group { flex-direction: column; }
+      .btn-group .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Profilo</h1>
+  </header>
+
+  <main class="container profile-container" style="padding-top:20px;">
+    <div class="profile-header">
+      <img id="profileAvatar" class="profile-avatar" src="resources/logo.png" alt="Avatar" onclick="document.getElementById('avatarInput').click()" />
+      <input type="file" id="avatarInput" accept="image/*" style="display: none;" />
+    </div>
+
+    <div style="text-align:center; margin: 8px 0 16px;">
+      <h2 id="profileName" style="margin:0 0 6px;">Caricamento...</h2>
+      <div id="profileBadges"></div>
+    </div>
+
+    <!-- Statistiche Rapide -->
+    <div class="profile-section">
+      <h3>📊 Le Tue Statistiche</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="statPosts">0</div>
+          <div class="stat-label">Post Pubblicati</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statPoints">0</div>
+          <div class="stat-label">Punti Totali</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statPosition">-</div>
+          <div class="stat-label">Posizione</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statSkrotz">0</div>
+          <div class="stat-label">Skrotz</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informazioni Personali -->
+    <div class="profile-section">
+      <h3>👤 Informazioni Personali</h3>
+      <form id="personalInfoForm">
+        <div class="form-group">
+          <label for="firstName">Nome</label>
+          <input type="text" id="firstName" placeholder="Il tuo nome" />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Cognome</label>
+          <input type="text" id="lastName" placeholder="Il tuo cognome" />
+        </div>
+        <div class="form-group">
+          <label for="nickname">Nickname</label>
+          <input type="text" id="nickname" placeholder="Il tuo nickname" />
+        </div>
+        <div class="form-group">
+          <label for="bio">Bio / Motto</label>
+          <textarea id="bio" placeholder="Scrivi qualcosa su di te o il tuo motto goliardico..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="birthDate">Data di Nascita</label>
+          <input type="date" id="birthDate" />
+        </div>
+        <div class="form-group">
+          <label for="city">Città</label>
+          <input type="text" id="city" placeholder="La tua città" />
+        </div>
+        <div class="btn-group">
+          <button type="submit" class="btn">💾 Salva Modifiche</button>
+          <button type="button" class="btn btn-secondary" id="cancelBtn">❌ Annulla</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Sicurezza Account -->
+    <div class="profile-section">
+      <h3>🔒 Sicurezza Account</h3>
+      <div class="form-group">
+        <label for="currentEmail">Email Attuale</label>
+        <input type="email" id="currentEmail" disabled />
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="changeEmailBtn">📧 Cambia Email</button>
+        <button class="btn btn-secondary" id="changePasswordBtn">🔑 Cambia Password</button>
+      </div>
+    </div>
+
+    <!-- Preferenze -->
+    <div class="profile-section">
+      <h3>⚙️ Preferenze</h3>
+      <div class="form-group">
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="notificationsEnabled" style="width:18px; height:18px;" />
+          <span>Abilita notifiche push</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="emailNotifications" style="width:18px; height:18px;" />
+          <span>Ricevi notifiche via email</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="darkMode" style="width:18px; height:18px;" />
+          <span>Modalità scura</span>
+        </label>
+      </div>
+      <button class="btn" id="savePreferencesBtn">💾 Salva Preferenze</button>
+    </div>
+
+    <!-- Zona Pericolosa -->
+    <div class="profile-section" style="border: 2px solid #e74c3c;">
+      <h3 style="color: #e74c3c;">⚠️ Zona Pericolosa</h3>
+      <p style="color: #666;">Queste azioni sono irreversibili. Procedi con cautela.</p>
+      <div class="btn-group">
+        <button class="btn btn-danger" id="deleteAccountBtn">🗑️ Elimina Account</button>
+        <button class="btn btn-secondary" id="logoutBtn">🚪 Logout</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script>
+    // Init Firebase IMMEDIATAMENTE
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    window.storage = firebase.storage();
+  </script>
+  <script src="resources/firebase.js"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    let currentUser = null;
+    let userData = {};
+
+    // Carica profilo utente
+    auth.onAuthStateChanged(async function(user) {
+      if (!user) return location.href = 'auth.html';
+      
+      // Set UID (if element exists)
+      const userUidEl = document.getElementById('userUid');
+      if (userUidEl) {
+        userUidEl.value = user.uid;
+      }
+      
+      currentUser = user;
+      document.getElementById('currentEmail').value = user.email;
+      
+      // Carica dati utente da Firestore
+      try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          userData = userDoc.data();
+          populateProfile(userData);
+        } else {
+          // Crea documento utente se non esiste
+          userData = {
+            email: user.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            role: 'user'
+          };
+          await db.collection('users').doc(user.uid).set(userData);
+        }
+      } catch (error) {
+        console.error('Errore caricamento profilo:', error);
+        alert('Errore nel caricamento del profilo');
+      }
+    });
+
+    function populateProfile(data) {
+      document.getElementById('profileName').textContent = data.displayName || data.nickname || 'Utente';
+      document.getElementById('firstName').value = data.firstName || '';
+      document.getElementById('lastName').value = data.lastName || '';
+      document.getElementById('nickname').value = data.nickname || '';
+      document.getElementById('bio').value = data.bio || '';
+      document.getElementById('birthDate').value = data.birthDate || '';
+      document.getElementById('city').value = data.city || '';
+      
+      if (data.photoURL) {
+        document.getElementById('profileAvatar').src = data.photoURL;
+      }
+      
+      // Cover rimossa
+      
+      // Badges
+      const badgesHtml = [];
+      if (data.role === 'admin' || data.role === 'superadmin') {
+        badgesHtml.push('<span class="badge badge-admin">👑 Admin</span>');
+      } else {
+        badgesHtml.push('<span class="badge badge-user">👤 Utente</span>');
+      }
+      document.getElementById('profileBadges').innerHTML = badgesHtml.join('');
+      
+      // Preferenze
+      document.getElementById('notificationsEnabled').checked = data.notificationsEnabled || false;
+      document.getElementById('emailNotifications').checked = data.emailNotifications || false;
+      document.getElementById('darkMode').checked = data.darkMode || false;
+    }
+
+    // Cropper modal (avatar only)
+    const cropModal = document.createElement('div');
+    cropModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;';
+    cropModal.innerHTML = `
+      <div style="background:var(--card);padding:16px;border-radius:12px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;gap:10px;">
+        <div id="cropStage" style="position:relative;background:#111;overflow:hidden;border-radius:8px;width:80vw;max-width:500px;height:500px;"></div>
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+          <label>Zoom</label>
+          <input id="cropZoom" type="range" min="0.5" max="3" step="0.01" value="1" />
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;color:var(--muted)">Anteprima</span>
+            <canvas id="cropPreview" width="200" height="200" style="width:200px;height:200px;border-radius:50%;border:2px solid #fff;background:#000"></canvas>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button id="cropCancel" class="btn btn-secondary">Annulla</button>
+            <button id="cropConfirm" class="btn">Ritaglia e carica</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(cropModal);
+
+    let cropImg, pan = {x:0,y:0}, dragging=false, start={x:0,y:0};
+    function openCropper(file){
+      const stage = cropModal.querySelector('#cropStage');
+      stage.innerHTML = '';
+      const img = document.createElement('img');
+      img.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);user-select:none;cursor:grab;';
+      img.draggable = false;
+      img.src = URL.createObjectURL(file);
+      cropImg = img; pan={x:0,y:0}; cropModal.querySelector('#cropZoom').value='1';
+      stage.appendChild(img);
+      cropModal.style.display='flex';
+      img.onload = ()=> { updateAvatarPreview(); };
+    }
+    function applyTransform(){
+      const z = parseFloat(cropModal.querySelector('#cropZoom').value);
+      cropImg.style.transform = `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px)) scale(${z})`;
+      updateAvatarPreview();
+    }
+    cropModal.querySelector('#cropZoom').addEventListener('input', applyTransform);
+    cropModal.querySelector('#cropCancel').addEventListener('click', ()=>{ cropModal.style.display='none'; });
+    cropModal.querySelector('#cropStage').addEventListener('mousedown', (e)=>{ dragging=true; start={x:e.clientX,y:e.clientY}; cropImg.style.cursor='grabbing'; });
+    window.addEventListener('mousemove', (e)=>{ if(!dragging) return; pan.x += (e.clientX-start.x); pan.y += (e.clientY-start.y); start={x:e.clientX,y:e.clientY}; applyTransform(); });
+    window.addEventListener('mouseup', ()=>{ dragging=false; if(cropImg) cropImg.style.cursor='grab'; });
+    async function renderCroppedAvatar(){
+      const canvas = document.createElement('canvas'); canvas.width=512; canvas.height=512; const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,512,512);
+      await new Promise(r=>{ if(cropImg.complete) r(); else cropImg.onload=r; });
+      const z = parseFloat(cropModal.querySelector('#cropZoom').value);
+      const drawW = cropImg.naturalWidth * z; const drawH = cropImg.naturalHeight * z;
+      const dx = (512 - drawW)/2 + pan.x; const dy = (512 - drawH)/2 + pan.y;
+      ctx.imageSmoothingQuality='high'; ctx.drawImage(cropImg, dx, dy, drawW, drawH);
+      return await new Promise(res=> canvas.toBlob(res, 'image/jpeg', 0.9));
+    }
+
+    function updateAvatarPreview(){
+      const pv = cropModal.querySelector('#cropPreview');
+      if (!pv || !cropImg) return;
+      const ctx = pv.getContext('2d');
+      // draw circular preview (canvas 200x200, displayed ~120px)
+      const S = pv.width; // 200
+      ctx.clearRect(0,0,S,S);
+      ctx.save();
+      ctx.beginPath(); ctx.arc(S/2,S/2,S/2,0,Math.PI*2); ctx.closePath(); ctx.clip();
+      ctx.fillStyle = '#000'; ctx.fillRect(0,0,S,S);
+      const z = parseFloat(cropModal.querySelector('#cropZoom').value);
+      const scale = S/512; // keep preview in sync with final 512
+      const drawW = cropImg.naturalWidth * z * scale;
+      const drawH = cropImg.naturalHeight * z * scale;
+      const dx = (S - drawW)/2 + pan.x*scale;
+      const dy = (S - drawH)/2 + pan.y*scale;
+      try { ctx.imageSmoothingQuality='high'; ctx.drawImage(cropImg, dx, dy, drawW, drawH); } catch {}
+      ctx.restore();
+    }
+    cropModal.querySelector('#cropConfirm').addEventListener('click', async ()=>{
+      const blob = await renderCroppedAvatar(); cropModal.style.display='none'; await uploadAvatarBlob(blob);
+    });
+
+    // Utils: resize image client-side using canvas
+    async function resizeImage(file, targetW, targetH, mode = 'cover', mime = 'image/jpeg', quality = 0.8) {
+      const img = await new Promise((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = URL.createObjectURL(file);
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, targetW, targetH);
+      const srcW = img.width, srcH = img.height;
+      const srcRatio = srcW / srcH;
+      const dstRatio = targetW / targetH;
+      let drawW, drawH;
+      if (mode === 'cover') {
+        if (srcRatio > dstRatio) { // source too wide
+          drawH = targetH;
+          drawW = Math.round(drawH * srcRatio);
+        } else {
+          drawW = targetW;
+          drawH = Math.round(drawW / srcRatio);
+        }
+      } else { // contain
+        if (srcRatio > dstRatio) {
+          drawW = targetW;
+          drawH = Math.round(drawW / srcRatio);
+        } else {
+          drawH = targetH;
+          drawW = Math.round(drawH * srcRatio);
+        }
+      }
+      const dx = Math.round((targetW - drawW)/2);
+      const dy = Math.round((targetH - drawH)/2);
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, dx, dy, drawW, drawH);
+      const blob = await new Promise((res) => canvas.toBlob(res, mime, quality));
+      return blob;
+    }
+
+    // Upload avatar
+    document.getElementById('profileAvatar').addEventListener('click', () => {
+      document.getElementById('avatarInput').click();
+    });
+
+    document.getElementById('avatarInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Immagine troppo grande! Max 2MB');
+        return;
+      }
+      // Apri cropper con ratio 1:1
+      const stage = cropModal.querySelector('#cropStage');
+      stage.style.height = Math.min(stage.clientWidth, 500) + 'px';
+      openCropper(file, 512, 512, true);
+    });
+
+    async function uploadAvatarBlob(blob){
+      try {
+        if (userData.photoURL) { try { await storage.refFromURL(userData.photoURL).delete(); } catch(e){} }
+        const storageRef = storage.ref(`avatars/${currentUser.uid}/avatar.jpg`);
+        await storageRef.put(blob, { contentType: 'image/jpeg', cacheControl: 'public, max-age=31536000' });
+        const photoURL = await storageRef.getDownloadURL();
+        await db.collection('users').doc(currentUser.uid).update({ photoURL });
+        document.getElementById('profileAvatar').src = photoURL + `?v=${Date.now()}`; // cache-busting
+        userData.photoURL = photoURL;
+        alert('✅ Avatar aggiornato!');
+      } catch (error) {
+        console.error('Errore upload avatar:', error);
+        alert('❌ Errore nell\'upload dell\'avatar');
+      }
+    }
+
+    // Funzioni cover rimosse
+
+    // Salva informazioni personali
+    document.getElementById('personalInfoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const updates = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        nickname: document.getElementById('nickname').value,
+        bio: document.getElementById('bio').value,
+        birthDate: document.getElementById('birthDate').value,
+        city: document.getElementById('city').value,
+        displayName: document.getElementById('nickname').value || document.getElementById('firstName').value,
+        display_name: document.getElementById('nickname').value || `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`.trim(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      try {
+        await db.collection('users').doc(currentUser.uid).update(updates);
+        alert('âœ… Profilo aggiornato con successo!');
+        userData = { ...userData, ...updates };
+        populateProfile(userData);
+      } catch (error) {
+        console.error('Errore salvataggio:', error);
+        alert('âŒ Errore nel salvataggio del profilo');
+      }
+    });
+
+    // Cambia email
+    document.getElementById('changeEmailBtn').addEventListener('click', async () => {
+      const newEmail = prompt('Inserisci la nuova email:');
+      if (!newEmail) return;
+      
+      try {
+        await currentUser.updateEmail(newEmail);
+        await db.collection('users').doc(currentUser.uid).update({ email: newEmail });
+        alert('âœ… Email aggiornata!');
+        document.getElementById('currentEmail').value = newEmail;
+      } catch (error) {
+        console.error('Errore cambio email:', error);
+        alert('âŒ Errore: ' + error.message);
+      }
+    });
+
+    // Cambia password
+    document.getElementById('changePasswordBtn').addEventListener('click', async () => {
+      const newPassword = prompt('Inserisci la nuova password (min 6 caratteri):');
+      if (!newPassword || newPassword.length < 6) {
+        alert('Password troppo corta!');
+        return;
+      }
+      
+      try {
+        await currentUser.updatePassword(newPassword);
+        alert('âœ… Password aggiornata!');
+      } catch (error) {
+        console.error('Errore cambio password:', error);
+        alert('âŒ Errore: ' + error.message);
+      }
+    });
+
+    // Salva preferenze
+    document.getElementById('savePreferencesBtn').addEventListener('click', async () => {
+      const preferences = {
+        notificationsEnabled: document.getElementById('notificationsEnabled').checked,
+        emailNotifications: document.getElementById('emailNotifications').checked,
+        darkMode: document.getElementById('darkMode').checked
+      };
+      
+      try {
+        await db.collection('users').doc(currentUser.uid).update(preferences);
+        alert('âœ… Preferenze salvate!');
+        
+        // Applica dark mode
+        if (preferences.darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (error) {
+        console.error('Errore salvataggio preferenze:', error);
+        alert('âŒ Errore nel salvataggio delle preferenze');
+      }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      if (confirm('Sei sicuro di voler uscire?')) {
+        await auth.signOut();
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Elimina account
+    document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
+      const confirmation = prompt('Sei SICURO? Scrivi "ELIMINA" per confermare:');
+      if (confirmation !== 'ELIMINA') return;
+      
+      try {
+        await db.collection('users').doc(currentUser.uid).delete();
+        await currentUser.delete();
+        alert('Account eliminato');
+        window.location.href = 'index.html';
+      } catch (error) {
+        console.error('Errore eliminazione account:', error);
+        alert('âŒ Errore: ' + error.message);
+      }
+    });
+
+    // Annulla modifiche
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      populateProfile(userData);
+    });
+    function copyUid(){
+      const uidInput = document.getElementById('userUid');
+      if (!uidInput) return;
+      uidInput.select();
+      document.execCommand('copy');
+      const btn = event.target.closest('button');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = '✅ Copiato!';
+        setTimeout(()=> btn.textContent = orig, 2000);
+      }
+    }
+  </script>
+    <script src="resources/error-logger.js?v=20251018"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/lazy-load.js?v=20251020"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+</body>
+</html>

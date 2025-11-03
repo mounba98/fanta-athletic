@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WIRC SNAP - Marvel Style (67 Cards)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow: hidden;
+      color: white;
+    }
+
+    /* HUD Top */
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+    .hud-item {
+      font-size: 18px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .energy { color: #00E0FF; }
+    .round { color: #fff; }
+    .scores { display: flex; gap: 20px; }
+    .score-you { color: #00ff88; }
+    .score-opp { color: #ff4444; }
+
+    /* Board */
+    .board {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 60px - 180px); /* Top HUD + Bottom Hand */
+    }
+
+    /* Location */
+    .location {
+      flex: 1;
+      max-width: 360px;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 3px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .location.revealed {
+      border-color: #00E0FF;
+      box-shadow: 0 0 20px rgba(0,224,255,0.4);
+    }
+    .loc-header {
+      text-align: center;
+      padding: 8px;
+      background: rgba(0,0,0,0.5);
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+    .loc-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .loc-effect {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+
+    /* Cards Grid (2x2) */
+    .loc-zone {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      padding: 8px;
+    }
+    .zone-player {
+      border-bottom: 1px solid rgba(0,224,255,0.3);
+    }
+    .zone-opponent {
+      border-top: 1px solid rgba(255,68,68,0.3);
+    }
+
+    /* Card */
+    .card {
+      aspect-ratio: 2/3;
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .card:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0,224,255,0.5);
+    }
+    .card.rare {
+      border-color: #FFD700;
+      animation: glow 2s ease-in-out infinite;
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+      50% { box-shadow: 0 0 20px rgba(255,215,0,0.9); }
+    }
+
+    .card-cost {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FF6B35, #F7931E);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .card-power {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4A90E2, #357ABD);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .card-name {
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+      margin-bottom: 4px;
+    }
+    .card-type {
+      font-size: 9px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      background: rgba(0,0,0,0.5);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Hand */
+    .hand-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      border-top: 2px solid rgba(255,255,255,0.1);
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      min-height: 160px;
+    }
+    .hand-card {
+      width: 100px;
+      height: 140px;
+      background: linear-gradient(135deg, #312e81, #6366f1);
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .hand-card:hover {
+      transform: translateY(-12px) scale(1.1);
+      border-color: #00E0FF;
+      z-index: 10;
+    }
+    .hand-card.selected {
+      border-color: #00ff88;
+      transform: translateY(-8px);
+    }
+
+    .end-turn-btn {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #00E0FF, #00A8CC);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,224,255,0.4);
+      transition: all 0.2s;
+      text-transform: uppercase;
+      margin-left: 20px;
+    }
+    .end-turn-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,224,255,0.6);
+    }
+    .end-turn-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border: 3px solid #00E0FF;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    }
+    .modal-close {
+      float: right;
+      font-size: 28px;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    /* Animations */
+    @keyframes cardDraw {
+      from { opacity: 0; transform: scale(0.8) translateY(50px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .card.animated {
+      animation: cardDraw 0.3s ease-out;
+    }
+
+    /* Loading */
+    .loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: white;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <!-- HUD Top -->
+  <div class="hud-top">
+    <div class="hud-item round">Turno <span id="currentRound">1</span>/6</div>
+    <div class="hud-item energy">⚡ Energia: <span id="currentEnergy">1</span>/<span id="maxEnergy">1</span></div>
+    <div class="scores">
+      <div class="score-you">Tu: <span id="scorePlayer">0</span></div>
+      <div class="score-opp">Avv: <span id="scoreOpponent">0</span></div>
+    </div>
+  </div>
+
+  <!-- Board (3 Locations) -->
+  <div class="board" id="board">
+    <!-- Locations will be generated here -->
+  </div>
+
+  <!-- Hand -->
+  <div class="hand-container" id="handContainer">
+    <!-- Hand cards will be generated here -->
+    <button class="end-turn-btn" id="endTurnBtn">Fine Turno</button>
+  </div>
+
+  <!-- Modal Card Detail -->
+  <div class="modal" id="cardModal">
+    <div class="modal-content">
+      <span class="modal-close" id="closeModal">&times;</span>
+      <h2 id="modalName">Card Name</h2>
+      <p id="modalEffect"></p>
+      <p id="modalLore" style="font-style:italic;color:rgba(255,255,255,0.7);"></p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">🎴 Caricamento carte...</div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+
+  <script>
+    // Init Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Game State
+    const state = {
+      round: 1,
+      energy: 1,
+      maxEnergy: 1,
+      locations: [],
+      hand: [],
+      deck: [],
+      playerBoard: [{}, {}, {}], // 3 locations
+      opponentBoard: [{}, {}, {}],
+      selectedCard: null,
+      scorePlayer: 0,
+      scoreOpponent: 0
+    };
+
+    let cardsData = [];
+    let locationsData = [];
+
+    // Load Data
+    async function loadGameData() {
+      try {
+        const [cardsRes, locationsRes] = await Promise.all([
+          fetch('data/wirc-snap-cards-full.json'),
+          fetch('data/wirc-locations.json')
+        ]);
+
+        cardsData = await cardsRes.json();
+        locationsData = await locationsRes.json();
+
+        console.log(`✅ Caricate ${cardsData.length} carte e ${locationsData.length} location`);
+        
+        document.getElementById('loading').style.display = 'none';
+        initGame();
+      } catch (err) {
+        alert('❌ Errore caricamento: ' + err.message);
+      }
+    }
+
+    // Init Game
+    function initGame() {
+      // Shuffle deck
+      state.deck = shuffle([...cardsData]).slice(0, 12).map((c, i) => ({
+        ...c,
+        instanceId: `p${i}`
+      }));
+
+      // Draw initial hand (3 cards)
+      for (let i = 0; i < 3; i++) {
+        drawCard();
+      }
+
+      // Select 3 random locations
+      const shuffledLocs = shuffle([...locationsData]);
+      state.locations = shuffledLocs.slice(0, 3).map((loc, i) => ({
+        ...loc,
+        revealed: i === 0, // First location revealed
+        playerCards: [],
+        opponentCards: []
+      }));
+
+      renderBoard();
+      renderHand();
+      updateHUD();
+    }
+
+    // Shuffle
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Draw Card
+    function drawCard() {
+      if (state.deck.length === 0) return;
+      const card = state.deck.pop();
+      state.hand.push(card);
+      renderHand();
+    }
+
+    // Render Board
+    function renderBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+
+      state.locations.forEach((loc, locIndex) => {
+        const locDiv = document.createElement('div');
+        locDiv.className = `location ${loc.revealed ? 'revealed' : ''}`;
+        locDiv.innerHTML = `
+          <div class="loc-header">
+            <div class="loc-name">${loc.revealed ? loc.name : '???'}</div>
+            ${loc.revealed ? `<div class="loc-effect">${loc.description}</div>` : ''}
+          </div>
+          <div class="loc-zone zone-opponent" data-location="${locIndex}" data-player="opponent"></div>
+          <div class="loc-zone zone-player" data-location="${locIndex}" data-player="player"></div>
+        `;
+
+        // Click zone to play card
+        locDiv.querySelectorAll('.loc-zone').forEach(zone => {
+          zone.addEventListener('click', () => {
+            if (zone.dataset.player === 'player' && state.selectedCard !== null) {
+              playCard(state.selectedCard, locIndex);
+            }
+          });
+        });
+
+        board.appendChild(locDiv);
+      });
+
+      renderCards();
+    }
+
+    // Render Cards on Board
+    function renderCards() {
+      state.locations.forEach((loc, locIndex) => {
+        const playerZone = document.querySelector(`.zone-player[data-location="${locIndex}"]`);
+        const opponentZone = document.querySelector(`.zone-opponent[data-location="${locIndex}"]`);
+
+        playerZone.innerHTML = '';
+        opponentZone.innerHTML = '';
+
+        loc.playerCards.forEach(card => {
+          playerZone.appendChild(createCardElement(card));
+        });
+
+        loc.opponentCards.forEach(card => {
+          opponentZone.appendChild(createCardElement(card));
+        });
+      });
+    }
+
+    // Create Card Element
+    function createCardElement(card, interactive = false) {
+      const cardDiv = document.createElement('div');
+      cardDiv.className = `card ${card.category === 'Tech' || card.cost >= 5 ? 'rare' : ''}`;
+      cardDiv.innerHTML = `
+        <div class="card-cost">${card.cost}</div>
+        <div class="card-power">${card.power}</div>
+        <div class="card-name">${card.name}</div>
+        <div class="card-type">${card.type}</div>
+      `;
+
+      if (interactive) {
+        cardDiv.addEventListener('click', () => showCardDetail(card));
+      }
+
+      return cardDiv;
+    }
+
+    // Render Hand
+    function renderHand() {
+      const handContainer = document.getElementById('handContainer');
+      const existing = handContainer.querySelectorAll('.hand-card');
+      existing.forEach(el => el.remove());
+
+      state.hand.forEach((card, index) => {
+        const cardEl = createCardElement(card, true);
+        cardEl.classList.add('hand-card', 'animated');
+        cardEl.style.width = '100px';
+        cardEl.style.height = '140px';
+
+        cardEl.addEventListener('click', () => {
+          // Deselect all
+          handContainer.querySelectorAll('.hand-card').forEach(el => el.classList.remove('selected'));
+          
+          if (state.selectedCard === index) {
+            state.selectedCard = null;
+          } else {
+            state.selectedCard = index;
+            cardEl.classList.add('selected');
+          }
+        });
+
+        handContainer.insertBefore(cardEl, document.getElementById('endTurnBtn'));
+      });
+    }
+
+    // Play Card
+    function playCard(handIndex, locationIndex) {
+      const card = state.hand[handIndex];
+      
+      if (!card) return;
+      if (state.energy < card.cost) {
+        alert('⚠️ Energia insufficiente!');
+        return;
+      }
+      if (state.locations[locationIndex].playerCards.length >= 4) {
+        alert('⚠️ Campo pieno (max 4 carte)!');
+        return;
+      }
+
+      // Play card
+      state.energy -= card.cost;
+      state.locations[locationIndex].playerCards.push(card);
+      state.hand.splice(handIndex, 1);
+      state.selectedCard = null;
+
+      renderBoard();
+      renderHand();
+      updateHUD();
+
+      // Trigger On Reveal effects (simplified)
+      if (card.type === 'on_reveal') {
+        console.log(`🔥 Activated: ${card.effect}`);
+      }
+    }
+
+    // End Turn
+    document.getElementById('endTurnBtn').addEventListener('click', () => {
+      // AI plays random cards
+      aiPlay();
+
+      // Next round
+      state.round++;
+      state.maxEnergy = Math.min(6, state.round);
+      state.energy = state.maxEnergy;
+
+      // Reveal locations
+      state.locations.forEach((loc, i) => {
+        if (loc.reveal_turn === state.round) {
+          loc.revealed = true;
+        }
+      });
+
+      // Draw card
+      drawCard();
+
+      renderBoard();
+      updateHUD();
+
+      if (state.round > 6) {
+        endGame();
+      }
+    });
+
+    // AI Play (Mock)
+    function aiPlay() {
+      // Simulate AI playing 1-2 random cards
+      const numCards = Math.min(2, Math.floor(Math.random() * 3));
+      for (let i = 0; i < numCards; i++) {
+        const randomLoc = Math.floor(Math.random() * 3);
+        const randomCard = cardsData[Math.floor(Math.random() * cardsData.length)];
+        
+        if (state.locations[randomLoc].opponentCards.length < 4) {
+          state.locations[randomLoc].opponentCards.push(randomCard);
+        }
+      }
+    }
+
+    // Update HUD
+    function updateHUD() {
+      document.getElementById('currentRound').textContent = state.round;
+      document.getElementById('currentEnergy').textContent = state.energy;
+      document.getElementById('maxEnergy').textContent = state.maxEnergy;
+      document.getElementById('scorePlayer').textContent = state.scorePlayer;
+      document.getElementById('scoreOpponent').textContent = state.scoreOpponent;
+    }
+
+    // End Game
+    function endGame() {
+      // Calculate scores per location
+      state.locations.forEach(loc => {
+        const playerPower = loc.playerCards.reduce((sum, c) => sum + c.power, 0);
+        const opponentPower = loc.opponentCards.reduce((sum, c) => sum + c.power, 0);
+
+        if (playerPower > opponentPower) state.scorePlayer++;
+        else if (opponentPower > playerPower) state.scoreOpponent++;
+      });
+
+      updateHUD();
+
+      const winner = state.scorePlayer > state.scoreOpponent ? 'Tu' : 'Avversario';
+      alert(`🏆 ${winner} vince ${state.scorePlayer}-${state.scoreOpponent}!`);
+    }
+
+    // Show Card Detail
+    function showCardDetail(card) {
+      document.getElementById('modalName').textContent = card.name;
+      document.getElementById('modalEffect').textContent = card.effect || 'Nessun effetto';
+      document.getElementById('modalLore').textContent = card.lore || '';
+      document.getElementById('cardModal').classList.add('active');
+    }
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('cardModal').classList.remove('active');
+    });
+
+    // Start
+    loadGameData();
+  </script>
+</body>
+</html>

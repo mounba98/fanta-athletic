@@ -1,0 +1,37 @@
+{
+  "sport": "basket",
+  "name": "Fanta Basket",
+  "positions": ["PG", "SG", "SF", "PF", "C", "UTIL", "BN"],
+  "lineup_slots": {
+    "PG": 1,
+    "SG": 1,
+    "SF": 1,
+    "PF": 1,
+    "C": 1,
+    "UTIL": 2,
+    "BN": 3
+  },
+  "captain_multiplier": 1.2,
+  "scoring": [
+    { "code": "PTS", "label": "Punti", "value": 1, "input": "counter" },
+    { "code": "REB", "label": "Rimbalzi", "value": 1.2, "input": "counter" },
+    { "code": "AST", "label": "Assist", "value": 1.5, "input": "counter" },
+    { "code": "STL", "label": "Palle rubate", "value": 3, "input": "counter" },
+    { "code": "BLK", "label": "Stoppate", "value": 3, "input": "counter" },
+    { "code": "3PM", "label": "Triple realizzate", "value": 1, "input": "counter" },
+    { "code": "TOV", "label": "Palle perse", "value": -1, "input": "counter" },
+    { "code": "PF", "label": "Falli personali", "value": -0.5, "input": "counter" },
+    { "code": "TECH", "label": "Tecnico", "value": -2, "input": "checkbox" },
+    { "code": "EJECT", "label": "Espulsione", "value": -5, "input": "checkbox" },
+    { "code": "DD", "label": "Double-Double", "value": 2, "input": "checkbox" },
+    { "code": "TD", "label": "Triple-Double", "value": 5, "input": "checkbox" },
+    { "code": "TEAM_WIN", "label": "Vittoria squadra (titolari)", "value": 2, "input": "checkbox", "apply": "starter" }
+  ],
+  "waivers_per_week": 3,
+  "trades_deadline_days_before_playoffs": 2,
+  "roster_size": { "min": 10, "max": 12 },
+  "draft": {
+    "type": "snake",
+    "budget": 200
+  }
+}

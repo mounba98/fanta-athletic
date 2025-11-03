@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Genera Codici Invito - Fanta Athletic</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 { color: #dc143c; margin-top: 0; }
+    .btn {
+      background: #dc143c;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    .btn:hover { background: #a01030; }
+    .btn-secondary {
+      background: #3498db;
+    }
+    .btn-secondary:hover { background: #2980b9; }
+    #log {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 500px;
+      overflow-y: auto;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+    .success { color: #00ff00; }
+    .error { color: #ff4444; }
+    .info { color: #00bfff; }
+    .warning { color: #ffa500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔑 Genera Codici Invito per Leghe</h1>
+    <p>Questo script aggiunge il campo <code>inviteCode</code> a tutte le leghe che non ce l'hanno.</p>
+    
+    <div>
+      <button class="btn" onclick="checkLeagues()">1️⃣ Verifica Leghe</button>
+      <button class="btn btn-secondary" onclick="addInviteCodes()">2️⃣ Genera Codici Invito</button>
+    </div>
+    
+    <div id="log"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+    
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type;
+      logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+    
+    function generateInviteCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+    
+    async function checkLeagues() {
+      const logDiv = document.getElementById('log');
+      logDiv.innerHTML = '';
+      
+      try {
+        log('🔍 Verifica leghe in corso...', 'info');
+        
+        const snapshot = await db.collection('leagues').get();
+        
+        if (snapshot.empty) {
+          log('⚠️ Nessuna lega trovata nel database', 'warning');
+          return;
+        }
+        
+        log(`✅ Trovate ${snapshot.size} leghe`, 'success');
+        
+        let withCode = 0;
+        let withoutCode = 0;
+        
+        snapshot.docs.forEach(doc => {
+          const data = doc.data();
+          const hasCode = data.inviteCode && data.inviteCode.length === 6;
+          
+          if (hasCode) {
+            withCode++;
+            log(`✅ ${doc.id} - ${data.name || 'Senza nome'} - Codice: ${data.inviteCode}`, 'success');
+          } else {
+            withoutCode++;
+            log(`❌ ${doc.id} - ${data.name || 'Senza nome'} - MANCA CODICE`, 'error');
+          }
+        });
+        
+        log('', 'info');
+        log(`📊 RIEPILOGO:`, 'info');
+        log(`   ✅ Leghe con codice: ${withCode}`, 'success');
+        log(`   ❌ Leghe senza codice: ${withoutCode}`, 'error');
+        
+        if (withoutCode > 0) {
+          log('', 'info');
+          log('👉 Clicca su "Genera Codici Invito" per crearli', 'warning');
+        }
+        
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+        console.error(error);
+      }
+    }
+    
+    async function addInviteCodes() {
+      if (!confirm('Sei sicuro di voler generare i codici invito per le leghe che non ce l\'hanno?')) {
+        return;
+      }
+      
+      const logDiv = document.getElementById('log');
+      logDiv.innerHTML = '';
+      
+      try {
+        log('🚀 Inizio generazione codici invito...', 'info');
+        
+        const snapshot = await db.collection('leagues').get();
+        
+        if (snapshot.empty) {
+          log('⚠️ Nessuna lega trovata', 'warning');
+          return;
+        }
+        
+        let updated = 0;
+        let skipped = 0;
+        
+        for (const doc of snapshot.docs) {
+          const data = doc.data();
+          const hasCode = data.inviteCode && data.inviteCode.length === 6;
+          
+          if (hasCode) {
+            log(`⏭️ ${doc.id} - ${data.name || 'Senza nome'} - Codice già presente: ${data.inviteCode}`, 'info');
+            skipped++;
+          } else {
+            const newCode = generateInviteCode();
+            
+            await db.collection('leagues').doc(doc.id).update({
+              inviteCode: newCode
+            });
+            
+            log(`✅ ${doc.id} - ${data.name || 'Senza nome'} - Nuovo codice: ${newCode}`, 'success');
+            updated++;
+          }
+        }
+        
+        log('', 'info');
+        log(`🎉 COMPLETATO!`, 'success');
+        log(`   ✅ Codici generati: ${updated}`, 'success');
+        log(`   ⏭️ Leghe già con codice: ${skipped}`, 'info');
+        log(`   📊 Totale leghe: ${snapshot.size}`, 'info');
+        
+        if (updated > 0) {
+          log('', 'info');
+          log('✅ Ora gli utenti possono usare i codici per unirsi alle leghe!', 'success');
+          log('👉 Vai su league-invite.html per vedere i codici', 'warning');
+        }
+        
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+        console.error(error);
+      }
+    }
+    
+    // Auth check
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        alert('Devi essere loggato come admin!');
+        window.location.href = 'auth.html';
+      } else {
+        log('✅ Loggato come: ' + user.email, 'success');
+        log('👆 Clicca su "Verifica Leghe" per iniziare', 'info');
+      }
+    });
+  </script>
+</body>
+</html>

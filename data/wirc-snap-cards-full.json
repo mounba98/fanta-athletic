@@ -1,0 +1,598 @@
+[
+  {
+    "name": "Nico",
+    "cost": 5,
+    "power": 6,
+    "type": "on_reveal",
+    "effect": "Copia tutti gli effetti 'Alla Scoperta' giocati finora e riduce di 1 il costo delle carte in mano.",
+    "category": "Tech",
+    "lore": "Lo sviluppatore del WIRC. Crea meta, li distrugge e li riscrive."
+  },
+  {
+    "name": "Thanoisi (Simo)",
+    "cost": 6,
+    "power": 9,
+    "type": "start_of_game",
+    "effect": "Mescola nel mazzo 6 carte 'Componenti Moto'. Quando tutte sono giocate: +12 Forza e può essere giocato ignorando le restrizioni di posizionamento, raddoppiando anche gli effetti continui in questo campo.",
+    "category": "Tech",
+    "lore": "L’ingegnere che ha trasformato un motore in un archetipo."
+  },
+  {
+    "name": "Il Pres",
+    "cost": 5,
+    "power": 8,
+    "type": "ongoing",
+    "effect": "Tutte le carte alleate ottengono +1 Forza permanente.",
+    "category": "Support",
+    "lore": "Il sovrano silenzioso del WIRC."
+  },
+  {
+    "name": "Fracks",
+    "cost": 4,
+    "power": 6,
+    "type": "ongoing",
+    "effect": "Ottiene +2 Forza per ogni carta presente nel suo campo (sia alleata che nemica).",
+    "category": "Tempo",
+    "lore": "Quando parla, anche la birra tace."
+  },
+  {
+    "name": "Bezza",
+    "cost": 4,
+    "power": 7,
+    "type": "ongoing",
+    "effect": "A fine turno, una carta casuale ottiene +8 Forza oppure viene distrutta.",
+    "category": "Chaos",
+    "lore": "Le sue convinzioni sono legge cosmica."
+  },
+  {
+    "name": "G-Cazzi",
+    "cost": 5,
+    "power": 7,
+    "type": "on_reveal",
+    "effect": "Raddoppia la Forza della carta più debole nel tuo lato del campo.",
+    "category": "Support",
+    "lore": "Clutch booster con zaino sempre pronto."
+  },
+  {
+    "name": "Nico Cartonato",
+    "cost": 3,
+    "power": 0,
+    "type": "ongoing",
+    "effect": "Copia l'effetto 'Continuo' dell’ultima carta giocata (alleata o nemica).",
+    "category": "Tech",
+    "lore": "Il meme che diventa meta."
+  },
+  {
+    "name": "Motore Ducati",
+    "cost": 1,
+    "power": 1,
+    "type": "on_reveal",
+    "effect": "Pesca una carta 'Componente Moto' dal mazzo (se disponibile).",
+    "category": "Tech",
+    "lore": "Batte come un cuore.",
+    "tags": [
+      "thanoisi_component"
+    ]
+  },
+  {
+    "name": "Carena Lucida",
+    "cost": 1,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "+2 Forza alla prossima carta giocata questo turno.",
+    "category": "Tech",
+    "lore": "L'aerodinamica è potenza.",
+    "tags": [
+      "thanoisi_component"
+    ]
+  },
+  {
+    "name": "Telaio d’Acciaio",
+    "cost": 1,
+    "power": 1,
+    "type": "ongoing",
+    "effect": "Le tue carte non possono essere distrutte nel prossimo turno.",
+    "category": "Tech",
+    "lore": "La struttura è destino.",
+    "tags": [
+      "thanoisi_component"
+    ]
+  },
+  {
+    "name": "Ruote Fiammeggianti",
+    "cost": 2,
+    "power": 1,
+    "type": "on_reveal",
+    "effect": "Distruggi una carta nemica casuale nel campo opposto.",
+    "category": "Destroy",
+    "lore": "Scalda l’asfalto e le anime.",
+    "tags": [
+      "thanoisi_component"
+    ]
+  },
+  {
+    "name": "Specchietti dell’Ego",
+    "cost": 1,
+    "power": 1,
+    "type": "on_reveal",
+    "effect": "Copia l'effetto 'Alla Scoperta' dell’ultima carta giocata in partita.",
+    "category": "Tech",
+    "lore": "Rifletti, poi colpisci.",
+    "tags": [
+      "thanoisi_component"
+    ]
+  },
+  {
+    "name": "Benzina da Gorgonzola",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Le tue carte in mano costano -1 questo turno (min 1).",
+    "category": "Ramp",
+    "lore": "Profuma di nottate e combo.",
+    "tags": [
+      "thanoisi_component"
+    ]
+  },
+  {
+    "name": "Tommy G",
+    "cost": 3,
+    "power": 4,
+    "type": "ongoing",
+    "effect": "Le carte non giocate ottengono +1 Forza a fine turno.",
+    "category": "Support",
+    "lore": "Mister e motivatore dell’Athletic."
+  },
+  {
+    "name": "Wabione",
+    "cost": 4,
+    "power": 6,
+    "type": "ongoing",
+    "effect": "Quando giochi una carta in questo campo: quella carta ottiene +1 Forza.",
+    "category": "Tempo",
+    "lore": "Batterista e collezionista del caos."
+  },
+  {
+    "name": "Dux",
+    "cost": 2,
+    "power": 3,
+    "type": "static",
+    "effect": "Se non giochi carte in un turno, ottiene +2 Forza permanenti.",
+    "category": "Discard",
+    "lore": "Maestro della calma attiva."
+  },
+  {
+    "name": "Giabba",
+    "cost": 3,
+    "power": 4,
+    "type": "on_reveal",
+    "effect": "Scarta 1 carta casuale dalla tua mano: ottieni +3 Forza.",
+    "category": "Discard",
+    "lore": "Filosofia viola & fumo."
+  },
+  {
+    "name": "Flondi",
+    "cost": 3,
+    "power": 3,
+    "type": "ongoing",
+    "effect": "Ottiene +1 Forza a fine turno. Se viene distrutto, guadagni +2 Energia nel prossimo turno.",
+    "category": "Discard",
+    "lore": "Mezzo genio, mezzo svacco."
+  },
+  {
+    "name": "Bos",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Pesca 1 carta. Se è di costo 1, gioca gratis.",
+    "category": "Tempo",
+    "lore": "Anime & combo low cost."
+  },
+  {
+    "name": "Canni",
+    "cost": 2,
+    "power": 3,
+    "type": "static",
+    "effect": "+2 Forza se non hai giocato carte nel turno precedente.",
+    "category": "Tempo",
+    "lore": "L’arte di premere un tasto."
+  },
+  {
+    "name": "Chep",
+    "cost": 3,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Disattiva l'effetto Continuo di una carta nemica in questo campo.",
+    "category": "Control",
+    "lore": "Capitano e taglia-castoni."
+  },
+  {
+    "name": "Meme",
+    "cost": 3,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Copia un effetto Continuo di una carta nemica in questo campo.",
+    "category": "Control",
+    "lore": "Banchiere politico e mematore."
+  },
+  {
+    "name": "Toti",
+    "cost": 3,
+    "power": 4,
+    "type": "ongoing",
+    "effect": "Riduce il costo della prossima carta di 1 (min 1) ogni turno.",
+    "category": "Ramp",
+    "lore": "Moda, conti, e campo."
+  },
+  {
+    "name": "Titti",
+    "cost": 3,
+    "power": 4,
+    "type": "ongoing",
+    "effect": "+1 Forza alle altre carte in questo campo.",
+    "category": "Support",
+    "lore": "Centrocampista con certezze."
+  },
+  {
+    "name": "Barta",
+    "cost": 2,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Pesca 1 carta. Se è costo 4+, ottiene +2 Forza.",
+    "category": "Tempo",
+    "lore": "Mai domo con la viola in testa."
+  },
+  {
+    "name": "Sbragi",
+    "cost": 2,
+    "power": 2,
+    "type": "static",
+    "effect": "Non può essere spostato. Ottiene +2 se vinci questo campo.",
+    "category": "Control",
+    "lore": "Scarso ma simpatico."
+  },
+  {
+    "name": "Angelino",
+    "cost": 3,
+    "power": 4,
+    "type": "on_reveal",
+    "effect": "Protegge una carta alleata in questo campo: non può essere distrutta nel prossimo turno.",
+    "category": "Support",
+    "lore": "Educatore in campo e fuori."
+  },
+  {
+    "name": "Andreino",
+    "cost": 3,
+    "power": 4,
+    "type": "on_reveal",
+    "effect": "+2 alla prossima carta giocata.",
+    "category": "Tempo",
+    "lore": "Buonissimo, pungente quando serve."
+  },
+  {
+    "name": "Giova",
+    "cost": 4,
+    "power": 5,
+    "type": "on_reveal",
+    "effect": "Pesca 2 carte, poi scarta 1 a caso.",
+    "category": "Tech",
+    "lore": "Ingegneria e midrange IQ."
+  },
+  {
+    "name": "Lil Swaolino",
+    "cost": 2,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Gioca una copia 1/1 di questa carta in un altro campo.",
+    "category": "Swarm",
+    "lore": "Artista, scout e debole al drummini."
+  },
+  {
+    "name": "Pippo Bongia",
+    "cost": 2,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Se hai 4+ carte in mano, ottieni +2 Forza.",
+    "category": "Tempo",
+    "lore": "Ricciolo, FIFA e risate."
+  },
+  {
+    "name": "Giulietto",
+    "cost": 2,
+    "power": 2,
+    "type": "ongoing",
+    "effect": "Le tue carte di costo 1 hanno +1 Forza.",
+    "category": "Support",
+    "lore": "Disponibile e preciso."
+  },
+  {
+    "name": "Wuenji",
+    "cost": 1,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Sposta una tua carta a sinistra in questo campo.",
+    "category": "Move",
+    "lore": "Testa dura, cuore tenero."
+  },
+  {
+    "name": "Boro",
+    "cost": 3,
+    "power": 4,
+    "type": "on_reveal",
+    "effect": "Rivela la carta in cima al tuo mazzo, poi pescalà.",
+    "category": "Tempo",
+    "lore": "Barman, bugiardo e basso."
+  },
+  {
+    "name": "Mini Boro",
+    "cost": 2,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Se hai giocato una carta di costo 1 questo turno, ottiene +2.",
+    "category": "Zoo",
+    "lore": "Attaccante mini blortz."
+  },
+  {
+    "name": "Ale Lapi",
+    "cost": 3,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "La prossima carta che giochi in questo campo costa -1.",
+    "category": "Tempo",
+    "lore": "Treccine e difesa solida."
+  },
+  {
+    "name": "Ciorlas",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Scarta la carta più a destra nella tua mano: pesca 1.",
+    "category": "Discard",
+    "lore": "Pensa a FIFA… male."
+  },
+  {
+    "name": "Marchino",
+    "cost": 3,
+    "power": 3,
+    "type": "ongoing",
+    "effect": "Se giochi due carte questo turno, ottiene +2.",
+    "category": "Tempo",
+    "lore": "Buono, extra scemo e cori in curva."
+  },
+  {
+    "name": "Bergit",
+    "cost": 1,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Guarda le prime 2 del mazzo: tienine 1, metti l’altra in fondo.",
+    "category": "Tech",
+    "lore": "Enciclopedia calcistica ambulante."
+  },
+  {
+    "name": "Robe",
+    "cost": 2,
+    "power": 3,
+    "type": "static",
+    "effect": "Immunità a riduzioni di Forza.",
+    "category": "Control",
+    "lore": "Juventino, buono ma fumoso."
+  },
+  {
+    "name": "Zio Sam",
+    "cost": 2,
+    "power": 2,
+    "type": "ongoing",
+    "effect": "Le carte nella tua mano mostrano la loro Forza finale prevista.",
+    "category": "Tech",
+    "lore": "Gamer silenzioso."
+  },
+  {
+    "name": "Civi",
+    "cost": 3,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Riduce di -1 la Forza di tutte le carte nemiche in questo campo (min 0).",
+    "category": "Control",
+    "lore": "Moto+Esselunga lifestyle."
+  },
+  {
+    "name": "Pino",
+    "cost": 4,
+    "power": 5,
+    "type": "static",
+    "effect": "Non può essere spostato o distrutto.",
+    "category": "Control",
+    "lore": "Due metri di serenità."
+  },
+  {
+    "name": "Iac",
+    "cost": 2,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Scambia posizione con una carta nemica casuale in questo campo.",
+    "category": "Tech",
+    "lore": "Mago delle monete."
+  },
+  {
+    "name": "Giulione",
+    "cost": 3,
+    "power": 4,
+    "type": "on_reveal",
+    "effect": "Crea una 1/1 'Cinghiale' in questo campo.",
+    "category": "Swarm",
+    "lore": "Cuoco e cacciatore clamoroso."
+  },
+  {
+    "name": "Momo",
+    "cost": 4,
+    "power": 6,
+    "type": "on_reveal",
+    "effect": "Disattiva l'effetto Continuo di tutte le carte nemiche in questo campo fino a fine turno.",
+    "category": "Control",
+    "lore": "Goleador e festaiolo."
+  },
+  {
+    "name": "Calo",
+    "cost": 2,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Pesca 1 e scarta 1 a caso.",
+    "category": "Discard",
+    "lore": "Culone viola, genio del calcino."
+  },
+  {
+    "name": "First Lady",
+    "cost": 3,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Dà +1 permanente a tutte le carte in mano.",
+    "category": "Support",
+    "lore": "Cuore del WIRC, regina della cucina."
+  },
+  {
+    "name": "Ida",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Cura una carta alleata: +2 permanente.",
+    "category": "Support",
+    "lore": "Prossima infermiera, mano ferma."
+  },
+  {
+    "name": "Sissi",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Rivela una carta nemica casuale in mano all’avversario.",
+    "category": "Tech",
+    "lore": "Ottica con fiuto."
+  },
+  {
+    "name": "Giulia",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Se hai Titti in mano o in campo: +2 Forza.",
+    "category": "Tempo",
+    "lore": "Cameriera e cuore di Titti."
+  },
+  {
+    "name": "Marta",
+    "cost": 3,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Le tue carte costano -1 nel prossimo turno (min 1).",
+    "category": "Ramp",
+    "lore": "Maestra e idea di Fanta Athletic."
+  },
+  {
+    "name": "Serena",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Pesca 1 carta.",
+    "category": "Tempo",
+    "lore": "Insegnante elementare dal sorriso gentile."
+  },
+  {
+    "name": "Wonia",
+    "cost": 3,
+    "power": 3,
+    "type": "ongoing",
+    "effect": "+1 Forza alle carte giocate dopo di lei in questo campo.",
+    "category": "Tempo",
+    "lore": "Compagna di Wabione, stile e presenza."
+  },
+  {
+    "name": "Matilde",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Sposta una tua carta in un altro campo.",
+    "category": "Move",
+    "lore": "Scout, cuore a sinistra."
+  },
+  {
+    "name": "Martina",
+    "cost": 3,
+    "power": 4,
+    "type": "on_reveal",
+    "effect": "La prossima carta giocata in qualsiasi campo costa -2 (min 1).",
+    "category": "Ramp",
+    "lore": "Kick boxing, festa e zero legami."
+  },
+  {
+    "name": "Gabri",
+    "cost": 3,
+    "power": 4,
+    "type": "static",
+    "effect": "Se non giochi questa carta entro il turno 6, viene rimossa dalla tua mano.",
+    "category": "Chaos",
+    "lore": "Scompare quando si fidanza."
+  },
+  {
+    "name": "Altobelli",
+    "cost": 2,
+    "power": 3,
+    "type": "static",
+    "effect": "Se nella tua mano per 3 turni: +3 Forza e costo +1.",
+    "category": "Tempo",
+    "lore": "Ex trio leggendario."
+  },
+  {
+    "name": "Trendiu",
+    "cost": 3,
+    "power": 3,
+    "type": "on_reveal",
+    "effect": "Duplica l'effetto 'Alla Scoperta' della prossima carta.",
+    "category": "Combo",
+    "lore": "Gorgonzola boy, creatore di gadget riciclati."
+  },
+  {
+    "name": "Santo",
+    "cost": 3,
+    "power": 4,
+    "type": "ongoing",
+    "effect": "+1 Energia nel prossimo turno quando giochi qui una carta.",
+    "category": "Ramp",
+    "lore": "DJ con super potenziale."
+  },
+  {
+    "name": "Pato",
+    "cost": 3,
+    "power": 5,
+    "type": "ongoing",
+    "effect": "+2 se hai giocato una carta di costo 1 questo turno.",
+    "category": "Zoo",
+    "lore": "Palestrato, fisico scolpito."
+  },
+  {
+    "name": "Beppe",
+    "cost": 3,
+    "power": 5,
+    "type": "static",
+    "effect": "Se giochi quest’ultima carta del turno: +2.",
+    "category": "Tempo",
+    "lore": "Trequartista, un po’ se la tira."
+  },
+  {
+    "name": "Tapi",
+    "cost": 2,
+    "power": 2,
+    "type": "on_reveal",
+    "effect": "Silenzia (rimuove i testi) di una carta nemica con Forza minore in questo campo.",
+    "category": "Control",
+    "lore": "Sbirro tra tossici."
+  },
+  
+  {
+    "name": "Cicchino",
+    "cost": 2,
+    "power": 4,
+    "type": "vanilla",
+    "effect": "",
+    "category": "Tempo",
+    "lore": "Carta base senza abilità: Cicchino."
+  }
+ 
+]

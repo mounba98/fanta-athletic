@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Gestione Squadre</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 20px; }
+    .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .table th, .table td { border-bottom: 1px solid rgba(0,0,0,0.08); padding: 8px 10px; text-align: left; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .input { padding: 10px 12px; border:1px solid #dbe1e8; border-radius: 10px; font-size: 14px; }
+    .btn { padding: 10px 12px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+    .editable { background: #fffbea; border: 1px dashed #ffc107; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Admin • Gestione Squadre</h1>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Aggiungi Squadra</h2>
+      <div class="row">
+        <input id="teamName" class="input" placeholder="Nome squadra" style="flex:1;" />
+        <button class="btn" id="addTeamBtn" style="white-space:nowrap;">➕ Aggiungi</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Squadre Esistenti (<span id="teamCount">0</span>)</h2>
+      <p style="color:var(--muted);font-size:14px;">⚠️ Click su squadra per espandere e gestire allenatori</p>
+      <div id="teamsList"></div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    const db = firebase.firestore();
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script>
+
+    firebase.auth().onAuthStateChanged(async (user)=>{
+      if (!user) return location.href='auth.html';
+      const a = await db.collection('admins').doc(user.uid).get();
+      if (!a.exists) return location.href='index.html';
+      boot();
+    });
+
+    let teamsData = [];
+    let usersMap = new Map();
+
+    async function boot(){
+      // Load users
+      const usersSnap = await db.collection('users').get();
+      usersSnap.docs.forEach(d=> usersMap.set(d.id, d.data()));
+
+      document.getElementById('addTeamBtn').onclick = async ()=>{
+        const name = document.getElementById('teamName').value.trim();
+        if (!name) return alert('Nome obbligatorio');
+        
+        // Find next available index
+        const maxIdx = teamsData.length > 0 ? Math.max(...teamsData.map(t=>parseInt(t.id)||0)) : -1;
+        const newIdx = maxIdx + 1;
+        
+        await db.collection('teams').doc(String(newIdx)).set({ 
+          name, 
+          owner: null, 
+          members: [],
+          coach_ids: [], 
+          roster: [], 
+          lineup: [null,null,null,null,null], 
+          captain: null,
+          createdAt: Date.now() 
+        });
+        document.getElementById('teamName').value='';
+      };
+
+      db.collection('teams').onSnapshot(s=>{
+        teamsData = s.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=> parseInt(a.id)-parseInt(b.id));
+        console.log('Teams loaded:', teamsData.length, teamsData);
+        renderTeams();
+      });
+    }
+
+    async function loadUsers(){
+      const snap = await db.collection('users').get();
+      return snap.docs.map(d=>({id:d.id, ...d.data()}));
+    }
+
+    async function renderTeams(){
+      const container = document.getElementById('teamsList');
+      document.getElementById('teamCount').textContent = teamsData.length;
+      
+      const users = await loadUsers();
+      
+      container.innerHTML = teamsData.map((t,idx)=>{
+        const teamUsers = users.filter(u=> u.team_index == t.id);
+        const allUsers = users.filter(u=> !u.team_index || u.team_index == t.id);
+        
+        return `
+          <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden;background:var(--card);">
+            <div onclick="toggleTeam('team${idx}')" style="padding:12px;background:var(--bg-secondary);cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-weight:700;font-size:16px;color:var(--text);">${t.name}</span>
+                <span style="font-size:12px;color:var(--muted);">(${teamUsers.length} utenti)</span>
+              </div>
+              <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();deleteTeam('${t.id}')" style="padding:4px 8px;">🗑️</button>
+            </div>
+            <div id="team${idx}" style="display:none;padding:16px;background:var(--card);">
+              <h4 style="margin:0 0 10px;color:var(--text);">Utenti Assegnati</h4>
+              <div id="users${idx}" style="margin-bottom:12px;">
+                ${teamUsers.map(u=>{
+                  const displayName = u.display_name || (u.firstName && u.lastName ? `${u.firstName} ${u.lastName}` : u.email || 'Utente');
+                  return `
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--border);">
+                    <span style="color:var(--text);">${displayName}</span>
+                    <button class="btn btn-sm btn-secondary" onclick="removeUser('${t.id}','${u.id}')" style="padding:4px 8px;">🗑️</button>
+                  </div>
+                  `;
+                }).join('') || '<p style="color:var(--muted);font-size:14px;">Nessun utente assegnato</p>'}
+              </div>
+              <div style="display:flex;gap:8px;">
+                <select id="userSelect${idx}" class="input" style="flex:1;padding:8px;">
+                  <option value="">-- Aggiungi utente --</option>
+                  ${allUsers.map(u=>{
+                    const displayName = u.display_name || (u.firstName && u.lastName ? `${u.firstName} ${u.lastName}` : u.email || 'Utente');
+                    return `<option value="${u.id}">${displayName}</option>`;
+                  }).join('')}
+                </select>
+                <button class="btn" onclick="addUser('${t.id}',${idx})" style="padding:8px 16px;">➕ Aggiungi</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleTeam(id){
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function addUser(teamId, idx){
+      const select = document.getElementById(`userSelect${idx}`);
+      const userId = select.value;
+      if (!userId) return alert('Seleziona un utente');
+      
+      await db.collection('users').doc(userId).update({
+        team_index: parseInt(teamId)
+      });
+      
+      renderTeams();
+    }
+
+    async function removeUser(teamId, userId){
+      if (!confirm('Rimuovere questo utente dalla squadra?')) return;
+      await db.collection('users').doc(userId).update({ team_index: null });
+      renderTeams();
+    }
+
+    async function updateTeam(id, field, val){ 
+      await db.collection('teams').doc(id).update({[field]: val.trim()}); 
+    }
+
+    async function deleteTeam(id){
+      if (!confirm(`Eliminare la squadra ${id}? Questa azione è irreversibile.`)) return;
+      await db.collection('teams').doc(id).delete();
+    }
+  </script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+</body>
+</html>

@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Riepilogo Titolari - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
+  <style>
+    :root {
+      --card-bg: var(--card, #ffffff);
+      --card-shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.08));
+      --text-muted: var(--muted, #6b7280);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px 0;
+      font-size: 22px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .control-group select {
+      min-width: 180px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 14px;
+      background: var(--card-bg);
+      color: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.35);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .summary-tile {
+      background: rgba(148, 163, 184, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-tile span {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .summary-tile strong {
+      font-size: 20px;
+    }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .pitch-summary {
+      background: linear-gradient(180deg, #1f8f52 0%, #166534 70%, #0f3d1f 100%);
+      border-radius: 24px;
+      padding: 32px 28px;
+      box-shadow: 0 22px 40px rgba(15, 23, 42, 0.35);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .pitch-summary::before,
+    .pitch-summary::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 48px);
+      border: 2px dashed rgba(255,255,255,0.35);
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .pitch-summary::before {
+      top: 20px;
+      bottom: 20px;
+    }
+
+    .pitch-summary::after {
+      top: 50%;
+      height: 2px;
+    }
+
+    .pitch-grid {
+      display: grid;
+      gap: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pitch-line {
+      display: flex;
+      justify-content: center;
+      gap: 26px;
+    }
+
+    .pitch-line.two {
+      justify-content: center;
+    }
+
+    .pitch-line.one {
+      justify-content: center;
+    }
+
+    .field-slot {
+      width: clamp(130px, 18vw, 160px);
+      aspect-ratio: 3 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .field-player {
+      background: rgba(12, 20, 33, 0.85);
+      color: white;
+      border-radius: 20px;
+      box-shadow: 0 16px 28px rgba(12, 20, 33, 0.45);
+      width: 100%;
+      height: 100%;
+      padding: 14px 12px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .field-player::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      pointer-events: none;
+    }
+
+    .field-player.captain {
+      box-shadow: 0 18px 32px rgba(234, 179, 8, 0.35);
+    }
+
+    .field-player.captain::after {
+      border-color: rgba(234, 179, 8, 0.7);
+    }
+
+    .field-role {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .field-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.35);
+      background: rgba(15, 23, 42, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 6px 0 10px;
+    }
+
+    .field-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .field-name {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .field-score {
+      font-size: 22px;
+      font-weight: 900;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .field-placeholder {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      padding: 18px;
+      font-size: 13px;
+      color: rgba(30,41,59,0.75);
+      text-align: center;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .player-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(148, 163, 184, 0.2);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .player-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .player-name {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .player-role {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(99, 102, 241, 0.15);
+      color: #4338ca;
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
+    .points {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .points .total {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary, #dc2626);
+    }
+
+    .points .detail {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .points .total.negative {
+      color: #dc2626;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(99, 102, 241, 0.12);
+      color: #3730a3;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge.negative {
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+    }
+
+    .badge.captain {
+      background: rgba(234, 179, 8, 0.18);
+      color: #92400e;
+      font-weight: 700;
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      gap: 8px;
+      background: rgba(148, 163, 184, 0.15);
+      padding: 6px;
+      border-radius: 999px;
+    }
+
+    .view-toggle button {
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .view-toggle button.active {
+      background: #1e293b;
+      color: white;
+      box-shadow: 0 4px 14px rgba(30,41,59,0.25);
+    }
+
+    .players-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .player-list {
+      overflow-x: auto;
+    }
+
+    .player-list-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .player-list-table th,
+    .player-list-table td {
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .player-list-table th {
+      background: rgba(148, 163, 184, 0.12);
+      color: #1e293b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .player-list-table tbody tr:hover {
+      background: rgba(148, 163, 184, 0.08);
+    }
+
+    .player-list-table .breakdown-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .player-list-desktop {
+      display: none;
+    }
+
+    .player-list-mobile {
+      display: grid;
+      gap: 10px;
+    }
+
+    .player-row {
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.65);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+      overflow: hidden;
+    }
+
+    .player-row-head {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .player-row-name {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: left;
+    }
+
+    .player-row-role {
+      display: none;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,0.55);
+    }
+
+    .player-row-points {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
+    .player-row-points.negative {
+      color: #dc2626;
+    }
+
+    .player-row-toggle {
+      font-size: 18px;
+      color: rgba(15,23,42,0.45);
+      transition: transform 0.2s ease;
+    }
+
+    .player-row.expanded .player-row-toggle {
+      transform: rotate(180deg);
+    }
+
+    .player-row-detail {
+      padding: 0 16px 16px;
+      display: none;
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .player-row.expanded .player-row-detail {
+      display: block;
+    }
+
+    .player-row-breakdown {
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+
+    .player-row-breakdown li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(15,23,42,0.85);
+    }
+
+    .player-row-breakdown strong {
+      font-weight: 700;
+      color: inherit;
+    }
+
+    .player-row-breakdown .badge {
+      background: rgba(15,23,42,0.05);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,0.6);
+    }
+
+    .player-row-empty {
+      margin-top: 10px;
+      font-size: 13px;
+      color: rgba(15,23,42,0.55);
+    }
+
+    .player-row-captain {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-weight: 700;
+    }
+
+    :root.dark .player-row {
+      background: rgba(15,23,42,0.7);
+      border-color: rgba(148,163,184,0.25);
+      box-shadow: none;
+    }
+
+    :root.dark .player-row-detail {
+      border-top-color: rgba(148,163,184,0.25);
+    }
+
+    :root.dark .player-row-breakdown li {
+      color: rgba(226,232,240,0.9);
+    }
+
+    :root.dark .player-row-breakdown .badge {
+      background: rgba(148,163,184,0.15);
+      color: rgba(226,232,240,0.75);
+    }
+
+    :root.dark .player-row-empty {
+      color: rgba(148,163,184,0.8);
+    }
+
+    @media (min-width: 600px) {
+      .player-row-role {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .player-list-desktop {
+        display: block;
+      }
+
+      .player-list-mobile {
+        display: none;
+      }
+
+      .player-row-toggle {
+        display: none;
+      }
+    }
+
+    .coach-card {
+      margin-top: 20px;
+      background: rgba(59, 130, 246, 0.08);
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      color: #0f172a;
+    }
+
+    .coach-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .coach-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(59,130,246,0.35);
+      background: rgba(59,130,246,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .coach-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .coach-name {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .coach-total-label {
+      font-weight: 700;
+    }
+
+    .coach-total-value {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .coach-total-value.negative {
+      color: #dc2626;
+    }
+
+    .curva-card {
+      margin-top: 20px;
+      background: rgba(16, 185, 129, 0.08);
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      color: #0f172a;
+    }
+
+    .curva-card h3 {
+      margin: 0;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .curva-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .curva-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    .curva-item strong {
+      font-size: 14px;
+    }
+
+    .curva-formula {
+      font-size: 12px;
+      color: rgba(15, 23, 42, 0.8);
+      margin-top: 2px;
+    }
+
+    :root.dark .curva-formula {
+      color: rgba(226, 232, 240, 0.85);
+    }
+
+    .curva-points {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .curva-points.negative {
+      color: #dc2626;
+    }
+
+    :root.dark .curva-points {
+      color: #f8fafc;
+    }
+
+    :root.dark .curva-points.negative {
+      color: #f87171;
+    }
+
+    .curva-total {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .curva-total.negative {
+      color: #dc2626;
+    }
+
+    :root.dark .coach-card {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: rgba(59, 130, 246, 0.35);
+      color: #e2e8f0;
+    }
+
+    :root.dark .coach-total-value {
+      color: #f1f5f9;
+    }
+
+    :root.dark .coach-total-value.negative {
+      color: #f87171;
+    }
+
+    :root.dark .curva-card {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #e2e8f0;
+    }
+
+    :root.dark .curva-total {
+      color: #f1f5f9;
+    }
+
+    :root.dark .curva-total.negative {
+      color: #f87171;
+    }
+
+    .coach-header strong {
+      font-size: 18px;
+    }
+
+    .rules-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .rules-list span {
+      font-size: 12px;
+      background: rgba(15, 23, 42, 0.06);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px 20px;
+      border: 1px dashed rgba(148, 163, 184, 0.4);
+      border-radius: 16px;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      main {
+        padding: 16px;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .control-group select {
+        width: 100%;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+
+      .players-header {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body data-header-title="👥 Riepilogo Titolari" data-header-subtitle="Analizza i punteggi della tua formazione">
+  <main>
+    <section class="card">
+      <h2>Seleziona giornata e squadra</h2>
+      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+        Seleziona la giornata e la squadra per vedere i punti dei 5 titolari schierati. Il riepilogo usa i dati ufficiali salvati in `results` e `days`.
+      </p>
+      <div class="controls">
+        <div class="control-group">
+          <label for="giornataSelect">Giornata</label>
+          <select id="giornataSelect"></select>
+        </div>
+        <div class="control-group">
+          <label for="teamSelect">Squadra</label>
+          <select id="teamSelect"></select>
+        </div>
+        <button id="refreshBtn" class="btn-primary">Aggiorna riepilogo</button>
+      </div>
+    </section>
+
+    <section class="card" id="summarySection">
+      <h2>Riepilogo punteggi</h2>
+      <div id="summaryContent" class="loading">Seleziona una giornata per visualizzare il riepilogo…</div>
+    </section>
+
+    <section class="card">
+      <div class="players-header">
+        <h2>Dettaglio giocatori titolari</h2>
+        <div id="viewToggle" class="view-toggle">
+          <button type="button" data-view="cards" class="active">🌟 Griglia</button>
+          <button type="button" data-view="list">📋 Lista</button>
+        </div>
+      </div>
+      <div id="playersContent" class="loading">In attesa dati…</div>
+      <div id="coachContent" class="loading" style="margin-top:16px;">Caricamento allenatore…</div>
+      <div id="curvaContent" class="loading" style="margin-top:16px;">Caricamento curva…</div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/rules-loader.js?v=2025110301"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+  </script>
+
+  <script>
+    const REPEATABLE_PLAYERS = new Set(['R040','R041','R042','R072','R075','R089','R097','R044','R045','R056','R057','R058','R061','R070','R063','R073','R092']);
+    const REPEATABLE_COACH = new Set(['R020','R036']);
+    const REPEATABLE_CURVA = new Set(['R008','R027','R028','R029','R015','R003','R002','R011C','infortunati_squalificati_curva']);
+    const CURVA_RULE_ALIASES = {
+      infortunati_squalificati_curva: {
+        rule_id: 'infortunati_squalificati_curva',
+        nome_bonus: 'Giocatore squalificato presente in curva',
+        valore: 1,
+        soggetto: 'Curva',
+        input: 'counter',
+        legacy: true
+      }
+    };
+
+    const state = {
+      user: null,
+      teams: [],
+      teamMap: new Map(),
+      players: new Map(),
+      coaches: new Map(),
+      playerRules: [],
+      coachRules: [],
+      curvaRules: [],
+      giornate: [],
+      selectedGiornata: null,
+      selectedTeamId: null,
+      userTeamId: null,
+      viewMode: 'cards',
+      cache: null
+    };
+    let playersListMediaQuery = null;
+
+    const giornateFallback = Array.from({ length: 24 }, (_, i) => `G${i + 1}`);
+
+    const giornataSelect = document.getElementById('giornataSelect');
+    const teamSelect = document.getElementById('teamSelect');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const summaryContent = document.getElementById('summaryContent');
+    const playersContent = document.getElementById('playersContent');
+    const coachContent = document.getElementById('coachContent');
+    const curvaContent = document.getElementById('curvaContent');
+    const viewToggle = document.getElementById('viewToggle');
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+      state.user = user;
+      await initializePage();
+    });
+
+    async function initializePage() {
+      try {
+        await Promise.all([
+          loadTeams(),
+          loadPlayers(),
+          loadCoaches(),
+          loadRules(),
+          loadGiornate(),
+          resolveUserTeam()
+        ]);
+
+        applyURLParams();
+        populateSelectors();
+        bindEvents();
+        setupViewToggle();
+        await loadLineupSummary();
+      } catch (error) {
+        console.error('Errore inizializzazione riepilogo:', error);
+        summaryContent.innerHTML = `<div class="empty-state">❌ Errore durante il caricamento: ${error.message || 'riprovare più tardi'}</div>`;
+        playersContent.innerHTML = '';
+        if (coachContent) coachContent.innerHTML = '';
+        if (curvaContent) curvaContent.innerHTML = '';
+      }
+    }
+
+    function applyURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      const g = params.get('g');
+      const team = params.get('team');
+      if (g) {
+        state.selectedGiornata = g.toUpperCase();
+      }
+      if (team) {
+        state.selectedTeamId = team;
+      }
+      const mode = params.get('view');
+      if (mode === 'list' || mode === 'cards') {
+        state.viewMode = mode;
+        updateViewToggle(mode);
+      }
+    }
+
+    async function loadTeams() {
+      const snapshot = await window.db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
+      state.teamMap.clear();
+      state.teams = snapshot.docs.map(doc => {
+        const data = doc.data() || {};
+        const numericId = Number(doc.id);
+        const entry = {
+          id: doc.id,
+          numericId: Number.isFinite(numericId) ? numericId : null,
+          name: data.name || (Number.isFinite(numericId) ? `Squadra ${numericId + 1}` : `Team ${doc.id}`),
+          coachIds: Array.isArray(data.coach_ids) ? data.coach_ids : []
+        };
+        state.teamMap.set(entry.id, entry);
+        return entry;
+      });
+    }
+
+    async function loadPlayers() {
+      const response = await fetch('resources/players.json');
+      if (!response.ok) throw new Error('Impossibile caricare players.json');
+      const data = await response.json();
+      state.players.clear();
+      (data.players || []).forEach(player => {
+        state.players.set(player.player_id, player);
+      });
+    }
+
+    async function loadCoaches() {
+      try {
+        const snapshot = await window.db.collection('coaches').get();
+        state.coaches.clear();
+        snapshot.docs.forEach(doc => {
+          state.coaches.set(doc.id, doc.data() || {});
+        });
+      } catch (error) {
+        console.warn('Impossibile caricare lista allenatori:', error);
+      }
+    }
+
+    async function loadRules() {
+      const data = await (window.loadRulesJSON ? window.loadRulesJSON() : { rules: [] });
+      const rules = Array.isArray(data.rules) ? data.rules : [];
+      state.playerRules = rules
+        .filter(r => r.soggetto === 'Giocatore')
+        .map(rule => ({
+          ...rule,
+          valore: Number(rule.valore) || 0,
+          input: REPEATABLE_PLAYERS.has(rule.rule_id) ? 'counter' : 'toggle'
+        }));
+
+      state.coachRules = rules
+        .filter(r => r.soggetto === 'Allenatore')
+        .map(rule => ({
+          ...rule,
+          valore: Number(rule.valore) || 0,
+          input: REPEATABLE_COACH.has(rule.rule_id) ? 'counter' : 'toggle'
+        }));
+
+      state.curvaRules = rules
+        .filter(r => r.soggetto === 'Curva')
+        .map(rule => ({
+          ...rule,
+          valore: Number(rule.valore) || 0,
+          input: REPEATABLE_CURVA.has(rule.rule_id) || (rule.note && rule.note.toLowerCase().includes('cumulativo')) ? 'counter' : 'toggle'
+        }));
+
+      Object.values(CURVA_RULE_ALIASES).forEach(alias => {
+        if (!state.curvaRules.some(rule => rule.rule_id === alias.rule_id)) {
+          state.curvaRules.push({ ...alias });
+        }
+      });
+    }
+
+    async function loadGiornate() {
+      try {
+        const snapshot = await window.db.collection('days').get();
+        const ids = snapshot.docs
+          .filter(doc => doc.exists && doc.data()?.computed)
+          .map(doc => doc.id);
+
+        if (ids.length) {
+          state.giornate = sortGiornate(ids);
+        } else {
+          state.giornate = await fallbackGiornateFromResults();
+        }
+      } catch (error) {
+        console.warn('Impossibile leggere days:', error);
+        state.giornate = await fallbackGiornateFromResults();
+      }
+
+      if (!state.selectedGiornata) {
+        state.selectedGiornata = state.giornate[state.giornate.length - 1] || 'G1';
+      }
+    }
+
+    async function fallbackGiornateFromResults() {
+      const available = [];
+      await Promise.all(giornateFallback.map(async gid => {
+        try {
+          const snap = await window.db.collection('results').doc(gid).collection('teams').limit(1).get();
+          if (!snap.empty) {
+            available.push(gid);
+          }
+        } catch (error) {
+          console.warn(`Errore verifica risultati ${gid}:`, error);
+        }
+      }));
+      return sortGiornate(available.length ? available : ['G1']);
+    }
+
+    function sortGiornate(ids) {
+      return ids
+        .map(id => ({ id, num: Number(id.replace(/[^0-9]/g, '')) || 0 }))
+        .sort((a, b) => a.num - b.num)
+        .map(entry => entry.id);
+    }
+
+    async function resolveUserTeam() {
+      try {
+        const doc = await window.db.collection('users').doc(state.user.uid).get();
+        const data = doc.exists ? doc.data() : {};
+        if (data && data.team_index !== undefined && data.team_index !== null) {
+          state.userTeamId = String(data.team_index);
+        }
+      } catch (error) {
+        console.warn('Impossibile leggere profilo utente:', error);
+      }
+
+      if (!state.selectedTeamId) {
+        state.selectedTeamId = state.userTeamId || (state.teams[0]?.id ?? '0');
+      }
+    }
+
+    function populateSelectors() {
+      giornataSelect.innerHTML = state.giornate
+        .map(id => `<option value="${id}" ${id === state.selectedGiornata ? 'selected' : ''}>${formatGiornataLabel(id)}</option>`) 
+        .join('');
+
+      teamSelect.innerHTML = state.teams
+        .map(team => `<option value="${team.id}" ${team.id === state.selectedTeamId ? 'selected' : ''}>${team.name}</option>`) 
+        .join('');
+    }
+
+    function bindEvents() {
+      giornataSelect.addEventListener('change', async (event) => {
+        state.selectedGiornata = event.target.value;
+        await loadLineupSummary();
+      });
+
+      teamSelect.addEventListener('change', async (event) => {
+        state.selectedTeamId = event.target.value;
+        await loadLineupSummary();
+      });
+
+      refreshBtn.addEventListener('click', async () => {
+        await loadLineupSummary();
+      });
+    }
+
+    function setupViewToggle() {
+      if (!viewToggle) return;
+      viewToggle.addEventListener('click', (event) => {
+        const btn = event.target.closest('button[data-view]');
+        if (!btn) return;
+        const mode = btn.dataset.view;
+        if (mode !== 'cards' && mode !== 'list') return;
+        if (mode === state.viewMode) return;
+        state.viewMode = mode;
+        updateViewToggle(mode);
+        renderFromCache();
+      });
+    }
+
+    function updateViewToggle(mode) {
+      if (!viewToggle) return;
+      viewToggle.querySelectorAll('button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === mode);
+      });
+    }
+
+    function formatGiornataLabel(id) {
+      const num = Number(id.replace(/[^0-9]/g, ''));
+      if (!Number.isFinite(num)) return id;
+      return `Giornata ${num}`;
+    }
+
+    async function loadLineupSummary() {
+      if (!state.selectedGiornata || !state.selectedTeamId) {
+        summaryContent.innerHTML = '<div class="empty-state">Seleziona giornata e squadra per vedere il riepilogo.</div>';
+        playersContent.innerHTML = '';
+        if (coachContent) coachContent.innerHTML = '';
+        state.cache = null;
+        return;
+      }
+
+      summaryContent.innerHTML = '<div class="loading">Caricamento riepilogo in corso…</div>';
+      playersContent.innerHTML = '<div class="loading">Analisi giocatori in corso…</div>';
+      if (coachContent) coachContent.innerHTML = '<div class="loading">Caricamento allenatore…</div>';
+      if (curvaContent) curvaContent.innerHTML = '<div class="loading">Caricamento curva…</div>';
+
+      try {
+        const [resultSnap, daySnap] = await Promise.all([
+          window.db.collection('results').doc(state.selectedGiornata).collection('teams').doc(state.selectedTeamId).get(),
+          window.db.collection('days').doc(state.selectedGiornata).get()
+        ]);
+
+        if (!resultSnap.exists) {
+          summaryContent.innerHTML = `<div class="empty-state">❌ Nessun risultato trovato per ${formatGiornataLabel(state.selectedGiornata)}.</div>`;
+          playersContent.innerHTML = '';
+          if (coachContent) coachContent.innerHTML = '';
+          if (curvaContent) curvaContent.innerHTML = '';
+          state.cache = null;
+          return;
+        }
+
+        const resultData = resultSnap.data() || {};
+        const dayData = daySnap.exists ? (daySnap.data() || {}) : {};
+        state.cache = { resultData, dayData };
+        renderFromCache();
+      } catch (error) {
+        console.error('Errore caricamento riepilogo titolari:', error);
+        summaryContent.innerHTML = `<div class="empty-state">❌ Errore: ${error.message || 'impossibile caricare i dati'}</div>`;
+        playersContent.innerHTML = '';
+        if (coachContent) coachContent.innerHTML = '';
+        if (curvaContent) curvaContent.innerHTML = '';
+        state.cache = null;
+      }
+    }
+
+    function renderFromCache() {
+      if (!state.cache) return;
+      renderSummary(state.cache.resultData);
+      renderPlayersSection(state.cache.resultData, state.cache.dayData);
+      renderCoachSection(state.cache.resultData, state.cache.dayData);
+      renderCurvaSection(state.cache.resultData, state.cache.dayData);
+    }
+
+    function renderSummary(resultData) {
+      const breakdown = resultData.breakdown || {};
+      const tiles = [
+        { label: 'Totale squadra', value: Number(resultData.points || 0).toFixed(2), highlight: true },
+        { label: 'Giocatori', value: Number(breakdown.players || 0).toFixed(2) },
+        { label: 'Bonus Capitano', value: Number(breakdown.captain || 0).toFixed(2) },
+        { label: 'Allenatore', value: Number(breakdown.coach || 0).toFixed(2) },
+        { label: 'Curva', value: Number(breakdown.curva || 0).toFixed(2) }
+      ];
+
+      if (breakdown.formation) {
+        tiles.splice(1, 0, { label: 'Formazione pubblicata', value: Number(breakdown.formation || 0).toFixed(2) });
+      }
+
+      summaryContent.innerHTML = `
+        <div class="summary-grid">
+          ${tiles.map(tile => `
+            <div class="summary-tile" style="${tile.highlight ? 'background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(236,72,153,0.12));' : ''}">
+              <span>${tile.label}</span>
+              <strong>${tile.value}</strong>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderPlayersSection(resultData, dayData) {
+      const lineup = Array.isArray(resultData.lineup) ? resultData.lineup.filter(Boolean) : [];
+      if (!lineup.length) {
+        playersContent.innerHTML = '<div class="empty-state">Nessuna formazione salvata per questa giornata.</div>';
+        return;
+      }
+
+      const playerSelections = (dayData.players || {});
+      const captainId = resultData.captain || null;
+
+      const playersData = lineup.map((playerId, index) => {
+        const info = state.players.get(playerId) || {};
+        const selections = playerSelections[playerId] || {};
+        const metrics = calculateMetrics(selections, state.playerRules);
+        const isCaptain = captainId && String(captainId) === String(playerId);
+        const totalWithCaptain = metrics.total + (isCaptain ? metrics.total : 0);
+        return {
+          playerId,
+          lineupIndex: index,
+          info,
+          displayLabel: getPlayerDisplayLabel(info),
+          photoUrl: getEntityPhoto(info),
+          selections,
+          metrics,
+          isCaptain,
+          totalWithCaptain
+        };
+      });
+
+      if (state.viewMode === 'list') {
+        playersContent.innerHTML = renderPlayersList(playersData);
+        setupPlayersListInteractions();
+      } else {
+        playersContent.innerHTML = renderPlayersField(playersData);
+      }
+    }
+
+    function renderPlayersField(playersData) {
+      const layout = [
+        playersData[0] || null,
+        playersData[1] || null,
+        playersData[2] || null,
+        playersData[3] || null,
+        playersData[4] || null
+      ];
+
+      const rows = [
+        [layout[0], layout[1]],
+        [layout[2], layout[3]],
+        [layout[4]]
+      ];
+
+      return `
+        <div class="pitch-summary">
+          <div class="pitch-grid">
+            ${rows.map((row, rowIdx) => `
+              <div class="pitch-line ${row.length === 1 ? 'one' : 'two'}">
+                ${row.map((playerData, colIdx) => renderFieldSlot(playerData, rowIdx * 2 + colIdx)).join('')}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPlayersList(playersData) {
+      const desktopRows = playersData.map((playerData, index) => {
+        const info = playerData.info;
+        const displayName = playerData.displayLabel || info.nome_completo || info.name || `Giocatore ${index + 1}`;
+        const breakdown = formatPlayerBreakdown(playerData);
+        return `
+          <tr>
+            <td><strong>${escapeHtml(displayName)}</strong>${info.nickname ? `<div style="font-size:11px;color:var(--text-muted);">${escapeHtml(capitalizeDisplay(info.nickname))}</div>` : ''}</td>
+            <td>${escapeHtml(info.role || '—')}</td>
+            <td style="font-weight:700;color:${playerData.totalWithCaptain < 0 ? '#dc2626' : 'var(--primary)'};">${playerData.totalWithCaptain.toFixed(2)}${playerData.isCaptain ? ' ⭐' : ''}</td>
+            <td class="breakdown-text">${escapeHtml(breakdown.text)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const mobileRows = playersData.map((playerData, index) => {
+        const info = playerData.info;
+        const displayName = playerData.displayLabel || info.nome_completo || info.name || `Giocatore ${index + 1}`;
+        const breakdown = formatPlayerBreakdown(playerData);
+        const roleLabel = info.role || '—';
+        const pointsClass = playerData.totalWithCaptain < 0 ? 'player-row-points negative' : 'player-row-points';
+        const breakdownContent = breakdown.items.length
+          ? `<ul class="player-row-breakdown">
+              ${breakdown.items.map(item => `
+                <li>
+                  <span>
+                    ${escapeHtml(item.label)}
+                    ${item.multiplierLabel ? `<span class="badge">${escapeHtml(item.multiplierLabel)}</span>` : ''}
+                  </span>
+                  <strong>${item.value > 0 ? '+' : ''}${item.value.toFixed(2)}</strong>
+                </li>
+              `).join('')}
+            </ul>`
+          : '<div class="player-row-empty">Nessun bonus/malus</div>';
+
+        return `
+          <div class="player-row" data-player-id="${escapeHtml(playerData.playerId)}">
+            <button class="player-row-head" type="button" aria-expanded="false">
+              <div class="player-row-name">
+                <strong>${escapeHtml(displayName)}</strong>
+                ${playerData.isCaptain ? '<span class="player-row-captain">Capitano</span>' : ''}
+                <span class="player-row-role">${escapeHtml(roleLabel)}</span>
+              </div>
+              <div class="player-row-meta" style="display:flex; align-items:center; gap:12px;">
+                <div class="${pointsClass}">${playerData.totalWithCaptain.toFixed(2)}${playerData.isCaptain ? ' ⭐' : ''}</div>
+                <span class="player-row-toggle">▾</span>
+              </div>
+            </button>
+            <div class="player-row-detail" hidden>
+              ${breakdownContent}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="player-list player-list-desktop">
+          <table class="player-list-table">
+            <thead>
+              <tr><th>Giocatore</th><th>Ruolo</th><th>Punti</th><th>Bonus/Malus</th></tr>
+            </thead>
+            <tbody>
+              ${desktopRows}
+            </tbody>
+          </table>
+        </div>
+        <div class="player-list player-list-mobile">
+          ${mobileRows}
+        </div>
+      `;
+    }
+
+    function setupPlayersListInteractions() {
+      if (!playersContent) return;
+      if (!playersListMediaQuery && window.matchMedia) {
+        playersListMediaQuery = window.matchMedia('(min-width: 900px)');
+        const mediaHandler = () => initPlayersListInteractions();
+        if (playersListMediaQuery.addEventListener) {
+          playersListMediaQuery.addEventListener('change', mediaHandler);
+        } else if (playersListMediaQuery.addListener) {
+          playersListMediaQuery.addListener(mediaHandler);
+        }
+      }
+      initPlayersListInteractions();
+    }
+
+    function initPlayersListInteractions() {
+      if (!playersContent) return;
+      const isDesktop = playersListMediaQuery ? playersListMediaQuery.matches : (window.matchMedia && window.matchMedia('(min-width: 900px)').matches);
+      const rows = playersContent.querySelectorAll('.player-row');
+      rows.forEach(row => {
+        const head = row.querySelector('.player-row-head');
+        const detail = row.querySelector('.player-row-detail');
+        if (!head || !detail) return;
+
+        if (!head._toggleHandler) {
+          head._toggleHandler = () => {
+            if (playersListMediaQuery && playersListMediaQuery.matches) {
+              return;
+            }
+            const expanded = row.classList.toggle('expanded');
+            head.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            detail.hidden = !expanded;
+            if (expanded) {
+              setTimeout(() => {
+                row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }, 80);
+            }
+          };
+        }
+
+        head.removeEventListener('click', head._toggleHandler);
+
+        if (isDesktop) {
+          row.classList.add('expanded');
+          detail.hidden = false;
+          head.setAttribute('aria-expanded', 'true');
+          head.disabled = true;
+          head.style.cursor = 'default';
+        } else {
+          row.classList.remove('expanded');
+          detail.hidden = true;
+          head.setAttribute('aria-expanded', 'false');
+          head.disabled = false;
+          head.style.cursor = 'pointer';
+          head.addEventListener('click', head._toggleHandler);
+        }
+      });
+    }
+
+    function renderFieldSlot(playerData, slotIndex) {
+      if (!playerData) {
+        return `<div class="field-slot"><div class="field-placeholder">Slot libero</div></div>`;
+      }
+
+      const info = playerData.info;
+      const label = playerData.displayLabel || info.nome_completo || info.name || `Giocatore ${slotIndex + 1}`;
+      const role = (info.role || '—').substring(0, 1);
+      const score = playerData.totalWithCaptain;
+      const baseScore = playerData.metrics.total;
+      const photo = playerData.photoUrl ? `<img src="${escapeHtml(playerData.photoUrl)}" alt="${escapeHtml(label)}" />` : '<span style="font-size:28px;">⚽</span>';
+
+      return `
+        <div class="field-slot">
+          <div class="field-player${playerData.isCaptain ? ' captain' : ''}">
+            <div class="field-role">${escapeHtml(role)}</div>
+            <div class="field-avatar">${photo}</div>
+            <div class="field-name">${escapeHtml(label)}</div>
+            <div class="field-score" title="Totale (base ${baseScore.toFixed(2)}${playerData.isCaptain ? ` + bonus ${baseScore.toFixed(2)}` : ''})">
+              ${score.toFixed(2)}${playerData.isCaptain ? ' ⭐' : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCoachSection(resultData, dayData) {
+      if (!coachContent) return;
+      const team = state.teamMap.get(state.selectedTeamId) || {};
+      const coachId = resultData.coachId || (Array.isArray(team.coachIds) ? team.coachIds[0] : null);
+
+      if (!coachId) {
+        coachContent.innerHTML = '<div class="empty-state" style="margin-top:0;">Nessun dato allenatore registrato per questa giornata.</div>';
+        return;
+      }
+
+      const coachInfo = state.coaches.get(coachId) || {};
+      const coachDisplayName = coachInfo.nome
+        || coachInfo.name
+        || coachInfo.nickname
+        || team.coachLabel
+        || team.coach
+        || coachId;
+      const selections = (dayData.coaches || {})[coachId] || {};
+      const metrics = calculateMetrics(selections, state.coachRules);
+
+      if (!metrics.breakdown.length && metrics.total === 0) {
+        coachContent.innerHTML = '<div class="empty-state" style="margin-top:0;">Nessun bonus/malus allenatore registrato.</div>';
+        return;
+      }
+
+      const coachPhoto = getEntityPhoto(coachInfo);
+      coachContent.innerHTML = `
+        <div class="coach-card">
+          <div class="coach-header">
+            <div class="coach-avatar">
+              ${coachPhoto ? `<img src="${escapeHtml(coachPhoto)}" alt="${escapeHtml(coachDisplayName)}" />` : '<span style="font-size:26px;">🎓</span>'}
+            </div>
+            <div class="coach-name">${escapeHtml(coachDisplayName)}</div>
+            <span class="badge">ID: ${escapeHtml(coachId)}</span>
+          </div>
+          <div style="font-size:14px;">
+            <span class="coach-total-label">Totale allenatore:</span>
+            <span class="coach-total-value ${metrics.total < 0 ? 'negative' : 'positive'}">${metrics.total.toFixed(2)}</span>
+          </div>
+          <div class="rules-list">
+            ${metrics.breakdown.map(item => `
+              <span class="${item.points < 0 ? 'badge negative' : 'badge'}">
+                ${escapeHtml(item.label || item.ruleId)}
+                <strong>${item.points > 0 ? '+' : ''}${item.points.toFixed(2)}</strong>
+              </span>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCurvaSection(resultData, dayData) {
+      if (!curvaContent) return;
+
+      const selections = dayData.curva || {};
+      const metrics = calculateCurvaMetrics(selections, state.curvaRules);
+      const total = Number(resultData.breakdown?.curva ?? metrics.total ?? 0);
+
+      if (!Object.keys(selections).length) {
+        curvaContent.innerHTML = '<div class="empty-state" style="margin-top:0;">Nessun bonus curva registrato per questa giornata.</div>';
+        return;
+      }
+
+      curvaContent.innerHTML = `
+        <div class="curva-card">
+          <h3>🎺 Curva</h3>
+          <div style="font-size:14px;">
+            <span style="font-weight:700;">Totale curva:</span>
+            <span class="curva-total ${total < 0 ? 'negative' : 'positive'}">${total.toFixed(2)}</span>
+          </div>
+          ${metrics.breakdown.length ? `
+            <div class="curva-list">
+              ${metrics.breakdown.map(item => {
+                const rule = state.curvaRules.find(r => r.rule_id === item.ruleId) || {};
+                const unit = Number(rule.valore) || 0;
+                const multiplier = Number(item.value || 0);
+                const formule = multiplier ? `${multiplier} × ${unit.toFixed(2)}` : `${unit.toFixed(2)}`;
+                return `
+                  <div class="curva-item">
+                    <div>
+                      <strong>${escapeHtml(item.label || item.ruleId)}</strong>
+                      <div class="curva-formula">${escapeHtml(formule)}</div>
+                    </div>
+                    <div class="curva-points ${item.points < 0 ? 'negative' : 'positive'}">${item.points > 0 ? '+' : ''}${item.points.toFixed(2)}</div>
+                  </div>`;
+              }).join('')}
+            </div>
+          ` : '<div class="empty-state" style="margin-top:0;">Nessun bonus curva registrato.</div>'}
+        </div>
+      `;
+    }
+
+    function calculateMetrics(selections, rules) {
+      let total = 0;
+      const breakdown = [];
+
+      rules.forEach(rule => {
+        let rawVal = selections[rule.rule_id];
+        let value = 0;
+        if (rawVal === undefined || rawVal === null) return;
+
+        if (typeof rawVal === 'object') {
+          if (rawVal.value !== undefined) {
+            rawVal = rawVal.value;
+          } else if (rawVal.count !== undefined) {
+            rawVal = rawVal.count;
+          }
+        }
+
+        if (rule.input === 'counter') {
+          value = Number(rawVal) || 0;
+          if (!value) return;
+        } else {
+          value = rawVal ? 1 : 0;
+          if (!value) return;
+        }
+
+        const points = value * rule.valore;
+        total += points;
+        breakdown.push({
+          ruleId: rule.rule_id,
+          label: rule.nome_bonus || rule.descrizione || rule.rule_id,
+          value,
+          points
+        });
+      });
+
+      return { total, breakdown };
+    }
+
+    function calculateCurvaMetrics(selections = {}, rules = []) {
+      let total = 0;
+      const breakdown = [];
+      const ruleMap = new Map(rules.map(rule => [rule.rule_id, rule]));
+
+      Object.values(CURVA_RULE_ALIASES).forEach(alias => {
+        if (!ruleMap.has(alias.rule_id)) {
+          ruleMap.set(alias.rule_id, alias);
+        }
+      });
+
+      Object.entries(selections || {}).forEach(([key, rawValue]) => {
+        const rule = ruleMap.get(key);
+        if (!rule) return;
+
+        let resolved = rawValue;
+        if (typeof resolved === 'object' && resolved !== null) {
+          if (resolved.value !== undefined) {
+            resolved = resolved.value;
+          } else if (resolved.count !== undefined) {
+            resolved = resolved.count;
+          } else if (resolved.qty !== undefined) {
+            resolved = resolved.qty;
+          }
+        }
+
+        const inputType = rule.input || (REPEATABLE_CURVA.has(rule.rule_id) ? 'counter' : 'toggle');
+        const value = inputType === 'counter' ? (Number(resolved) || 0) : (resolved ? 1 : 0);
+        if (!value) return;
+
+        const unit = Number(rule.valore) || 0;
+        const points = value * unit;
+        total += points;
+        breakdown.push({
+          ruleId: rule.rule_id,
+          label: rule.nome_bonus || rule.descrizione || key,
+          value,
+          points
+        });
+      });
+
+      breakdown.sort((a, b) => (b.points - a.points) || a.label.localeCompare(b.label, 'it'));
+
+      return { total, breakdown };
+    }
+
+    function getPlayerDisplayLabel(info) {
+      if (!info) return '';
+      if (info.nickname) return capitalizeDisplay(info.nickname);
+      if (info.cognome) return capitalizeDisplay(info.cognome);
+      if (info.surname) return capitalizeDisplay(info.surname);
+      if (info.nome_completo) {
+        const parts = info.nome_completo.trim().split(/\s+/);
+        if (parts.length) {
+          return capitalizeDisplay(parts[parts.length - 1]);
+        }
+      }
+      if (info.name) return capitalizeDisplay(info.name);
+      return '';
+    }
+
+    function capitalizeDisplay(str) {
+      return String(str || '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+    }
+
+    function getEntityPhoto(entity) {
+      if (!entity) return '';
+      return entity.photo_url || entity.photoUrl || entity.photo || entity.image_url || entity.imageUrl || entity.avatar || entity.avatar_url || '';
+    }
+
+    function formatPlayerBreakdown(playerData) {
+      const items = playerData.metrics.breakdown || [];
+      const breakdownItems = items.map(item => {
+        const multiplier = (item.value !== undefined && item.value !== null) ? Number(item.value) : null;
+        return {
+          label: item.label || item.ruleId,
+          value: Number(item.points) || 0,
+          multiplier,
+          multiplierLabel: multiplier !== null && multiplier !== 0 && multiplier !== 1 ? `${multiplier}x` : null
+        };
+      });
+
+      if (playerData.isCaptain && playerData.metrics.total) {
+        breakdownItems.push({
+          label: 'Bonus capitano',
+          value: Number(playerData.metrics.total) || 0,
+          multiplier: null,
+          multiplierLabel: null
+        });
+      }
+
+      const text = breakdownItems.length
+        ? breakdownItems.map(item => `${item.label}: ${item.value > 0 ? '+' : ''}${item.value.toFixed(2)}${item.multiplierLabel ? ` (${item.multiplierLabel})` : ''}`).join(' • ')
+        : 'Nessun bonus/malus';
+
+      return { items: breakdownItems, text };
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+
+  <script src="resources/firebase.js"></script>
+  <script src="resources/feature-flags.js?v=20251103"></script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+</body>
+</html>
+

@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "last_updated": "2025-10-21",
+  "cards": [
+    {
+      "id": "nicola",
+      "nome": "Nicola Mocci",
+      "ruolo": "Supporto",
+      "rarita": "Epico",
+      "costo_birra": 5,
+      "hp": 600,
+      "dps": 40,
+      "velocita": "media",
+      "range": 120,
+      "bersagli": "terra_aria",
+      "tratti": ["smanettone", "gamer"],
+      "abilita": {
+        "nome": "Deploy Dev Mode",
+        "descrizione": "Rigenera +2 Birre/s al team per 5s e rimuove debuff.",
+        "cd_sec": 18,
+        "durata_sec": 5
+      },
+      "battute": {
+        "spawn": "Tranquilli, fixo tutto.",
+        "win": "Ottimizzato pure il Bar.",
+        "ko": "Era la cache, giuro..."
+      },
+      "audio": {
+        "spawn": "audio/nicola/spawn.mp3",
+        "win": "audio/nicola/win.mp3",
+        "ko": "audio/nicola/ko.mp3"
+      }
+    },
+    {
+      "id": "fracks",
+      "nome": "Fracks",
+      "ruolo": "Tank",
+      "rarita": "Leggendario",
+      "costo_birra": 7,
+      "hp": 1200,
+      "dps": 55,
+      "velocita": "lenta",
+      "range": 60,
+      "bersagli": "terra",
+      "abilita": {
+        "nome": "Manifesto del Circolo",
+        "descrizione": "Riduce del 20% i danni subiti dagli alleati vicini per 6s.",
+        "cd_sec": 20,
+        "durata_sec": 6
+      },
+      "battute": {
+        "spawn": "Compagni, difendiamo il Bar!",
+        "win": "La rivoluzione inizia al bancone.",
+        "ko": "Torno... dopo una riunione."
+      },
+      "audio": {
+        "spawn": "audio/fracks/spawn.mp3",
+        "win": "audio/fracks/win.mp3",
+        "ko": "audio/fracks/ko.mp3"
+      }
+    }
+  ]
+}

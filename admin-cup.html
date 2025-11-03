@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestione Coppa - Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .bracket { display: grid; gap: 40px; margin: 20px 0; }
+    .bracket-round { display: flex; flex-direction: column; gap: 20px; }
+    .match-card { background: var(--card); padding: 16px; border-radius: 12px; box-shadow: var(--shadow); }
+    .team-slot { display: flex; justify-content: space-between; padding: 12px; border-radius: 8px; margin: 4px 0; }
+    .winner { background: #e8f5e9; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html"><img src="resources/logo.png" alt="Fanta Athletic" /></a>
+    <h1>🏆 Gestione Coppa</h1>
+  </header>
+  <main class="container">
+    <div class="card"><h2>Coppa in Sviluppo</h2><p>Feature in arrivo...</p></div>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script>
+    if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+  <script src="resources/app-init.js"></script>
+</body>
+</html>

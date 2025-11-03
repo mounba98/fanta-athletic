@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIRC SNAP v5 - Marvel Style</title>
+  <link rel="icon" href="/favicon.svg" />
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <link rel="stylesheet" href="wirc-snap-v5-styles.css" />
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles" id="particles"></div>
+
+  <div class="app-container">
+    <!-- AUTH SCREEN -->
+    <div class="auth-screen" id="authScreen">
+      <div class="auth-logo">⚡ WIRC SNAP v5 ⚡</div>
+      <div class="auth-subtitle">Marvel Style Card Battle</div>
+      <button class="auth-btn" id="loginBtn">🎮 Login Fanta Athletic</button>
+      <div class="auth-user-info" id="userInfo" style="display:none;">
+        <div class="auth-user-name" id="userName"></div>
+        <div class="auth-user-email" id="userEmail"></div>
+      </div>
+      <button class="deck-btn" id="buildDeckBtn" style="display:none; margin-top:20px;">🎴 Build Deck</button>
+    </div>
+
+    <!-- DECK BUILDER SCREEN -->
+    <div class="deck-builder-screen" id="deckBuilderScreen">
+      <div class="deck-builder-header">
+        <h2>🎴 DECK BUILDER</h2>
+        <p>Scegli 12 carte per il tuo mazzo</p>
+      </div>
+      
+      <div class="deck-builder-content">
+        <!-- Left: Available Cards -->
+        <div class="available-cards-panel">
+          <div class="panel-header">
+            <h3>Carte Disponibili (<span id="availableCount">67</span>)</h3>
+            <input type="text" id="cardSearch" placeholder="🔍 Cerca carta..." />
+          </div>
+          <div class="cards-list" id="availableCardsList"></div>
+        </div>
+
+        <!-- Right: Your Deck -->
+        <div class="your-deck-panel">
+          <div class="panel-header">
+            <h3>Il Tuo Mazzo (<span id="deckCount">0</span>/12)</h3>
+            <input type="text" id="deckName" placeholder="Nome mazzo..." value="My Deck" />
+          </div>
+          <div class="deck-list" id="yourDeckList">
+            <div class="deck-empty-message">Clicca sulle carte per aggiungerle</div>
+          </div>
+          <div class="deck-actions">
+            <button class="save-deck-btn" id="saveDeckBtn">💾 Salva Mazzo</button>
+            <button class="load-deck-btn" id="loadDeckBtn">📂 Carica Mazzo</button>
+            <button class="start-game-btn" id="startGameFromDeck">🚀 Inizia Partita</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="back-btn" id="backToAuthBtn">⬅️ Indietro</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="game-screen" id="gameScreen">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <!-- Player Avatar Left -->
+        <div class="player-avatar player">
+          <div class="avatar-circle">
+            <div class="avatar-emoji">🎮</div>
+          </div>
+          <div class="avatar-name" id="playerName">You</div>
+        </div>
+
+        <!-- Timer Left -->
+        <div class="timer-container">
+          <div class="timer-label">TIME</div>
+          <div class="timer-circle">
+            <svg class="timer-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
+              <circle id="timerCircle" cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="8" 
+                      stroke-dasharray="282.74" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+            </svg>
+            <div class="timer-text" id="timerText">60</div>
+          </div>
+        </div>
+
+        <!-- Cubes Center -->
+        <div class="cubes-display">
+          <div class="cubes-value" id="cubesValue">1</div>
+          <div class="cubes-label">CUBES</div>
+          <button class="snap-btn" id="snapBtn">⚡ SNAP</button>
+        </div>
+
+        <!-- Opponent Avatar Right -->
+        <div class="player-avatar opponent">
+          <div class="avatar-circle">
+            <div class="avatar-emoji">🤖</div>
+          </div>
+          <div class="avatar-name">Opponent</div>
+        </div>
+
+        <!-- Round/Energy Right -->
+        <div class="game-info">
+          <div class="info-item">
+            <span class="info-label">TURN</span>
+            <span class="info-value round" id="roundValue">1/6</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">ENERGY</span>
+            <span class="info-value energy" id="energyValue">1/6</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Board: 3 Locations -->
+      <div class="board">
+        <div class="location" data-location="0">
+          <div class="location-zones">
+            <!-- Opponent Zone (top) -->
+            <div class="zone zone-opponent">
+              <div class="cards-grid" data-zone="opponent" data-location="0">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+              </div>
+            </div>
+            
+            <!-- Location Name & Effect -->
+            <div class="location-header">
+              <div class="location-name">???</div>
+              <div class="location-effect">Hidden</div>
+              <div class="location-scores">
+                <div class="location-score opponent" data-score="opponent">0</div>
+                <div class="location-score player" data-score="player">0</div>
+              </div>
+            </div>
+
+            <!-- Player Zone (bottom) -->
+            <div class="zone zone-player">
+              <div class="cards-grid" data-zone="player" data-location="0">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="location" data-location="1">
+          <div class="location-zones">
+            <div class="zone zone-opponent">
+              <div class="cards-grid" data-zone="opponent" data-location="1">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+              </div>
+            </div>
+            <div class="location-header">
+              <div class="location-name">???</div>
+              <div class="location-effect">Hidden</div>
+              <div class="location-scores">
+                <div class="location-score opponent" data-score="opponent">0</div>
+                <div class="location-score player" data-score="player">0</div>
+              </div>
+            </div>
+            <div class="zone zone-player">
+              <div class="cards-grid" data-zone="player" data-location="1">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="location" data-location="2">
+          <div class="location-zones">
+            <div class="zone zone-opponent">
+              <div class="cards-grid" data-zone="opponent" data-location="2">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+              </div>
+            </div>
+            <div class="location-header">
+              <div class="location-name">???</div>
+              <div class="location-effect">Hidden</div>
+              <div class="location-scores">
+                <div class="location-score opponent" data-score="opponent">0</div>
+                <div class="location-score player" data-score="player">0</div>
+              </div>
+            </div>
+            <div class="zone zone-player">
+              <div class="cards-grid" data-zone="player" data-location="2">
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+                <div class="card-slot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hand -->
+      <div class="hand-container">
+        <button class="retreat-btn" id="retreatBtn">🏃 RETREAT</button>
+        <div class="hand" id="hand">
+          <!-- Cards will be added here -->
+        </div>
+        <button class="end-turn-btn" id="endTurnBtn">🚀 END TURN</button>
+      </div>
+      
+      <!-- Turn Status Overlay -->
+      <div class="turn-status-overlay" id="turnStatusOverlay" style="display:none;">
+        <div class="turn-status-message" id="turnStatusMessage">Turno dell'avversario...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Detail Modal -->
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-modal-content">
+      <button class="detail-modal-close" id="detailModalClose">✕</button>
+      <div id="detailModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="modal" id="gameOverModal">
+    <div class="modal-content">
+      <div class="modal-title" id="gameOverTitle">Victory!</div>
+      <div class="modal-subtitle" id="gameOverSubtitle">You won!</div>
+      <div class="modal-stats">
+        <div class="modal-stat">
+          <div class="modal-stat-label">Your Score</div>
+          <div class="modal-stat-value player" id="playerFinalScore">0</div>
+        </div>
+        <div class="modal-stat">
+          <div class="modal-stat-label">Opponent</div>
+          <div class="modal-stat-value opponent" id="opponentFinalScore">0</div>
+        </div>
+      </div>
+      <div class="modal-stats">
+        <div class="modal-stat">
+          <div class="modal-stat-label">Cubes Won</div>
+          <div class="modal-stat-value cubes" id="cubesWon">0</div>
+        </div>
+      </div>
+      <button class="modal-btn" id="playAgainBtn">🎮 Play Again</button>
+    </div>
+  </div>
+
+  <!-- Effect Notification -->
+  <div class="effect-notification" id="effectNotification" style="display:none;"></div>
+
+  <script src="wirc-snap-v5-engine.js"></script>
+  <script src="wirc-snap-v5-ui.js"></script>
+</body>
+</html>

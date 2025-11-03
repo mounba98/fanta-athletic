@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Rules to Firestore</title>
+  <style>
+    body {
+      font-family: system-ui;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #2d6cdf; }
+    .btn {
+      background: #2d6cdf;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    .btn:hover { background: #1e5bbf; }
+    .btn-danger { background: #dc2626; }
+    .btn-danger:hover { background: #b91c1c; }
+    #log {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .success { color: #10b981; }
+    .error { color: #dc2626; }
+    .info { color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Upload Rules to Firestore</h1>
+    <p>Questo tool carica tutte le regole da <code>rules.json</code> su Firestore.</p>
+    
+    <div>
+      <button class="btn" onclick="uploadRules()">📤 Upload Regole</button>
+      <button class="btn btn-danger" onclick="deleteAllRules()">🗑️ Elimina Tutte Regole</button>
+      <button class="btn" onclick="verifyRules()">✅ Verifica Regole</button>
+    </div>
+    
+    <div id="log"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js"></script>
+  <script src="resources/rules-loader.js?v=2025110301"></script>
+
+  <script>
+    function log(msg, type = 'info') {
+      const logEl = document.getElementById('log');
+      const line = document.createElement('div');
+      line.className = type;
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(msg);
+    }
+
+    async function waitForFirebase() {
+      log('⏳ Attendo Firebase...', 'info');
+      let retries = 0;
+      while (!window.db && retries < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+      }
+      
+      if (window.db) {
+        log('✅ Firebase pronto!', 'success');
+        return true;
+      } else {
+        log('❌ Firebase non disponibile dopo 5s!', 'error');
+        return false;
+      }
+    }
+
+    async function uploadRules() {
+      try {
+        log('📡 Caricamento rules.json...', 'info');
+        const data = await (window.loadRulesJSON ? window.loadRulesJSON() : Promise.resolve({ rules: [] }));
+        const rules = data.rules || [];
+        
+        log(`✅ Trovate ${rules.length} regole in rules.json`, 'success');
+        
+        if (!window.db) {
+          const ready = await waitForFirebase();
+          if (!ready) return;
+        }
+        
+        log('📤 Upload regole su Firestore...', 'info');
+        
+        let uploaded = 0;
+        let errors = 0;
+        
+        for (const rule of rules) {
+          try {
+            // Usa rule_id come document ID
+            const docData = {
+              ...rule,
+              attivo: true, // Aggiungi campo attivo
+              visible: true, // Default visible
+              updated_at: new Date().toISOString()
+            };
+            
+            await window.db.collection('rules').doc(rule.rule_id).set(docData, { merge: true });
+            uploaded++;
+            log(`✓ ${rule.rule_id}: ${rule.nome_bonus} (${rule.valore})`, 'success');
+          } catch (e) {
+            errors++;
+            log(`✗ ${rule.rule_id}: ${e.message}`, 'error');
+          }
+        }
+        
+        log(`\n🎉 COMPLETATO! Uploaded: ${uploaded}, Errors: ${errors}`, 'success');
+        
+      } catch (e) {
+        log(`❌ Errore: ${e.message}`, 'error');
+      }
+    }
+
+    async function deleteAllRules() {
+      if (!confirm('⚠️ SEI SICURO? Questo eliminerà TUTTE le regole da Firestore!')) {
+        return;
+      }
+      
+      try {
+        log('🗑️ Eliminazione regole...', 'info');
+        
+        if (!window.db) {
+          const ready = await waitForFirebase();
+          if (!ready) return;
+        }
+        
+        const snapshot = await window.db.collection('rules').get();
+        log(`Trovate ${snapshot.docs.length} regole da eliminare`, 'info');
+        
+        let deleted = 0;
+        for (const doc of snapshot.docs) {
+          await doc.ref.delete();
+          deleted++;
+          log(`✗ Eliminata: ${doc.id}`, 'error');
+        }
+        
+        log(`\n🗑️ Eliminate ${deleted} regole`, 'success');
+        
+      } catch (e) {
+        log(`❌ Errore: ${e.message}`, 'error');
+      }
+    }
+
+    async function verifyRules() {
+      try {
+        log('🔍 Verifica regole...', 'info');
+        
+        // Load JSON
+        const data = await (window.loadRulesJSON ? window.loadRulesJSON() : Promise.resolve({ rules: [] }));
+        const jsonRules = data.rules || [];
+        log(`JSON: ${jsonRules.length} regole`, 'info');
+        
+        // Load Firestore
+        if (!window.db) {
+          const ready = await waitForFirebase();
+          if (!ready) return;
+        }
+        
+        const snapshot = await window.db.collection('rules').get();
+        const firestoreRules = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        log(`Firestore: ${firestoreRules.length} regole`, 'info');
+        
+        // Compare R026
+        const jsonR026 = jsonRules.find(r => r.rule_id === 'R026');
+        const firestoreR026 = firestoreRules.find(r => r.rule_id === 'R026');
+        
+        log('\n📋 R026 (Tamburo Trasferta):', 'info');
+        log(`  JSON: ${jsonR026?.valore}`, jsonR026?.valore === -0.5 ? 'success' : 'error');
+        log(`  Firestore: ${firestoreR026?.valore}`, firestoreR026?.valore === -0.5 ? 'success' : 'error');
+        
+        if (jsonR026?.valore !== firestoreR026?.valore) {
+          log('⚠️ MISMATCH! JSON e Firestore non coincidono per R026!', 'error');
+        } else {
+          log('✅ R026 sincronizzata', 'success');
+        }
+        
+        // Check R011/R011C
+        const r011 = firestoreRules.find(r => r.rule_id === 'R011');
+        const r011c = firestoreRules.find(r => r.rule_id === 'R011C');
+        log(`\n📋 Squalificato in curva:`, 'info');
+        log(`  R011 (Giocatore): ${r011?.valore || 'NON TROVATA'}`, r011 ? 'success' : 'error');
+        log(`  R011C (Curva): ${r011c?.valore || 'NON TROVATA'}`, r011c ? 'success' : 'error');
+        
+      } catch (e) {
+        log(`❌ Errore: ${e.message}`, 'error');
+      }
+    }
+
+    // Auto-verify on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        log('🚀 Tool caricato. Premi un bottone per iniziare.', 'info');
+      }, 500);
+    });
+  </script>
+</body>
+</html>

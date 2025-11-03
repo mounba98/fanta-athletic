@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Formazioni Volley - Fanta Athletic</title>
+  <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
+  <style>
+    .volley-court {
+      max-width: 600px;
+      margin: 20px auto;
+      background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 24px rgba(0,102,204,0.3);
+    }
+    
+    .court-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .slot {
+      background: rgba(255,255,255,0.95);
+      border: 3px dashed rgba(0,0,0,0.2);
+      border-radius: 12px;
+      padding: 15px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .slot:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .slot.filled {
+      background: white;
+      border-color: #0066CC;
+      border-style: solid;
+    }
+    
+    .slot-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .player-name {
+      font-weight: 600;
+      font-size: 14px;
+      text-align: center;
+    }
+    
+    .bench {
+      background: rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+    
+    .bench-title {
+      font-weight: 700;
+      color: white;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    
+    .bench-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .bench-player {
+      background: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .bench-player:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🏐 Formazioni Volley</h1>
+  </header>
+
+  <main style="padding: 20px;">
+    <div class="volley-court">
+      <div class="court-grid">
+        <div class="slot" data-position="S">
+          <div class="slot-label">SCHIACCIATORE 1 (S)</div>
+          <div class="player-name">-</div>
+        </div>
+        <div class="slot" data-position="O">
+          <div class="slot-label">OPPOSTO (O)</div>
+          <div class="player-name">-</div>
+        </div>
+        <div class="slot" data-position="S">
+          <div class="slot-label">SCHIACCIATORE 2 (S)</div>
+          <div class="player-name">-</div>
+        </div>
+        <div class="slot" data-position="P">
+          <div class="slot-label">PALLEGGIATORE (P)</div>
+          <div class="player-name">-</div>
+        </div>
+        <div class="slot" data-position="C">
+          <div class="slot-label">CENTRALE (C)</div>
+          <div class="player-name">-</div>
+        </div>
+        <div class="slot" data-position="L">
+          <div class="slot-label">LIBERO (L)</div>
+          <div class="player-name">-</div>
+        </div>
+      </div>
+      
+      <div class="bench">
+        <div class="bench-title">PANCHINA (3 giocatori)</div>
+        <div class="bench-list" id="benchList">
+          <div class="bench-player">Giocatore 1</div>
+          <div class="bench-player">Giocatore 2</div>
+          <div class="bench-player">Giocatore 3</div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="max-width: 600px; margin: 20px auto; text-align: center;">
+      <button class="btn" style="background: #0066CC; color: white; padding: 14px 30px; font-size: 16px; font-weight: 700;">
+        💾 Salva Formazione
+      </button>
+    </div>
+    
+    <div style="max-width: 800px; margin: 40px auto; background: var(--card); padding: 20px; border-radius: 12px;">
+      <h3 style="margin-top: 0;">📋 Regole Fanta Volley</h3>
+      <ul style="line-height: 1.8;">
+        <li><strong>Titolari:</strong> 1 P + 2 S + 1 O + 1 C + 1 L</li>
+        <li><strong>Panchina:</strong> 3 giocatori</li>
+        <li><strong>Capitano:</strong> +20% punteggio</li>
+        <li><strong>Punteggi:</strong> Punto attacco (3), Ace (3), Muro punto (3), Difesa (1)</li>
+        <li><strong>Bonus:</strong> Ricezione perfetta (1), MVP (3), Vittoria match (3)</li>
+        <li><strong>Malus:</strong> Errore attacco (-1), Errore servizio (-1), Cartellino rosso (-3)</li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+  </script>
+  
+  <script>
+    console.log('🏐 Fanta Volley - UI Ready');
+    
+    document.querySelectorAll('.slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        alert('Seleziona giocatore dalla rosa (funzionalità in sviluppo)');
+      });
+    });
+  </script>
+  
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+</body>
+</html>

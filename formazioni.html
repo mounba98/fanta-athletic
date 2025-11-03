@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Formazioni</title>
+  <meta name="description" content="Gestisci le formazioni della tua squadra." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <style>
+    .layout { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+    .sidebar, .panel { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
+    /* Sticky team list on desktop */
+    @media (min-width: 641px){
+      .sidebar { position: sticky; top: 110px; max-height: calc(100vh - 130px); overflow: auto; }
+    }
+    .team { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border:1px solid #e7edf3; border-radius:10px; cursor:pointer; }
+    .team:hover { box-shadow: 0 0 0 3px var(--ring); }
+    .muted { color: var(--muted); font-size: 12px; }
+    .hint { margin-top:6px; background: rgba(0,0,0,0.35); color:#fff; padding:6px 8px; border-radius:8px; font-size:12px; }
+
+    /* Buttons under pitch in full width grid */
+    .actions-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; width:100%; }
+
+    /* Logo box clickable */
+    #logoBox { width: 112px; height: 112px; border-radius: 12px; border:1px solid #dbe1e8; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; }
+    #logoBox img { width:100%; height:100%; object-fit:cover; }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items:start; }
+    .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
+    .meta-wrap { display:grid; grid-template-columns: 360px 1fr; column-gap: 16px; align-items:start; }
+    .meta-left .row { margin: 0 0 4px !important; }
+    .list { display:grid; gap:8px; }
+    /* Larger players font in lists */
+    #playersPool .player-pick span { font-size: 16px; }
+    .tag { display:inline-block; padding:3px 8px; border-radius:999px; background:#eef3f8; color:#506070; font-size:12px; }
+    .sectionh { margin:10px 0 4px; font-weight:800; }
+    .row { display:flex; gap:10px; align-items:center; }
+    /* Enlarged selector and inputs */
+    #giornataSel { padding: 10px 14px; font-size: 16px; border-radius: 10px; border:1px solid #dbe1e8; box-shadow: 0 0 0 4px var(--ring); }
+    #playerSearch { padding: 14px 16px; font-size: 16px; }
+    /* Make specific buttons match input height */
+    #saveTeam, #saveKickoff, #addSelected { padding: 14px 16px; font-size: 16px; border:1px solid #dbe1e8; box-shadow: 0 0 0 4px var(--ring); vertical-align: middle; line-height: 1; transform: translateY(-4px); }
+    /* Shrink 'Aggiungi giocatori' ~20% */
+    #addSelected { padding: 12px 10px; font-size: 13px; transform: translateY(-2px); width: 88px; white-space: normal; line-height: 1.1; text-align: center; }
+    /* Coach buttons restyle */
+    .meta-right { display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+    #coachButtons { flex-wrap: nowrap !important; gap: 8px; justify-content:flex-start; }
+    #coachButtons .btn { padding: 14px 18px; border-radius: 14px; font-weight: 800; font-size: 18px; flex: 0 0 auto; }
+    #coachButtons .btn.selected { background: var(--primary); color: #fff; border: none; }
+
+    .coach-preview {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(59, 130, 246, 0.12);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .coach-preview-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(59, 130, 246, 0.2);
+      border: 2px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .coach-preview-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Pitch and DnD */
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 12px; padding: 16px; color:#e8f6ee; box-shadow: var(--shadow); }
+    .pitch-grid { display:grid; gap: 10px; }
+    .pitch-grid .line { display:grid; gap: 14px; justify-content:center; align-items:center; }
+    .pitch-grid .line.two { grid-template-columns: repeat(2, minmax(170px, 1fr)); }
+    .pitch-grid .line.one { grid-template-columns: minmax(190px, 1fr); max-width: 58%; margin: 0 auto; }
+    .slot { min-height: 90px; background: rgba(255,255,255,0.12); border:2px dashed rgba(255,255,255,0.5); border-radius:10px; display:flex; align-items:center; justify-content:center; padding:10px; text-align:center; }
+    .slot.filled { background: rgba(255,255,255,0.18); border-style: solid; }
+    .draggable { background:transparent; border:none; border-radius:8px; padding:6px 8px; cursor:grab; color:#2b3a42; user-select:none; -webkit-user-select:none; touch-action:none; display: flex; align-items: center; gap: 8px; }
+    .draggable.dragging-touch { opacity:0.5; transform:scale(0.95); box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+    .slot.touch-drop-target { background:rgba(34,197,94,0.3); border-color:#22c55e; border-style:solid; }
+    .captain { border:2px solid #f39c12; }
+    .badgeC { margin-left:6px; background:#fdf3d3; color:#8a5d00; border:1px solid #f1d592; border-radius:6px; padding:2px 6px; font-size:11px; }
+
+    .roster { display:grid; gap:8px; border:1px solid #e7edf3; border-radius:10px; padding:8px; }
+    .roster .draggable { display:flex; justify-content:space-between; align-items:center; }
+
+    .player-chip {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+    }
+
+    .player-chip img {
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      object-fit:cover;
+      border:2px solid rgba(255,255,255,0.25);
+      box-shadow:0 2px 6px rgba(15,23,42,0.25);
+      flex-shrink:0;
+    }
+
+    .player-chip-text {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+
+    .player-chip-name {
+      font-weight:700;
+      font-size:15px;
+      color:#0f172a;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .player-chip-meta {
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .slot-player-name {
+      flex:1;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-weight:700;
+      color:#f8fafc;
+      text-shadow:0 1px 3px rgba(0,0,0,0.45);
+    }
+
+    .btn-sm { padding:10px 14px; font-size: 15px; }
+    #saveTeam { padding: 12px 16px; font-size: 15px; }
+    #kickoffTime { padding: 10px 12px; font-size: 16px; }
+    #teamName { font-weight: 400; font-size: 20px; padding: 14px 16px; }
+    /* Enlarge team list font */
+    #teams .item { font-size: 18px; }
+
+    /* Accordion roles */
+    .role-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; margin-bottom:8px; }
+    .role-header { display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:800; }
+    .role-section.collapsed .role-body { display:none; }
+    .strip { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .pill { padding:6px 8px; border-radius:999px; background:#eef3f8; border:1px solid #dbe1e8; color:#2b3a42; }
+    .btn-danger { background:#fbeaea; color:#b00020; border:1px solid #e39aa0; }
+    .selected { box-shadow: 0 0 0 3px rgba(52,152,219,0.25); }
+    /* Mobile helpers */
+    .mobile-only { display:none; }
+    .desktop-only { display:block; }
+    
+    /* Tablet support 768px-1024px */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .grid2 { grid-template-columns: 1fr; gap: 18px; }
+      .panel { max-width: 700px; margin: 0 auto; padding: 20px; }
+      .pitch { max-width: 550px; margin: 0 auto; }
+      .pitch-grid .line.two { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+      .pitch-grid .line.one { grid-template-columns: minmax(180px, 1fr); max-width: 55%; }
+      .slot { min-height: 90px; font-size: 15px; padding: 10px; }
+      #teamSelectMobile { width: 100%; }
+      #benchStrip { max-width: 550px; margin: 0 auto; justify-content: center; }
+      .sectionh { max-width: 550px; margin: 0 auto; }
+      /* Larger touch targets for tablet */
+      .btn { min-height: 44px; padding: 10px 16px; }
+      .draggable { min-height: 48px; padding: 10px 12px; }
+      /* Hide sidebar on tablet */
+      .sidebar { position: static; max-height: none; }
+    }
+    
+    /* Mobile 640px and below */
+    @media (max-width: 600px) {
+      .mobile-only { display:block; }
+      .desktop-only { display:none !important; }
+      .sidebar { display:none; }
+      header { padding-left: 60px !important; padding-right: 16px !important; }
+      header p { display:none; }
+      header h1 { font-size: 14px !important; }
+      .logo-home img { width: 36px !important; height: 36px !important; }
+      .grid2 { grid-template-columns: 1fr; }
+      .panel { max-width: 380px; margin: 0 auto; }
+      .pitch { max-width: 300px; margin: 0 auto; }
+      .sectionh { max-width: 300px; margin-left: auto; margin-right: auto; }
+      #benchStrip { max-width: 300px; margin-left: auto; margin-right: auto; justify-content: center; }
+      #colRight > .row { max-width: 300px; margin-left: auto; margin-right: auto; }
+      /* Mobile: slot più grandi, layout verticale foto+nome */
+      .pitch-grid .line.two { grid-template-columns: repeat(2, minmax(125px, 1fr)); }
+      .pitch-grid .line.one { grid-template-columns: minmax(135px, 1fr); max-width: 65%; }
+      .slot { min-height: 120px; padding: 10px; }
+      #teamSelectMobile { width: 100%; }
+      /* Larger touch targets for mobile */
+      .btn { min-height: 48px; font-size: 16px; }
+      /* Layout verticale: foto SOPRA nome */
+      .pitch .draggable { flex-direction: column; padding: 8px 6px; gap: 4px; background: transparent; border: none; }
+      .pitch .draggable img { width: 48px !important; height: 48px !important; flex-shrink: 0; border-radius: 50%; border:2px solid rgba(255,255,255,0.4); }
+      .pitch .draggable .slot-player-name { font-size: 12px; line-height: 1.15; text-align: center; white-space: normal; }
+      .pitch .draggable .badgeC { margin-top: 4px; }
+      .btn-sm { padding: 4px 6px; font-size: 12px; min-height: 32px; }
+      /* Roster mobile: mantieni orizzontale */
+      .roster .draggable { flex-direction: row; background: #fff; border: 1px solid #dbe1e8; padding: 6px 8px; }
+      .roster .player-chip img { width: 36px; height: 36px; border:1px solid rgba(148,163,184,0.4); box-shadow:none; }
+      .roster .player-chip-name { font-size: 13px; color: #2b3a42; text-shadow: none; white-space: normal; }
+      .roster .player-chip-meta { font-size: 11px; }
+    }
+    
+    /* iOS Safari specific fixes */
+    @supports (-webkit-touch-callout: none) {
+      .draggable { -webkit-user-select: none; user-select: none; }
+      .slot { -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
+    }
+    
+    /* JS removed from style block (moved to <script>) */
+    
+    /* Dark Mode Formazioni */
+    :root.dark .draggable,
+    :root.dark .pill {
+      background: #334155;
+      color: #e2e8f0;
+      border-color: #475569;
+    }
+    
+    :root.dark .roster {
+      border-color: #475569;
+    }
+    
+    :root.dark .team {
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+    
+    :root.dark .team .muted {
+      color: #94a3b8;
+    }
+
+    :root.dark .player-chip-name {
+      color: #e2e8f0;
+    }
+
+    :root.dark .player-chip-meta {
+      color: rgba(226,232,240,0.7);
+    }
+
+    :root.dark .player-chip img {
+      border-color: rgba(148,163,184,0.5);
+      box-shadow: 0 2px 6px rgba(15,23,42,0.4);
+    }
+    
+    /* Pulsanti salvataggio evidenziati */
+    #saveTeam, #saveKickoff {
+      transition: all 0.3s;
+      border: 2px solid var(--primary);
+    }
+    
+    #saveTeam:hover, #saveKickoff:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220,20,60,0.3);
+    }
+    
+    /* Stili per il drag and drop e interazioni */
+    .dragging {
+      opacity: 0.5;
+      border: 2px dashed #3498db !important;
+      cursor: grabbing !important;
+    }
+    .drag-over {
+      background-color: rgba(52, 152, 219, 0.3) !important;
+      border-style: solid !important;
+      border-color: #3498db !important;
+      transform: scale(1.05);
+    }
+    .slot {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .slot-empty {
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      text-align: center;
+      padding: 10px;
+      user-select: none;
+      font-weight: 600;
+    }
+    [data-act="remove"] {
+      padding: 2px 8px;
+      line-height: 1;
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    [data-act="remove"]:hover {
+      background: #ff5252;
+      transform: scale(1.1);
+    }
+    .draggable {
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .draggable:active {
+      cursor: grabbing;
+    }
+    .roster .draggable {
+      cursor: grab;
+    }
+    .roster .draggable:hover {
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    #benchStrip .draggable {
+      cursor: pointer;
+    }
+    #benchStrip .draggable:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    /* Hide reset anywhere */
+    #resetTeam { display:none !important; }
+    /* Sticky header with hide-on-scroll (mobile) */
+    header { position: sticky; top: 0; z-index: 50; transition: transform .25s ease; }
+    header.nav-hidden { transform: translateY(-110%); }
+  </style>
+</head>
+  <body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>⚽ Formazioni</h1>
+    <p>Gestisci la formazione della tua squadra</p>
+    </header>
+
+  <main class="layout">
+    <section class="sidebar" style="display:none;">
+      <div class="list" id="teams"></div>
+    </section>
+
+    <section class="panel" id="editor">
+      <!-- Header con giornata e calcio d'inizio -->
+      <div style="background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; width: 100%;">
+            <select id="giornataSel" class="input" style="min-width:150px;"></select>
+            <span id="lockStatus" class="muted"></span>
+          </div>
+          <!-- Selettore squadra mobile -->
+          <div class="mobile-only" style="width: 100%; margin-top: 12px;">
+            <label>
+              <div class="muted" style="margin-bottom: 6px;">La tua squadra:</div>
+              <select id="teamSelectMobile" class="input" style="width: 100%;"></select>
+            </label>
+          </div>
+          <!-- Calcio d'inizio rimosso: gestito da admin in Calcolo -->
+        </div>
+      </div>
+      
+      <!-- Info squadra -->
+      <div class="desktop-only" id="teamMeta" style="background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);"></div>
+      <div class="grid2" style="margin-top:0; align-items:start;">
+        <div class="desktop-only" id="colPool">
+          <div class="sectionh">Rosa (11)</div>
+          <div class="row" style="margin-bottom:8px;">
+            <input id="playerSearch" placeholder="Cerca giocatori..." class="input" style="max-width:100%;" />
+            <button class="btn btn-secondary btn-sm" id="addSelected">Aggiungi giocatori</button>
+          </div>
+          <div class="list" id="playersPool"></div>
+        </div>
+        <div id="colRight">
+          <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+          <div class="pitch">
+            <div class="pitch-grid" id="pitchGrid">
+              <div class="line two">
+                <div class="slot" data-slot="0"></div>
+                <div class="slot" data-slot="1"></div>
+              </div>
+              <div class="line two">
+                <div class="slot" data-slot="2"></div>
+                <div class="slot" data-slot="3"></div>
+              </div>
+              <div class="line one">
+                <div class="slot" data-slot="4"></div>
+              </div>
+            </div>
+            <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+          </div>
+          <div class="actions-grid" style="margin:8px 0;">
+            <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+            <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+          </div>
+          <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+          <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" data-filter-role="all" style="background: var(--primary);">Tutti</button>
+            <button class="btn btn-secondary btn-sm" data-filter-role="P">P</button>
+            <button class="btn btn-secondary btn-sm" data-filter-role="D">D</button>
+            <button class="btn btn-secondary btn-sm" data-filter-role="C">C</button>
+            <button class="btn btn-secondary btn-sm" data-filter-role="A">A</button>
+          </div>
+          <div id="benchStrip" class="strip"></div>
+          <div class="role-section desktop-only" id="teamRosterSection" style="margin-top:8px;">
+            <div class="role-header">Rosa della squadra <span>▾</span></div>
+            <div class="role-body">
+              <div class="roster" id="teamRoster"></div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn mobile-only" id="confirmLineup" style="width:100%">Conferma formazione</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+  </footer>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script src="resources/firebase.js"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const $ = (s)=>document.querySelector(s);
+    const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+    // Funzioni di supporto per il drag and drop
+    function handleDragStart(e) {
+      const draggable = e.target.closest('[data-pid]');
+      if (!draggable) return;
+      
+      e.dataTransfer.setData('text/plain', draggable.dataset.pid);
+      draggable.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      const draggable = e.target.closest('[data-pid]');
+      if (draggable) {
+        draggable.classList.remove('dragging');
+      }
+      // Rimuovi tutte le classi drag-over
+      $$('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    }
+
+    // ========== CLICK SINGOLO per MOBILE (no drag complicato) ==========
+    function handleMobileClickPlayer(pid) {
+      const t = state.teams[state.selectedTeamIdx];
+      if (!t) return;
+      
+      const locked = isLockedAuto();
+      const computed = state.daysComputed && !state.isAdmin;
+      const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computed;
+      
+      if (!canWrite) {
+        if (computed) toast('📊 Giornata già calcolata!');
+        else if (locked) toast('⏰ Formazioni bloccate!');
+        else toast('❌ Non hai permessi!');
+        return;
+      }
+      
+      // Giocatore GIÀ in campo? → RIMUOVI
+      const indexInLineup = t.lineup.indexOf(pid);
+      if (indexInLineup !== -1) {
+        t.lineup[indexInLineup] = null;
+        
+        // Se era capitano, rimuovi badge
+        if (t.captain === pid) {
+          t.captain = null;
+        }
+        
+        saveTeams();
+        renderEditor();
+        toast('❌ Giocatore rimosso dal campo');
+        return;
+      }
+      
+      // Giocatore in panchina? → AGGIUNGI al primo slot vuoto
+      const emptySlot = t.lineup.findIndex(p => p === null);
+      if (emptySlot === -1) {
+        toast('⚠️ Tutti gli slot occupati! Rimuovi prima un giocatore.');
+        return;
+      }
+      
+      t.lineup[emptySlot] = pid;
+      saveTeams();
+      renderEditor();
+      toast('✅ Giocatore aggiunto al campo');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDragEnter(e) {
+      e.preventDefault();
+      const slot = e.target.closest('.slot');
+      if (slot) {
+        slot.classList.add('drag-over');
+      }
+    }
+
+    function handleDragLeave(e) {
+      const slot = e.target.closest('.slot');
+      if (slot && !slot.contains(e.relatedTarget)) {
+        slot.classList.remove('drag-over');
+      }
+    }
+
+    function handleDrop(e, slotIndex) {
+      e.preventDefault();
+      const slot = e.currentTarget;
+      slot.classList.remove('drag-over');
+      
+      const pid = e.dataTransfer.getData('text/plain');
+      if (!pid) return;
+      
+      const t = state.teams[state.selectedTeamIdx];
+      if (!t || !t.roster.includes(pid)) {
+        toast('Questo giocatore non è nella rosa della squadra!');
+        return;
+      }
+      
+      const locked = isLockedAuto();
+      const computed = state.daysComputed && !state.isAdmin;
+      const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computed;
+      
+      if (computed) {
+        toast('📊 Giornata già calcolata! Non puoi modificare.');
+        return;
+      }
+      
+      if (!canWrite) {
+        toast('Formazione bloccata o non hai permessi.');
+        return;
+      }
+      
+      // Rimuovi il giocatore dalla sua posizione attuale (se presente)
+      const oldIndex = t.lineup.indexOf(pid);
+      if (oldIndex !== -1 && oldIndex !== slotIndex) {
+        t.lineup[oldIndex] = null;
+      }
+      
+      // Aggiungi il giocatore alla nuova posizione
+      t.lineup[slotIndex] = pid;
+      
+      saveTeams();
+      renderEditor();
+    }
+
+    function handleBenchDoubleClick(pid) {
+      const t = state.teams[state.selectedTeamIdx];
+      if (!t) return;
+      
+      const locked = isLockedAuto();
+      const computed = state.daysComputed && !state.isAdmin;
+      const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computed;
+      
+      if (computed) {
+        toast('📊 Giornata già calcolata! Non puoi modificare.');
+        return;
+      }
+      
+      if (!canWrite) {
+        toast('Formazione bloccata o non hai permessi.');
+        return;
+      }
+      
+      // Trova il primo slot vuoto
+      const emptySlotIndex = t.lineup.findIndex(p => p === null);
+      if (emptySlotIndex === -1) {
+        toast('Tutti gli slot sono occupati! Rimuovi prima un giocatore dal campo.');
+        return;
+      }
+      
+      // Rimuovi il giocatore dalla sua posizione attuale (se presente)
+      const oldIndex = t.lineup.indexOf(pid);
+      if (oldIndex !== -1) {
+        t.lineup[oldIndex] = null;
+      }
+      
+      // Aggiungi il giocatore al primo slot vuoto
+      t.lineup[emptySlotIndex] = pid;
+      
+      saveTeams();
+      renderEditor();
+      toast('Giocatore aggiunto al campo!');
+    }
+
+    const state = {
+      players: [],
+      coaches: [],
+      teams: [], // 19 elements
+      selectedTeamIdx: 0,
+      // team object shape: { name, coach_ids:[], roster: [player_id], lineup: [player_id|null]*5, captain: player_id|null }
+      snapshots: {}, // per team index: { lineup: [], captain: id|null }
+      giornata: 'G1',
+      isAdmin: false,
+      deadlineTime: null, // deadline from Firestore
+      user: null,
+      userTeamIdx: null,
+      userDisplayName: '' ,
+      daysComputed: false,
+      benchFilter: 'all' // Filtro ruoli panchina: 'all', 'P', 'D', 'C', 'A'
+    };
+
+  const PLAYER_LABEL_OVERRIDES = new Map([
+    ['alessio lupi', 'Ale Lupi'],
+    ['ale lupi', 'Ale Lupi']
+  ]);
+
+  function capitalizeWords(str) {
+    return String(str || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
+  function getPlayerPhoto(player) {
+    if (!player) return '';
+    return player.photo_url
+      || player.photoUrl
+      || player.image_url
+      || player.imageUrl
+      || player.photo
+      || player.avatar
+      || player.avatar_url
+      || '';
+  }
+
+  function getPlayerDisplayLabel(player) {
+    if (!player) return '';
+    const full = String(player.nome_completo || player.name || '').trim();
+    const override = PLAYER_LABEL_OVERRIDES.get(full.toLowerCase());
+    if (override) return override;
+    if (player.nickname) return capitalizeWords(player.nickname);
+    if (player.cognome) return capitalizeWords(player.cognome);
+    if (player.surname) return capitalizeWords(player.surname);
+    if (full) {
+      const parts = full.split(/\s+/).filter(Boolean);
+      if (parts.length === 1) return capitalizeWords(parts[0]);
+      return capitalizeWords(parts[parts.length - 1]);
+    }
+    return capitalizeWords(player.player_id || 'Giocatore');
+  }
+
+    function toast(msg){
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.position='fixed'; el.style.bottom='16px'; el.style.right='16px'; el.style.background='#2d6cdf'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.boxShadow='var(--shadow)'; el.style.zIndex='9999';
+      document.body.appendChild(el); setTimeout(()=> el.remove(), 2000);
+    }
+
+    async function loadAuth(){
+      if (!window.auth || !window.db) return;
+      window.auth.onAuthStateChanged(async (user)=>{
+        state.user = user || null; state.isAdmin = false; state.userTeamIdx = null;
+        if (user){
+          try{
+            const ad = await window.db.collection('admins').doc(user.uid).get();
+            state.isAdmin = !!ad.exists;
+            const ud = await window.db.collection('users').doc(user.uid).get();
+            if (ud.exists) {
+              const userData = ud.data();
+              state.userTeamIdx = userData.team_index;
+              console.log('✅ User team_index:', state.userTeamIdx);
+              if (typeof state.userTeamIdx !== 'number' && !state.isAdmin) {
+                console.warn('⚠️ User senza team_index assegnato!');
+                toast('⚠️ Non hai una squadra assegnata. Vai su "Scegli Squadra" o contatta un admin.');
+              }
+              if (!state.isAdmin && typeof state.userTeamIdx === 'number') {
+                state.selectedTeamIdx = state.userTeamIdx;
+              }
+            } else {
+              console.warn('⚠️ Documento user non trovato in Firestore');
+            }
+          } catch { /* noop */ }
+        }
+        updateAuthBtn();
+        renderTeamsList(); renderEditor();
+        // scroll alla squadra dell'utente, se presente
+        try{
+          const el = document.querySelector(`#teams .item[data-idx="${state.selectedTeamIdx}"]`);
+          if (el) el.scrollIntoView({ block:'nearest' });
+        } catch {}
+      });
+    }
+
+    function updateAuthBtn(){
+      const btn = document.getElementById('userAuthBtn'); if (!btn) return;
+      btn.textContent = state.user ? 'Esci' : 'Accedi';
+    }
+
+    function canEdit(idx){
+      return state.isAdmin || (state.user && state.userTeamIdx===idx);
+    }
+
+    function mondayWindow(now){
+      // returns [startLock, endLock) for current week: Mon 20:30 .. Wed 00:30
+      const d = new Date(now);
+      const day = d.getDay(); // 0 Sun .. 6 Sat
+      // get current week Monday 20:30
+      const curMon = new Date(d);
+      const diffToMon = (day + 6) % 7; // days since Monday
+      curMon.setDate(d.getDate() - diffToMon);
+      curMon.setHours(20,30,0,0);
+      // End: Wednesday 00:30 of the same week (Mon + 2 days at 00:30)
+      const wed0030 = new Date(curMon);
+      wed0030.setDate(curMon.getDate()+2);
+      wed0030.setHours(0,30,0,0);
+      return [curMon, wed0030];
+    }
+    // getKickoff rimosso: calcio d'inizio gestito in Calcolo
+    function isLockedAuto(){
+      // PRIORITÀ 1: Se giornata calcolata → BLOCCATA (anche G1/G2!)
+      if (state.daysComputed && !state.isAdmin) {
+        console.log('📊 Giornata', state.giornata, '- BLOCCATA (già calcolata)');
+        return true;
+      }
+      
+      // PRIORITÀ 2: Check deadline da Firestore
+      if (state.deadlineTime) {
+        const now = new Date();
+        if (now >= state.deadlineTime) {
+          console.log('⏰ Giornata', state.giornata, '- BLOCCATA (deadline scaduta)');
+          return true;
+        }
+      }
+      
+      // Altrimenti aperta
+      console.log('🔓 Giornata', state.giornata, '- APERTA');
+      return false;
+    }
+    async function updateDaysComputed(){
+      // Reads days/{giornata}.computed from Firestore; fallback false
+      try{
+        if (window.db){
+          const doc = await window.db.collection('days').doc(state.giornata).get();
+          state.daysComputed = !!(doc.exists && (doc.data()?.computed===true));
+          return;
+        }
+      }catch(e){ /* noop */ }
+      state.daysComputed = false;
+    }
+    async function loadDeadline(){
+      // Carica deadline da Firestore per giornata corrente
+      state.deadlineTime = null;
+      try{
+        if (!window.db) {
+          console.warn('⚠️ Firestore non disponibile');
+          return;
+        }
+        // Fallback per fanta principale senza leghe
+        const giornataNum = parseInt(state.giornata.replace('G',''));
+        let deadlinePath;
+        
+        if (window.currentLeague && window.currentLeague.id) {
+          deadlinePath = `leagues/${window.currentLeague.id}/deadlines/giornata_${giornataNum}`;
+        } else {
+          // Fallback: deadlines globali
+          deadlinePath = `deadlines/G${giornataNum}`;
+        }
+        
+        console.log('📡 Loading deadline from:', deadlinePath);
+        
+        let doc;
+        if (window.currentLeague && window.currentLeague.id) {
+          try {
+            doc = await window.db.collection('leagues').doc(window.currentLeague.id)
+              .collection('deadlines').doc(`giornata_${giornataNum}`).get();
+          } catch(err) {
+            console.warn('⚠️ Error loading league deadline, trying global:', err);
+            doc = await window.db.collection('deadlines').doc(`G${giornataNum}`).get();
+          }
+        } else {
+          // Fallback: deadline globale
+          doc = await window.db.collection('deadlines').doc(`G${giornataNum}`).get();
+        }
+        
+        if (doc.exists && doc.data().deadline){
+          state.deadlineTime = doc.data().deadline.toDate();
+          console.log('✅ Deadline loaded:', state.deadlineTime);
+        } else {
+          console.warn('⚠️ Deadline non trovata per giornata', giornataNum, '- Formazioni APERTE');
+        }
+      }catch(e){ 
+        console.error('❌ Deadline load error:', e); 
+      }
+    }
+    async function initLockUI(){
+      const sel = document.getElementById('giornataSel');
+      sel.innerHTML = Array.from({length:24}, (_,i)=>`<option value=\"G${i+1}\">Giornata ${i+1}</option>`).join('');
+      
+      // state.giornata è GIÀ settata da selectActiveGiornata() - NON sovrascrivere!
+      console.log('🟢 initLockUI: usando giornata esistente:', state.giornata);
+      sel.value = state.giornata;
+      
+      sel.onchange = async ()=>{ state.giornata = sel.value; await loadDeadline(); await updateDaysComputed(); updateLockStatus(); await applySavedFromFirestore(state.giornata); subscribeSavedForGiornata(state.giornata); renderEditor(); };
+      await loadDeadline();
+      await updateDaysComputed();
+      updateLockStatus();
+      setInterval(()=>{ const before = document.getElementById('lockStatus').dataset.locked; updateLockStatus(); if (document.getElementById('lockStatus').dataset.locked!==before) renderEditor(); }, 30000);
+    }
+    function updateLockStatus(){
+      const ls = document.getElementById('lockStatus');
+      const locked = isLockedAuto();
+      const final = state.daysComputed && !state.isAdmin; // admin bypassa
+      ls.dataset.locked = (locked||final)? '1':'0';
+      
+      if (final) {
+        ls.textContent = `📊 Giornata ${state.giornata} CALCOLATA - Solo lettura`;
+        ls.style.color = '#dc143c';
+        ls.style.fontWeight = '700';
+      } else if (state.deadlineTime) {
+        const now = new Date();
+        if (locked) {
+          ls.textContent = `🔒 Formazioni bloccate (deadline: ${state.deadlineTime.toLocaleString()})`;
+          ls.style.color = '#f59e0b';
+          ls.style.fontWeight = '600';
+        } else {
+          const timeUntil = state.deadlineTime - now;
+          const hoursLeft = Math.floor(timeUntil / (1000*60*60));
+          const minutesLeft = Math.floor((timeUntil % (1000*60*60)) / (1000*60));
+          if (hoursLeft > 0) {
+            ls.textContent = `✅ Formazioni aperte (chiudono tra ${hoursLeft}h ${minutesLeft}m)`;
+          } else if (minutesLeft > 0) {
+            ls.textContent = `⚠️ Formazioni aperte (chiudono tra ${minutesLeft}m)`;
+          } else {
+            ls.textContent = `✅ Formazioni aperte`;
+          }
+          ls.style.color = hoursLeft < 2 ? '#f59e0b' : '#10b981';
+          ls.style.fontWeight = '600';
+        }
+      } else {
+        ls.textContent = `✅ Formazioni aperte`;
+        ls.style.color = '#10b981';
+        ls.style.fontWeight = '600';
+      }
+    }
+
+    // initKickoffUI rimosso: calcio d'inizio gestito in Calcolo
+
+    // LocalStorage fallback disabilitato per evitare divergenze tra finestre
+    function keySaved(g){ return `teams_saved_${g}`; }
+    function loadSaved(g){ return {}; }
+    function saveSaved(g, data){ /* noop */ }
+    async function saveCurrentTeamFormation(){
+      const t = state.teams[state.selectedTeamIdx]; if (!t) return;
+      if (!t.captain){ toast('Seleziona il capitano prima di salvare'); return; }
+      const payload = {
+        lineup: t.lineup||[],
+        captain: t.captain||null,
+        name: t.name||'',
+        updated_at: Date.now()
+      };
+      // no local fallback: si scrive solo su Firestore per evitare stati divergenti
+      const g = state.giornata;
+      // Firestore write
+      try{
+        if (window.db){ 
+          console.log('💾 Saving to Firestore:', {
+            teamIdx: state.selectedTeamIdx,
+            giornata: g,
+            lineup: payload.lineup,
+            captain: payload.captain,
+            isIOS: isIOS(),
+            isMobile: isMobile()
+          });
+          
+          await window.db.collection('teams').doc(String(state.selectedTeamIdx)).collection('saved').doc(g).set(payload, { merge:true }); 
+          
+          console.log('✅ Firestore save SUCCESS');
+          toast(`✅ Formazione salvata • Squadra ${state.selectedTeamIdx+1} • ${g}`); 
+        }
+      }catch(e){ 
+        console.error('❌ Firestore save ERROR:', e);
+        console.error('Error details:', {
+          code: e?.code,
+          message: e?.message,
+          name: e?.name
+        });
+        
+        // Messaggi specifici per errori comuni
+        let errorMsg = 'Errore salvataggio';
+        if (e?.code === 'permission-denied') {
+          errorMsg = '🚫 Permesso negato. Verifica login e team assegnato.';
+        } else if (e?.code === 'unavailable') {
+          errorMsg = '📡 Connessione assente. Riprova tra poco.';
+        } else if (e?.message?.includes('network')) {
+          errorMsg = '📡 Problema di rete. Controlla connessione.';
+        } else {
+          errorMsg = `❌ ${e?.message || 'Errore sconosciuto'}`;
+        }
+        
+        toast(errorMsg);
+        
+        // iOS: suggerisci disattivare Private mode
+        if (isIOS() && e?.code === 'permission-denied') {
+          setTimeout(() => {
+            if (confirm('Possibile modalità Privata iOS. Disattivare e ricaricare?')) {
+              window.location.reload();
+            }
+          }, 1000);
+        }
+      }
+    }
+
+    async function resizeToDataUrl(file, maxW=256, maxH=256){
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      await new Promise((res)=>{ img.onload=res; img.src=url; });
+      const ratio = Math.min(maxW/img.width, maxH/img.height, 1);
+      const w = Math.round(img.width*ratio), h = Math.round(img.height*ratio);
+      const canvas = document.createElement('canvas'); canvas.width=w; canvas.height=h;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0,0,w,h);
+      const data = canvas.toDataURL('image/png', 0.9);
+      URL.revokeObjectURL(url);
+      return data;
+    }
+    function teamLogoKey(idx){ return `team_logo_${idx}`; }
+    function getTeamLogo(idx){ return localStorage.getItem(teamLogoKey(idx))||''; }
+    function setTeamLogo(idx, dataUrl){
+      try {
+        localStorage.setItem(teamLogoKey(idx), dataUrl);
+      } catch (err) {
+        console.warn('⚠️ Impossibile salvare logo squadra su localStorage:', err);
+      }
+    }
+
+    function isMobile(){ 
+      const mobile = (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) || window.matchMedia('(max-width: 640px)').matches;
+      if (mobile) {
+        console.log('📱 Mobile detected:', navigator.userAgent);
+      }
+      return mobile;
+    }
+    
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+    
+    function isSafari() {
+      return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    }
+
+    function initTeams(){
+      try { state.teams = JSON.parse(localStorage.getItem('teams_data')||'[]'); } catch { state.teams = []; }
+      if (!Array.isArray(state.teams) || state.teams.length !== 19){
+        state.teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null }));
+      }
+    }
+
+    function saveTeams(){
+      try {
+        localStorage.setItem('teams_data', JSON.stringify(state.teams));
+      } catch (err) {
+        console.warn('⚠️ Impossibile salvare teams su localStorage:', err);
+      }
+      // persist single team to Firestore if admin
+      try{
+        if (window.db && state.isAdmin){
+          const idx = String(state.selectedTeamIdx);
+          const t = state.teams[state.selectedTeamIdx];
+          window.db.collection('teams').doc(idx).set({
+            name: t.name||'',
+            coach_ids: t.coach_ids||[],
+            roster: t.roster||[],
+            logo: getTeamLogo(state.selectedTeamIdx)||''
+          }, { merge: true });
+        }
+      }catch{}
+    }
+
+    async function syncTeamsFromFirestore(){
+      if (!window.db) return;
+      try{
+        const tasks = Array.from({length:19}, (_,i)=> window.db.collection('teams').doc(String(i)).get());
+        const docs = await Promise.all(tasks);
+        docs.forEach((doc, i)=>{
+          if (doc.exists){
+            const d = doc.data();
+            const t = state.teams[i];
+            if (!t) return;
+            if (d.name) t.name = d.name;
+            if (Array.isArray(d.coach_ids)) t.coach_ids = d.coach_ids;
+            if (Array.isArray(d.roster)) t.roster = d.roster;
+            if (d.logo) setTeamLogo(i, d.logo);
+          }
+        });
+      }catch(e){ console.warn('FS load teams error', e); }
+    }
+
+    async function applySavedFromFirestore(g){
+      if (!window.db) return;
+      console.log('🔄 Loading formazioni for:', g);
+      try{
+        const tasks = Array.from({length:19}, (_,i)=> window.db.collection('teams').doc(String(i)).collection('saved').doc(g).get());
+        const docs = await Promise.all(tasks);
+        docs.forEach((doc,i)=>{
+          const t = state.teams[i]; if (!t) return;
+          if (doc.exists){
+            const d = doc.data();
+            if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
+            if (d.captain!==undefined) t.captain = d.captain;
+            if (d.name && !t.name) t.name = d.name;
+          } else {
+            // Reset se non esiste doc salvato per coerenza tra client
+            t.lineup = [null,null,null,null,null];
+            t.captain = null;
+          }
+        });
+        console.log('✅ Formazioni loaded for:', g);
+        // Force render dopo load
+        renderEditor();
+      }catch(e){ console.warn('FS load saved error', e); }
+    }
+
+    // Realtime subscription to saved formations for current giornata
+    let savedUnsubs = [];
+    function unsubscribeSaved(){ try{ savedUnsubs.forEach(u=>u&&u()); }catch{} savedUnsubs=[]; }
+    function subscribeSavedForGiornata(g){
+      unsubscribeSaved();
+      if (!window.db) return;
+      for (let i=0;i<19;i++){
+        const ref = window.db.collection('teams').doc(String(i)).collection('saved').doc(g);
+        const unsub = ref.onSnapshot(doc=>{
+          const t = state.teams[i]; if (!t) return;
+          if (doc.exists){
+            const d = doc.data()||{};
+            if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
+            if (d.captain!==undefined) t.captain = d.captain;
+            if (d.name && !t.name) t.name = d.name;
+          } else {
+            t.lineup = [null,null,null,null,null];
+            t.captain = null;
+          }
+          renderTeamsList();
+          if (state.selectedTeamIdx===i) renderEditor();
+        });
+        savedUnsubs.push(unsub);
+      }
+    }
+
+    function renderTeamsList(){
+      const list = document.getElementById('teams');
+      const saved = loadSaved(state.giornata);
+      list.innerHTML = state.teams.map((t, idx)=>{
+        const starters = (t.lineup||[]).filter(Boolean);
+        const incomplete = starters.length<5;
+        const logo = getTeamLogo(idx);
+        return `
+          <div class="item ${state.selectedTeamIdx===idx?'selected':''}" data-idx="${idx}">
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${logo? `<img src="${logo}" alt="logo" style="width:28px;height:28px;border-radius:6px;border:1px solid #dbe1e8;object-fit:cover;"/>` : ''}
+              <div>
+                <div style="font-weight:700;">${t.name||('Squadra '+(idx+1))} ${incomplete? '<span class="pill" style="background:#fff3cd;color:#8a6d3b;border:1px solid #ffe58f;">incompleta</span>':''}</div>
+                <div class="muted">${(t.roster||[]).length}/11 • ${t.coach_ids&&t.coach_ids[0]? ('Coach: '+(state.coaches.find(c=>c.coach_id===t.coach_ids[0])?.nome||t.coach_ids[0])) : 'Coach: —'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      $$('#teams .item').forEach(el=> el.addEventListener('click', ()=>{ state.selectedTeamIdx = Number(el.dataset.idx); renderTeamsList(); renderEditor(); }));
+    }
+
+    function roleOf(pid){
+      const p = state.players.find(x=>x.player_id===pid); return p?.role||'';
+    }
+    function roleForConstraint(pid){
+      const p = state.players.find(x=>x.player_id===pid);
+      if (!p) return '';
+      if (p.role === 'Portiere') return 'Difensore';
+      return p.role;
+    }
+
+    async function fetchOwnersForTeam(idx){
+      try{
+        if (!window.db) return [];
+        const snap = await window.db.collection('users').where('team_index','==', idx).get();
+        const list = [];
+        snap.forEach(doc=>{ const d=doc.data()||{}; list.push(d.display_name||d.email||doc.id); });
+        return list;
+      }catch(e){ console.warn('fetchOwnersForTeam', e); return []; }
+    }
+
+    function renderEditor(){
+      const t = state.teams[state.selectedTeamIdx];
+      if (!t) return;
+      const locked = isLockedAuto();
+      const computedReadOnly = state.daysComputed && !state.isAdmin; // Giornate calcolate read-only per non-admin
+      const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computedReadOnly;
+      const canSelectCoach = state.isAdmin || ((state.user && state.userTeamIdx===state.selectedTeamIdx) && (!Array.isArray(t.coach_ids) || t.coach_ids.length===0));
+      // snapshot iniziale per annulla modifiche: creato se assente
+      if (!state.snapshots[state.selectedTeamIdx]){
+        state.snapshots[state.selectedTeamIdx] = { lineup: (t.lineup||[]).slice(), captain: t.captain||null };
+      }
+      const logo = getTeamLogo(state.selectedTeamIdx);
+      const role = state.isAdmin? 'Admin' : (state.user ? (state.userTeamIdx===state.selectedTeamIdx? 'Proprietario' : 'Utente') : 'Ospite');
+      const display = state.userDisplayName || (state.user?.email||'');
+      const ownerInfo = `<strong>${role}</strong>${display? ' • <strong>'+display+'</strong>' : ''}`;
+      const primaryCoachId = Array.isArray(t.coach_ids) && t.coach_ids.length ? t.coach_ids[0] : null;
+      const selectedCoach = primaryCoachId ? state.coaches.find(c => c.coach_id === primaryCoachId) : null;
+      const coachPhoto = selectedCoach ? (selectedCoach.photo_url || selectedCoach.photoUrl || selectedCoach.photo || selectedCoach.image_url || selectedCoach.imageUrl || '') : '';
+      const coachPreview = selectedCoach ? `
+        <div class="coach-preview">
+          <div class="coach-preview-avatar">
+            ${coachPhoto ? `<img src="${coachPhoto}" alt="${selectedCoach.nome || selectedCoach.name || 'Coach'}" onerror="this.src='resources/logo.png'"/>` : '<span style="font-size:22px;">🎓</span>'}
+          </div>
+          <div>
+            <div style="font-weight:700;">${selectedCoach.nome || selectedCoach.name || primaryCoachId}</div>
+            ${selectedCoach.nickname ? `<div class="muted">${selectedCoach.nickname}</div>` : ''}
+          </div>
+        </div>
+      ` : '<div class="muted" style="margin-top:8px;">Nessun coach assegnato</div>';
+      $('#teamMeta').innerHTML = `
+        <div class="grid2">
+          <div>
+            <div class="muted" style="font-size:16px; font-weight:800;">Logo squadra</div>
+            <div class="row" style="gap:10px; align-items:center;">
+              <div id="logoBox">${logo? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>'}</div>
+              <div style="flex:1;">
+                <div class="muted">Nome squadra</div>
+                <input id="teamName" class="input" value="${t.name}" ${!canWrite?'disabled':''} />
+              </div>
+            </div>
+            <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" ${!canWrite?'disabled':''} />
+          </div>
+          <div>
+            <div class="muted" style="margin:0 0 4px;">Allenatori</div>
+            <div id="coachButtons" class="row" style="gap:8px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
+              ${state.coaches.map(c=> `
+                <button class="btn btn-secondary btn-sm ${t.coach_ids.includes(c.coach_id)?'selected':''}" data-coach-id="${c.coach_id}" ${!canSelectCoach?'disabled':''}><strong>${c.nome}</strong></button>
+              `).join('')}
+            </div>
+            <div style="margin-top:6px;">
+              <div class="muted">Accesso</div>
+              <div>${ownerInfo}</div>
+              <div class="muted" id="ownersList" style="margin-top:6px;">Allenatori: …</div>
+              ${coachPreview}
+            </div>
+          </div>
+        </div>
+      `;
+      // async owners list
+      fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
+        const el = document.getElementById('ownersList'); if (!el) return;
+        el.textContent = arr.length? `Allenatori: ${arr.join(', ')}` : 'Allenatori: —';
+      });
+
+      // Player pool with checkbox selection
+      const pool = $('#playersPool');
+      const needle = ($('#playerSearch').value||'').toLowerCase();
+      const grouped = new Map(['Portiere','Difensore','Centrocampista','Attaccante'].map(r=>[r,[]]));
+      state.players.forEach(p=>{
+        const text = (p.nome_completo+' '+(p.nickname||'')).toLowerCase();
+        if (!needle || text.includes(needle)) grouped.get(p.role).push(p);
+      });
+      pool.innerHTML = Array.from(grouped.entries()).map(([role, list])=>{
+        if (!list.length) return '';
+        const sorted = list.slice().sort((a,b)=>{
+          const sa = a.nome_completo.split(/\s+/).pop().toLowerCase();
+          const sb = b.nome_completo.split(/\s+/).pop().toLowerCase();
+          return sa.localeCompare(sb,'it');
+        });
+        return `
+          <div class="role-section" data-role-group="${role}">
+            <div class="role-header">${role}<span>▾</span></div>
+            <div class="role-body">
+              <div class="list">
+                ${sorted.map(p=> `
+                  <div class="row player-pick" data-pid="${p.player_id}" style="gap:8px; align-items:center; justify-content:space-between; padding:6px 8px; border:1px solid #e7edf3; border-radius:8px;">
+                    <label class="row" style="gap:8px; align-items:center; flex:1; min-width:0;">
+                      <input type="checkbox" data-pid="${p.player_id}" ${t.roster.includes(p.player_id)?'checked':''} ${!canWrite?'disabled':''} />
+                      <div style="flex:1; min-width:0;">
+                        <div style="font-weight:600;">${p.nome_completo}${p.nickname? ' • @'+p.nickname:''}</div>
+                        <div style="font-size:11px; color:var(--muted);">${p.team || 'N/A'}</div>
+                      </div>
+                    </label>
+                    <span class="tag">${p.role[0]}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      $('#playerSearch').oninput = ()=> { renderEditor(); };
+      // Accordion toggles
+      $$('#playersPool .role-section .role-header').forEach(h=>{
+        h.addEventListener('click', ()=>{
+          h.parentElement.classList.toggle('collapsed');
+        });
+      });
+      // Roster accordion
+      const rosterHeader = document.querySelector('#teamRosterSection .role-header');
+      if (rosterHeader){
+        rosterHeader.addEventListener('click', ()=>{
+          rosterHeader.parentElement.classList.toggle('collapsed');
+        });
+      }
+      // row-wide toggle on click
+      $$('#playersPool .player-pick').forEach(row=>{
+        row.addEventListener('click', (e)=>{
+          if (e.target && (e.target.tagName==='INPUT' || e.target.tagName==='LABEL')) return;
+          const cb = row.querySelector('input[type="checkbox"]');
+          if (!cb || cb.disabled) return;
+          cb.checked = !cb.checked;
+        });
+      });
+      $('#addSelected').onclick = ()=>{
+        if (!canWrite) { alert('Formazione bloccata o non hai permessi.'); return; }
+        const ticks = $$('#playersPool input[type="checkbox"]:checked');
+        const ids = ticks.map(x=>x.dataset.pid);
+        const unique = Array.from(new Set([...(t.roster||[]), ...ids]));
+        t.roster = unique.slice(0,11);
+        saveTeams();
+        renderEditor();
+      };
+
+      // Roster list (management only; no drag here)
+      const roster = $('#teamRoster');
+      roster.innerHTML = (t.roster||[]).map(pid=>{
+        const p = state.players.find(x=>x.player_id===pid);
+        if (!p) {
+          console.warn('⚠️ Player non trovato in roster:', pid);
+        }
+        const displayName = p ? getPlayerDisplayLabel(p) : `⚠️ Player non trovato (${pid.substring(0,8)}...)`;
+        const photo = p ? getPlayerPhoto(p) : '';
+        const teamLabel = p?.team ? String(p.team) : '';
+        return `
+          <div class="draggable" draggable="true" data-pid="${pid}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;">
+            <div class="player-chip" style="flex:1;">
+              ${photo ? `<img src="${photo}" alt="${displayName}" onerror="this.src='resources/logo.png'" />` : '<span style="width:40px;height:40px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#475569;">?</span>'}
+              <div class="player-chip-text">
+                <span class="player-chip-name">${displayName}</span>
+                ${teamLabel ? `<span class="player-chip-meta">${teamLabel}</span>` : ''}
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" data-act="rm" style="padding:4px 8px;">×</button>
+          </div>
+        `;
+      }).join('');
+
+      // Bind management buttons and drag handlers
+      $$('#teamRoster .draggable').forEach(el=>{
+        // Drag handlers
+        el.addEventListener('dragstart', handleDragStart);
+        el.addEventListener('dragend', handleDragEnd);
+        
+        // Click singolo per mobile (semplice!)
+        if (isMobile()) {
+          el.addEventListener('click', ()=> handleMobileClickPlayer(el.dataset.pid));
+        }
+        
+        // Remove button
+        el.querySelector('[data-act="rm"]').addEventListener('click', ()=>{
+          if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+          t.roster = t.roster.filter(x=>x!==el.dataset.pid);
+          t.lineup = t.lineup.map(x=> x===el.dataset.pid ? null : x);
+          if (t.captain===el.dataset.pid) t.captain = null;
+          saveTeams(); renderEditor();
+        });
+        
+        // Doppio click per aggiungere al campo
+        el.addEventListener('dblclick', ()=>{
+          if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+          handleBenchDoubleClick(el.dataset.pid);
+        });
+      });
+
+      // Fill slots
+      const grid = $('#pitchGrid');
+      $$('#pitchGrid .slot').forEach((slot,i)=>{
+        slot.innerHTML = '';
+        const pid = t.lineup[i];
+        if (pid){
+          const p = state.players.find(x=>x.player_id===pid);
+          if (!p) {
+            console.warn('⚠️ Player non trovato in campo:', pid);
+          }
+          const displayName = p ? getPlayerDisplayLabel(p) : `⚠️ Player ${pid.substring(0,8)}...`;
+          const cap = (t.captain===pid)? ' captain':'';
+          const photoURL = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
+          slot.classList.add('filled');
+          const showCapBtn = (!t.captain) || (t.captain===pid);
+          slot.innerHTML = `
+            <div class="draggable${cap}" draggable="true" data-pid="${pid}" style="display:flex;justify-content:space-between;align-items:center;gap:8px; width:100%;">
+              <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+                <img src="${photoURL}" alt="${displayName}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.3);" onerror="this.src='resources/logo.png'" />
+                <span class="slot-player-name">${displayName}${t.captain===pid? '<span class="badgeC">C</span>':''}</span>
+              </div>
+              <span style="display:flex; gap:6px; align-items:center;">
+                ${showCapBtn? '<button class="btn btn-secondary btn-sm" data-act="cap">C</button>' : ''}
+                <button class="btn btn-secondary btn-sm" data-act="remove">×</button>
+              </span>
+            </div>
+          `;
+          const dragEl = slot.querySelector('.draggable');
+          
+          // Drag and drop handlers
+          dragEl.addEventListener('dragstart', handleDragStart);
+          dragEl.addEventListener('dragend', handleDragEnd);
+          
+          // Click singolo per mobile (semplice!)
+          if (isMobile()) {
+            dragEl.addEventListener('click', ()=> handleMobileClickPlayer(pid));
+          }
+          
+          // Doppio click per rimuovere dal campo
+          dragEl.addEventListener('dblclick', (e)=>{
+            if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+            t.lineup[i] = null;
+            saveTeams();
+            renderEditor();
+            toast('Giocatore rimosso dal campo!');
+          });
+          
+          // Captain toggle from slot
+          const capBtn = dragEl.querySelector('[data-act="cap"]');
+          if (capBtn){
+            capBtn.addEventListener('click', (e)=>{
+              e.stopPropagation();
+              if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+              t.captain = (t.captain===pid)? null : pid;
+              saveTeams(); renderEditor();
+            });
+          }
+          
+          // Remove button
+          const removeBtn = dragEl.querySelector('[data-act="remove"]');
+          if (removeBtn){
+            removeBtn.addEventListener('click', (e)=>{
+              e.stopPropagation();
+              if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+              t.lineup[i] = null;
+              saveTeams();
+              renderEditor();
+              toast('Giocatore rimosso dal campo!');
+            });
+          }
+        } else {
+          slot.classList.remove('filled');
+          slot.innerHTML = '<div class="slot-empty">Trascina qui</div>';
+        }
+        
+        // Drop handlers
+        slot.addEventListener('dragover', handleDragOver);
+        slot.addEventListener('dragenter', handleDragEnter);
+        slot.addEventListener('dragleave', handleDragLeave);
+        slot.addEventListener('drop', (e)=> handleDrop(e, i));
+        // Mobile: slot vuoti non hanno click (si clicca su giocatore dalla panchina)
+      });
+
+      // Render bench/roster strip (draggable to pitch; tap-to-assign on mobile)
+      const bench = $('#benchStrip');
+      const onField = new Set((t.lineup||[]).filter(Boolean));
+      
+      // Filtro ruoli
+      const roleMap = { 'Portiere': 'P', 'Difensore': 'D', 'Centrocampista': 'C', 'Attaccante': 'A' };
+      const filteredRoster = (t.roster||[])
+        .filter(pid => !onField.has(pid))
+        .filter(pid => {
+          if (state.benchFilter === 'all') return true;
+          const p = state.players.find(x => x.player_id === pid);
+          return p && roleMap[p.role] === state.benchFilter;
+        });
+      
+      bench.innerHTML = filteredRoster
+        .map(pid=>{
+          const p = state.players.find(x=>x.player_id===pid);
+          const cap = (t.captain===pid)? ' captain':'';
+          const sel = '';
+          const photoURL = p?.photoURL || p?.image_url || 'resources/logo.png';
+          const displayName = p?.nome_completo || pid;
+          return `<div class="draggable${cap}${sel}" draggable="true" data-pid="${pid}" style="display:flex;align-items:center;gap:6px;">
+            <img src="${photoURL}" alt="${displayName}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);" onerror="this.src='resources/logo.png'" />
+            <span style="flex:1;min-width:0;">${displayName}${t.captain===pid? '<span class="badgeC">C</span>':''}</span>
+          </div>`;
+        }).join('');
+      // enable drag from bench
+      $$('#benchStrip .draggable').forEach(el=>{
+        el.addEventListener('dragstart', handleDragStart);
+        el.addEventListener('dragend', handleDragEnd);
+        
+        // Click singolo per mobile (semplice!)
+        if (isMobile()) {
+          el.addEventListener('click', ()=> handleMobileClickPlayer(el.dataset.pid));
+        }
+        
+        // Doppio click per aggiungere al campo
+        el.addEventListener('dblclick', ()=>{
+          if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+          handleBenchDoubleClick(el.dataset.pid);
+        });
+        
+        // Mobile già gestito da click handler sopra (handleMobileClickPlayer)
+      });
+      // allow dropping from pitch back to bench to remove from that slot
+      bench.addEventListener('dragover', ev=> ev.preventDefault());
+      bench.addEventListener('drop', ev=>{
+        ev.preventDefault();
+        if (!canWrite) { return; }
+        const dragged = ev.dataTransfer.getData('text/plain');
+        // If dragged is currently placed in lineup, remove it (send to bench)
+        if (t.lineup.includes(dragged)){
+          t.lineup = t.lineup.map(x=> x===dragged ? null : x);
+          saveTeams(); renderEditor();
+        }
+      });
+
+      $('#teamName').oninput = ()=>{ if (!canWrite) return; t.name = $('#teamName').value; saveTeams(); renderTeamsList(); };
+      
+      // Event listeners per filtro ruoli panchina
+      $$('[data-filter-role]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const role = btn.dataset.filterRole;
+          state.benchFilter = role;
+          
+          // Update UI bottoni (evidenzia selezionato)
+          $$('[data-filter-role]').forEach(b => {
+            if (b.dataset.filterRole === role) {
+              b.style.background = 'var(--primary)';
+              b.style.color = 'white';
+            } else {
+              b.style.background = '';
+              b.style.color = '';
+            }
+          });
+          
+          renderEditor(); // Re-render panchina con filtro
+        });
+      });
+      
+      const coachWrap = document.getElementById('coachButtons');
+      if (coachWrap){
+        coachWrap.querySelectorAll('button[data-coach-id]').forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            const id = btn.getAttribute('data-coach-id');
+            // Only admins, or owners if not yet set
+            if (!canSelectCoach) { return; }
+            t.coach_ids = id ? [id] : [];
+            saveTeams(); renderTeamsList(); renderEditor();
+          });
+        });
+      }
+      // Logo upload via logoBox
+      const logoBox = document.getElementById('logoBox');
+      const logoInput = document.getElementById('teamLogoInput');
+      if (logoBox && logoInput){
+        logoBox.addEventListener('click', ()=>{ if (!logoInput.disabled) logoInput.click(); });
+        logoInput.addEventListener('change', async ()=>{
+          const f = logoInput.files?.[0]; if (!f) return;
+          const data = await resizeToDataUrl(f, 128, 128);
+          setTeamLogo(state.selectedTeamIdx, data);
+          saveTeams(); renderTeamsList(); renderEditor();
+        });
+      }
+      const teamLogoInput = document.getElementById('teamLogoInput');
+      if (teamLogoInput){
+        teamLogoInput.addEventListener('change', async ()=>{
+          const f = teamLogoInput.files?.[0]; if (!f) return;
+          const data = await resizeToDataUrl(f, 128, 128);
+          setTeamLogo(state.selectedTeamIdx, data);
+          saveTeams();
+          renderTeamsList(); renderEditor();
+        });
+      }
+      const btnSave = $('#saveTeam'); if (btnSave) btnSave.onclick = ()=>{ if (!canWrite) { return; } saveTeams(); state.snapshots[state.selectedTeamIdx] = { lineup: (t.lineup||[]).slice(), captain: t.captain||null }; toast('Squadra salvata'); renderTeamsList(); };
+      const btnSaveFormation = document.getElementById('saveFormation');
+      if (btnSaveFormation){ btnSaveFormation.onclick = async ()=>{
+        async function saveFormation(){
+          // Debug logging completo
+          console.log('🔍 SAVE ATTEMPT:', {
+            user: state.user?.email || 'not logged',
+            userTeamIdx: state.userTeamIdx,
+            selectedTeamIdx: state.selectedTeamIdx,
+            isAdmin: state.isAdmin,
+            locked: isLockedAuto(),
+            giornata: state.giornata,
+            canWrite: canWrite
+          });
+          
+          // Salvare su Firestore formazione attuale
+          if (!canWrite) {
+            if (!state.user) {
+              toast('❌ Devi effettuare il login per salvare');
+              console.error('❌ SAVE FAILED: Not logged in');
+              return;
+            }
+            if (typeof state.userTeamIdx !== 'number' && !state.isAdmin) {
+              toast('❌ Non hai una squadra assegnata! Contatta un admin.');
+              console.error('❌ SAVE FAILED: No team assigned. UserID:', state.user.uid);
+              return;
+            }
+            const locked = isLockedAuto();
+            if (locked && !state.isAdmin){
+              toast(`⏰ Formazioni bloccate! Deadline scaduta.`);
+              console.error('❌ SAVE FAILED: Deadline passed');
+            } else if (!(state.user && state.userTeamIdx===state.selectedTeamIdx) && !state.isAdmin){
+              toast('❌ Non puoi salvare la formazione di un\'altra squadra');
+              console.error('❌ SAVE FAILED: Wrong team. User team:', state.userTeamIdx, 'Selected:', state.selectedTeamIdx);
+            } else {
+              toast('❌ Permesso negato');
+              console.error('❌ SAVE FAILED: Permission denied (unknown reason)');
+            }
+            return;
+          }  
+          await saveCurrentTeamFormation();
+          renderTeamsList();
+        }
+        saveFormation();
+      } }
+      const btnReset = $('#resetTeam'); if (btnReset) btnReset.onclick = ()=>{ /* hidden by design */ };
+      $('#clearLineup').onclick = ()=>{ if (!canWrite) { return; } t.lineup=[null,null,null,null,null]; saveTeams(); renderEditor(); };
+
+      // Mobile: populate team selector and confirm button
+      const sel = document.getElementById('teamSelectMobile');
+      if (sel){
+        // Admin vedono tutte le squadre, user solo la propria
+        if (state.isAdmin) {
+          sel.innerHTML = state.teams.map((tm,idx)=>`<option value="${idx}">${tm.name||('Squadra '+(idx+1))}</option>`).join('');
+        } else if (typeof state.userTeamIdx === 'number') {
+          // User vedono solo la loro squadra
+          sel.innerHTML = `<option value="${state.userTeamIdx}">${state.teams[state.userTeamIdx]?.name||('Squadra '+(state.userTeamIdx+1))}</option>`;
+        } else {
+          // Nessuna squadra assegnata
+          sel.innerHTML = '<option value="">Nessuna squadra assegnata</option>';
+        }
+        sel.value = String(state.selectedTeamIdx);
+        sel.disabled = !state.isAdmin && typeof state.userTeamIdx !== 'number';
+        sel.onchange = ()=>{ state.selectedTeamIdx = Number(sel.value); renderTeamsList(); renderEditor(); };
+      }
+      const confirmBtn = document.getElementById('confirmLineup');
+      if (confirmBtn){
+        confirmBtn.onclick = async ()=>{
+          // Check deadline + giornata calcolata
+          const locked = isLockedAuto();
+          const computed = state.daysComputed && !state.isAdmin;
+          
+          if (computed) {
+            toast('📊 Giornata già calcolata! Non puoi modificare.');
+            return;
+          }
+          
+          if (locked && !state.isAdmin) {
+            toast('⏰ Formazioni bloccate! Deadline scaduta.');
+            return;
+          }
+          
+          if (!canWrite) {
+            toast('❌ Non hai permessi per salvare questa formazione.');
+            return;
+          }
+          
+          if (!t.captain) {
+            toast('⚠️ Devi selezionare un capitano!');
+            return;
+          }
+          
+          // SALVA SU FIRESTORE (non solo localStorage!)
+          saveTeams(); // Backup localStorage
+          await saveCurrentTeamFormation(); // SALVA SU FIRESTORE!
+          renderTeamsList();
+        };
+      }
+    }
+
+    function validateLineup(line){
+      const chosen = line.filter(Boolean);
+      const roles = chosen.map(roleForConstraint);
+      const hasD = roles.includes('Difensore');
+      const hasC = roles.includes('Centrocampista');
+      const hasA = roles.includes('Attaccante');
+      // must be <=5 length check happens by grid size; enforce min role presence if there are 5
+      if (chosen.length===0) return true; // allow progressive build
+      if (chosen.length<5) return true; // relax until full
+      return hasD && hasC && hasA;
+    }
+
+    async function loadPlayersAndCoaches(){
+      // base JSON
+      let basePlayers=[], baseCoaches=[];
+      try{ const resp = await fetch('resources/players.json'); const js=await resp.json(); basePlayers = js.players||[]; }catch{}
+      try{ const resp = await fetch('resources/coaches.json'); const js=await resp.json(); baseCoaches = js.coaches||[]; }catch{}
+      
+      console.log('📦 Players da JSON:', basePlayers.length);
+      
+      // merge Firestore
+      try{
+        if (window.db){
+          const [ps, cs] = await Promise.all([
+            window.db.collection('players').get(),
+            window.db.collection('coaches').get()
+          ]);
+          const pdocs = ps.docs.map(d=> ({ player_id:d.id, ...(d.data()||{}) }));
+          const cdocs = cs.docs.map(d=> ({ coach_id:d.id, ...(d.data()||{}) }));
+          console.log('🔥 Players da Firestore:', pdocs.length);
+          console.log('🔥 Firestore player IDs:', pdocs.map(p => p.player_id));
+          
+          const pmap = new Map(basePlayers.map(p=>[p.player_id||p.nome_completo, p]));
+          for (const x of pdocs){ 
+            const k=x.player_id||x.nome_completo; 
+            pmap.set(k, { ...(pmap.get(k)||{}), ...x });
+            console.log('✅ Merged player:', k, x.nome_completo, 'photoURL:', x.photoURL);
+          }
+          const cmap = new Map(baseCoaches.map(c=>[c.coach_id||c.nome, c]));
+          for (const x of cdocs){ const k=x.coach_id||x.nome; cmap.set(k, { ...(cmap.get(k)||{}), ...x }); }
+          state.players = Array.from(pmap.values());
+          state.coaches = Array.from(cmap.values());
+          console.log('✅ Total players dopo merge:', state.players.length);
+          
+          // Load photos from Firebase Storage for players without photoURL
+          if (window.firebase && window.firebase.storage) {
+            const storage = window.firebase.storage();
+            const leagueId = 'default'; // or get from state
+            
+            for (const player of state.players) {
+              if (!player.photoURL) {
+                try {
+                  const photoRef = storage.ref(`players/${leagueId}/${player.player_id}.jpg`);
+                  const photoURL = await photoRef.getDownloadURL();
+                  player.photoURL = photoURL;
+                  console.log('📸 Loaded photo for', player.nome_completo, photoURL);
+                } catch (error) {
+                  // Photo not found, keep default
+                }
+              }
+            }
+          }
+        } else {
+          state.players = basePlayers; state.coaches = baseCoaches;
+        }
+      }catch(e){
+        console.error('❌ Errore caricamento players:', e);
+        state.players = basePlayers; state.coaches = baseCoaches;
+      }
+    }
+    async function selectActiveGiornata() {
+      // Seleziona prima giornata NON calcolata
+      try {
+        if (!window.db) {
+          console.warn('⚠️ window.db non disponibile, rimango su G1');
+          return;
+        }
+        
+        // Controlla G1, G2, G3... fino a trovare una NON calcolata
+        for (let i = 1; i <= 38; i++) {
+          const g = 'G' + i;
+          const doc = await window.db.collection('days').doc(g).get();
+          const computed = !!(doc.exists && (doc.data()?.computed === true));
+          
+          if (!computed) {
+            state.giornata = g;
+            console.log('✅ Auto-selected giornata attiva:', g);
+            return;
+          }
+        }
+        
+        // Se tutte calcolate, lascia G1 come fallback
+        console.log('⚠️ Tutte giornate calcolate, fallback a G1');
+      } catch(e) {
+        console.error('❌ Errore select active giornata:', e);
+      }
+    }
+    
+    async function boot(){
+      // iOS/Mobile diagnostics
+      if (isIOS()) {
+        console.log('🍎 iOS detected - Special checks enabled');
+        // Check localStorage disponibile
+        try {
+          localStorage.setItem('ios_test', '1');
+          localStorage.removeItem('ios_test');
+          console.log('✅ iOS localStorage OK');
+        } catch(e) {
+          console.error('❌ iOS localStorage BLOCKED (Private mode?):', e);
+          alert('⚠️ Modalità Privata rilevata. Disattiva per salvare formazioni.');
+        }
+      }
+      
+      if (isSafari()) {
+        console.log('🧭 Safari detected');
+      }
+      
+      if (isMobile()) {
+        console.log('📱 Mobile mode active');
+      }
+      
+      await loadPlayersAndCoaches();
+      initTeams();
+      await syncTeamsFromFirestore();
+      
+      // AUTO-SELECT GIORNATA ATTIVA (NON CALCOLATA) - ASPETTA CHE DB SIA READY!
+      // window.db è inizializzato da firebase-config.js
+      let retries = 0;
+      while (!window.db && retries < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+      }
+      
+      if (window.db) {
+        await selectActiveGiornata();
+        console.log('🔵 Giornata dopo selectActive:', state.giornata);
+      } else {
+        console.error('❌ Firebase DB non disponibile dopo 5s, uso G1');
+      }
+      
+      // initLockUI NON deve sovrascrivere state.giornata
+      await initLockUI();
+      console.log('🔵 Giornata dopo initLockUI:', state.giornata);
+      
+      // initKickoffUI() rimosso: gestito in Calcolo
+      // auth
+      await loadAuth();
+      await applySavedFromFirestore(state.giornata);
+      subscribeSavedForGiornata(state.giornata);
+      renderTeamsList();
+      renderEditor();
+    }
+    boot();
+  </script>
+    <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/lazy-load.js?v=20251020"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+</body>
+</html>

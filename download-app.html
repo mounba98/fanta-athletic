@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Download App - Fanta Athletic</title>
+  <script>
+    // Carica tema IMMEDIATAMENTE per evitare flash
+    (function() {
+      const savedTheme = localStorage.getItem('fantaAthletic_theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+  <meta name="description" content="Scarica l'app Fanta Athletic per Android e iOS. Gestisci la tua squadra ovunque tu sia!" />
+  <meta name="theme-color" content="#dc143c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Athletic 2018" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="resources/logo.png" />
+  <link rel="apple-touch-startup-image" href="resources/logo.png" />
+  <style>
+    @media (max-width: 640px){ .nav a.m-hide { display: none; } }
+    
+    .hero-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .hero-section h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+    
+    .hero-section p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .download-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 2px solid transparent;
+    }
+    
+    .download-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      border-color: var(--primary);
+    }
+    
+    .download-card h3 {
+      color: var(--primary);
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .download-card p {
+      color: var(--muted);
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+    
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--primary);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      margin: 10px;
+    }
+    
+    .download-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(220, 20, 60, 0.3);
+    }
+    
+    .download-btn.secondary {
+      background: var(--secondary);
+    }
+    
+    .download-btn.secondary:hover {
+      background: var(--secondary-dark);
+    }
+    
+    .features-section {
+      background: var(--bg-secondary);
+      padding: 60px 20px;
+      margin-top: 60px;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .feature-item {
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .feature-item .icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      display: block;
+    }
+    
+    .feature-item h4 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+    }
+    
+    .feature-item p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    
+    .pwa-instructions {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 30px;
+      margin: 40px auto;
+      max-width: 800px;
+      box-shadow: var(--shadow);
+    }
+    
+    .pwa-instructions h3 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .pwa-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+    }
+    
+    .pwa-step-number {
+      background: var(--primary);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .pwa-step-content h4 {
+      margin: 0 0 5px 0;
+      color: var(--text);
+    }
+    
+    .pwa-step-content p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    .qr-code {
+      text-align: center;
+      margin: 30px 0;
+    }
+    
+    .qr-code img {
+      max-width: 200px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    
+    @media (max-width: 768px) {
+      .hero-section h1 {
+        font-size: 2rem;
+      }
+      
+      .hero-section p {
+        font-size: 1rem;
+      }
+      
+      .download-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .download-card {
+        padding: 30px 20px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Download App</h1>
+    <div class="auth-buttons" id="authButtons" style="display:none;">
+      <a href="auth.html" class="btn" style="background:#28a745;">🔐 Accedi</a>
+    </div>
+  </header>
+
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <h1>📱 Scarica Fanta Athletic</h1>
+      <p>Porta la tua squadra sempre con te! Gestisci formazioni, controlla classifiche e partecipa alle competizioni ovunque tu sia.</p>
+    </section>
+
+    <!-- PWA Install Section -->
+    <div style="max-width: 600px; margin: 0 auto;">
+      <div class="download-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <h3 style="color: white; font-size: 2.5rem; margin-bottom: 20px;">📱 Installa Fanta Athletic</h3>
+        <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 30px;">
+          Installa l'app direttamente dal browser. Funziona offline, si aggiorna automaticamente e si comporta come un'app nativa!
+        </p>
+        
+        <a href="#" class="download-btn" id="pwaInstallBtn" onclick="installPWA()" style="display: none; background: white; color: #667eea; font-size: 1.3rem; padding: 20px 40px;">
+          ⬇️ Installa App Ora
+        </a>
+        
+        <div id="pwaNotSupported" style="display: none;">
+          <p style="color: rgba(255,255,255,0.8); font-size: 1rem;">
+            Il tuo browser non supporta l'installazione PWA
+          </p>
+        </div>
+        
+        <div id="pwaAlreadyInstalled" style="display: none;">
+          <p style="color: #4ade80; font-size: 1rem; font-weight: 600;">
+            ✅ App già installata!
+          </p>
+        </div>
+        
+        <br>
+        <small style="color: rgba(255,255,255,0.7); font-size: 1rem;">
+          Chrome, Edge, Safari • Sempre aggiornata • Funziona offline
+        </small>
+      </div>
+    </div>
+
+    <!-- PWA Installation Instructions -->
+    <div class="pwa-instructions">
+      <h3>📋 Come installare l'App Web (PWA)</h3>
+      
+      <div class="pwa-step">
+        <div class="pwa-step-number">1</div>
+        <div class="pwa-step-content">
+          <h4>Chrome/Edge Desktop</h4>
+          <p>Clicca sull'icona "Installa" nella barra degli indirizzi o usa il menu ⋮ → "Installa Fanta Athletic"</p>
+        </div>
+      </div>
+      
+      <div class="pwa-step">
+        <div class="pwa-step-number">2</div>
+        <div class="pwa-step-content">
+          <h4>Chrome Mobile</h4>
+          <p>Apri il menu ⋮ → "Aggiungi alla schermata Home" → "Aggiungi"</p>
+        </div>
+      </div>
+      
+      <div class="pwa-step">
+        <div class="pwa-step-number">3</div>
+        <div class="pwa-step-content">
+          <h4>Safari iOS</h4>
+          <p>Tocca il pulsante Condividi 📤 → "Aggiungi alla schermata Home" → "Aggiungi"</p>
+        </div>
+      </div>
+      
+      <div class="pwa-step">
+        <div class="pwa-step-number">4</div>
+        <div class="pwa-step-content">
+          <h4>Safari macOS</h4>
+          <p>Menu Safari → "Aggiungi alla schermata Home" o usa il pulsante Condividi</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR Code for Mobile -->
+    <div class="qr-code">
+      <h3>📱 Scansiona per accedere</h3>
+      <p style="color: var(--muted); margin-bottom: 20px;">
+        Usa la fotocamera del tuo smartphone per aprire rapidamente l'app
+      </p>
+      <div id="qrCodeContainer">
+        <!-- QR Code will be generated here -->
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <h2 style="text-align: center; margin-bottom: 40px; color: var(--primary);">
+        ✨ Caratteristiche dell'App
+      </h2>
+      
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="icon">⚡</span>
+          <h4>Veloce e Leggera</h4>
+          <p>Caricamento istantaneo e funzionamento fluido su tutti i dispositivi</p>
+        </div>
+        
+        <div class="feature-item">
+          <span class="icon">📱</span>
+          <h4>Design Responsive</h4>
+          <p>Ottimizzata per smartphone, tablet e desktop con interfaccia adattiva</p>
+        </div>
+        
+        <div class="feature-item">
+          <span class="icon">🔄</span>
+          <h4>Sincronizzazione</h4>
+          <p>I tuoi dati si sincronizzano automaticamente tra tutti i dispositivi</p>
+        </div>
+        
+        <div class="feature-item">
+          <span class="icon">🔔</span>
+          <h4>Notifiche Push</h4>
+          <p>Ricevi aggiornamenti su partite, classifiche e novità della lega</p>
+        </div>
+        
+        <div class="feature-item">
+          <span class="icon">🌙</span>
+          <h4>Tema Scuro</h4>
+          <p>Modalità scura per un'esperienza confortevole in ogni momento</p>
+        </div>
+        
+        <div class="feature-item">
+          <span class="icon">🛡️</span>
+          <h4>Sicura</h4>
+          <p>Autenticazione sicura e protezione dei dati personali</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Nicola Mocci - All Rights Reserved</small>
+    <small style="display: block; margin-top: 4px; opacity: 0.7;">Developed by Nicola Mocci</small>
+  </footer>
+
+  <!-- Firebase SDKs - Solo per PWA install detection -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script>
+    // Firebase config solo per download page
+    window.firebaseConfig = {
+      apiKey: "AIzaSyDnQMuPvx_Gr8VjBJf_Hrx39O8w2dm67co",
+      authDomain: "fanta-athletic.firebaseapp.com",
+      projectId: "fanta-athletic",
+      storageBucket: "fanta-athletic.firebasestorage.app",
+      messagingSenderId: "845950461193",
+      appId: "1:845950461193:web:04475bb0eaa2dc459a9fd8",
+      measurementId: "G-289T0N4D8L"
+    };
+    
+    // Init Firebase solo per auth (PWA install)
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.auth = firebase.auth();
+  </script>
+
+  <!-- QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // PWA Install Detection
+    let deferredPrompt;
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    const pwaNotSupported = document.getElementById('pwaNotSupported');
+    const pwaAlreadyInstalled = document.getElementById('pwaAlreadyInstalled');
+
+    // Check if already installed first
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      pwaInstallBtn.style.display = 'none';
+      pwaAlreadyInstalled.style.display = 'block';
+    } else {
+      // Show install button by default
+      pwaInstallBtn.style.display = 'inline-flex';
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      pwaInstallBtn.style.display = 'inline-flex';
+    });
+
+    // Generate QR Code
+    function generateQRCode() {
+      const currentUrl = window.location.origin;
+      const qrContainer = document.getElementById('qrCodeContainer');
+      
+      // Try to generate real QR code
+      if (typeof QRCode !== 'undefined') {
+        QRCode.toCanvas(qrContainer, currentUrl, {
+          width: 200,
+          height: 200,
+          color: {
+            dark: '#dc143c',
+            light: '#ffffff'
+          },
+          margin: 2
+        }, function (error) {
+          if (error) {
+            console.error('QR Code generation failed:', error);
+            showQRFallback(qrContainer, currentUrl);
+          } else {
+            console.log('QR Code generated successfully');
+          }
+        });
+      } else {
+        console.warn('QRCode library not loaded, using fallback');
+        showQRFallback(qrContainer, currentUrl);
+      }
+    }
+    
+    function showQRFallback(container, url) {
+      container.innerHTML = `
+        <div style="width: 200px; height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin: 0 auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+          <div style="text-align: center; color: white;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">📱</div>
+            <div style="font-size: 1rem; font-weight: 600;">Scansiona per accedere</div>
+            <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 5px;">${url}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Download Functions
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('PWA installata con successo');
+            pwaInstallBtn.style.display = 'none';
+            document.getElementById('pwaAlreadyInstalled').style.display = 'block';
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        // Fallback per browser che non supportano beforeinstallprompt
+        alert('Per installare l\'app:\n\n• Chrome/Edge: Clicca ⋮ → "Installa Fanta Athletic"\n• Safari iOS: Tocca Condividi → "Aggiungi alla schermata Home"\n• Safari macOS: Menu Safari → "Aggiungi alla schermata Home"');
+      }
+    }
+
+    // Mostra tasto Accedi se non loggato (semplificato)
+    firebase.auth().onAuthStateChanged((user) => {
+      const authButtons = document.getElementById('authButtons');
+      if (!user && authButtons) {
+        authButtons.style.display = 'block';
+      }
+    });
+
+    // Generate QR Code on page load
+    document.addEventListener('DOMContentLoaded', generateQRCode);
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registrato'))
+        .catch(err => console.log('Errore Service Worker:', err));
+    }
+  </script>
+
+  <!-- Include only essential scripts -->
+  <script src="resources/pwa-install.js"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+</body>
+</html>

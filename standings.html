@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Classifica</title>
+  <meta name="description" content="Classifica cumulativa su tutte le giornate salvate (locale)." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <style>
+    .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
+    .table { width:100%; border-collapse: collapse; }
+    .table th, .table td { padding:10px; border-bottom:1px solid #eef2f6; text-align:left; }
+    .grid { display:grid; gap:16px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Classifica</h1>
+    </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Totali per giornata</h2>
+      <table class="table" id="byDay">
+        <thead>
+          <tr><th>Giornata</th><th>Data</th><th>Giocatori</th><th>Allenatori</th><th>Curva</th><th>Totale</th><th>Cumulativo</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Dettaglio per giornata (per squadra)</h2>
+      <div class="row" style="gap:8px; align-items:center; margin-bottom:8px;">
+        <span class="muted">Giornata</span>
+        <select id="giornataSel" class="input" style="max-width:140px;"></select>
+        <button class="btn btn-secondary" id="exportByDay">Esporta JSON giornata</button>
+      </div>
+      <table class="table" id="byTeamDay">
+        <thead>
+          <tr><th>#</th><th>Squadra</th><th>Curva</th><th>Giocatori</th><th>Capitano</th><th>Coach</th><th>Totale</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Classifica squadre (cumulata)</h2>
+      <div class="actions" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" id="exportTeams">Esporta JSON classifica squadre</button>
+      </div>
+      <table class="table" id="teamsRank">
+        <thead>
+          <tr><th>#</th><th>Squadra</th><th>Coach</th><th>Totale</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="muted" style="margin-top:8px;">Il punteggio per giornata di ogni squadra = Base Curva + Somma 5 titolari (+ raddoppio capitano) + Punteggio coach.</div>
+    </section>
+
+    <section class="card">
+      <h2>Note</h2>
+      <p>Questa classifica è calcolata localmente leggendo i salvataggi in questo browser. L'assegnazione alle squadre sarà aggiunta più avanti.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/rules-loader.js?v=2025110301"></script>
+  <script>
+    // Init Firebase SUBITO
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+  </script>
+  <script src="resources/app-init.js"></script>
+  <script>
+    
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const prulesCache = null;
+    function computeTotalRules(selMap, rules){
+      return Object.keys(selMap||{}).reduce((sum, id) => {
+        const s = selMap[id]||{};
+        return sum + rules.reduce((acc, r)=> acc + ((r.rule_id in s) ? (r.input==='counter'? Number(s[r.rule_id]||0)*Number(r.valore) : (s[r.rule_id]?Number(r.valore):0)) : 0), 0);
+      }, 0);
+    }
+    function normalize(rules, soggetto, repeatables){
+      return rules.filter(x=>x.soggetto===soggetto).map(x=> ({...x, input: repeatables.has(x.rule_id)?'counter':'toggle'}));
+    }
+
+    async function boot(){
+      const rulesData = await (window.loadRulesJSON ? window.loadRulesJSON() : Promise.resolve({ rules: [] }));
+      const rules = Array.isArray(rulesData.rules) ? rulesData.rules : [];
+      const coachesList = (await (await fetch('resources/coaches.json')).json()).coaches||[];
+      const PR = normalize(rules,'Giocatore', new Set(['R040','R041','R042','R072','R075','R089','R097','R044','R045','R056','R057','R058','R061','R070','R063','R073','R092']));
+      const CR = normalize(rules,'Allenatore', new Set(['R020','R036']));
+      const VR = normalize(rules,'Curva', new Set(['R008','R027','R028','R029','R015','R003','R002']));
+
+      // Tabella totali per giornata (globale)
+      const tbody = document.querySelector('#byDay tbody');
+      let cumul = 0;
+      const rows = [];
+      // Per classifica squadre - Load from Firestore first
+      let teams = [];
+      try {
+        if (!window.db) {
+          throw new Error('Database non disponibile');
+        }
+        const teamsSnap = await window.db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
+        teams = teamsSnap.docs.map((d,i)=>{
+          const data = d.data();
+          return { name: data.name || `Squadra ${i+1}`, coach_ids: data.coach_ids||[], roster: data.roster||[], lineup: data.lineup||[null,null,null,null,null], captain: data.captain||null };
+        });
+        console.log('Loaded teams from Firestore:', teams.length, teams.map(t => t.name));
+      } catch (e) {
+        console.warn('Firestore teams load failed, using localStorage:', e);
+        try { teams = JSON.parse(localStorage.getItem('teams_data')||'[]'); } catch { teams = []; }
+        if (!Array.isArray(teams) || teams.length === 0){
+          teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null }));
+        }
+      }
+      const coachNameById = new Map(coachesList.map(c=>[c.coach_id, c.nome]));
+      const cumulPerTeam = Array.from({length: teams.length}, ()=>0);
+      const perDayPerTeam = {}; // { G1: [scores per team index], ... }
+
+      for (let i=1;i<=24;i++){
+        const keyP = `players_G${i}`; const keyC = `coaches_G${i}`; const keyV = `curva_G${i}`; const keyD = `giornata_meta_G${i}`;
+        const p = JSON.parse(localStorage.getItem(keyP)||'{}'); // { player_id: {rule_id: val} }
+        const c = JSON.parse(localStorage.getItem(keyC)||'{}'); // { coach_id: {rule_id: val} }
+        const v = JSON.parse(localStorage.getItem(keyV)||'{}'); // { rule_id: val }
+        const meta = JSON.parse(localStorage.getItem(keyD)||'{}');
+        const savedKey = `teams_saved_G${i}`;
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem(savedKey)||'{}'); } catch { saved = {}; }
+        const tp = computeTotalRules(p, PR);
+        const tc = computeTotalRules(c, CR);
+        const tv = VR.reduce((sum,r)=>{
+          const selVal = v[r.rule_id];
+          const w = Number(r.valore);
+          return sum + (r.input==='counter' ? Number(selVal||0)*w : ((selVal?1:0)*w));
+        }, 0);
+        const tot = tp+tc+tv;
+        if (tp||tc||tv){
+          cumul += tot;
+          rows.push(`<tr><td>Giornata ${i}</td><td>${meta.data||''}</td><td>${tp.toFixed(2)}</td><td>${tc.toFixed(2)}</td><td>${tv.toFixed(2)}</td><td>${tot.toFixed(2)}</td><td>${cumul.toFixed(2)}</td></tr>`);
+        }
+
+        // Calcolo per squadre se esistono lineup/coach
+        const teamScores = Array.from({length: teams.length}, ()=>0);
+        const curvaBase = tv; // base curva da applicare a tutte
+        teams.forEach((t,idx)=>{
+          const snap = saved[idx]||null;
+          // somma giocatori titolari
+          const starters = ((snap?.lineup)||t.lineup||[]).filter(Boolean);
+          const playerSum = starters.reduce((acc, pid)=>{
+            const sel = p[pid]||{};
+            const pts = PR.reduce((s, r)=> s + ((r.rule_id in sel) ? (r.input==='counter'? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+            return acc + pts;
+          }, 0);
+          // capitano raddoppia i suoi punti (aggiungi una volta il suo totale)
+          let captainBonus = 0;
+          const captainId = (snap?.captain) ?? t.captain;
+          if (captainId){
+            const selC = p[captainId]||{};
+            const capPts = PR.reduce((s, r)=> s + ((r.rule_id in selC) ? (r.input==='counter'? Number(selC[r.rule_id]||0)*Number(r.valore) : (selC[r.rule_id]?Number(r.valore):0)) : 0), 0);
+            captainBonus = capPts; // aggiungo di nuovo per raddoppio
+          }
+          // coach (1 fisso se presente)
+          let coachPts = 0;
+          const coachId = (t.coach_ids&&t.coach_ids[0])||null;
+          if (coachId){
+            const selCoach = c[coachId]||{};
+            coachPts = CR.reduce((s, r)=> s + ((r.rule_id in selCoach) ? (r.input==='counter'? Number(selCoach[r.rule_id]||0)*Number(r.valore) : (selCoach[r.rule_id]?Number(r.valore):0)) : 0), 0);
+          }
+          const teamTotal = curvaBase + playerSum + captainBonus + coachPts;
+          teamScores[idx] = teamTotal;
+          cumulPerTeam[idx] += teamTotal;
+        });
+        perDayPerTeam[`G${i}`] = teamScores;
+      }
+      tbody.innerHTML = rows.join('') || '<tr><td colspan="7">Nessun dato salvato.</td></tr>';
+
+      // Populate giornata selector
+      const gsel = document.getElementById('giornataSel');
+      gsel.innerHTML = Array.from({length:24}, (_,i)=>`<option value="G${i+1}">Giornata ${i+1}</option>`).join('');
+      gsel.value = 'G1';
+
+      function renderByTeamDay(gkey){
+        const idx = Number((gkey||'G1').slice(1));
+        const p = JSON.parse(localStorage.getItem(`players_${gkey}`)||'{}');
+        const c = JSON.parse(localStorage.getItem(`coaches_${gkey}`)||'{}');
+        const v = JSON.parse(localStorage.getItem(`curva_${gkey}`)||'{}');
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem(`teams_saved_${gkey}`)||'{}'); } catch { saved = {}; }
+        const curvaBase = VR.reduce((sum,r)=>{
+          const selVal = v[r.rule_id]; const w = Number(r.valore);
+          return sum + (r.input==='counter' ? Number(selVal||0)*w : ((selVal?1:0)*w));
+        }, 0);
+        const rowsT = teams.map((t,ti)=>{
+          const snap = saved[ti]||null;
+          const starters = (t.lineup||[]).filter(Boolean);
+          const startersEff = ((snap?.lineup)||starters).filter(Boolean);
+          const playerSum = startersEff.reduce((acc, pid)=>{
+            const sel = p[pid]||{};
+            const pts = PR.reduce((s, r)=> s + ((r.rule_id in sel) ? (r.input==='counter'? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
+            return acc + pts;
+          }, 0);
+          let captainBonus = 0;
+          const captainId = (snap?.captain) ?? t.captain;
+          if (captainId){
+            const selC = p[captainId]||{};
+            const capPts = PR.reduce((s, r)=> s + ((r.rule_id in selC) ? (r.input==='counter'? Number(selC[r.rule_id]||0)*Number(r.valore) : (selC[r.rule_id]?Number(r.valore):0)) : 0), 0);
+            captainBonus = capPts;
+          }
+          let coachPts = 0;
+          const coachId = (t.coach_ids&&t.coach_ids[0])||null;
+          if (coachId){
+            const selCoach = c[coachId]||{};
+            coachPts = CR.reduce((s, r)=> s + ((r.rule_id in selCoach) ? (r.input==='counter'? Number(selCoach[r.rule_id]||0)*Number(r.valore) : (selCoach[r.rule_id]?Number(r.valore):0)) : 0), 0);
+          }
+          const total = curvaBase + playerSum + captainBonus + coachPts;
+          return { name: t.name||`Squadra ${ti+1}`, curvaBase, playerSum, captainBonus, coachPts, total };
+        }).sort((a,b)=> b.total-a.total || a.name.localeCompare(b.name,'it'));
+        const tb = document.querySelector('#byTeamDay tbody');
+        tb.innerHTML = rowsT.map((r,i)=> `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.curvaBase.toFixed(2)}</td><td>${r.playerSum.toFixed(2)}</td><td>${r.captainBonus.toFixed(2)}</td><td>${r.coachPts.toFixed(2)}</td><td><strong>${r.total.toFixed(2)}</strong></td></tr>`).join('') || '<tr><td colspan="7">Nessun dato</td></tr>';
+        return rowsT;
+      }
+
+      let lastRows = renderByTeamDay('G1');
+      gsel.addEventListener('change', ()=>{ lastRows = renderByTeamDay(gsel.value); });
+      document.getElementById('exportByDay').addEventListener('click', ()=>{
+        const payload = { giornata: gsel.value, rows: lastRows };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `dettaglio_${gsel.value}.json`; a.click(); URL.revokeObjectURL(a.href);
+      });
+
+      // Render classifica squadre cumulata con colori top 5
+      const tBody = document.querySelector('#teamsRank tbody');
+      const entries = teams.map((t,idx)=>({ idx, name: t.name||`Squadra ${idx+1}`, coach: ((t.coach_ids&&t.coach_ids[0])? coachNameById.get(t.coach_ids[0])||t.coach_ids[0] : '—'), total: cumulPerTeam[idx]||0 }));
+      entries.sort((a,b)=> (b.total - a.total) || a.name.localeCompare(b.name,'it'));
+      tBody.innerHTML = entries.map((e,i)=> {
+        let bgColor = '';
+        let textColor = '#000';
+        if (i === 0) { bgColor = '#ffd700'; textColor = '#000'; } // Oro
+        else if (i === 1) { bgColor = '#c0c0c0'; textColor = '#000'; } // Argento
+        else if (i === 2) { bgColor = '#cd7f32'; textColor = '#000'; } // Bronzo
+        else { bgColor=''; textColor = '#fff'; }
+        
+        return `<tr style="background: ${bgColor}; color: ${textColor};">
+          <td style="font-weight: ${i < 3 ? '900' : '700'}; font-size: ${i < 3 ? '18px' : '16px'};">${i+1}</td>
+          <td style="font-weight: ${i < 3 ? '800' : '600'};">${e.name}</td>
+          <td>${e.coach}</td>
+          <td style="font-weight: ${i < 3 ? '900' : '700'}; font-size: ${i < 3 ? '18px' : '16px'};">${e.total.toFixed(2)}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="4">Nessun dato per squadre.</td></tr>';
+
+      // Export JSON classifica squadre
+      document.getElementById('exportTeams').addEventListener('click', ()=>{
+        const payload = {
+          by_day: perDayPerTeam,
+          cumulative: Object.fromEntries(entries.map(e=> [e.name, e.total])),
+          teams_meta: teams.map((t,idx)=> ({ index: idx, name: t.name||`Squadra ${idx+1}`, coach_id: (t.coach_ids&&t.coach_ids[0])||null }))
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'classifica_squadre.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+    }
+
+    boot();
+  </script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/auth-ui.js?v=202510172227"></script>
+</body>
+</html>
