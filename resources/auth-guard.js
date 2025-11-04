@@ -7,12 +7,39 @@
 (function() {
   'use strict';
   
+  // Check se auth guard è disabilitato globalmente
+  if (window.__DISABLE_AUTH_GUARD__) {
+    console.log('🔓 Auth guard disabilitato per questa pagina');
+    return;
+  }
+  
   // Pages che NON richiedono login
-  const PUBLIC_PAGES = ['auth.html', 'login.html', 'register.html'];
+  const PUBLIC_PAGES = ['auth.html', 'login.html', 'register.html', 'index.html', 'store.html', 'adsense-verification.html', 'adsense-preview.html', 'privacy.html', 'terms.html'];
   const currentPage = window.location.pathname.split('/').pop();
   
   // Se è pagina pubblica, esci
   if (PUBLIC_PAGES.includes(currentPage)) {
+    return;
+  }
+  
+  // Whitelist per bot Google AdSense e crawler
+  function isGoogleBot() {
+    const userAgent = navigator.userAgent || '';
+    const referrer = document.referrer || '';
+    const isGoogleCrawler = /googlebot|google|mediapartners-google|adsbot-google/i.test(userAgent);
+    const isGoogleReferrer = /google\.com|googlebot\.com|adsense|doubleclick/i.test(referrer);
+    const isGoogleIP = /66\.249\.|64\.233\.|72\.14\.|74\.125\.|209\.85\.|216\.239\.|66\.102\.|108\.177\.|172\.217\.|142\.250\.|216\.58\./i.test(window.location.hostname);
+    
+    // Check anche per query params che AdSense potrebbe usare
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasAdSenseParam = urlParams.has('adsense') || urlParams.has('googlebot');
+    
+    return isGoogleCrawler || isGoogleReferrer || hasAdSenseParam;
+  }
+  
+  // Se è un bot Google, lascia passare
+  if (isGoogleBot()) {
+    console.log('🤖 Google bot detected, allowing access for AdSense verification');
     return;
   }
   

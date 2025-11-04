@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -10,8 +10,10 @@
   <meta name="description" content="Gestione squadre: nome, allenatori, rosa e titolari (5)." />
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
   <style>
-    .layout { display: grid; grid-template-columns: minmax(260px, 1fr) 2fr; gap: 20px; }
-    .sidebar, .panel { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
+    body.page-squadre { background: var(--bg, #0f172a); }
+    .page-squadre main.layout { margin-top: 18px; }
+    .layout { display: grid; grid-template-columns: minmax(320px, 0.95fr) minmax(0, 2.05fr); gap: 24px; align-items: stretch; }
+    .sidebar, .panel { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 20px; display:flex; flex-direction:column; gap:16px; min-height:0; }
     /* Sticky team list on desktop */
     @media (min-width: 641px){
       .sidebar { position: sticky; top: 110px; max-height: calc(100vh - 130px); overflow: auto; }
@@ -28,13 +30,43 @@
     #logoBox { width: 112px; height: 112px; border-radius: 12px; border:1px solid #dbe1e8; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; }
     #logoBox img { width:100%; height:100%; object-fit:cover; }
     .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items:start; }
+    #colRight { display:flex; flex-direction:column; gap:0; }
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
-    .meta-wrap { display:grid; grid-template-columns: 360px 1fr; column-gap: 16px; align-items:start; }
+    .meta-wrap { display:grid; grid-template-columns: 360px 1fr; column-gap: 16px; align-items:start; margin-bottom: 24px; }
     .meta-left .row { margin: 0 0 4px !important; }
     .list { display:grid; gap:8px; }
     /* Larger players font in lists */
     #playersPool .player-pick span { font-size: 16px; }
     .tag { display:inline-block; padding:3px 8px; border-radius:999px; background:#eef3f8; color:#506070; font-size:12px; }
+    .tag-success { background:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
+    .tag-danger { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
+    .player-pill { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:rgba(15,23,42,0.9); border:1px solid rgba(148,163,184,0.25); color:#f8fafc; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .player-pill img { width:42px; height:42px; border-radius:50%; object-fit:cover; border:2px solid rgba(148,163,184,0.4); box-shadow:0 2px 6px rgba(15,23,42,0.45); }
+    .player-pill .pill-info { display:flex; flex-direction:column; line-height:1.2; }
+    .player-pill .pill-name { font-weight:700; font-size:15px; letter-spacing:0.01em; }
+    .player-pill .pill-role { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.8; }
+    .player-pill .pill-actions { display:flex; gap:6px; align-items:center; margin-left:auto; }
+    .player-pill .pill-actions .btn-sm { padding:6px 10px; font-size:12px; border-radius:10px; }
+    .player-pill:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(15,23,42,0.35); }
+    .player-pill .badgeC { margin-left:6px; font-size:11px; display:inline-flex; align-items:center; justify-content:center; }
+    .bench-pill { background: rgba(15,23,42,0.78); border:1px solid rgba(148,163,184,0.2); }
+    .bench-pill-active { box-shadow:0 0 0 2px var(--secondary); }
+    .top-players-card { background: linear-gradient(160deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.92) 100%); border-radius:18px; padding:18px; margin-bottom:20px; border:1px solid rgba(148,163,184,0.15); box-shadow: 0 16px 32px rgba(15,23,42,0.45); display:flex; flex-direction:column; gap:12px; }
+    .top-players-card h3 { margin:0; font-size:18px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:8px; }
+    .top-player-card { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:14px; background:rgba(148,163,184,0.15); border:1px solid rgba(148,163,184,0.35); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .top-player-card.rank-1 { background:linear-gradient(135deg,#fde68a 0%,#fbbf24 45%,#f59e0b 100%); color:#1f2937; border:none; }
+    .top-player-card.rank-2 { background:linear-gradient(135deg,#e2e8f0 0%,#cbd5f5 100%); color:#0f172a; border:none; }
+    .top-player-card.rank-3 { background:linear-gradient(135deg,#fecaca 0%,#fca5a5 100%); color:#111827; border:none; }
+    .top-player-left { display:flex; align-items:center; gap:12px; }
+    .top-player-rank { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; background:rgba(15,23,42,0.35); color:inherit; }
+    .top-player-card.rank-1 .top-player-rank, .top-player-card.rank-2 .top-player-rank, .top-player-card.rank-3 .top-player-rank { background:rgba(255,255,255,0.25); }
+    .top-player-left img { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.55); box-shadow:0 4px 12px rgba(15,23,42,0.4); }
+    .top-player-info { display:flex; flex-direction:column; line-height:1.2; }
+    .top-player-name { font-weight:700; font-size:15px; }
+    .top-player-role { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.75; }
+    .top-player-points { font-size:22px; font-weight:800; }
+    .top-player-card:hover { transform: translateY(-2px); box-shadow:0 18px 36px rgba(15,23,42,0.35); }
+    .top-players-empty { color:rgba(148,163,184,0.7); font-size:13px; text-align:center; padding:8px 0; }
     .sectionh { margin:10px 0 4px; font-weight:800; }
     .row { display:flex; gap:10px; align-items:center; }
     /* Enlarged selector and inputs */
@@ -108,13 +140,13 @@
     header.nav-hidden { transform: translateY(-110%); }
   </style>
 </head>
-  <body>
+  <body class= page-squadre>
   <header>
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
     <h1>Squadre</h1>
-    <p>Imposta 19 squadre: nome, allenatori (1–3), rosa (11) e titolari (5).</p>
+    <p>Imposta 19 squadre: nome, allenatori (1�3), rosa (11) e titolari (5).</p>
   </header>
 
   <main class="layout">
@@ -158,6 +190,11 @@
           <div class="list" id="playersPool"></div>
         </div>
         <div id="colRight">
+          <div class="top-players-card" id="topPlayersCard" style="display:none; margin-top:0; margin-bottom:20px;">
+            <h3>🌟 Top 3 giocatori (stagione)</h3>
+            <div id="topPlayersList"></div>
+            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+          </div>
           <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
           <div class="pitch">
             <div class="pitch-grid" id="pitchGrid">
@@ -183,7 +220,7 @@
           <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
           <div id="benchStrip" class="strip"></div>
           <div class="role-section desktop-only" id="teamRosterSection" style="margin-top:8px;">
-            <div class="role-header">Rosa della squadra <span>▾</span></div>
+            <div class="role-header">Rosa della squadra <span>?</span></div>
             <div class="role-body">
               <div class="roster" id="teamRoster"></div>
             </div>
@@ -217,6 +254,144 @@
 
     const $ = (s)=>document.querySelector(s);
     const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+    const PLAYER_LABEL_OVERRIDES = new Map([
+      ['alessio lupi', 'Ale Lupi'],
+      ['ale lupi', 'Ale Lupi']
+    ]);
+
+    function escapeHtml(str){
+      return String(str ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
+    function capitalizeWords(str) {
+      return String(str || '').split(/\s+/).filter(Boolean).map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+    }
+
+    function getPlayerPhoto(player) {
+      if (!player) return '';
+      return player.photo_url || player.photoUrl || player.image_url || player.imageUrl || player.photo || player.avatar || player.avatar_url || '';
+    }
+
+    function getRoleAbbr(role){
+      if (!role) return '';
+      const map = {
+        'Portiere': 'P',
+        'Difensore': 'D',
+        'Centrocampista': 'C',
+        'Attaccante': 'A'
+      };
+      return map[role] || (role[0] ? role[0].toUpperCase() : '');
+    }
+
+    function getPlayerDisplayLabel(player) {
+      if (!player) return '';
+      const full = String(player.nome_completo || player.name || '').trim();
+      const override = PLAYER_LABEL_OVERRIDES.get(full.toLowerCase());
+      if (override) return override;
+      if (player.nickname) return capitalizeWords(player.nickname);
+      if (player.cognome) return capitalizeWords(player.cognome);
+      if (player.surname) return capitalizeWords(player.surname);
+      if (full) {
+        const parts = full.split(/\s+/).filter(Boolean);
+        if (parts.length === 1) return capitalizeWords(parts[0]);
+        return capitalizeWords(parts[parts.length - 1]);
+      }
+      return capitalizeWords(player.player_id || 'Giocatore');
+    }
+
+    function getPlayerSeasonPoints(player) {
+      if (!player) return 0;
+      const totals = [player.total_points, player.totale, player.fantapunti, player.points, player.media_voto];
+      for (const value of totals) {
+        if (value !== undefined && value !== null && value !== '') {
+          const num = Number(value);
+          if (!Number.isNaN(num)) return num;
+        }
+      }
+      return 0;
+    }
+
+    function getTeamDocRef(index){
+      if (!window.db) return null;
+      if (window.LeagueHelper && typeof window.LeagueHelper.getLeagueDoc === 'function') {
+        try {
+          const ref = window.LeagueHelper.getLeagueDoc('teams', String(index));
+          if (ref) return ref;
+        } catch (err) {
+          console.warn('LeagueHelper.getLeagueDoc failed', err);
+        }
+      }
+      return window.db.collection('teams').doc(String(index));
+    }
+
+    function getSavedDocRef(index, giornata){
+      if (!window.db) return null;
+      if (window.LeagueHelper && typeof window.LeagueHelper.getLeagueSubcollection === 'function') {
+        try {
+          const sub = window.LeagueHelper.getLeagueSubcollection('teams', String(index), 'saved');
+          if (sub) {
+            return sub.doc(giornata);
+          }
+        } catch (err) {
+          console.warn('LeagueHelper.getLeagueSubcollection failed', err);
+        }
+      }
+      return window.db.collection('teams').doc(String(index)).collection('saved').doc(giornata);
+    }
+
+    function renderTopPlayersCard(team){
+      const card = document.getElementById('topPlayersCard');
+      const list = document.getElementById('topPlayersList');
+      const empty = document.getElementById('topPlayersEmpty');
+      if (!card || !list) return;
+      if (!team){
+        card.style.display = 'none';
+        list.innerHTML = '';
+        if (empty) empty.style.display = 'none';
+        return;
+      }
+      const entries = (team.roster || [])
+        .map(pid => {
+          const player = state.players.find(x => x.player_id === pid);
+          return player ? { player, pid, points: getPlayerSeasonPoints(player) } : null;
+        })
+        .filter(Boolean)
+        .sort((a,b)=> b.points - a.points)
+        .slice(0, 3);
+
+      if (!entries.length){
+        card.style.display = 'none';
+        list.innerHTML = '';
+        if (empty) empty.style.display = 'block';
+        return;
+      }
+
+      card.style.display = 'flex';
+      list.innerHTML = entries.map((entry, idx) => {
+        const photo = getPlayerPhoto(entry.player) || 'resources/logo.png';
+        const label = escapeHtml(getPlayerDisplayLabel(entry.player));
+        const role = getRoleAbbr(entry.player.role || entry.player.ruolo);
+        return `
+          <div class="top-player-card rank-${idx + 1}">
+            <div class="top-player-left">
+              <span class="top-player-rank">${idx + 1}</span>
+              <img src="${photo}" alt="${label}" onerror="this.src='resources/logo.png'" />
+              <div class="top-player-info">
+                <div class="top-player-name">${label}</div>
+                ${role ? `<div class="top-player-role">${role}</div>` : ''}
+              </div>
+            </div>
+            <div class="top-player-points">${entry.points.toFixed(1)}</div>
+          </div>`;
+      }).join('');
+      if (empty) empty.style.display = 'none';
+    }
 
     const state = {
       players: [],
@@ -357,7 +532,13 @@
       const g = state.giornata;
       // Firestore write
       try{
-        if (window.db){ await window.db.collection('teams').doc(String(state.selectedTeamIdx)).collection('saved').doc(g).set(payload, { merge:true }); toast(`Formazione salvata • Squadra ${state.selectedTeamIdx+1} • ${g}`); }
+        const ref = getSavedDocRef(state.selectedTeamIdx, g);
+        if (ref){
+          await ref.set(payload, { merge:true });
+          toast(`Formazione salvata • Squadra ${state.selectedTeamIdx+1} • ${g}`);
+        } else {
+          toast('Database non disponibile');
+        }
       }catch(e){ console.warn('FS save formation error', e); toast(`Errore salvataggio: ${e?.message||'Firestore'}`); }
     }
 
@@ -390,15 +571,17 @@
       localStorage.setItem('teams_data', JSON.stringify(state.teams));
       // persist single team to Firestore if admin
       try{
-        if (window.db && state.isAdmin){
-          const idx = String(state.selectedTeamIdx);
+        if (state.isAdmin){
           const t = state.teams[state.selectedTeamIdx];
-          window.db.collection('teams').doc(idx).set({
-            name: t.name||'',
-            coach_ids: t.coach_ids||[],
-            roster: t.roster||[],
-            logo: getTeamLogo(state.selectedTeamIdx)||''
-          }, { merge: true });
+          const docRef = getTeamDocRef(state.selectedTeamIdx);
+          if (docRef){
+            docRef.set({
+              name: t.name||'',
+              coach_ids: t.coach_ids||[],
+              roster: t.roster||[],
+              logo: getTeamLogo(state.selectedTeamIdx)||''
+            }, { merge: true });
+          }
         }
       }catch{}
     }
@@ -406,10 +589,13 @@
     async function syncTeamsFromFirestore(){
       if (!window.db) return;
       try{
-        const tasks = Array.from({length:19}, (_,i)=> window.db.collection('teams').doc(String(i)).get());
+        const tasks = Array.from({length:19}, (_,i)=>{
+          const ref = getTeamDocRef(i);
+          return ref ? ref.get() : Promise.resolve(null);
+        });
         const docs = await Promise.all(tasks);
         docs.forEach((doc, i)=>{
-          if (doc.exists){
+          if (doc && doc.exists){
             const d = doc.data();
             const t = state.teams[i];
             if (!t) return;
@@ -425,11 +611,14 @@
     async function applySavedFromFirestore(g){
       if (!window.db) return;
       try{
-        const tasks = Array.from({length:19}, (_,i)=> window.db.collection('teams').doc(String(i)).collection('saved').doc(g).get());
+        const tasks = Array.from({length:19}, (_,i)=>{
+          const ref = getSavedDocRef(i, g);
+          return ref ? ref.get() : Promise.resolve(null);
+        });
         const docs = await Promise.all(tasks);
         docs.forEach((doc,i)=>{
           const t = state.teams[i]; if (!t) return;
-          if (doc.exists){
+          if (doc && doc.exists){
             const d = doc.data();
             if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
             if (d.captain!==undefined) t.captain = d.captain;
@@ -450,7 +639,8 @@
       unsubscribeSaved();
       if (!window.db) return;
       for (let i=0;i<19;i++){
-        const ref = window.db.collection('teams').doc(String(i)).collection('saved').doc(g);
+        const ref = getSavedDocRef(i, g);
+        if (!ref) continue;
         const unsub = ref.onSnapshot(doc=>{
           const t = state.teams[i]; if (!t) return;
           if (doc.exists){
@@ -471,18 +661,24 @@
 
     function renderTeamsList(){
       const list = document.getElementById('teams');
-      const saved = loadSaved(state.giornata);
       list.innerHTML = state.teams.map((t, idx)=>{
         const starters = (t.lineup||[]).filter(Boolean);
-        const incomplete = starters.length<5;
+        const hasFormation = starters.length>=5;
         const logo = getTeamLogo(idx);
+        const coachName = t.coach_ids && t.coach_ids[0] ? (state.coaches.find(c=>c.coach_id===t.coach_ids[0])?.nome || t.coach_ids[0]) : null;
+        const statusClass = hasFormation ? 'tag tag-success' : 'tag tag-danger';
+        const statusText = hasFormation ? 'Schierata' : 'Non schierata';
         return `
           <div class="item ${state.selectedTeamIdx===idx?'selected':''}" data-idx="${idx}">
-            <div style="display:flex; align-items:center; gap:8px;">
-              ${logo? `<img src="${logo}" alt="logo" style="width:28px;height:28px;border-radius:6px;border:1px solid #dbe1e8;object-fit:cover;"/>` : ''}
+            <div style="display:flex; align-items:center; gap:10px;">
+              ${logo? `<img src="${logo}" alt="logo" style="width:34px;height:34px;border-radius:8px;border:1px solid #dbe1e8;object-fit:cover;"/>` : '<div style="width:34px;height:34px;border-radius:8px;background:rgba(148,163,184,0.2);"></div>'}
               <div>
-                <div style="font-weight:700;">${t.name||('Squadra '+(idx+1))} ${incomplete? '<span class="pill" style="background:#fff3cd;color:#8a6d3b;border:1px solid #ffe58f;">incompleta</span>':''}</div>
-                <div class="muted">${(t.roster||[]).length}/11 • ${t.coach_ids&&t.coach_ids[0]? ('Coach: '+(state.coaches.find(c=>c.coach_id===t.coach_ids[0])?.nome||t.coach_ids[0])) : 'Coach: —'}</div>
+                <div style="font-weight:800; font-size:16px;">${escapeHtml(t.name||('Squadra '+(idx+1)))}</div>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:2px;">
+                  <span class="${statusClass}">${statusText}</span>
+                  <span class="muted">${(t.roster||[]).length}/11 in rosa</span>
+                  ${coachName ? `<span class="muted">Coach: ${escapeHtml(coachName)}</span>` : '<span class="muted">Coach: —</span>'}
+                </div>
               </div>
             </div>
           </div>
@@ -514,6 +710,7 @@
     function renderEditor(){
       const t = state.teams[state.selectedTeamIdx];
       if (!t) return;
+      renderTopPlayersCard(t);
       const locked = isLockedAuto();
       const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin);
       const canSelectCoach = state.isAdmin || ((state.user && state.userTeamIdx===state.selectedTeamIdx) && (!Array.isArray(t.coach_ids) || t.coach_ids.length===0));
@@ -524,7 +721,7 @@
       const logo = getTeamLogo(state.selectedTeamIdx);
       const role = state.isAdmin? 'Admin' : (state.user ? (state.userTeamIdx===state.selectedTeamIdx? 'Proprietario' : 'Utente') : 'Ospite');
       const display = state.userDisplayName || (state.user?.email||'');
-      const ownerInfo = `<strong>${role}</strong>${display? ' • <strong>'+display+'</strong>' : ''}`;
+      const ownerInfo = `<strong>${role}</strong>${display? ' &bull; <strong>'+escapeHtml(display)+'</strong>' : ''}`;
       $('#teamMeta').innerHTML = `
         <div class="grid2">
           <div>
@@ -533,7 +730,7 @@
               <div id="logoBox">${logo? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>'}</div>
               <div style="flex:1;">
                 <div class="muted">Nome squadra</div>
-                <input id="teamName" class="input" value="${t.name}" ${!canWrite?'disabled':''} />
+                <input id="teamName" class="input" value="${escapeHtml(t.name||'')}" ${!canWrite?'disabled':''} />
               </div>
             </div>
             <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" ${!canWrite?'disabled':''} />
@@ -542,11 +739,11 @@
             <div class="muted" style="margin:0 0 4px;">Allenatori</div>
             <div id="coachButtons" class="row" style="gap:8px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
               ${state.coaches.map(c=> `
-                <button class="btn btn-secondary btn-sm ${t.coach_ids.includes(c.coach_id)?'selected':''}" data-coach-id="${c.coach_id}" ${!canSelectCoach?'disabled':''}><strong>${c.nome}</strong></button>
+                <button class="btn btn-secondary btn-sm ${t.coach_ids.includes(c.coach_id)?'selected':''}" data-coach-id="${c.coach_id}" ${!canSelectCoach?'disabled':''}><strong>${escapeHtml(c.nome || c.coach_id || 'Coach')}</strong></button>
               `).join('')}
             </div>
-            <div style="margin-top:6px;">
-              <div class="muted">Accesso</div>
+            <div style="margin-top:16px;">
+              <div class="muted" style="margin-bottom:4px;">Accesso</div>
               <div>${ownerInfo}</div>
               <div class="muted" id="ownersList" style="margin-top:6px;">Allenatori: …</div>
             </div>
@@ -576,14 +773,14 @@
         });
         return `
           <div class="role-section" data-role-group="${role}">
-            <div class="role-header">${role}<span>▾</span></div>
+            <div class="role-header">${role}<span>?</span></div>
             <div class="role-body">
               <div class="list">
                 ${sorted.map(p=> `
                   <div class="row player-pick" data-pid="${p.player_id}" style="gap:8px; align-items:center; justify-content:space-between; padding:6px 8px; border:1px solid #e7edf3; border-radius:8px;">
                     <label class="row" style="gap:8px; align-items:center; flex:1;">
                       <input type="checkbox" data-pid="${p.player_id}" ${t.roster.includes(p.player_id)?'checked':''} ${!canWrite?'disabled':''} />
-                      <span>${p.nome_completo}${p.nickname? ' • @'+p.nickname:''}</span>
+                      <span>${p.nome_completo}${p.nickname? ' � @'+p.nickname:''}</span>
                     </label>
                     <span class="tag">${p.role[0]}</span>
                   </div>
@@ -655,22 +852,30 @@
       });
 
       // Fill slots
-      const grid = $('#pitchGrid');
       $$('#pitchGrid .slot').forEach((slot,i)=>{
         slot.innerHTML = '';
         const pid = t.lineup[i];
         if (pid){
           const p = state.players.find(x=>x.player_id===pid);
           const cap = (t.captain===pid)? ' captain':'';
-          slot.classList.add('filled');
           const showCapBtn = (!t.captain) || (t.captain===pid);
+          const photo = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
+          const label = escapeHtml(getPlayerDisplayLabel(p) || pid);
+          const role = getRoleAbbr(p?.role || p?.ruolo);
+          slot.classList.add('filled');
           slot.innerHTML = `
-            <div class="draggable${cap}" draggable="true" data-pid="${pid}" style="display:flex;justify-content:space-between;align-items:center;gap:8px; width:100%;">
-              <span>${p?.nome_completo||pid}${t.captain===pid? '<span class=\"badgeC\">C</span>':''}</span>
-              <span style="display:flex; gap:6px; align-items:center;">
-                ${showCapBtn? '<button class=\"btn btn-secondary btn-sm\" data-act=\"cap\">C</button>' : ''}
-                ${isMobile()? '<button class=\"btn btn-secondary btn-sm\" data-act=\"clr\">x</button>':''}
-              </span>
+            <div class="draggable${cap}" draggable="true" data-pid="${pid}" style="width:100%;">
+              <div class="player-pill" style="width:100%; justify-content:flex-start;">
+                <img src="${photo}" alt="${label}" onerror="this.src='resources/logo.png'" />
+                <div class="pill-info">
+                  <span class="pill-name">${label}${t.captain===pid? '<span class="badgeC">C</span>':''}</span>
+                  ${role ? `<span class="pill-role">${role}</span>` : ''}
+                </div>
+                <div class="pill-actions">
+                  ${showCapBtn? '<button class="btn btn-secondary btn-sm" data-act="cap">C</button>' : ''}
+                  ${isMobile()? '<button class="btn btn-secondary btn-sm" data-act="clr">x</button>' : ''}
+                </div>
+              </div>
             </div>`;
           const dragEl = slot.querySelector('.draggable');
           dragEl.addEventListener('dragstart', ev=>{ if (!isMobile()) ev.dataTransfer.setData('text/plain', pid); });
@@ -736,7 +941,19 @@
         const p = state.players.find(x=>x.player_id===pid);
         const cap = (t.captain===pid)? ' captain':'';
         const sel = state.mobilePick===pid ? ' selected' : '';
-        return `<div class="draggable${cap}${sel}" draggable="true" data-pid="${pid}">${p?.nome_completo||pid}${t.captain===pid? '<span class="badgeC">C</span>':''}</div>`;
+        const photo = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
+        const label = escapeHtml(getPlayerDisplayLabel(p) || pid);
+        const role = getRoleAbbr(p?.role || p?.ruolo);
+        const activeClass = sel ? ' bench-pill-active' : '';
+        return `<div class="draggable${cap}${sel}" draggable="true" data-pid="${pid}">
+          <div class="player-pill bench-pill${activeClass}" style="width:100%; justify-content:flex-start;">
+            <img src="${photo}" alt="${label}" onerror="this.src='resources/logo.png'" />
+            <div class="pill-info">
+              <span class="pill-name">${label}${t.captain===pid? '<span class="badgeC">C</span>':''}</span>
+              ${role ? `<span class="pill-role">${role}</span>` : ''}
+            </div>
+          </div>
+        </div>`;
       }).join('');
       // enable drag from bench
       $$('#benchStrip .draggable').forEach(el=>{
@@ -911,7 +1128,16 @@
     }
     boot();
   </script>
+  <script src="resources/app-init.js"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>
   <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
 </body>
 </html>
+
+
+
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Verifica AdSense</title>
+  <meta name="description" content="Fanta Athletic - Fantasy Football League Manager. Verifica AdSense per Google." />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .verification-content {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--card);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    h1 {
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .ad-placeholder {
+      background: #f0f0f0;
+      border: 2px dashed #ccc;
+      padding: 40px;
+      margin: 30px 0;
+      border-radius: 8px;
+    }
+    .ad-placeholder::before {
+      content: 'Spazio pubblicitario AdSense';
+      color: #999;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="verification-content">
+    <h1>🏆 Fanta Athletic</h1>
+    <p>Fantasy Football League Manager - Sistema completo per gestire la tua lega di fantacalcio.</p>
+    
+    <div class="ad-placeholder" style="width: 728px; height: 90px; margin: 30px auto; border: 3px dashed #dc143c; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #666; font-weight: 700;">
+      <div style="font-size: 18px; color: #dc143c; margin-bottom: 8px;">728×90</div>
+      <div style="font-size: 14px; color: #999;">Slot AdSense - Header Banner</div>
+    </div>
+    
+    <p><strong>Benvenuto in Fanta Athletic</strong></p>
+    <p>Piattaforma completa per la gestione di leghe di fantacalcio con:</p>
+    <ul style="text-align: left; display: inline-block; margin: 20px 0;">
+      <li>Gestione squadre e formazioni</li>
+      <li>Calcolo automatico punteggi</li>
+      <li>Classifiche e statistiche</li>
+      <li>Store ufficiale</li>
+      <li>Bacheca e social features</li>
+    </ul>
+    
+    <div class="ad-placeholder" style="width: 300px; height: 250px; margin: 30px auto; border: 3px dashed #dc143c; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #666; font-weight: 700;">
+      <div style="font-size: 18px; color: #dc143c; margin-bottom: 8px;">300×250</div>
+      <div style="font-size: 14px; color: #999;">Slot AdSense - Rectangle</div>
+    </div>
+    
+    <p style="margin-top: 40px;">
+      <a href="index.html" style="color: var(--primary); text-decoration: none; font-weight: 700;">→ Vai alla Home</a>
+    </p>
+  </div>
+  
+  <!-- Firebase SDKs (senza auth guard) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script>
+    // Disabilita auth guard PRIMA di qualsiasi altro script
+    if (document.body) {
+      document.body.dataset.disableAutoHeader = 'true';
+    }
+    // Previeni auth guard da qualsiasi script incluso successivamente
+    window.__DISABLE_AUTH_GUARD__ = true;
+    
+    // Init Firebase solo per analytics, non per auth
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+  </script>
+  <!-- NON includere app-init.js per evitare auth-guard -->
+</body>
+</html>
+

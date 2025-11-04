@@ -11,6 +11,8 @@
   let userLeagues = [];
   let attachRetries = 0;
   let listenersAttached = false;
+  let initialized = false;
+  let bootstrapScheduled = false;
   const MAX_ATTACH_RETRIES = 15;
   
   // Esponi globalmente
@@ -20,27 +22,42 @@
    * Inizializza selettore lega
    */
   async function initLeagueSelector() {
-    // Aspetta Firebase auth
+    if (initialized) return;
+
     if (!window.firebase || !firebase.auth) {
-      setTimeout(initLeagueSelector, 500);
+      setTimeout(initLeagueSelector, 400);
       return;
     }
-    
+
+    // On desktop wait until navbar is available
+    if (window.innerWidth > 820 && !document.querySelector('header .nav')) {
+      if (!bootstrapScheduled) {
+        bootstrapScheduled = true;
+        window.addEventListener('navbar-ready', () => {
+          bootstrapScheduled = false;
+          initLeagueSelector();
+        }, { once: true });
+      }
+      setTimeout(initLeagueSelector, 200);
+      return;
+    }
+
+    initialized = true;
+
     firebase.auth().onAuthStateChanged(async user => {
       if (!user) {
         console.log('No user logged in, skipping league selector');
         return;
       }
-      
+
       await loadUserLeagues();
       await loadCurrentLeague();
-      
-      // Non renderizzare se non ci sono leghe
+
       if (userLeagues.length === 0) {
         console.warn('[LEAGUE-SELECTOR] No leagues found, skipping render');
         return;
       }
-      
+
       renderLeagueSelector();
       attachEventListeners();
     });
@@ -786,6 +803,9 @@
   };
   
 })();
+
+
+
 
 
 

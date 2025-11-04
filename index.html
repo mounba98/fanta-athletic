@@ -68,6 +68,16 @@
     @media (max-width: 600px) {
       #myTeamCard { padding: 18px !important; }
       #myTeamName { font-size: 20px !important; }
+    .page-with-ads { display: flex; flex-direction: column; gap: 24px; }
+    .home-content { display: flex; flex-direction: column; gap: 24px; }
+    .ad-slot { display: none; }
+    @media (min-width: 1200px) {
+      .page-with-ads { display: grid; grid-template-columns: 220px minmax(0, 1fr) 220px; gap: 32px; align-items: start; }
+      .home-content { order: 2; }
+      .ad-slot { display: flex; position: sticky; top: 120px; justify-content: center; align-items: center; background: var(--card); border-radius: 20px; min-height: 420px; padding: 24px; box-shadow: var(--shadow); color: var(--muted); font-weight: 600; text-align: center; }
+      .ad-slot-left { order: 1; }
+      .ad-slot-right { order: 3; }
+    }
     }
     .recent-results-card {
       max-width: 820px;
@@ -420,8 +430,17 @@
     </section>
     
     <!-- Grid card secondarie: 3 colonne fisse -->
-    <div class="home-cards" style="max-width: 1400px; margin: 20px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; grid-auto-rows: 1fr;">
+    <!-- Sezioni rapide -->
+    <div class="home-cards">
       <style>
+        .home-cards {
+          max-width: 1400px;
+          margin: 20px auto 0;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 20px;
+          grid-auto-rows: 1fr;
+        }
         .home-cards .section {
           display: flex;
           flex-direction: column;
@@ -431,69 +450,64 @@
           margin-top: auto;
         }
         @media (max-width: 900px) {
-          .home-layout { grid-template-columns: 1fr !important; }
-          .home-cards { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-        @media (max-width: 600px) {
-          .home-cards { grid-template-columns: 1fr !important; }
+          .home-cards { gap: 16px; }
         }
       </style>
-      
+
       <section class="section">
-        <h2>⚽ Formazioni</h2>
+        <h2>Store Ufficiale</h2>
+        <p>Felpe, magliette, sticker e gadget ufficiali Athletic 2018.</p>
+        <a href="store.html" class="btn">Visita lo Store</a>
+      </section>
+
+      <section class="section">
+        <h2>Formazioni</h2>
         <p>Gestisci la formazione della tua squadra.</p>
         <a href="formazioni.html" class="btn">Vai alle Formazioni</a>
       </section>
-      
+
       <section class="section">
-        <h2>🏆 Squadre</h2>
+        <h2>Squadre</h2>
         <p>Visualizza info e statistiche delle squadre.</p>
         <a href="squadre.html" class="btn">Vai alle Squadre</a>
       </section>
-      
+
       <section class="section">
-        <h2>🎮 Giornate</h2>
+        <h2>Giornate</h2>
         <p>Inserisci i punteggi delle giornate.</p>
         <a href="matchday.html" class="btn">Vai alle Giornate</a>
       </section>
-      
+
       <section class="section">
-        <h2>🔨 Asta</h2>
+        <h2>Asta</h2>
         <p>Partecipa all'asta per acquistare giocatori.</p>
         <a href="asta.html" class="btn">Vai all'Asta</a>
       </section>
-      
+
       <section class="section">
-        <h2>💬 Bacheca</h2>
+        <h2>?? Bacheca</h2>
         <p>Trash talk, meme e goliardate varie.</p>
         <a href="bacheca.html" class="btn">Vai alla Bacheca</a>
       </section>
-      
+
       <section class="section">
-        <h2>👤 Profilo</h2>
+        <h2>?? Profilo</h2>
         <p>Gestisci il tuo profilo e le impostazioni.</p>
         <a href="profile.html" class="btn">Vai al Profilo</a>
       </section>
-      
+
       <section class="section">
-        <h2>📈 Statistiche</h2>
+        <h2>Statistiche</h2>
         <p>Analizza le statistiche avanzate.</p>
         <a href="statistiche.html" class="btn">Vai alle Statistiche</a>
       </section>
-      
+
       <section class="section">
-        <h2>📅 Calendario</h2>
+        <h2>Calendario</h2>
         <p>Visualizza calendario partite e scontri.</p>
         <a href="calendario.html" class="btn">Vai al Calendario</a>
       </section>
-      
-      <section class="section">
-        <h2>🛒 Store</h2>
-        <p>Acquista gadget e merchandising ufficiale.</p>
-        <a href="#" class="btn" onclick="alert('Store in arrivo!'); return false;">Prossimamente</a>
-      </section>
-      
-    </div><!-- Fine home-cards -->
+    </div>
   </main>
 
   <!-- Install Prompt gestito da pwa-install.js -->
@@ -568,8 +582,19 @@
     // Carica nome squadra utente - usa team_index da users collection
     async function loadMyTeamName() {
       const user = firebase.auth().currentUser;
+      const myTeamCard = document.getElementById('myTeamCard');
+      const myTeamName = document.getElementById('myTeamName');
+      
       if (!user) {
-        document.getElementById('myTeamName').textContent = 'Accedi';
+        if (myTeamName) {
+          myTeamName.textContent = 'Accedi per vedere la tua squadra';
+        }
+        if (myTeamCard) {
+          myTeamCard.style.cursor = 'pointer';
+          myTeamCard.onclick = () => window.location.href = 'auth.html';
+        }
+        // Mostra messaggi per altri elementi
+        updateUnauthenticatedMessages();
         return;
       }
       
@@ -580,8 +605,9 @@
         const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
         
         if (!userDoc.exists) {
-          document.getElementById('myTeamName').textContent = 'Nessuna squadra';
+          if (myTeamName) myTeamName.textContent = 'Nessuna squadra assegnata';
           console.warn('⚠️ Dashboard: User doc non esiste');
+          updateUnauthenticatedMessages('Nessuna squadra assegnata');
           return;
         }
         
@@ -591,8 +617,9 @@
         console.log('📊 Dashboard: User team_index:', teamIndex);
         
         if (teamIndex === null || teamIndex === undefined) {
-          document.getElementById('myTeamName').textContent = 'Nessuna squadra';
+          if (myTeamName) myTeamName.textContent = 'Nessuna squadra assegnata';
           console.warn('⚠️ Dashboard: team_index non impostato');
+          updateUnauthenticatedMessages('Unisciti a una competizione per vedere la tua squadra');
           return;
         }
         
@@ -600,25 +627,73 @@
         const teamDoc = await firebase.firestore().collection('teams').doc(String(teamIndex)).get();
         
         if (!teamDoc.exists) {
-          document.getElementById('myTeamName').textContent = 'Nessuna squadra';
+          if (myTeamName) myTeamName.textContent = 'Squadra non trovata';
           console.warn('⚠️ Dashboard: Team', teamIndex, 'non esiste');
+          updateUnauthenticatedMessages('Squadra non trovata nella competizione');
           return;
         }
         
         const teamData = teamDoc.data();
-        document.getElementById('myTeamName').textContent = teamData.name || 'La Mia Squadra';
+        if (myTeamName) myTeamName.textContent = teamData.name || 'La Mia Squadra';
         console.log('✅ Dashboard: Nome squadra:', teamData.name);
+        
+        // Reset click handler se tutto ok
+        if (myTeamCard) {
+          myTeamCard.onclick = () => window.location.href = 'formazioni.html';
+        }
         
       } catch (error) {
         console.error('❌ Dashboard error:', error);
-        document.getElementById('myTeamName').textContent = 'Errore: ' + error.message;
+        if (myTeamName) myTeamName.textContent = 'Errore nel caricamento';
+        updateUnauthenticatedMessages('Errore nel caricamento dei dati');
+      }
+    }
+    
+    function updateUnauthenticatedMessages(customMessage) {
+      // Aggiorna Ultimo Risultato
+      const lastMatchContent = document.getElementById('lastMatchContent');
+      if (lastMatchContent) {
+        const message = customMessage || 'Accedi per vedere i tuoi risultati';
+        lastMatchContent.innerHTML = `
+          <div class="match-pill">
+            <span>Stato</span>
+            <strong class="match-summary-empty" style="color: var(--muted);">${message}</strong>
+          </div>
+        `;
+      }
+      
+      // Aggiorna Classifiche
+      const classifichePreview = document.getElementById('classifichePreview');
+      if (classifichePreview) {
+        const message = customMessage || 'Accedi per vedere la classifica';
+        classifichePreview.innerHTML = `
+          <div style="text-align: center; color: var(--muted); padding: 20px;">
+            🔒 ${message}
+          </div>
+        `;
+      }
+      
+      // Aggiorna Ultimi Risultati
+      const recentResults = document.getElementById('recentResults');
+      if (recentResults) {
+        const message = customMessage || 'Accedi per vedere i tuoi risultati';
+        recentResults.innerHTML = `
+          <div class="recent-results-placeholder" style="color: var(--muted);">🔒 ${message}</div>
+        `;
       }
     }
     
     // Esegui quando auth è pronta
     firebase.auth().onAuthStateChanged((user) => {
-      if (user) loadMyTeamName();
+      loadMyTeamName();
+      if (!user) {
+        // Se non loggato, mostra messaggi dopo un breve delay per permettere al DOM di essere pronto
+        setTimeout(updateUnauthenticatedMessages, 500);
+      }
     });
   </script>
 </body>
 </html>
+
+
+

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Store - Athletic 2018</title>
+  <meta name="description" content="Gestione store ufficiale Athletic 2018." />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    body { background: var(--background-alt, #0f172a); }
+    header { margin-bottom: 24px; }
+    .admin-main { max-width: 1100px; margin: 0 auto 80px; padding: 24px 20px; display: grid; gap: 24px; }
+    .card { background: var(--card); border-radius: 18px; box-shadow: var(--shadow-lg, 0 18px 36px rgba(15, 23, 42, 0.18)); padding: 24px; }
+    .card h2 { margin-top: 0; }
+    form fieldset { border: none; display: grid; gap: 18px; }
+    form .grid-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+    input, textarea, select { padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(148,163,184,0.35); font: inherit; background: rgba(15,23,42,0.02); }
+    textarea { min-height: 120px; resize: vertical; }
+    .actions { display: flex; gap: 16px; justify-content: flex-end; }
+    .btn { border-radius: 12px; padding: 12px 16px; font-weight: 700; border: none; cursor: pointer; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #ec4899); color: white; }
+    .btn-muted { background: rgba(148,163,184,0.12); color: var(--text); }
+    .products-list { display: grid; gap: 18px; }
+    .product-item { background: var(--surface); border-radius: 16px; padding: 20px; border: 1px solid rgba(148,163,184,0.18); display: grid; gap: 12px; }
+    .product-item h3 { margin: 0; display: flex; gap: 10px; align-items: center; }
+    .product-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--muted); }
+    .badge { background: rgba(99,102,241,0.14); color: #312e81; border-radius: 999px; padding: 4px 12px; font-weight: 600; font-size: 12px; }
+    .product-actions { display: flex; gap: 12px; }
+    .product-actions button { border-radius: 10px; border: none; padding: 10px 14px; cursor: pointer; font-weight: 600; }
+    .product-actions button[data-action="toggle"] { background: rgba(34,197,94,0.15); color: #166534; }
+    .product-actions button[data-action="delete"] { background: rgba(239,68,68,0.14); color: #991b1b; }
+    .notice { background: rgba(99,102,241,0.1); border: 1px dashed rgba(99,102,241,0.35); border-radius: 14px; padding: 14px 18px; font-size: 14px; color: #1e293b; }
+    .warning { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); border-radius: 12px; padding: 14px 18px; color: #991b1b; }
+    .empty-state { background: rgba(148,163,184,0.12); border-radius: 12px; padding: 20px; text-align: center; color: var(--muted); }
+    @media (max-width: 720px) { .product-actions { flex-direction: column; } }
+  </style>
+</head>
+<body data-disable-auto-header="true">
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home"><img src="resources/logo.png" alt="Athletic 2018" /></a>
+    <h1>Admin Store</h1>
+    <p>Gestione prodotti, disponibilità e link di pagamento dello store ufficiale.</p>
+  </header>
+
+  <main class="admin-main">
+    <section class="card" id="authState" style="display:none;"></section>
+
+    <section class="card" id="storeFormCard" style="display:none;">
+      <h2>Nuovo prodotto</h2>
+      <p class="notice">Compila tutti i campi. Puoi aggiornare in seguito da lista prodotti.</p>
+      <form id="storeForm">
+        <fieldset class="grid-two">
+          <label>Nome prodotto
+            <input name="name" required maxlength="60" placeholder="Felpa Classic Ultras" />
+          </label>
+          <label>Categoria
+            <input name="category" placeholder="Felpe / Maglie / Sticker" />
+          </label>
+          <label>Prezzo (€)
+            <input name="price" type="number" step="0.01" min="0" placeholder="59" />
+          </label>
+          <label>Currency
+            <select name="currency">
+              <option value="EUR" selected>EUR</option>
+              <option value="USD">USD</option>
+            </select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <label>Descrizione
+            <textarea name="description" placeholder="Dettagli materiali, fit, tempi produzione..."></textarea>
+          </label>
+          <label>Immagine (URL)
+            <input name="imageUrl" type="url" placeholder="https://..." />
+          </label>
+        </fieldset>
+        <fieldset class="grid-two">
+          <label>Tag (separati da virgola)
+            <input name="tags" placeholder="limited, preordine, ricamo" />
+          </label>
+          <label>Badge
+            <input name="badge" placeholder="Nuova / Preordine / Best seller" />
+          </label>
+          <label>Checkout URL (Stripe / PayPal)
+            <input name="checkoutUrl" type="url" placeholder="https://buy.stripe.com/..." />
+          </label>
+          <label>Priorità
+            <input name="priority" type="number" step="1" placeholder="0" />
+          </label>
+        </fieldset>
+        <div class="actions">
+          <button type="reset" class="btn btn-muted">Reset</button>
+          <button type="submit" class="btn btn-primary">Salva prodotto</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" id="productsCard" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+        <h2>Prodotti pubblicati</h2>
+        <span class="badge" id="productsCount">0 prodotti</span>
+      </div>
+      <div class="products-list" id="productsList">
+        <div class="empty-state">Nessun prodotto inserito.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/app-init.js"></script>
+  <script>
+    const authState = document.getElementById('authState');
+    const storeFormCard = document.getElementById('storeFormCard');
+    const productsCard = document.getElementById('productsCard');
+    const productsList = document.getElementById('productsList');
+    const productsCount = document.getElementById('productsCount');
+    const storeForm = document.getElementById('storeForm');
+    const db = window.db || (firebase.apps.length ? firebase.firestore() : null);
+
+    const state = { user: null, isAdmin: false, products: [], unsub: null };
+
+    function showAuthMessage(message, variant = 'notice') {
+      authState.style.display = 'block';
+      authState.className = `card ${variant}`;
+      authState.textContent = message;
+    }
+
+    async function ensureAdmin(user) {
+      if (!db || !user) return false;
+      try {
+        const doc = await db.collection('admins').doc(user.uid).get();
+        return doc.exists;
+      } catch (e) {
+        console.error('Admin check error', e);
+        return false;
+      }
+    }
+
+    function renderProducts() {
+      if (!state.products.length) {
+        productsList.innerHTML = '<div class="empty-state">Ancora nessun prodotto. Inizia aggiungendo una felpa o uno sticker!</div>';
+        productsCount.textContent = '0 prodotti';
+        return;
+      }
+
+      productsCount.textContent = `${state.products.length} prodotti`;
+      productsList.innerHTML = state.products.map(product => {
+        const activeBadge = product.active === false ? '<span class="badge" style="background: rgba(239,68,68,0.15); color:#991b1b;">Bozza</span>' : '<span class="badge">Visibile</span>';
+        const price = product.price?.value !== undefined ? `${product.price.value.toFixed(2)} ${product.price.currency || 'EUR'}` : '—';
+        const checkout = product.checkoutUrl ? `<span class="badge" style="background: rgba(34,197,94,0.15); color:#166534;">Checkout attivo</span>` : '';
+        return `
+        <article class="product-item" data-id="${product.id}">
+          <h3>${product.name || 'Senza titolo'} ${activeBadge}</h3>
+          <div class="product-meta">
+            <span>Categoria: ${product.category || '—'}</span>
+            <span>Prezzo: ${price}</span>
+            <span>Priority: ${product.priority || 0}</span>
+            ${checkout}
+          </div>
+          <p>${product.description || ''}</p>
+          <div class="product-actions">
+            <button data-action="toggle">${product.active === false ? 'Pubblica' : 'Metti in bozza'}</button>
+            <button data-action="delete">Elimina</button>
+          </div>
+        </article>`;
+      }).join('');
+
+      productsList.querySelectorAll('button[data-action]').forEach(button => {
+        button.addEventListener('click', () => handleProductAction(button.closest('.product-item'), button.dataset.action));
+      });
+    }
+
+    async function handleProductAction(item, action) {
+      if (!item) return;
+      const id = item.dataset.id;
+      if (!id) return;
+      if (!db) return alert('Firestore non disponibile');
+
+      if (action === 'toggle') {
+        const product = state.products.find(p => p.id === id);
+        const nextValue = !(product && product.active !== false);
+        await db.collection('store_products').doc(id).set({ active: nextValue }, { merge: true });
+        return;
+      }
+
+      if (action === 'delete') {
+        const confirmDelete = confirm('Eliminare definitivamente il prodotto?');
+        if (!confirmDelete) return;
+        await db.collection('store_products').doc(id).delete();
+      }
+    }
+
+    if (storeForm) {
+      storeForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!db) return alert('Firestore non disponibile');
+        const formData = new FormData(storeForm);
+        const priceValue = parseFloat(formData.get('price'));
+        const product = {
+          name: formData.get('name')?.trim() || 'Senza titolo',
+          category: formData.get('category')?.trim() || '',
+          description: formData.get('description')?.trim() || '',
+          imageUrl: formData.get('imageUrl')?.trim() || '',
+          tags: (formData.get('tags') || '').split(',').map(t => t.trim()).filter(Boolean),
+          badge: formData.get('badge')?.trim() || '',
+          checkoutUrl: formData.get('checkoutUrl')?.trim() || '',
+          priority: parseInt(formData.get('priority') || '0', 10),
+          price: isNaN(priceValue) ? null : { value: priceValue, currency: formData.get('currency') || 'EUR' },
+          active: true,
+          archived: false,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        };
+        await db.collection('store_products').add(product);
+        storeForm.reset();
+      });
+    }
+
+    async function subscribeProducts() {
+      if (!db) return;
+      if (state.unsub) state.unsub();
+      state.unsub = db.collection('store_products').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+        state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderProducts();
+      });
+    }
+
+    firebase.auth().onAuthStateChanged(async user => {
+      state.user = user;
+      if (!user) {
+        showAuthMessage('Accedi con un account admin per gestire lo store.', 'warning');
+        storeFormCard.style.display = 'none';
+        productsCard.style.display = 'none';
+        return;
+      }
+
+      const isAdmin = await ensureAdmin(user);
+      state.isAdmin = isAdmin;
+      if (!isAdmin) {
+        showAuthMessage('Accesso negato. Questo modulo è riservato agli amministratori.', 'warning');
+        storeFormCard.style.display = 'none';
+        productsCard.style.display = 'none';
+        return;
+      }
+
+      authState.style.display = 'none';
+      storeFormCard.style.display = 'block';
+      productsCard.style.display = 'block';
+      subscribeProducts();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preview Slot Pubblicitari AdSense - Fanta Athletic</title>
+  <meta name="description" content="Preview di tutti gli slot pubblicitari disponibili per AdSense" />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+    }
+    .preview-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .slot-section {
+      background: var(--card);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+    }
+    .slot-section h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 10px;
+    }
+    .slot-info {
+      background: rgba(220, 20, 60, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary);
+    }
+    .slot-info strong {
+      color: var(--primary);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .ad-placeholder {
+      background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+      border: 3px dashed #dc143c;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-weight: 700;
+      text-align: center;
+      position: relative;
+      margin: 20px auto;
+    }
+    .ad-placeholder::before {
+      content: attr(data-size);
+      font-size: 18px;
+      font-weight: 800;
+      color: #dc143c;
+      margin-bottom: 10px;
+    }
+    .ad-placeholder::after {
+      content: 'Slot AdSense';
+      font-size: 14px;
+      color: #999;
+      margin-top: 10px;
+    }
+    .ad-placeholder.banner-160x600 {
+      width: 160px;
+      height: 600px;
+    }
+    .ad-placeholder.banner-728x90 {
+      width: 728px;
+      max-width: 100%;
+      height: 90px;
+    }
+    .ad-placeholder.banner-300x250 {
+      width: 300px;
+      height: 250px;
+    }
+    .ad-placeholder.banner-320x50 {
+      width: 320px;
+      height: 50px;
+    }
+    .ad-placeholder.banner-970x250 {
+      width: 970px;
+      max-width: 100%;
+      height: 250px;
+    }
+    .layout-demo {
+      display: grid;
+      grid-template-columns: 160px 1fr 160px;
+      gap: 20px;
+      margin: 20px 0;
+      align-items: start;
+    }
+    .layout-demo .main-content {
+      background: rgba(220, 20, 60, 0.05);
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 800px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+    @media (max-width: 1280px) {
+      .layout-demo {
+        grid-template-columns: 1fr;
+      }
+      .layout-demo .ad-sidebar {
+        display: none;
+      }
+    }
+    .code-snippet {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      margin-top: 15px;
+      line-height: 1.6;
+    }
+    .code-snippet code {
+      color: #60a5fa;
+    }
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .copy-btn:hover {
+      background: var(--primary-hover);
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+    <h1>📍 Preview Slot Pubblicitari AdSense</h1>
+    
+    <div class="slot-section">
+      <h2>🖥️ Desktop - Banner Laterali (160×600)</h2>
+      <div class="slot-info">
+        <strong>Posizione:</strong> Fissi ai lati della pagina (solo desktop ≥1280px)
+        <strong>Dimensioni:</strong> 160×600 pixel (Standard Banner)
+        <strong>Pagine:</strong> index.html (home)
+        <strong>Visibilità:</strong> Solo desktop, nascosti su mobile/tablet
+      </div>
+      
+      <div class="layout-demo">
+        <div class="ad-sidebar">
+          <div class="ad-placeholder banner-160x600" data-size="160×600"></div>
+        </div>
+        <div class="main-content">
+          <div>Contenuto principale della pagina</div>
+          <div style="margin-top: 20px; font-size: 12px; color: var(--muted);">
+            Gli slot 160×600 sono posizionati ai lati del contenuto principale
+          </div>
+        </div>
+        <div class="ad-sidebar">
+          <div class="ad-placeholder banner-160x600" data-size="160×600"></div>
+        </div>
+      </div>
+      
+      <div class="code-snippet">
+        <code>&lt;!-- In index.html, sostituisci .ad-slot con: --&gt;
+&lt;ins class="adsbygoogle"
+     style="display:inline-block;width:160px;height:600px"
+     data-ad-client="ca-pub-XXXXXXXXXX"
+     data-ad-slot="XXXXXXXXXX"&gt;&lt;/ins&gt;
+&lt;script&gt;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+&lt;/script&gt;</code>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copia Codice</button>
+      </div>
+    </div>
+    
+    <div class="slot-section">
+      <h2>📱 Header Banner (728×90)</h2>
+      <div class="slot-info">
+        <strong>Posizione:</strong> Sotto la navbar, in alto nella pagina
+        <strong>Dimensioni:</strong> 728×90 pixel (Leaderboard)
+        <strong>Pagine:</strong> Tutte le pagine (opzionale)
+        <strong>Visibilità:</strong> Desktop e tablet
+      </div>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <div class="ad-placeholder banner-728x90" data-size="728×90" style="margin: 0 auto;"></div>
+      </div>
+      
+      <div class="code-snippet">
+        <code>&lt;!-- Dopo la navbar, aggiungi: --&gt;
+&lt;ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-XXXXXXXXXX"
+     data-ad-slot="XXXXXXXXXX"
+     data-ad-format="auto"&gt;&lt;/ins&gt;
+&lt;script&gt;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+&lt;/script&gt;</code>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copia Codice</button>
+      </div>
+    </div>
+    
+    <div class="slot-section">
+      <h2>📄 In-Content Rectangle (300×250)</h2>
+      <div class="slot-info">
+        <strong>Posizione:</strong> Nel contenuto della pagina, tra le sezioni
+        <strong>Dimensioni:</strong> 300×250 pixel (Medium Rectangle)
+        <strong>Pagine:</strong> index.html, store.html, classifiche.html
+        <strong>Visibilità:</strong> Desktop, tablet e mobile
+      </div>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <div class="ad-placeholder banner-300x250" data-size="300×250" style="margin: 0 auto;"></div>
+      </div>
+      
+      <div class="code-snippet">
+        <code>&lt;!-- Nel contenuto, aggiungi: --&gt;
+&lt;ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-XXXXXXXXXX"
+     data-ad-slot="XXXXXXXXXX"&gt;&lt;/ins&gt;
+&lt;script&gt;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+&lt;/script&gt;</code>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copia Codice</button>
+      </div>
+    </div>
+    
+    <div class="slot-section">
+      <h2>📱 Mobile Banner (320×50)</h2>
+      <div class="slot-info">
+        <strong>Posizione:</strong> Sticky in basso o in alto su mobile
+        <strong>Dimensioni:</strong> 320×50 pixel (Mobile Banner)
+        <strong>Pagine:</strong> Tutte le pagine mobile
+        <strong>Visibilità:</strong> Solo mobile
+      </div>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <div class="ad-placeholder banner-320x50" data-size="320×50" style="margin: 0 auto;"></div>
+      </div>
+      
+      <div class="code-snippet">
+        <code>&lt;!-- Sticky bottom mobile, aggiungi: --&gt;
+&lt;ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-XXXXXXXXXX"
+     data-ad-slot="XXXXXXXXXX"
+     data-ad-format="auto"
+     data-full-width-responsive="true"&gt;&lt;/ins&gt;
+&lt;script&gt;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+&lt;/script&gt;</code>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copia Codice</button>
+      </div>
+    </div>
+    
+    <div class="slot-section">
+      <h2>📊 Large Banner (970×250)</h2>
+      <div class="slot-info">
+        <strong>Posizione:</strong> Tra sezioni principali, full-width
+        <strong>Dimensioni:</strong> 970×250 pixel (Billboard)
+        <strong>Pagine:</strong> index.html, classifiche.html
+        <strong>Visibilità:</strong> Desktop e tablet large
+      </div>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <div class="ad-placeholder banner-970x250" data-size="970×250" style="margin: 0 auto; max-width: 100%;"></div>
+      </div>
+      
+      <div class="code-snippet">
+        <code>&lt;!-- Tra sezioni, aggiungi: --&gt;
+&lt;ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-XXXXXXXXXX"
+     data-ad-slot="XXXXXXXXXX"
+     data-ad-format="auto"&gt;&lt;/ins&gt;
+&lt;script&gt;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+&lt;/script&gt;</code>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copia Codice</button>
+      </div>
+    </div>
+    
+    <div class="slot-section" style="background: linear-gradient(135deg, rgba(220,20,60,0.1) 0%, rgba(59,130,246,0.1) 100%);">
+      <h2>✅ Prossimi Passi</h2>
+      <ol style="line-height: 2;">
+        <li>Registrati su <a href="https://www.google.com/adsense/" target="_blank" style="color: var(--primary);">Google AdSense</a></li>
+        <li>Usa <code>adsense-verification.html</code> per la verifica del sito</li>
+        <li>Dopo l'approvazione, ottieni i codici pubblicitari</li>
+        <li>Sostituisci i placeholder con i codici AdSense</li>
+        <li>Usa questa pagina come riferimento per vedere dove posizionare gli annunci</li>
+      </ol>
+    </div>
+  </div>
+  
+  <script>
+    function copyCode(btn) {
+      const codeBlock = btn.previousElementSibling;
+      const text = codeBlock.textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = '✅ Copiato!';
+        btn.style.background = '#28a745';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = '';
+        }, 2000);
+      }).catch(err => {
+        console.error('Errore copia:', err);
+        alert('Errore nella copia. Seleziona manualmente il codice.');
+      });
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Store Ufficiale - Athletic 2018</title>
+  <meta name="description" content="Felpe, maglie, sticker e merchandising ufficiale Athletic 2018." />
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <style>
+    body { background: var(--bg, #f4f4f4); transition: background 0.3s ease; }
+    :root.dark body { background: #0f172a; }
+    header { margin-bottom: 24px; }
+    .store-main { padding: 24px 20px 80px; max-width: 1200px; margin: 0 auto; }
+    .store-hero { background: linear-gradient(135deg, #1e293b 0%, #0f172a 80%); color: #f8fafc; border-radius: 24px; padding: 36px 32px; box-shadow: 0 18px 42px rgba(15, 23, 42, 0.35); margin-bottom: 32px; position: relative; overflow: hidden; transition: background 0.3s ease; }
+    :root:not(.dark) .store-hero { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); color: #1e293b; box-shadow: 0 18px 42px rgba(0, 0, 0, 0.08); }
+    .store-hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 55%); pointer-events: none; }
+    :root:not(.dark) .store-hero::after { background: radial-gradient(circle at 20% 20%, rgba(0,0,0,0.03), transparent 55%); }
+    .store-hero h1 { font-size: 42px; margin: 0 0 12px; transition: color 0.3s ease; }
+    :root:not(.dark) .store-hero h1 { color: #1e293b; }
+    .store-hero p { font-size: 18px; margin: 0 0 20px; color: rgba(226, 232, 240, 0.85); max-width: 720px; transition: color 0.3s ease; }
+    :root:not(.dark) .store-hero p { color: #475569; }
+    .store-pill-list { display: flex; flex-wrap: wrap; gap: 12px; }
+    .store-pill { background: rgba(148, 163, 184, 0.18); border-radius: 999px; padding: 10px 18px; font-weight: 600; letter-spacing: 0.02em; transition: background 0.3s ease, color 0.3s ease; }
+    :root:not(.dark) .store-pill { background: rgba(15, 23, 42, 0.08); color: #1e293b; }
+    .store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+    .product-card { background: var(--card, #ffffff); border-radius: 20px; box-shadow: var(--shadow-lg, 0 18px 36px rgba(15, 23, 42, 0.18)); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease; border: 1px solid rgba(148,163,184,0.18); }
+    :root.dark .product-card { background: #1e293b; border: 1px solid rgba(148,163,184,0.18); }
+    :root:not(.dark) .product-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(15, 23, 42, 0.25); }
+    :root:not(.dark) .product-card:hover { box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12); }
+    .product-media { position: relative; padding-bottom: 62%; overflow: hidden; }
+    .product-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .product-badge { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.92); color: #0f172a; font-weight: 700; border-radius: 999px; padding: 6px 12px; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .product-body { padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .product-body h3 { margin: 0; font-size: 20px; font-weight: 800; color: var(--text, #2c3e50); transition: color 0.3s ease; }
+    :root.dark .product-body h3 { color: #e2e8f0; }
+    .product-desc { font-size: 14px; color: var(--muted, #6b7a8a); line-height: 1.6; transition: color 0.3s ease; }
+    :root.dark .product-desc { color: #94a3b8; }
+    .product-meta { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    .product-price { font-size: 22px; font-weight: 800; color: var(--primary); }
+    .product-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .product-tag { background: rgba(99,102,241,0.14); color: #312e81; font-weight: 600; border-radius: 999px; padding: 5px 12px; font-size: 12px; }
+    .product-actions { display: flex; gap: 12px; margin-top: 20px; }
+    .product-actions button { flex: 1; border-radius: 12px; padding: 12px 16px; font-weight: 700; border: none; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #ec4899); color: white; box-shadow: 0 12px 24px rgba(99,102,241,0.25); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(99,102,241,0.35); }
+    .btn-outline { background: transparent; border: 1px solid rgba(148,163,184,0.3); color: var(--text, #2c3e50); transition: border 0.3s ease, color 0.3s ease; }
+    :root.dark .btn-outline { border: 1px solid rgba(148,163,184,0.3); color: #e2e8f0; }
+    :root:not(.dark) .btn-outline { border: 1px solid rgba(0,0,0,0.2); color: #1e293b; }
+    .store-empty { background: var(--card); border-radius: 16px; padding: 28px; text-align: center; color: var(--muted); font-size: 16px; }
+    .store-alert { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); color: #1e293b; border-radius: 14px; padding: 14px 18px; font-size: 14px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start; }
+    .store-alert strong { display: block; }
+    @media (max-width: 720px) { .store-hero h1 { font-size: 32px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home"><img src="resources/logo.png" alt="Athletic 2018" /></a>
+    <h1>Store Ufficiale</h1>
+    <p>Felpe, maglie da riscaldamento, sticker e accessori personalizzati Athletic 2018.</p>
+  </header>
+
+  <main class="store-main">
+    <section class="store-hero">
+      <h1>Supporta la Curva Morello</h1>
+      <p>Una collezione pensata per i tifosi: materiali premium, tirature limitate e una produzione indipendente. Tutto il ricavato finanzia trasferte, coreografie e nuove iniziative della community.</p>
+      <div class="store-pill-list">
+        <span class="store-pill">Edizioni limitate</span>
+        <span class="store-pill">Spedizioni entro 10 giorni</span>
+        <span class="store-pill">Pagamenti sicuri Stripe</span>
+        <span class="store-pill">Packaging eco-friendly</span>
+      </div>
+    </section>
+
+    <section class="store-grid" id="storeGrid" aria-live="polite">
+      <div class="store-empty">⏳ Caricamento in corso...</div>
+    </section>
+
+    <div class="store-alert" id="storeNotice" style="display:none;">
+      <div>ℹ️</div>
+      <div>
+        <strong>Pagamenti abilitati su richiesta</strong>
+        <span>Aggiungi il link di checkout Stripe o PayPal dal pannello admin per completare gli ordini online. In alternativa puoi usare il pulsante "Richiedi informazioni" per gestire manualmente.</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <small>&copy; <span id="year"></span> Athletic 2018 – Tutti i diritti riservati.</small>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script src="resources/firebase.js"></script>
+  <script src="resources/app-init.js"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script>
+    // Prevent other scripts from loading on store page
+    if (window.location.pathname.includes('store.html')) {
+      // Override any dashboard/classifiche scripts
+      window.loadMyTeamName = function() { return Promise.resolve(); };
+      if (window.initClassifichePreview) {
+        window.initClassifichePreview = function() {};
+      }
+    }
+    
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const FALLBACK_PRODUCTS = [
+      {
+        id: 'hoodie-classic',
+        name: 'Felpa Classic Ultras',
+        description: 'Felpa oversize in cotone organico con ricamo Athletic 2018. Logo fronte, motto "Morello dentro" sul retro.',
+        price: { value: 59, currency: 'EUR' },
+        category: 'Felpe',
+        imageUrl: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=720&q=80',
+        tags: ['limited', '2024', 'ricamo premium'],
+        checkoutUrl: '',
+        badge: 'Preordine',
+      },
+      {
+        id: 'tee-away',
+        name: 'Maglia Allenamento Away',
+        description: 'T-shirt performance con grafica diagonale, numerazione personalizzabile e stemma termo-applicato.',
+        price: { value: 34, currency: 'EUR' },
+        category: 'Maglie',
+        imageUrl: 'https://images.unsplash.com/photo-1608339400020-24ac0658958b?auto=format&fit=crop&w=720&q=80',
+        tags: ['quickdry', 'custom'],
+        checkoutUrl: '',
+        badge: 'Nuova',
+      },
+      {
+        id: 'stickers-pack',
+        name: 'Sticker Pack Curva',
+        description: '12 adesivi resistenti alle intemperie con i cori storici, crest e messaggi ironici dedicati al campionato.',
+        price: { value: 12, currency: 'EUR' },
+        category: 'Sticker',
+        imageUrl: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?auto=format&fit=crop&w=720&q=80',
+        tags: ['waterproof', 'vinile'],
+        checkoutUrl: '',
+        badge: 'Best seller',
+      }
+    ];
+
+    const db = window.db || (firebase.apps.length ? firebase.firestore() : null);
+    const storeGrid = document.getElementById('storeGrid');
+    const storeNotice = document.getElementById('storeNotice');
+
+    function formatPrice(price) {
+      if (!price || price.value === undefined) return '—';
+      const currency = price.currency || 'EUR';
+      try {
+        return new Intl.NumberFormat('it-IT', { style: 'currency', currency }).format(price.value);
+      } catch (e) {
+        return `${price.value.toFixed(2)} ${currency}`;
+      }
+    }
+
+    function renderProducts(products) {
+      if (!products.length) {
+        storeGrid.innerHTML = '<div class="store-empty">🚧 Al momento lo store è in allestimento. Torna a breve!</div>';
+        storeNotice.style.display = 'none';
+        return;
+      }
+
+      const hasCheckout = products.some(p => p.checkoutUrl);
+      storeNotice.style.display = hasCheckout ? 'flex' : 'none';
+
+      storeGrid.innerHTML = products.map(product => {
+        const tags = (product.tags || []).map(tag => `<span class="product-tag">${tag}</span>`).join('');
+        const badge = product.badge ? `<span class="product-badge">${product.badge}</span>` : '';
+        return `
+        <article class="product-card">
+          <div class="product-media">
+            <img src="${product.imageUrl || 'resources/logo.png'}" alt="${product.name}" loading="lazy" />
+            ${badge}
+          </div>
+          <div class="product-body">
+            <h3>${product.name}</h3>
+            <p class="product-desc">${product.description || ''}</p>
+            <div class="product-tags">${tags}</div>
+            <div class="product-meta">
+              <div class="product-price">${formatPrice(product.price)}</div>
+              <div>${product.category || ''}</div>
+            </div>
+            <div class="product-actions">
+              <button class="btn-primary" data-action="buy" data-id="${product.id}">Acquista</button>
+              <button class="btn-outline" data-action="info" data-id="${product.id}">Info</button>
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    function attachProductHandlers(products) {
+      storeGrid.querySelectorAll('button[data-action]').forEach(button => {
+        button.addEventListener('click', () => {
+          const product = products.find(p => p.id === button.dataset.id);
+          if (!product) return;
+          if (button.dataset.action === 'buy') {
+            if (product.checkoutUrl) {
+              window.open(product.checkoutUrl, '_blank', 'noopener');
+            } else {
+              alert('Pagamento online in attivazione. Usa il pulsante "Info" per prenotare.');
+            }
+          }
+          if (button.dataset.action === 'info') {
+            const subject = encodeURIComponent(`Richiesta info: ${product.name}`);
+            const body = encodeURIComponent(`Ciao crew Athletic 2018,%0D%0A%0D%0Avorrei maggiori informazioni su ${product.name}.\n\nLink prodotto: ${location.href}`);
+            window.open(`mailto:shop@athletic2018.it?subject=${subject}&body=${body}`);
+          }
+        });
+      });
+    }
+
+    async function loadProducts() {
+      console.log('🛒 Caricamento prodotti store...');
+      if (!db) {
+        console.warn('⚠️ Firestore non disponibile, uso fallback statico');
+        renderProducts(FALLBACK_PRODUCTS);
+        attachProductHandlers(FALLBACK_PRODUCTS);
+        return;
+      }
+
+      try {
+        console.log('📡 Query Firestore store_products...');
+        const snapshot = await db.collection('store_products').where('archived', '==', false).get();
+        console.log(`📦 Trovati ${snapshot.size} prodotti (archived=false)`);
+        
+        if (snapshot.empty) {
+          console.log('✅ Nessun prodotto in Firestore, uso fallback');
+          renderProducts(FALLBACK_PRODUCTS);
+          attachProductHandlers(FALLBACK_PRODUCTS);
+          return;
+        }
+
+        const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(p => p.active !== false)
+          .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+        console.log(`✅ ${products.length} prodotti attivi da renderizzare`);
+        renderProducts(products);
+        attachProductHandlers(products);
+      } catch (error) {
+        console.error('❌ Errore caricamento store_products:', error);
+        renderProducts(FALLBACK_PRODUCTS);
+        attachProductHandlers(FALLBACK_PRODUCTS);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProducts);
+  </script>
+</body>
+</html>
