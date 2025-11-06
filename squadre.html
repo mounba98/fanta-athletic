@@ -1472,9 +1472,9 @@
       const coachSection = document.getElementById('coachSection');
       if (coachSection) {
         coachSection.innerHTML = `
-          <div style="display:flex; flex-direction:column; gap:12px; flex:1; align-items: center; width: 100%;">
-            <div class="muted" style="margin:0 0 4px; font-size:14px; font-weight:700;">Allenatori</div>
-            <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:center; margin:0; width: 100%;">
+          <div style="display:flex; flex-direction:column; gap:12px; flex:1; align-items: center; width: 100%; justify-content: center;">
+            <div class="muted" style="margin:0 0 4px; font-size:14px; font-weight:700; text-align: center; width: 100%;">Allenatori</div>
+            <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:center; align-items:center; margin:0 auto; width: 100%; max-width: 100%;">
               ${state.coaches.map(c=> {
                 const coachName = c.nome || c.name || c.coach_id || 'Coach';
                 let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
