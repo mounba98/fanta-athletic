@@ -59,7 +59,10 @@
     .top-row { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; margin-bottom: 20px; }
     .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
     .podium-section { display: flex; justify-content: flex-end; align-items: flex-start; }
-    .right-column { display: flex; flex-direction: column; gap: 20px; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
+    .field-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
+    .pitch { max-width: 600px; }
+    #benchStrip { max-width: 600px; width: 100%; }
     #colPool { max-width: 100%; }
     #playersPool { max-width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
@@ -477,34 +480,38 @@
               <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
             </div>
           </div>
-          <div>
-            <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-            <div class="pitch">
-              <div class="pitch-grid" id="pitchGrid">
-                <div class="line two">
-                  <div class="slot" data-slot="0"></div>
-                  <div class="slot" data-slot="1"></div>
+          <div class="field-section">
+            <div>
+              <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+              <div class="pitch">
+                <div class="pitch-grid" id="pitchGrid">
+                  <div class="line two">
+                    <div class="slot" data-slot="0"></div>
+                    <div class="slot" data-slot="1"></div>
+                  </div>
+                  <div class="line two">
+                    <div class="slot" data-slot="2"></div>
+                    <div class="slot" data-slot="3"></div>
+                  </div>
+                  <div class="line one">
+                    <div class="slot" data-slot="4"></div>
+                  </div>
                 </div>
-                <div class="line two">
-                  <div class="slot" data-slot="2"></div>
-                  <div class="slot" data-slot="3"></div>
-                </div>
-                <div class="line one">
-                  <div class="slot" data-slot="4"></div>
-                </div>
+                <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
               </div>
-              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+              <div class="actions-grid" style="margin:8px 0; justify-content: flex-start;">
+                <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+                <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+              </div>
             </div>
-            <div class="actions-grid" style="margin:8px 0;">
-              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-              <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-            </div>
-            <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
-            <div id="benchStrip" class="strip"></div>
-            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
-              <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
-              <div class="role-body">
-                <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
+            <div style="width: 100%;">
+              <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+              <div id="benchStrip" class="strip"></div>
+              <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
+                <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
+                <div class="role-body">
+                  <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
+                </div>
               </div>
             </div>
           </div>
