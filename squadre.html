@@ -43,7 +43,8 @@
     .hint { margin-top:6px; background: rgba(0,0,0,0.35); color:#fff; padding:6px 8px; border-radius:8px; font-size:12px; }
 
     /* Buttons under pitch in full width grid */
-    .actions-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; width:100%; }
+    .actions-grid { display:flex; gap:8px; width:100%; }
+    #saveFormation, #clearLineup { width: 200px; }
 
     /* Logo box clickable */
     #logoBox { width: 120px; height: 120px; border-radius: 16px; border:1px solid #dbe1e8; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; }
@@ -497,14 +498,13 @@
             <div class="actions-grid" style="margin:8px 0;">
               <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
               <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-              <button class="btn btn-secondary desktop-only" id="undoLineup">Annulla modifiche titolari</button>
             </div>
             <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
             <div id="benchStrip" class="strip"></div>
-            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px;">
+            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
               <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
               <div class="role-body">
-                <div class="roster" id="teamRoster"></div>
+                <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
               </div>
             </div>
           </div>
