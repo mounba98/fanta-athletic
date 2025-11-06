@@ -56,7 +56,11 @@
     .meta-podium { align-self: center; }
     .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; }
-    .right-column { display: flex; flex-direction: column; gap: 20px; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
+    .top-section { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; margin-bottom: 20px; width: 100%; }
+    .logo-name-section { display: flex; flex-direction: column; gap: 12px; }
+    .podium-top-right { display: flex; justify-content: flex-end; }
+    .field-bench-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
     #colPool { max-width: 100%; }
     #playersPool { max-width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
@@ -167,7 +171,7 @@
     }
 
     /* Pitch and DnD - Uniformato con formazioni */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0 auto; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0; }
     .pitch-grid { display:grid; gap: 14px; margin-top: 10px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -443,16 +447,27 @@
           <div class="row meta-controls">
             <select id="giornataSel" class="input"></select>
           </div>
-          <div id="logoNameContainer" style="display:none;">
-            <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
-            <div class="row" style="gap:10px; align-items:center;">
-              <div id="logoBox" style="margin-left: 0;">Carica logo</div>
-              <div style="flex:1;">
-                <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
-                <input id="teamName" class="input" value="" />
+          <div class="top-section">
+            <div class="logo-name-section">
+              <div id="logoNameContainer" style="display:none;">
+                <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
+                <div class="row" style="gap:10px; align-items:center;">
+                  <div id="logoBox" style="margin-left: 0;">Carica logo</div>
+                  <div style="flex:1;">
+                    <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
+                    <input id="teamName" class="input" value="" />
+                  </div>
+                </div>
+                <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" />
               </div>
             </div>
-            <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" />
+            <div class="podium-top-right">
+              <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
+                <h3>🌟 Top 3 giocatori (stagione)</h3>
+                <div id="topPlayersList"></div>
+                <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+              </div>
+            </div>
           </div>
           <div id="colPool">
             <div class="sectionh">Rosa (11)</div>
@@ -465,39 +480,38 @@
         </div>
         <div class="right-column">
           <div id="teamMeta"></div>
-          <div class="top-players-card" id="topPlayersCard" style="display:none; margin-bottom:20px;">
-            <h3>🌟 Top 3 giocatori (stagione)</h3>
-            <div id="topPlayersList"></div>
-            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
-          </div>
-          <div>
-            <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-            <div class="pitch">
-              <div class="pitch-grid" id="pitchGrid">
-                <div class="line two">
-                  <div class="slot" data-slot="0"></div>
-                  <div class="slot" data-slot="1"></div>
+          <div class="field-bench-section">
+            <div>
+              <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+              <div class="pitch">
+                <div class="pitch-grid" id="pitchGrid">
+                  <div class="line two">
+                    <div class="slot" data-slot="0"></div>
+                    <div class="slot" data-slot="1"></div>
+                  </div>
+                  <div class="line two">
+                    <div class="slot" data-slot="2"></div>
+                    <div class="slot" data-slot="3"></div>
+                  </div>
+                  <div class="line one">
+                    <div class="slot" data-slot="4"></div>
+                  </div>
                 </div>
-                <div class="line two">
-                  <div class="slot" data-slot="2"></div>
-                  <div class="slot" data-slot="3"></div>
-                </div>
-                <div class="line one">
-                  <div class="slot" data-slot="4"></div>
-                </div>
+                <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
               </div>
-              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+              <div class="actions-grid" style="margin:8px 0;">
+                <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+                <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+              </div>
             </div>
-            <div class="actions-grid" style="margin:8px 0;">
-              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-              <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-            </div>
-            <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
-            <div id="benchStrip" class="strip"></div>
-            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
-              <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
-              <div class="role-body">
-                <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
+            <div style="width: 420px;">
+              <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+              <div id="benchStrip" class="strip"></div>
+              <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
+                <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
+                <div class="role-body">
+                  <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
+                </div>
               </div>
             </div>
           </div>
