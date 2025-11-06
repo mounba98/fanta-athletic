@@ -57,10 +57,7 @@
     .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; }
     .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
-    .top-section { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; margin-bottom: 20px; width: 100%; }
     .meta-controls { display: flex; align-items: flex-start; gap: 20px; }
-    .logo-name-section { display: flex; flex-direction: column; gap: 12px; }
-    .podium-top-right { display: flex; justify-content: flex-end; }
     .field-bench-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
     #colPool { max-width: 100%; }
     #playersPool { max-width: 100%; }
@@ -448,31 +445,19 @@
     <section class="panel" id="editor" style="margin-top: 8px;">
       <div class="main-layout desktop-only">
         <div class="left-column">
-          <div class="row meta-controls" style="align-items: flex-start; gap: 20px;">
+          <div class="row meta-controls">
             <select id="giornataSel" class="input"></select>
-            <div id="teamMeta" style="flex: 1;"></div>
           </div>
-          <div class="top-section">
-            <div class="logo-name-section">
-              <div id="logoNameContainer" style="display:none;">
-                <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
-                <div class="row" style="gap:10px; align-items:center;">
-                  <div id="logoBox" style="margin-left: 0;">Carica logo</div>
-                  <div style="flex:1;">
-                    <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
-                    <input id="teamName" class="input" value="" />
-                  </div>
-                </div>
-                <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" />
+          <div id="logoNameContainer" style="display:none;">
+            <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
+            <div class="row" style="gap:10px; align-items:center;">
+              <div id="logoBox" style="margin-left: 0;">Carica logo</div>
+              <div style="flex:1;">
+                <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
+                <input id="teamName" class="input" value="" />
               </div>
             </div>
-            <div class="podium-top-right">
-              <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
-                <h3>🌟 Top 3 giocatori (stagione)</h3>
-                <div id="topPlayersList"></div>
-                <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
-              </div>
-            </div>
+            <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" />
           </div>
           <div id="colPool">
             <div class="sectionh">Rosa (11)</div>
@@ -484,6 +469,12 @@
           </div>
         </div>
         <div class="right-column">
+          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0 0 20px 0;">
+            <h3>🌟 Top 3 giocatori (stagione)</h3>
+            <div id="topPlayersList"></div>
+            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+          </div>
+          <div id="teamMeta" style="margin-bottom: 20px;"></div>
           <div class="field-bench-section">
             <div>
               <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
