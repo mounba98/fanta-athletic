@@ -86,10 +86,11 @@
     .top-player-rank { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; background:rgba(15,23,42,0.35); color:inherit; }
     .top-player-card.rank-1 .top-player-rank, .top-player-card.rank-2 .top-player-rank, .top-player-card.rank-3 .top-player-rank { background:rgba(255,255,255,0.25); }
     .top-player-left img { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.55); box-shadow:0 4px 12px rgba(15,23,42,0.4); }
-    .top-player-info { display:flex; flex-direction:column; line-height:1.2; }
+    .top-player-info { display:flex; align-items:center; gap:12px; flex:1; }
     .top-player-name { font-weight:700; font-size:15px; }
-    .top-player-role { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.75; }
-    .top-player-points { font-size:22px; font-weight:800; }
+    .top-player-role { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.75; margin-left: auto; }
+    .top-player-points { font-size:22px; font-weight:800; display: flex; align-items: center; }
+    .top-player-card { display: flex; align-items: center; }
     /* PC: aumenta altezza e font top 3 giocatori */
     @media (min-width: 641px) {
       .top-player-card { padding: 16px 20px; min-height: 80px; display: flex; align-items: center; }
