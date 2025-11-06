@@ -465,6 +465,43 @@
     .top-players-card { margin-top: 0; }
     /* Il campo già usa max-width; legalo alla variabile */
     .pitch { max-width: var(--pitch-width); }
+    
+    /* --- SQUADRE: fix struttura e niente scroll separato a sinistra --- */
+    
+    /* 1) Sidebar: niente scroll interno. Lascia scorrere l'intera pagina */
+    @media (min-width: 641px){
+      .sidebar {
+        position: sticky;           /* ok tenerla appiccicata in alto */
+        top: var(--sticky-top);
+        max-height: none !important;
+        overflow: visible !important;  /* <— elimina lo scroll interno */
+      }
+    }
+    
+    /* 2) Layout: larghezza sidebar fissa, editor prende tutto il resto */
+    .layout {
+      grid-template-columns: 340px minmax(0, 1fr) !important;
+    }
+    
+    /* 3) Lista squadre: una sola colonna, non due */
+    #teams {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+    
+    /* 4) Card della squadra: compatta e full-width nella colonna */
+    #teams .item {
+      min-height: auto !important;
+      width: 100% !important;
+    }
+    
+    /* 5) (opzionale) se vuoi che la sidebar NON sia sticky del tutto:
+       scommenta qui sotto e commenta il blocco sticky sopra
+    */
+    /*
+    .sidebar { position: static !important; top: auto !important; }
+    */
   </style>
 </head>
   <body class="page-squadre">
