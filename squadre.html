@@ -92,16 +92,18 @@
     .top-player-role { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.75; margin-left: auto; }
     .top-player-points { font-size:22px; font-weight:800; display: flex; align-items: center; }
     .top-player-card { display: flex; align-items: center; }
-    /* PC: aumenta altezza e font top 3 giocatori */
+    /* PC: riduce dimensioni top 3 giocatori */
     @media (min-width: 641px) {
-      .top-player-card { padding: 16px 20px; min-height: 80px; display: flex; align-items: center; }
-      .top-player-left { display: flex; align-items: center; gap: 12px; }
-      .top-player-left img { width: 60px; height: 60px; }
-      .top-player-rank { width: 40px; height: 40px; font-size: 20px; }
-      .top-player-info { display: flex; align-items: center; gap: 12px; flex: 1; }
-      .top-player-name { font-size: 22px; }
-      .top-player-role { font-size: 18px; font-weight: 700; margin-left: auto; }
-      .top-player-points { font-size: 32px; display: flex; align-items: center; }
+      .top-player-card { padding: 10px 14px; min-height: 60px; display: flex; align-items: center; }
+      .top-player-left { display: flex; align-items: center; gap: 10px; }
+      .top-player-left img { width: 44px; height: 44px; }
+      .top-player-rank { width: 28px; height: 28px; font-size: 14px; }
+      .top-player-info { display: flex; align-items: center; gap: 10px; flex: 1; }
+      .top-player-name { font-size: 16px; }
+      .top-player-role { font-size: 14px; font-weight: 700; margin-left: auto; }
+      .top-player-points { font-size: 24px; display: flex; align-items: center; }
+      .top-players-card { padding: 12px 16px; }
+      .top-players-card h3 { font-size: 16px; margin: 0 0 10px 0; }
     }
     .top-player-card:hover { transform: translateY(-2px); box-shadow:0 18px 36px rgba(15,23,42,0.35); }
     .top-players-empty { color:rgba(148,163,184,0.7); font-size:13px; text-align:center; padding:8px 0; }
@@ -127,8 +129,8 @@
     }
 
     /* Pitch and DnD - Uniformato con formazioni */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 32px 24px 24px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-    .pitch-grid { display:grid; gap: 18px; margin-top: 12px; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0 auto; }
+    .pitch-grid { display:grid; gap: 14px; margin-top: 10px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
     .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 50%; margin: 0 auto; }
@@ -143,10 +145,10 @@
       background: rgba(15,23,42,0.28);
       border: 1px solid rgba(255,255,255,0.18);
       border-radius: 14px;
-      padding: 14px;
+      padding: 10px;
       display:flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       cursor: grab;
       user-select: none;
       -webkit-user-select: none;
@@ -161,18 +163,19 @@
     .slot-card-main {
       display:flex;
       align-items:center;
-      gap: 12px;
+      gap: 8px;
       min-width: 0;
+      flex: 1;
     }
 
     .slot-avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 22px;
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
       overflow: hidden;
       border: 2px solid rgba(255,255,255,0.32);
       flex-shrink: 0;
-      box-shadow: 0 10px 18px rgba(15,23,42,0.3);
+      box-shadow: 0 8px 14px rgba(15,23,42,0.3);
       background: rgba(15,23,42,0.32);
     }
 
@@ -192,7 +195,7 @@
     }
 
     .slot-name {
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 700;
       text-shadow: 0 1px 3px rgba(15,23,42,0.45);
       white-space: nowrap;
@@ -529,12 +532,30 @@
       return map[role] || (role[0] ? role[0].toUpperCase() : '');
     }
 
-    function getPlayerDisplayLabel(player) {
+    function getPlayerDisplayLabel(player, format) {
       if (!player) return '';
       const full = String(player.nome_completo || player.name || '').trim();
       const override = PLAYER_LABEL_OVERRIDES.get(full.toLowerCase());
       if (override) return override;
+      
+      // Se c'è un soprannome, usalo sempre
       if (player.nickname) return capitalizeWords(player.nickname);
+      
+      // Formato iniziale.cognome per campo/panchina
+      if (format === 'initial.surname') {
+        const parts = full.split(/\s+/).filter(Boolean);
+        if (parts.length >= 2) {
+          const initial = parts[0][0].toUpperCase();
+          const surname = parts[parts.length - 1];
+          return `${initial}. ${capitalizeWords(surname)}`;
+        }
+        if (parts.length === 1) return capitalizeWords(parts[0]);
+      }
+      
+      // Formato completo per altre viste
+      if (format === 'full') return full;
+      
+      // Default: solo cognome
       if (player.cognome) return capitalizeWords(player.cognome);
       if (player.surname) return capitalizeWords(player.surname);
       if (full) {
@@ -1282,6 +1303,25 @@
               ${state.coaches.map(c=> `
                 <button class="btn btn-secondary btn-sm ${t.coach_ids.includes(c.coach_id)?'selected':''}" data-coach-id="${c.coach_id}" ${!canSelectCoach?'disabled':''}><strong>${escapeHtml(c.nome || c.coach_id || 'Coach')}</strong></button>
               `).join('')}
+            </div>
+            <div class="row" style="gap:8px; flex-wrap:wrap; justify-content:flex-start; margin-top:8px;">
+              ${state.coaches.map(c=> {
+                const coachName = c.nome || c.name || c.coach_id || 'Coach';
+                let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
+                // Fallback per Tommy
+                if (!coachPhoto && (coachName === 'Tommy' || c.coach_id === 'tommy' || c.coach_id?.toLowerCase() === 'tommy')) {
+                  coachPhoto = 'resources/tommy_guardu.png';
+                }
+                const coachInitials = coachName.split(/\s+/).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                return `
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <div style="width:48px; height:48px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:2px solid ${t.coach_ids.includes(c.coach_id)?'var(--primary)':'rgba(148,163,184,0.3)'};">
+                      ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:18px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:18px; font-weight:700;">${coachInitials}</span>`}
+                    </div>
+                    <span style="font-size:11px; color:var(--muted);">${escapeHtml(coachName)}</span>
+                  </div>
+                `;
+              }).join('')}
             </div>
             <div style="margin-top:16px;">
               <div class="muted" style="margin-bottom:4px;">Accesso</div>
