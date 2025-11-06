@@ -60,9 +60,9 @@
     .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
     .podium-section { display: flex; justify-content: flex-end; align-items: flex-start; }
     .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
-    .field-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
-    .pitch { max-width: 600px; }
-    #benchStrip { max-width: 600px; width: 100%; }
+    .field-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
+    .pitch { max-width: 600px; margin: 0 !important; }
+    #benchStrip { max-width: 600px; width: 100%; margin: 0 !important; }
     #colPool { max-width: 100%; }
     #playersPool { max-width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
@@ -173,7 +173,7 @@
     }
 
     /* Pitch and DnD - Uniformato con formazioni */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0 auto; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0; }
     .pitch-grid { display:grid; gap: 14px; margin-top: 10px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -397,7 +397,7 @@
       .grid2 { max-width: 100%; margin: 0 auto; }
       .pitch { max-width: 300px; margin: 0 auto; }
       .sectionh { max-width: 300px; margin-left: auto; margin-right: auto; }
-      #benchStrip { max-width: 300px; margin-left: auto; margin-right: auto; justify-content: center; }
+      #benchStrip { max-width: 300px; margin-left: auto !important; margin-right: auto !important; justify-content: center; }
       #colRight > .row { max-width: 300px; margin-left: auto; margin-right: auto; }
       /* shrink slots proportionally on mobile - Uniformato con formazioni */
       .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
