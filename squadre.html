@@ -32,8 +32,10 @@
     .team-card-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .team-meta { font-size: 13px; color: var(--muted); }
     .sidebar, .panel { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 22px 22px 26px; display:flex; flex-direction:column; gap:20px; min-height:0; }
-    .panel#editor { gap: 0 !important; }
-    .panel#editor .main-layout { gap: 20px; }
+    .panel#editor { gap: 0 !important; padding-top: 0 !important; }
+    .panel#editor .main-layout { gap: 20px; margin-top: 0 !important; }
+    .panel#editor .main-layout .right-column { margin-top: 0 !important; padding-top: 0 !important; }
+    .panel#editor .main-layout .right-column > div:first-child { margin-top: 0 !important; padding-top: 0 !important; }
     .panel .right-column { padding-top: 0 !important; margin-top: 0 !important; }
     .panel .main-layout .right-column > div:first-child { margin-top: 0 !important; padding-top: 0 !important; }
     .sidebar { align-items: stretch; }
@@ -471,10 +473,10 @@
             <div class="list" id="playersPool"></div>
           </div>
         </div>
-        <div class="right-column">
-          <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 0;">
-            <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-            <div class="pitch" style="margin: 0;">
+        <div class="right-column" style="margin-top: 0 !important; padding-top: 0 !important;">
+          <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 0 !important; padding-top: 0 !important;">
+            <div class="sectionh" style="margin-top:0 !important; padding-top: 0 !important;">Titolari (5 a 5)</div>
+            <div class="pitch" style="margin: 0 !important; padding-top: 0 !important;">
               <div class="pitch-grid" id="pitchGrid">
                 <div class="line two">
                   <div class="slot" data-slot="0"></div>
