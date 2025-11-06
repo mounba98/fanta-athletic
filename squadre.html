@@ -75,7 +75,7 @@
     .bench-pill { background: var(--card, rgba(255,255,255,0.95)); border:1px solid rgba(148,163,184,0.25); color: var(--text, #1f2937); }
     :root.dark .bench-pill { background: rgba(15,23,42,0.9); border-color: rgba(148,163,184,0.25); color: #f8fafc; }
     .bench-pill-active { box-shadow:0 0 0 2px var(--secondary); }
-    .top-players-card { background: var(--card, #fff); border-radius:18px; padding:18px; margin-bottom:20px; border:1px solid rgba(148,163,184,0.15); box-shadow: var(--shadow); display:flex; flex-direction:column; gap:12px; }
+    .top-players-card { background: var(--card, #fff); border-radius:18px; padding:10px 12px; margin-bottom:8px; border:1px solid rgba(148,163,184,0.15); box-shadow: var(--shadow); display:flex; flex-direction:column; gap:8px; }
     :root.dark .top-players-card { background: linear-gradient(160deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.92) 100%); }
     .top-players-card h3 { margin:0; font-size:18px; font-weight:800; color:var(--text, #1f2937); display:flex; align-items:center; gap:8px; }
     :root.dark .top-players-card h3 { color:#f8fafc; }
@@ -120,8 +120,8 @@
     }
     /* PC: riduce dimensioni top 3 giocatori */
     @media (min-width: 641px) {
-      .top-players-card { padding: 12px 16px; }
-      .top-players-card h3 { font-size: 16px; margin: 0 0 10px 0; }
+      .top-players-card { padding: 8px 12px; margin-bottom: 8px; }
+      .top-players-card h3 { font-size: 14px; margin: 0 0 6px 0; }
     }
     .top-player-card:hover { transform: translateY(-2px); box-shadow:0 18px 36px rgba(15,23,42,0.35); }
     .top-players-empty { color:rgba(148,163,184,0.7); font-size:13px; text-align:center; padding:8px 0; }

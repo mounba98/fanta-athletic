@@ -1930,7 +1930,7 @@
                 ${teamLabel ? `<span class="player-chip-meta">${teamLabel}</span>` : ''}
               </div>
             </div>
-            <button class="btn btn-secondary btn-sm" data-act="rm" style="padding:4px 8px;">×</button>
+            <!-- Rimozione disabilitata nella rosa squadra di formazioni -->
           </div>
         `;
       }).join('');
@@ -1946,14 +1946,8 @@
           el.addEventListener('click', ()=> handleMobileClickPlayer(el.dataset.pid));
         }
         
-        // Remove button
-        el.querySelector('[data-act="rm"]').addEventListener('click', ()=>{
-          if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
-          t.roster = t.roster.filter(x=>x!==el.dataset.pid);
-          t.lineup = t.lineup.map(x=> x===el.dataset.pid ? null : x);
-          if (t.captain===el.dataset.pid) t.captain = null;
-          saveTeams(); renderEditor();
-        });
+        // Remove button disabilitato nella rosa squadra di formazioni
+        // I giocatori si rimuovono solo da squadre.html
         
         // Doppio click per aggiungere al campo
         el.addEventListener('dblclick', ()=>{
