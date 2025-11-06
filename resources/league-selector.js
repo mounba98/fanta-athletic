@@ -825,7 +825,7 @@
         align-items: center;
         justify-content: space-between;
         position: relative;
-        z-index: 1500;
+        z-index: 900;
       }
       
       .league-selector-mobile .league-selector-btn {
@@ -924,7 +924,7 @@
       .league-selector-mobile-host {
         width: 100%;
         position: relative;
-        z-index: 1400;
+        z-index: 900;
         padding: 0 16px;
         margin: -8px 0 18px;
       }

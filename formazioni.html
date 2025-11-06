@@ -30,7 +30,7 @@
     .actions-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; width:100%; }
 
     /* Logo box clickable */
-    #logoBox { width: 112px; height: 112px; border-radius: 12px; border:1px solid #dbe1e8; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; }
+    #logoBox { width: 160px; height: 160px; border-radius: 16px; border:1px solid #dbe1e8; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; }
     #logoBox img { width:100%; height:100%; object-fit:cover; }
     .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items:start; }
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
@@ -422,7 +422,29 @@
       header h1 { font-size: 14px !important; }
       .logo-home img { width: 36px !important; height: 36px !important; }
       .grid2 { grid-template-columns: 1fr; }
-      .panel { max-width: 380px; margin: 0 auto; }
+      .panel { max-width: 100%; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+      /* Tasti fissi in basso sopra bottom nav */
+      .mobile-fixed-buttons {
+        position: fixed;
+        bottom: 70px;
+        left: 0;
+        right: 0;
+        display: flex;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        z-index: 40;
+      }
+      .mobile-fixed-buttons .btn {
+        flex: 1;
+        min-height: 48px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      /* Padding per non coprire contenuto */
+      body.page-formazioni { padding-bottom: 140px; }
        .pitch { max-width: 320px; margin: 0 auto; padding: 24px 18px 22px; }
       .sectionh { max-width: 300px; margin-left: auto; margin-right: auto; }
       #benchStrip { max-width: 300px; margin-left: auto; margin-right: auto; justify-content: center; }
@@ -724,8 +746,10 @@
             </div>
           </div>
           
-          <div class="row" style="margin-top:10px;">
-            <button class="btn mobile-only" id="confirmLineup" style="width:100%">Conferma formazione</button>
+          <!-- Mobile: tasti fissi in basso -->
+          <div class="mobile-fixed-buttons mobile-only">
+            <button class="btn" id="saveFormationMobile">Salva</button>
+            <button class="btn btn-secondary" id="clearLineupMobile">Svuota</button>
           </div>
         </div>
       </div>
@@ -2218,6 +2242,33 @@
       } }
       const btnReset = $('#resetTeam'); if (btnReset) btnReset.onclick = ()=>{ /* hidden by design */ };
       $('#clearLineup').onclick = ()=>{ if (!canWrite) { return; } t.lineup=[null,null,null,null,null]; saveTeams(); renderEditor(); };
+      // Mobile buttons
+      const btnSaveMobile = document.getElementById('saveFormationMobile');
+      const btnClearMobile = document.getElementById('clearLineupMobile');
+      if (btnSaveMobile) {
+        btnSaveMobile.onclick = async ()=>{
+          if (!canWrite) { 
+            if (!state.user) {
+              toast('❌ Devi effettuare il login per salvare');
+              return;
+            }
+            toast('❌ Permesso negato');
+            return;
+          }
+          await saveCurrentTeamFormation();
+          renderTeamsList();
+          toast('✅ Formazione salvata');
+        };
+      }
+      if (btnClearMobile) {
+        btnClearMobile.onclick = ()=>{ 
+          if (!canWrite) { return; } 
+          t.lineup=[null,null,null,null,null]; 
+          saveTeams(); 
+          renderEditor(); 
+          toast('✅ Campo svuotato');
+        };
+      }
 
       // Mobile: populate team selector and confirm button
       const sel = document.getElementById('teamSelectMobile');
