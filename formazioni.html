@@ -386,13 +386,6 @@
     .role-header { display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:800; }
     .role-section.collapsed .role-body { display:none; }
     .strip { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    /* Mobile: panchina orizzontale con scroll */
-    @media (max-width: 768px) {
-      .strip { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: thin; padding-bottom: 4px; }
-      .strip::-webkit-scrollbar { height: 6px; }
-      .strip::-webkit-scrollbar-track { background: rgba(148,163,184,0.1); border-radius: 3px; }
-      .strip::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 3px; }
-    }
     .pill { padding:6px 8px; border-radius:999px; background:#eef3f8; border:1px solid #dbe1e8; color:#2b3a42; }
     .btn-danger { background:#fbeaea; color:#b00020; border:1px solid #e39aa0; }
     .selected { box-shadow: 0 0 0 3px rgba(52,152,219,0.25); }
