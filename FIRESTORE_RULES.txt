@@ -1,0 +1,140 @@
+// 🔥 FIRESTORE RULES - Copia e incolla in Firebase Console
+// https://console.firebase.google.com/project/fanta-athletic/firestore/rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========== HELPER FUNCTIONS ==========
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      // Check if user is in admins collection
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // ========== PUBLIC COLLECTIONS ==========
+    
+    // Teams - Read public, write admin only
+    match /teams/{teamId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Players - Read public, write admin only  
+    match /players/{playerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Coaches - Read public, write admin only
+    match /coaches/{coachId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Rules - Read public, write admin only
+    match /rules/{ruleId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Calendar - Read public, write admin only
+    match /athletic_calendar/{matchId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Giornate - Read public, write admin only
+    match /giornate/{giornataId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Standings - Read public, write admin only
+    match /standings/{standingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // ========== CONTEST ==========
+    
+    // Contest matches - Read all, write admin only
+    match /contest/matches {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Contest scores - Read all, write admin only  
+    match /contest/scores {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Contest settings - Read all, write admin only
+    match /contest/settings {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // User predictions - Read if authenticated, write own only
+    match /contest/predictions/{userId}/{matchday} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ========== USERS ==========
+    
+    // Users - Read if authenticated, write own only
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Admins - Read if admin, write never (set manually)
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if false; // Set manually via console
+    }
+    
+    // ========== FORMATIONS ==========
+    
+    // Formations - Read all, write if authenticated
+    match /formations/{giornata}/{userId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ========== APP VERSION (for force refresh) ==========
+    
+    match /app_config/version {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
+
+// ========== SETUP ADMIN USER ==========
+
+/* 
+IMPORTANTE: Dopo aver copiato queste rules, devi creare il tuo user come admin:
+
+1. Vai su Firestore Console
+2. Crea collection "admins"
+3. Document ID = IL TUO USER ID (prendi da Authentication)
+4. Aggiungi campo:
+   - active: true
+   - created_at: [timestamp now]
+   
+Esempio:
+Collection: admins
+Document ID: "abc123xyz" (il tuo Firebase UID)
+Fields:
+  active: true
+  created_at: October 22, 2024 at 5:30:00 PM UTC+2
+  email: "tuaemail@example.com"
+*/

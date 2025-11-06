@@ -1,0 +1,332 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    function isLeagueMember(leagueId) {
+      return isSignedIn() && (
+        isAdmin() ||
+        request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.members ||
+        request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins
+      );
+    }
+    
+    function isLeagueAdmin(leagueId) {
+      return isSignedIn() && (
+        isAdmin() ||
+        request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins
+      );
+    }
+    
+    // ========== Leagues/Competizioni ==========
+    match /leagues/{leagueId} {
+      allow read: if isLeagueMember(leagueId);
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        request.auth.uid in resource.data.admins ||
+        isAdmin() ||
+        (!(request.auth.uid in resource.data.members) &&
+         request.auth.uid in request.resource.data.members &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members']))
+      );
+      allow delete: if isAdmin();
+      
+      // Teams subcollection
+      match /teams/{teamId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+        allow update: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin() ||
+          request.auth.uid == resource.data.owner ||
+          ((!('owner' in resource.data) || resource.data.owner == null || resource.data.owner == '') &&
+           request.resource.data.owner == request.auth.uid)
+        );
+        allow delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+        
+        // Saved formations subcollection
+        match /saved/{giornata} {
+          allow read: if isLeagueMember(leagueId);
+          allow write: if isLeagueMember(leagueId);
+        }
+      }
+      
+      // Players subcollection
+      match /players/{playerId} {
+        allow read: if isLeagueMember(leagueId);
+        allow write: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+      
+      // Coaches subcollection
+      match /coaches/{coachId} {
+        allow read: if isLeagueMember(leagueId);
+        allow write: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+      
+      // Results subcollection (Risultati per giornata)
+      match /results/{giornata} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+        
+        // Teams results subcollection
+        match /teams/{teamId} {
+          allow read: if isLeagueMember(leagueId);
+          allow create, update, delete: if isSignedIn() && (
+            request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+            isAdmin()
+          );
+        }
+      }
+      
+      // Days subcollection (Giornate)
+      match /days/{giornata} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+      
+      // Deadlines subcollection
+      match /deadlines/{giornataId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+      
+      // Matchday_temp subcollection (bozze giornate)
+      match /matchday_temp/{giornataId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+      
+      // Rules subcollection
+      match /rules/{ruleId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+
+      // H2H schedule per lega
+      match /h2h_schedule/{seasonId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isLeagueAdmin(leagueId);
+
+        match /giornate/{giornataId} {
+          allow read: if isLeagueMember(leagueId);
+          allow create, update, delete: if isLeagueAdmin(leagueId);
+        }
+      }
+
+      // H2H results per lega
+      match /h2h_results/{seasonId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isLeagueAdmin(leagueId);
+
+        match /giornate/{giornataId} {
+          allow read: if isLeagueMember(leagueId);
+          allow create, update, delete: if isLeagueAdmin(leagueId);
+        }
+      }
+
+      // Bacheca / Posts
+      match /posts/{postId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create: if isLeagueMember(leagueId);
+        allow update: if isLeagueMember(leagueId);
+        allow delete: if isLeagueAdmin(leagueId) || (isSignedIn() && request.auth.uid == resource.data.authorUid);
+      }
+    }
+    
+    // ========== Legacy Collections (backward compatibility) ==========
+    // Results legacy (top-level) - per migrazione
+    match /results/{giornata} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+      
+      match /teams/{teamId} {
+        allow read: if true;
+        allow create, update, delete: if isAdmin();
+      }
+    }
+    
+    // Days legacy (top-level) - per migrazione
+    match /days/{giornata} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // Matchday_temp legacy (top-level) - per migrazione
+    match /matchday_temp/{giornataId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // H2H Schedule (top-level)
+    match /h2h_schedule/{seasonId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+      
+      match /giornate/{giornataId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
+    }
+    
+    // H2H Results (top-level)
+    match /h2h_results/{seasonId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+      
+      match /giornate/{giornataId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
+    }
+
+    // Posts legacy (top-level)
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // Teams legacy (top-level) - per backward compatibility
+    match /teams/{teamId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+      
+      match /saved/{giornata} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn();
+      }
+    }
+    
+    // Players legacy (top-level)
+    match /players/{playerId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // Coaches legacy (top-level)
+    match /coaches/{coachId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // ========== Global Catalog ==========
+    match /clubs/{clubId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /rosters/{rosterId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      
+      match /roster_members/{memberId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+    
+    match /players_global/{playerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /coaches_global/{coachId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /taxonomies/{taxonomyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // ========== Store ==========
+    match /store_products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // ========== Config ==========
+    match /config/{configId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // ========== Rules (legacy top-level) ==========
+    match /rules/{ruleId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // ========== Admins ==========
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // ========== Users ==========
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+    
+    // ========== Notifications ==========
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == resource.data.userId ||
+        isAdmin()
+      );
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (
+        request.auth.uid == resource.data.userId ||
+        isAdmin()
+      );
+    }
+    
+    // Notifications subcollection (per social-notifications.js)
+    match /notifications/{userId}/items/{itemId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == userId ||
+        isAdmin()
+      );
+      allow write: if isSignedIn() && (
+        request.auth.uid == userId ||
+        isAdmin()
+      );
+    }
+  }
+}

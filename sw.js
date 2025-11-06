@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fanta-athletic-v2025110520';
+const CACHE_NAME = 'fanta-athletic-v2025110524';
 const urlsToCache = [
   '/',
   '/index.html',

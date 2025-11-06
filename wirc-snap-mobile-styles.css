@@ -1,0 +1,589 @@
+/* WIRC SNAP MOBILE - VERTICAL LAYOUT */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0A0D18;
+  color: #FFF;
+  overflow-x: hidden;
+  max-width: 100vw;
+  min-height: 100vh;
+}
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* AUTH SCREEN */
+.auth-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-container h1 {
+  font-size: 48px;
+  color: #00BFFF;
+  text-shadow: 0 0 20px #00BFFF;
+  margin-bottom: 40px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00FF9D, #00BFFF);
+  color: #0A0D18;
+  border: none;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+}
+
+.btn-secondary {
+  background: #10152B;
+  color: #00BFFF;
+  border: 2px solid #00BFFF;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* DECK SCREEN */
+.deck-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: #10152B;
+  border-bottom: 2px solid #00BFFF;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: #00BFFF;
+  font-size: 24px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.deck-header h2 {
+  font-size: 24px;
+  color: #00BFFF;
+}
+
+#decksList {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.deck-item {
+  background: #10152B;
+  border: 2px solid #00BFFF;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+}
+
+.deck-item h3 {
+  color: #00BFFF;
+  margin-bottom: 10px;
+}
+
+.deck-item p {
+  color: #AAB2C8;
+  font-size: 14px;
+}
+
+/* DECK BUILDER */
+.builder-header {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #10152B;
+  border-bottom: 2px solid #00BFFF;
+  gap: 10px;
+}
+
+#deckNameInput {
+  flex: 1;
+  background: #0A0D18;
+  border: 1px solid #00BFFF;
+  color: #FFF;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.btn-save {
+  background: #00FF9D;
+  border: none;
+  color: #0A0D18;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.builder-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.cards-collection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 15px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.deck-current {
+  background: #10152B;
+  padding: 15px;
+  border-top: 2px solid #00BFFF;
+}
+
+.deck-current h3 {
+  color: #00BFFF;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+#currentDeck {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  min-height: 80px;
+}
+
+/* GAME SCREEN */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #10152B;
+  border-bottom: 2px solid #00BFFF;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00BFFF, #00FF9D);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+}
+
+.player-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #00BFFF;
+}
+
+.game-stats {
+  text-align: right;
+}
+
+.stat {
+  font-size: 12px;
+  color: #AAB2C8;
+  margin-bottom: 5px;
+}
+
+.stat span {
+  color: #00BFFF;
+  font-weight: 700;
+}
+
+.cubes {
+  font-size: 20px;
+  font-weight: 900;
+  color: #00FF9D;
+}
+
+/* LOCATIONS */
+.locations-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.location {
+  background: #10152B;
+  border: 2px solid #00BFFF;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+  padding: 5px;
+}
+
+.location[data-loc="0"] {
+  border-color: #4A90E2;
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.4);
+}
+
+.location[data-loc="1"] {
+  border-color: #9B59B6;
+  box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+}
+
+.location[data-loc="2"] {
+  border-color: #E67E22;
+  box-shadow: 0 0 20px rgba(230, 126, 34, 0.4);
+}
+
+.loc-cards {
+  display: flex;
+  gap: 3px;
+  min-height: 60px;
+  padding: 5px;
+  justify-content: center;
+}
+
+.loc-cards.opponent {
+  background: rgba(255, 0, 0, 0.05);
+}
+
+.loc-cards.player {
+  background: rgba(0, 255, 157, 0.05);
+}
+
+.loc-info {
+  padding: 8px;
+  text-align: center;
+  border-top: 1px solid rgba(0, 191, 255, 0.3);
+  border-bottom: 1px solid rgba(0, 191, 255, 0.3);
+}
+
+.loc-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: #00BFFF;
+  text-shadow: 0 0 10px #00BFFF;
+  margin-bottom: 4px;
+}
+
+.loc-effect {
+  font-size: 11px;
+  color: #AAB2C8;
+  margin-bottom: 6px;
+}
+
+.loc-scores {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.score {
+  font-size: 18px;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.score.opp {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff6b6b;
+}
+
+.score.player {
+  background: rgba(0, 255, 157, 0.2);
+  color: #00FF9D;
+}
+
+/* HAND */
+.hand-container {
+  background: #10152B;
+  padding: 10px;
+  border-top: 2px solid #00BFFF;
+}
+
+.energy-display {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 900;
+  color: #00FF9D;
+}
+
+.energy-icon {
+  font-size: 24px;
+}
+
+.hand-cards {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+/* CARDS */
+.card {
+  width: 70px;
+  min-width: 70px;
+  height: 100px;
+  background: linear-gradient(135deg, #1a1f3a, #0e1123);
+  border: 2px solid #00BFFF;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card:active {
+  transform: scale(0.95);
+}
+
+.card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.card-cost {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #FF6B35, #F7931E);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #FFF;
+  border: 2px solid #FFF;
+}
+
+.card-power {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #FFF;
+  border: 2px solid #FFF;
+}
+
+.card-name {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  padding: 15px 4px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  color: #FFF;
+  text-shadow: 0 1px 3px #000;
+}
+
+/* ACTIONS */
+.game-actions {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  background: #10152B;
+  border-top: 2px solid #00BFFF;
+}
+
+.btn-end-turn {
+  flex: 2;
+  background: linear-gradient(135deg, #00FF9D, #00BFFF);
+  border: none;
+  color: #0A0D18;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 900;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(0, 255, 157, 0.6);
+  animation: pulse-btn 2s infinite;
+}
+
+@keyframes pulse-btn {
+  0%, 100% { box-shadow: 0 0 25px rgba(0, 255, 157, 0.6); }
+  50% { box-shadow: 0 0 35px rgba(0, 255, 157, 0.9); }
+}
+
+.btn-snap {
+  flex: 1;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border: none;
+  color: #0A0D18;
+  padding: 18px 10px;
+  font-size: 16px;
+  font-weight: 900;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.btn-retreat {
+  flex: 1;
+  background: #E53935;
+  border: none;
+  color: #FFF;
+  padding: 18px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 400px;
+  background: #10152B;
+  border: 2px solid #00BFFF;
+  border-radius: 16px;
+  padding: 30px 20px;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #00BFFF;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.card-zoom {
+  width: 250px;
+  height: 375px;
+  margin: 0 auto 20px;
+  perspective: 1000px;
+  position: relative;
+}
+
+.card-face {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  transition: transform 0.6s;
+  border-radius: 16px;
+  border: 3px solid #00BFFF;
+  box-shadow: 0 0 30px rgba(0, 191, 255, 0.6);
+}
+
+.card-face.front {
+  transform: rotateY(0deg);
+}
+
+.card-face.back {
+  transform: rotateY(180deg);
+}
+
+.card-zoom.flipped .front {
+  transform: rotateY(180deg);
+}
+
+.card-zoom.flipped .back {
+  transform: rotateY(0deg);
+}
+
+.card-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.btn-flip {
+  width: 100%;
+  background: #00BFFF;
+  border: none;
+  color: #0A0D18;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* ANIMATIONS */
+@keyframes card-play {
+  0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.card.play-anim {
+  animation: card-play 0.5s ease-out;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0D18;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00BFFF;
+  border-radius: 3px;
+}

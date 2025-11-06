@@ -1,0 +1,263 @@
+# WIRC SNAP - 26 CARTE BILANCIATE PER CHATGPT
+
+## ISTRUZIONI PER CHATGPT
+Usa queste carte per generare immagini con:
+- Nome personaggio
+- Cost (angolo alto sinistra, grande)
+- Power (angolo alto destra, grande)
+- Emoji centrale
+- Descrizione effetto in basso
+
+---
+
+## CARTE COSTO 1 (2 carte)
+
+**Paolino** 
+Cost: 1 | Power: 2
+Emoji: 🔍
+Trigger: On Reveal
+Effetto: Pesca 1 carta
+Descrizione: "Pesca 1 carta"
+
+**Cocci**
+Cost: 1 | Power: 1
+Emoji: 💥
+Trigger: Ongoing
+Effetto: +2 se colpito
+Descrizione: "+2 Forza se colpito"
+
+---
+
+## CARTE COSTO 2 (9 carte)
+
+**Bosi**
+Cost: 2 | Power: 3
+Emoji: 🌿
+Trigger: Ongoing
+Effetto: +1 Forza ogni turno
+Descrizione: "+1 Forza ogni turno"
+
+**Dux**
+Cost: 2 | Power: 3
+Emoji: 🧘
+Trigger: On Reveal
+Effetto: +2 se hai Relaxato
+Descrizione: "+2 se hai Relaxato"
+
+**Pippo Bongia**
+Cost: 2 | Power: 3
+Emoji: 🎯
+Trigger: Ongoing
+Effetto: Scout +1 Forza
+Descrizione: "Scout +1 Forza"
+
+**Giulietto**
+Cost: 2 | Power: 2
+Emoji: 🧒
+Trigger: Ongoing
+Effetto: Costo 1 +1
+Descrizione: "Carte costo 1 +1 Forza"
+
+**Trendiu**
+Cost: 2 | Power: 2
+Emoji: 🎭
+Trigger: On Reveal
+Effetto: Copia effetto alleato
+Descrizione: "Copia effetto alleato"
+
+**G Cazzi**
+Cost: 2 | Power: 3
+Emoji: 🏋️
+Trigger: On Reveal
+Effetto: +3 con Atleta
+Descrizione: "+3 se hai Atleta"
+
+**Canni**
+Cost: 2 | Power: 3
+Emoji: 🤖
+Trigger: Ongoing
+Effetto: +2 se salti turno
+Descrizione: "+2 se salti turno"
+
+**Lisa**
+Cost: 2 | Power: 3
+Emoji: 👩
+Trigger: On Reveal
+Effetto: +2 se hai Ale Lapi
+Descrizione: "+2 se hai Ale Lapi"
+
+---
+
+## CARTE COSTO 3 (11 carte)
+
+**Chep**
+Cost: 3 | Power: 2
+Emoji: 💭
+Trigger: On Reveal
+Effetto: Disattiva Continuo nemico
+Descrizione: "Disattiva Ongoing nemico qui"
+
+**Toti**
+Cost: 3 | Power: 4
+Emoji: ☕
+Trigger: Ongoing
+Effetto: Allenatori +1
+Descrizione: "Allenatori +1 Forza"
+
+**Calosi**
+Cost: 3 | Power: 5
+Emoji: 🎨
+Trigger: On Reveal
+Effetto: +2 dopo Festaiolo
+Descrizione: "+2 dopo Festaiolo"
+
+**Giabba**
+Cost: 3 | Power: 4
+Emoji: 🎸
+Trigger: Ongoing
+Effetto: +1 ogni turno
+Descrizione: "+1 Forza ogni turno"
+
+**Santo**
+Cost: 3 | Power: 4
+Emoji: 🎵
+Trigger: On Reveal
+Effetto: Creativi +2
+Descrizione: "Creativi +2 Forza"
+
+**Pato**
+Cost: 3 | Power: 5
+Emoji: 💪
+Trigger: Ongoing
+Effetto: +2 con Atleta
+Descrizione: "+2 se hai Atleta"
+
+**Beppe**
+Cost: 3 | Power: 5
+Emoji: ⚽
+Trigger: Ongoing
+Effetto: Atleti +1
+Descrizione: "Atleti +1 Forza"
+
+**Meme**
+Cost: 3 | Power: 3
+Emoji: 📊
+Trigger: On Reveal
+Effetto: Copia Ongoing nemico
+Descrizione: "Copia Ongoing nemico"
+
+**Titti**
+Cost: 3 | Power: 4
+Emoji: 🎓
+Trigger: Ongoing
+Effetto: Tutti Atleti +2
+Descrizione: "Tutti Atleti +2 Forza"
+
+**Wengi**
+Cost: 3 | Power: 4
+Emoji: 🤕
+Trigger: Ongoing
+Effetto: +1 per carta nemica
+Descrizione: "+1 per carta nemica qui"
+
+**Boro**
+Cost: 3 | Power: 5
+Emoji: 🍺
+Trigger: On Reveal
+Effetto: +1 Energia max
+Descrizione: "+1 Energia massima"
+
+**Wonia**
+Cost: 3 | Power: 4
+Emoji: 💃
+Trigger: Ongoing
+Effetto: +2 se hai Wabione
+Descrizione: "+2 se hai Wabione"
+
+---
+
+## CARTE COSTO 4 (4 carte)
+
+**Fracks**
+Cost: 4 | Power: 6
+Emoji: 👔
+Trigger: Ongoing
+Effetto: Blortz qui +1 Forza
+Descrizione: "Blortz qui +1 Forza"
+
+**Wabione**
+Cost: 4 | Power: 7
+Emoji: 🧱
+Trigger: Ongoing
+Effetto: +3 con 2 Relaxati
+Descrizione: "+3 con 2 Relaxati"
+
+**Momo**
+Cost: 4 | Power: 6
+Emoji: 🕺
+Trigger: On Reveal
+Effetto: Disattiva Ongoing random
+Descrizione: "Disattiva Ongoing random"
+
+**Nicola Mocci**
+Cost: 4 | Power: 6
+Emoji: 💻
+Trigger: On Reveal
+Effetto: Duplica prossimo effetto
+Descrizione: "Duplica prossimo effetto"
+
+---
+
+## CARTE COSTO 5 (1 carta)
+
+**Tommy Guardu**
+Cost: 5 | Power: 8
+Emoji: ⚽
+Trigger: Ongoing
+Effetto: Nemici qui -1 Forza
+Descrizione: "Nemici qui -1 Forza"
+
+---
+
+## STATISTICHE BILANCIAMENTO
+
+**Costo 1**: 2 carte (media 1.5 power)
+**Costo 2**: 9 carte (media 2.7 power)
+**Costo 3**: 11 carte (media 4.1 power)
+**Costo 4**: 4 carte (media 6.2 power)
+**Costo 5**: 1 carta (8 power)
+
+**Totale**: 26 carte (24 originali + Wonia + Lisa)
+
+**Power/Cost Ratio**: ~1.5-2.0 (bilanciato)
+
+---
+
+## NOTE GAMEPLAY
+
+- **Draw cards** ora cost 1-2 (non più 5)
+- **Sinergias**: 
+  - Wonia + Wabione
+  - Lisa + Ale Lapi
+  - Atleti (Pato, Beppe, Titti, G Cazzi)
+  - Scout (Pippo, Giulietto)
+  - Relaxati (Bosi, Dux, Wabione)
+  
+- **Control**: Chep, Momo (disable Ongoing)
+- **Ramp**: Boro (+1 energy)
+- **Card advantage**: Paolino (draw)
+
+---
+
+## PER CHATGPT: PROMPT GENERAZIONE IMMAGINI
+
+"Crea una carta in stile Marvel Snap per il personaggio [NOME]:
+- Sfondo neon gradient (viola/rosa/blu)
+- Border luminoso
+- Cost [X] angolo alto sinistra (grande, bold)
+- Power [Y] angolo alto destra (grande, bold)
+- Emoji [EMOJI] al centro (gigante)
+- Nome [NOME] in alto (font Bebas Neue)
+- Descrizione '[EFFETTO]' in basso (font piccolo)
+- Dimensioni: 300x420px ratio 5:7
+- Stile: neon, cyberpunk, futuristico"
