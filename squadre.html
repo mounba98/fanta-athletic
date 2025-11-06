@@ -13,13 +13,14 @@
     body.page-squadre { background: var(--bg, #0f172a); }
     .page-squadre main.layout { margin-top: 0; padding-top: 0; }
     .layout { display: grid; grid-template-columns: minmax(320px, 0.95fr) minmax(0, 2.05fr); gap: 24px; align-items: start; }
-    .sidebar { width: 100%; display:flex; flex-direction:column; gap:14px; padding: 16px 18px 20px; }
+    .sidebar { width: 100%; display:flex; flex-direction:column; gap:14px; padding: 8px 18px 20px; }
+    .sidebar .section-title { font-size: 20px; font-weight: 800; color: var(--text); margin: 0 0 12px 0; padding: 0; }
     .sidebar .list { width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: stretch; padding: 0; }
     #teams { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
     @media (max-width: 640px) and (orientation: landscape) {
       #teams { grid-template-columns: 1fr; overflow-y: auto; max-height: calc(100vh - 200px); }
     }
-    #teams .item { width: 100%; box-sizing: border-box; border-radius: 16px; border: 1px solid rgba(148,163,184,0.18); background: var(--card, rgba(15,23,42,0.6)); padding: 14px 18px; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease; display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:12px; }
+    #teams .item { width: 100%; box-sizing: border-box; border-radius: 16px; border: 1px solid rgba(148,163,184,0.18); background: var(--card, rgba(15,23,42,0.6)); padding: 20px 18px; min-height: 70px; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease; display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:12px; }
     :root.dark #teams .item { background: rgba(15,23,42,0.85); border-color: rgba(148,163,184,0.25); }
     #teams .item:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(15,23,42,0.18); }
     #teams .item.selected { border-color: var(--primary, #6366f1); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
@@ -34,7 +35,7 @@
     .sidebar { align-items: stretch; }
     /* Sticky team list on desktop */
     @media (min-width: 641px){
-      .sidebar { position: sticky; top: 110px; max-height: calc(100vh - 130px); overflow: auto; }
+      .sidebar { position: sticky; top: 90px; max-height: calc(100vh - 100px); overflow: auto; }
     }
     .team { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border:1px solid #e7edf3; border-radius:10px; cursor:pointer; }
     .team:hover { box-shadow: 0 0 0 3px var(--ring); }
@@ -391,6 +392,7 @@
 
   <main class="layout">
     <section class="sidebar">
+      <h2 class="section-title">Lista squadre</h2>
       <div class="list" id="teams"></div>
     </section>
 
@@ -430,11 +432,6 @@
           <div class="list" id="playersPool"></div>
         </div>
         <div id="colRight">
-          <div class="top-players-card" id="topPlayersCard" style="display:none; margin-top:0; margin-bottom:20px;">
-            <h3>🌟 Top 3 giocatori (stagione)</h3>
-            <div id="topPlayersList"></div>
-            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
-          </div>
           <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
           <div class="pitch">
             <div class="pitch-grid" id="pitchGrid">
@@ -1263,6 +1260,11 @@
       const display = state.userDisplayName || (state.user?.email||'');
       const ownerInfo = `<strong>${role}</strong>${display? ' &bull; <strong>'+escapeHtml(display)+'</strong>' : ''}`;
       $('#teamMeta').innerHTML = `
+        <div class="top-players-card" id="topPlayersCard" style="display:none; margin-bottom:20px;">
+          <h3>🌟 Top 3 giocatori (stagione)</h3>
+          <div id="topPlayersList"></div>
+          <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+        </div>
         <div class="grid2">
           <div>
             <div class="muted" style="font-size:16px; font-weight:800;">Logo squadra</div>

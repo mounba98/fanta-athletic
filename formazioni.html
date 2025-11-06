@@ -255,6 +255,34 @@
       text-shadow: 0 2px 4px rgba(15,23,42,0.5);
     }
 
+    .coach-slot-mini {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.15);
+      border: 2px dashed rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .coach-slot-mini img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .coach-slot-mini span {
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(15,23,42,0.5);
+    }
+
     .coach-badge-info {
       display:flex;
       flex-direction: column;
@@ -704,8 +732,9 @@
                   <div class="slot" data-slot="2"></div>
                   <div class="slot" data-slot="3"></div>
                 </div>
-                <div class="line one">
+                <div class="line one" style="display: flex; align-items: center; justify-content: center; gap: 12px; position: relative;">
                    <div class="slot" data-slot="4"></div>
+                   <div class="coach-slot-mini" id="coachSlotMini"></div>
                 </div>
               </div>
               <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
@@ -1782,6 +1811,21 @@
           coachBadgeEl.style.display = 'flex';
         } else {
           coachBadgeEl.style.display = 'none';
+        }
+      }
+      // Coach slot mini vicino al capitano
+      const coachSlotMiniEl = document.getElementById('coachSlotMini');
+      if (coachSlotMiniEl) {
+        if (selectedCoach) {
+          const coachName = selectedCoach.nome || selectedCoach.name || 'Coach';
+          const coachInitials = getInitials(coachName);
+          coachSlotMiniEl.innerHTML = coachPhoto ? 
+            `<img src="${coachPhoto}" alt="${coachName}" onerror="this.parentElement.innerHTML='<span>${coachInitials}</span>'"/>` : 
+            `<span>${coachInitials}</span>`;
+          coachSlotMiniEl.style.display = 'flex';
+        } else {
+          coachSlotMiniEl.innerHTML = '';
+          coachSlotMiniEl.style.display = 'flex';
         }
       }
       const coachPreview = selectedCoach ? `
