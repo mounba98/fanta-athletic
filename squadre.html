@@ -911,14 +911,6 @@
       wed0030.setHours(0,30,0,0);
       return [curMon, wed0030];
     }
-    function getKickoff(g){
-      try {
-        const v = localStorage.getItem(getLeagueScopedKey('kickoff', g));
-        return v ? new Date(v) : null;
-      } catch {
-        return null;
-      }
-    }
     function isLockedAuto(){
       const now = new Date();
       // Weekly lock window: Mon 20:30 -> Wed 00:30
@@ -1892,7 +1884,6 @@
       if (sel) sel.value = state.giornata;
       await updateDaysComputed();
       updateLockStatus();
-      initKickoffUI();
       renderTeamsList();
       renderEditor();
     });
@@ -1905,7 +1896,6 @@
       await loadTeamSeasonPoints();
       await autoSelectNextGiornata();
       await initLockUI();
-      initKickoffUI();
       await applySavedFromFirestore(state.giornata);
       subscribeSavedForGiornata(state.giornata);
       renderTeamsList();
