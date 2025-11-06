@@ -12,7 +12,7 @@
   <style>
     body.page-squadre { background: var(--bg, #0f172a); }
     .page-squadre main.layout { margin-top: 0; padding-top: 0; }
-    .layout { display: grid; grid-template-columns: minmax(320px, 0.95fr) minmax(0, 2.05fr); gap: 24px; align-items: start; }
+    .layout { display: grid; grid-template-columns: minmax(320px, 0.95fr) minmax(0, 2.05fr); gap: 24px; align-items: start; max-width: 1200px; margin-left: auto; margin-right: auto; }
     .sidebar { width: 100%; display:flex; flex-direction:column; gap:14px; padding: 8px 18px 20px; }
     .sidebar .section-title { font-size: 20px; font-weight: 800; color: var(--text); margin: 0 0 12px 0; padding: 0; }
     .sidebar .list { width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: stretch; padding: 0; }
@@ -434,6 +434,37 @@
     /* Sticky header with hide-on-scroll (mobile) */
     header { position: sticky; top: 0; z-index: 50; transition: transform .25s ease; }
     header.nav-hidden { transform: translateY(-110%); }
+    
+    /* --- Larghezza massima e centratura dell'area --- */
+    .layout {
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* --- Ampiezze coerenti a destra --- */
+    :root { --pitch-width: 620px; }          /* 560–660 ok; è la "larghezza guida" */
+    .right-column {
+      align-items: flex-start !important;   /* prima era flex-end: spingeva tutto a destra */
+      gap: 14px;
+    }
+    /* Tutti i blocchi "di campo" condividono la stessa misura */
+    .top-players-card,
+    .pitch,
+    .actions-grid,
+    #benchStrip,
+    .right-column .sectionh {
+      width: 100%;
+      max-width: var(--pitch-width);
+    }
+    /* Panchina non appiccicata a destra e con wrapping gradevole */
+    #benchStrip {
+      justify-content: flex-start;
+    }
+    /* La card del podio era troppo stretta (420px): allineala al campo */
+    .top-players-card { margin-top: 0; }
+    /* Il campo già usa max-width; legalo alla variabile */
+    .pitch { max-width: var(--pitch-width); }
   </style>
 </head>
   <body class="page-squadre">
@@ -478,7 +509,7 @@
             <div class="list" id="playersPool"></div>
           </div>
         </div>
-        <div class="right-column" style="margin-top: -22px !important; padding-top: 0 !important;">
+        <div class="right-column" style="padding-top: 0 !important;">
           <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0 0 12px 0; max-width: 420px; width: 100%;">
             <h3>🌟 Top 3 giocatori (stagione)</h3>
             <div id="topPlayersList"></div>
