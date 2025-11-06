@@ -75,7 +75,7 @@
     .bench-pill { background: var(--card, rgba(255,255,255,0.95)); border:1px solid rgba(148,163,184,0.25); color: var(--text, #1f2937); }
     :root.dark .bench-pill { background: rgba(15,23,42,0.9); border-color: rgba(148,163,184,0.25); color: #f8fafc; }
     .bench-pill-active { box-shadow:0 0 0 2px var(--secondary); }
-    .top-players-card { background: var(--card, #fff); border-radius:18px; padding:10px 12px; margin-bottom:8px; border:1px solid rgba(148,163,184,0.15); box-shadow: var(--shadow); display:flex; flex-direction:column; gap:8px; }
+    .top-players-card { background: var(--card, #fff); border-radius:18px; padding:10px 12px; margin-bottom:8px; border:1px solid rgba(148,163,184,0.15); box-shadow: var(--shadow); display:flex; flex-direction:column; gap:8px; max-width: 320px; width: 100%; margin-left: auto; margin-right: auto; }
     :root.dark .top-players-card { background: linear-gradient(160deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.92) 100%); }
     .top-players-card h3 { margin:0; font-size:18px; font-weight:800; color:var(--text, #1f2937); display:flex; align-items:center; gap:8px; }
     :root.dark .top-players-card h3 { color:#f8fafc; }
@@ -99,8 +99,12 @@
       transition: transform 0.2s ease;
       max-width: 140px;
     }
+    #topPlayersList {
+      max-width: 100%;
+      width: 100%;
+    }
     #topPlayersList > div {
-      max-width: 300px;
+      max-width: 280px;
       margin: 0 auto;
       width: 100%;
     }
@@ -755,13 +759,13 @@
       // Podio: 2° a sinistra, 1° al centro, 3° a destra (ordinati per punti decrescenti)
       const [first, second, third] = entries;
       list.innerHTML = `
-        <div style="display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-top: 8px; max-width: 100%; width: 100%;">
+        <div style="display: flex; align-items: flex-end; justify-content: center; gap: 6px; margin-top: 8px; max-width: 100%; width: 100%;">
           ${second ? (() => {
             const photo = getPlayerPhoto(second.player) || 'resources/logo.png';
             const label = escapeHtml(getPlayerDisplayLabel(second.player));
             const role = getRoleAbbr(second.player.role || second.player.ruolo);
             return `
-              <div class="top-player-podium rank-2" style="flex: 0 0 110px; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end;">
+              <div class="top-player-podium rank-2" style="flex: 0 0 90px; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end;">
                 <div style="text-align: center; margin-bottom: 8px;">
                   <span class="top-player-rank" style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 14px; line-height: 24px;">2</span>
                 </div>
@@ -779,7 +783,7 @@
             const label = escapeHtml(getPlayerDisplayLabel(first.player));
             const role = getRoleAbbr(first.player.role || first.player.ruolo);
             return `
-              <div class="top-player-podium rank-1" style="flex: 0 0 120px; min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end;">
+              <div class="top-player-podium rank-1" style="flex: 0 0 100px; min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end;">
                 <div style="text-align: center; margin-bottom: 8px;">
                   <span class="top-player-rank" style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.3); font-size: 16px; line-height: 28px;">1</span>
                 </div>
@@ -797,7 +801,7 @@
             const label = escapeHtml(getPlayerDisplayLabel(third.player));
             const role = getRoleAbbr(third.player.role || third.player.ruolo);
             return `
-              <div class="top-player-podium rank-3" style="flex: 0 0 110px; min-height: 120px; display: flex; flex-direction: column; justify-content: flex-end;">
+              <div class="top-player-podium rank-3" style="flex: 0 0 90px; min-height: 120px; display: flex; flex-direction: column; justify-content: flex-end;">
                 <div style="text-align: center; margin-bottom: 8px;">
                   <span class="top-player-rank" style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 14px; line-height: 24px;">3</span>
                 </div>
