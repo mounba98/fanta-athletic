@@ -1800,9 +1800,12 @@
       const primaryCoachId = Array.isArray(t.coach_ids) && t.coach_ids.length ? t.coach_ids[0] : null;
       const selectedCoach = primaryCoachId ? state.coaches.find(c => c.coach_id === primaryCoachId) : null;
       let coachPhoto = selectedCoach ? (selectedCoach.photo_url || selectedCoach.photoUrl || selectedCoach.photo || selectedCoach.image_url || selectedCoach.imageUrl || '') : '';
-      // Fallback per Tommy: usa immagine locale se disponibile
+      // Fallback per Tommy e Trendiu: usa immagine locale se disponibile
       if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Tommy' || selectedCoach.coach_id === 'tommy' || selectedCoach.coach_id?.toLowerCase() === 'tommy')) {
         coachPhoto = 'resources/tommy_guardu.png';
+      }
+      if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Trendiu' || selectedCoach.coach_id === 'trendiu' || selectedCoach.coach_id?.toLowerCase() === 'trendiu')) {
+        coachPhoto = 'resources/trendiu_athletic.jpg';
       }
       // Coach slot mini vicino al capitano
       const coachSlotMiniEl = document.getElementById('coachSlotMini');
