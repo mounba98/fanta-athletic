@@ -12,7 +12,7 @@
   <style>
     body.page-squadre { background: var(--bg, #0f172a); }
     .page-squadre main.layout { margin-top: 0; padding-top: 0; }
-    .layout { display: grid; grid-template-columns: minmax(320px, 0.95fr) minmax(0, 2.05fr); gap: 24px; align-items: start; max-width: 1200px; margin-left: auto; margin-right: auto; }
+    .layout { display: grid; grid-template-columns: 300px 1fr 1fr; gap: 20px; align-items: start; max-width: 100%; margin-left: 0; margin-right: 0; padding: 0 20px; }
     .sidebar { width: 100%; display:flex; flex-direction:column; gap:14px; padding: 8px 18px 20px; }
     .sidebar .section-title { font-size: 20px; font-weight: 800; color: var(--text); margin: 0 0 12px 0; padding: 0; }
     .sidebar .list { width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: stretch; padding: 0; }
@@ -62,9 +62,10 @@
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
-    .main-layout { display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 0; padding-top: 0; }
-    .left-column { display: flex; flex-direction: column; gap: 16px; max-width: 400px; width: 100%; }
-    .right-column { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; min-width: 0; flex: 1; margin-top: 0; padding-top: 0; }
+    .main-layout { display: contents; }
+    .left-column { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+    .center-column { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+    .right-column { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; min-width: 0; flex: 1; margin-top: 0; padding-top: 0; }
     .meta-controls { display: flex; align-items: flex-start; gap: 20px; }
     #colPool { max-width: 400px; width: 100%; }
     #playersPool { max-width: 400px; width: 100%; }
@@ -178,7 +179,7 @@
     }
 
     /* Pitch and DnD - Uniformato con formazioni */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0 !important; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 100%; margin: 0 !important; }
     .pitch-grid { display:grid; gap: 14px; margin-top: 10px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -443,9 +444,9 @@
     }
     
     /* --- Ampiezze coerenti a destra --- */
-    :root { --pitch-width: 620px; }          /* 560–660 ok; è la "larghezza guida" */
+    :root { --pitch-width: 100%; }
     .right-column {
-      align-items: flex-start !important;   /* prima era flex-end: spingeva tutto a destra */
+      align-items: flex-start !important;
       gap: 14px;
     }
     /* Tutti i blocchi "di campo" condividono la stessa misura */
@@ -455,16 +456,16 @@
     #benchStrip,
     .right-column .sectionh {
       width: 100%;
-      max-width: var(--pitch-width);
+      max-width: 100%;
     }
     /* Panchina non appiccicata a destra e con wrapping gradevole */
     #benchStrip {
       justify-content: flex-start;
     }
-    /* La card del podio era troppo stretta (420px): allineala al campo */
+    /* La card del podio */
     .top-players-card { margin-top: 0; }
-    /* Il campo già usa max-width; legalo alla variabile */
-    .pitch { max-width: var(--pitch-width); }
+    /* Il campo */
+    .pitch { max-width: 100%; }
     
     /* --- SQUADRE: fix struttura e niente scroll separato a sinistra --- */
     
@@ -478,9 +479,11 @@
       }
     }
     
-    /* 2) Layout: larghezza sidebar fissa, editor prende tutto il resto */
+    /* 2) Layout: 3 colonne - sinistra (squadre), centro (controlli), destra (campo) */
     .layout {
-      grid-template-columns: 340px minmax(0, 1fr) !important;
+      grid-template-columns: 300px 1fr 1fr !important;
+      max-width: 100% !important;
+      padding: 0 20px !important;
     }
     
     /* 3) Lista squadre: una sola colonna, non due */
@@ -1445,55 +1448,63 @@
         logoNameContainer.style.display = 'block';
       }
       
-      $('#teamMeta').innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:12px; flex:1;">
-          <div class="muted" style="margin:0 0 4px; font-size:14px; font-weight:700;">Allenatori</div>
-          <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
-            ${state.coaches.map(c=> {
-              const coachName = c.nome || c.name || c.coach_id || 'Coach';
-              let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
-              // Fallback per Tommy e Trendiu
-              if (!coachPhoto && (coachName === 'Tommy' || c.coach_id === 'tommy' || c.coach_id?.toLowerCase() === 'tommy')) {
-                coachPhoto = 'resources/tommy_guardu.png';
-              }
-              if (!coachPhoto && (coachName === 'Trendiu' || c.coach_id === 'trendiu' || c.coach_id?.toLowerCase() === 'trendiu')) {
-                coachPhoto = 'resources/trendiu_athletic.jpg';
-              }
-              const coachInitials = coachName.split(/\s+/).map(n => n[0]).join('').toUpperCase().substring(0, 2);
-              const isSelected = t.coach_ids.includes(c.coach_id);
-              return `
-                <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor: ${canSelectCoach ? 'pointer' : 'default'};" 
-                     ${canSelectCoach ? `onclick="selectCoach('${c.coach_id}')"` : ''}
-                     class="coach-photo-item ${isSelected ? 'coach-selected' : ''}">
-                  <div style="width:100px; height:100px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:3px solid ${isSelected?'var(--primary)':'rgba(148,163,184,0.3)'}; transition: all 0.2s ease; ${canSelectCoach ? 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);' : ''}" 
-                       ${canSelectCoach ? `onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.2)';"` : ''}
-                       ${canSelectCoach ? `onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';"` : ''}>
-                    ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:32px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:32px; font-weight:700;">${coachInitials}</span>`}
+      // Coach section nella colonna destra
+      const coachSection = document.getElementById('coachSection');
+      if (coachSection) {
+        coachSection.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:12px; flex:1;">
+            <div class="muted" style="margin:0 0 4px; font-size:14px; font-weight:700;">Allenatori</div>
+            <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
+              ${state.coaches.map(c=> {
+                const coachName = c.nome || c.name || c.coach_id || 'Coach';
+                let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
+                // Fallback per Tommy e Trendiu
+                if (!coachPhoto && (coachName === 'Tommy' || c.coach_id === 'tommy' || c.coach_id?.toLowerCase() === 'tommy')) {
+                  coachPhoto = 'resources/tommy_guardu.png';
+                }
+                if (!coachPhoto && (coachName === 'Trendiu' || c.coach_id === 'trendiu' || c.coach_id?.toLowerCase() === 'trendiu')) {
+                  coachPhoto = 'resources/trendiu_athletic.jpg';
+                }
+                const coachInitials = coachName.split(/\s+/).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                const isSelected = t.coach_ids.includes(c.coach_id);
+                return `
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor: ${canSelectCoach ? 'pointer' : 'default'};" 
+                       ${canSelectCoach ? `onclick="selectCoach('${c.coach_id}')"` : ''}
+                       class="coach-photo-item ${isSelected ? 'coach-selected' : ''}">
+                    <div style="width:100px; height:100px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:3px solid ${isSelected?'var(--primary)':'rgba(148,163,184,0.3)'}; transition: all 0.2s ease; ${canSelectCoach ? 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);' : ''}" 
+                         ${canSelectCoach ? `onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.2)';"` : ''}
+                         ${canSelectCoach ? `onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';"` : ''}>
+                      ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:32px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:32px; font-weight:700;">${coachInitials}</span>`}
+                    </div>
+                    <span style="font-size:12px; color:var(--text); font-weight:${isSelected ? '700' : '500'};">${escapeHtml(coachName)}</span>
                   </div>
-                  <span style="font-size:12px; color:var(--text); font-weight:${isSelected ? '700' : '500'};">${escapeHtml(coachName)}</span>
-                </div>
-              `;
-            }).join('')}
+                `;
+              }).join('')}
+            </div>
+            <div style="margin-top:8px;">
+              <div class="muted" style="margin-bottom:4px; font-size:12px;">Accesso</div>
+              <div style="font-size:12px;">${ownerInfo}</div>
+              <div class="muted" id="ownersList" style="margin-top:4px; font-size:11px;">Utenti: …</div>
+            </div>
           </div>
-          <div style="margin-top:8px;">
-            <div class="muted" style="margin-bottom:4px; font-size:12px;">Accesso</div>
-            <div style="font-size:12px;">${ownerInfo}</div>
-            <div class="muted" id="ownersList" style="margin-top:4px; font-size:11px;">Allenatori: …</div>
-          </div>
+        `;
+      }
+      
+      // Utenti collegati nella colonna centrale
+      $('#teamMeta').innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="muted" style="font-size:12px;">Utenti collegati</div>
+          <div id="ownersListCenter" style="font-size:12px;">Caricamento...</div>
         </div>
       `;
       
-      // async owners list
-      fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
-        const el = document.getElementById('ownersList'); if (!el) return;
-        el.textContent = arr.length? `Allenatori: ${arr.join(', ')}` : 'Allenatori: —';
-      });
-      
-      // async owners list - mostra nome utente invece di email
+      // async owners list - mostra nome utente invece di email (centro e destra)
       fetchOwnersForTeam(state.selectedTeamIdx).then(async (arr)=>{
-        const el = document.getElementById('ownersList'); if (!el) return;
+        const elCenter = document.getElementById('ownersListCenter');
+        const elRight = document.getElementById('ownersList');
         if (!arr.length) {
-          el.textContent = 'Nessun utente collegato';
+          if (elCenter) elCenter.textContent = 'Nessun utente collegato';
+          if (elRight) elRight.textContent = 'Nessun utente collegato';
           return;
         }
         // Cerca i nomi utente per ogni email
@@ -1509,19 +1520,15 @@
           }
           return email.split('@')[0]; // Fallback: parte prima di @
         }));
-        el.textContent = userNames.join(', ');
+        const namesText = userNames.join(', ');
+        if (elCenter) elCenter.textContent = namesText;
+        if (elRight) elRight.textContent = `Utenti: ${namesText}`;
       });
       
       // Render top players card AFTER teamMeta is rendered
       renderTopPlayersCard(t);
       
-      // Assicura il podio in cima alla right-column
-      {
-        const card = document.getElementById('topPlayersCard');
-        const right = document.querySelector('.right-column');
-        const first = right?.firstElementChild;
-        if (card && right && first && first !== card) right.insertBefore(card, first);
-      }
+      // Il podio è già nella colonna destra, non serve spostarlo
       
       // Disabilita/abilita il bottone in base ai permessi
       const addBtn = document.getElementById('addSelected');
