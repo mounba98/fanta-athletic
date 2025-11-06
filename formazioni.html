@@ -1796,7 +1796,11 @@
       const ownerInfo = `<strong>${role}</strong>${display? ' • <strong>'+display+'</strong>' : ''}`;
       const primaryCoachId = Array.isArray(t.coach_ids) && t.coach_ids.length ? t.coach_ids[0] : null;
       const selectedCoach = primaryCoachId ? state.coaches.find(c => c.coach_id === primaryCoachId) : null;
-      const coachPhoto = selectedCoach ? (selectedCoach.photo_url || selectedCoach.photoUrl || selectedCoach.photo || selectedCoach.image_url || selectedCoach.imageUrl || '') : '';
+      let coachPhoto = selectedCoach ? (selectedCoach.photo_url || selectedCoach.photoUrl || selectedCoach.photo || selectedCoach.image_url || selectedCoach.imageUrl || '') : '';
+      // Fallback per Tommy: usa immagine locale se disponibile
+      if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Tommy' || selectedCoach.coach_id === 'tommy' || selectedCoach.coach_id?.toLowerCase() === 'tommy')) {
+        coachPhoto = 'resources/tommy_guardu.png';
+      }
       // Coach badge nel campo
       const coachBadgeEl = document.getElementById('coachBadge');
       if (coachBadgeEl) {
