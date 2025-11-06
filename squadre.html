@@ -124,10 +124,12 @@
       width: 100%;
     }
     #topPlayersList > div {
-      max-width: 320px !important;
+      max-width: 420px !important;
       width: 100% !important;
       margin: 0 auto;
     }
+    #playersPool input[disabled] { opacity: .45; cursor: not-allowed; }
+    #addSelected[disabled] { opacity: .45; cursor: not-allowed; }
     #topPlayersList > div > div {
       max-width: 100%;
       width: 100%;
@@ -1444,6 +1446,18 @@
       
       // Render top players card AFTER teamMeta is rendered
       renderTopPlayersCard(t);
+      
+      // Assicura il podio in cima alla right-column
+      {
+        const card = document.getElementById('topPlayersCard');
+        const right = document.querySelector('.right-column');
+        const first = right?.firstElementChild;
+        if (card && right && first && first !== card) right.insertBefore(card, first);
+      }
+      
+      // Disabilita/abilita il bottone in base ai permessi
+      const addBtn = document.getElementById('addSelected');
+      if (addBtn) addBtn.disabled = !canWrite;
 
       // Player pool with checkbox selection
       const pool = $('#playersPool');
