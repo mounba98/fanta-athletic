@@ -85,7 +85,7 @@
     }
 
     /* Pitch and DnD */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 32px 24px 24px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 32px 24px 24px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 900px; margin: 0 auto; }
     .pitch-grid { display:grid; gap: 18px; margin-top: 12px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -235,18 +235,19 @@
     }
 
     .coach-badge-visual {
-      width: 44px;
-      height: 44px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       display:flex;
       align-items:center;
       justify-content:center;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 18px;
       letter-spacing: 0.08em;
-      background: rgba(59,130,246,0.25);
-      border: 2px solid rgba(59,130,246,0.45);
+      background: rgba(15,23,42,0.65);
+      border: 3px solid rgba(255,255,255,0.4);
       overflow: hidden;
+      box-shadow: 0 8px 20px rgba(15,23,42,0.4);
       text-transform: uppercase;
     }
 
@@ -690,10 +691,11 @@
       
       <!-- Info squadra -->
       <div class="desktop-only" id="teamMeta" style="background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);"></div>
-      <div class="grid2" style="margin-top:0; align-items:start;">
+      <div class="grid2" style="margin-top:0; align-items:start; max-width: 1200px; margin-left: auto; margin-right: auto;">
         <div id="colRight" style="width: 100%;">
           <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
           <div class="pitch">
+            <div class="coach-badge" id="coachBadge"></div>
             <div class="pitch-grid" id="pitchGrid">
               <div class="line two">
                 <div class="slot" data-slot="0"></div>
@@ -1763,6 +1765,22 @@
       const primaryCoachId = Array.isArray(t.coach_ids) && t.coach_ids.length ? t.coach_ids[0] : null;
       const selectedCoach = primaryCoachId ? state.coaches.find(c => c.coach_id === primaryCoachId) : null;
       const coachPhoto = selectedCoach ? (selectedCoach.photo_url || selectedCoach.photoUrl || selectedCoach.photo || selectedCoach.image_url || selectedCoach.imageUrl || '') : '';
+      // Coach badge nel campo
+      const coachBadgeEl = document.getElementById('coachBadge');
+      if (coachBadgeEl) {
+        if (selectedCoach) {
+          const coachName = selectedCoach.nome || selectedCoach.name || 'Coach';
+          const coachInitials = getInitials(coachName);
+          coachBadgeEl.innerHTML = `
+            <div class="coach-badge-visual">
+              ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" onerror="this.textContent='${coachInitials}'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center';"/>` : `<span>${coachInitials}</span>`}
+            </div>
+          `;
+          coachBadgeEl.style.display = 'flex';
+        } else {
+          coachBadgeEl.style.display = 'none';
+        }
+      }
       const coachPreview = selectedCoach ? `
         <div class="coach-preview">
           <div class="coach-preview-avatar">

@@ -95,9 +95,9 @@
       .top-player-card { padding: 16px 20px; min-height: 80px; }
       .top-player-left img { width: 60px; height: 60px; }
       .top-player-rank { width: 40px; height: 40px; font-size: 20px; }
-      .top-player-name { font-size: 20px; }
-      .top-player-role { font-size: 13px; }
-      .top-player-points { font-size: 28px; }
+      .top-player-name { font-size: 22px; }
+      .top-player-role { font-size: 18px; font-weight: 700; }
+      .top-player-points { font-size: 32px; }
     }
     .top-player-card:hover { transform: translateY(-2px); box-shadow:0 18px 36px rgba(15,23,42,0.35); }
     .top-players-empty { color:rgba(148,163,184,0.7); font-size:13px; text-align:center; padding:8px 0; }
@@ -716,9 +716,9 @@
             <div class="top-player-left">
               <span class="top-player-rank">${idx + 1}</span>
               <img src="${photo}" alt="${label}" onerror="this.src='resources/logo.png'" />
-              <div class="top-player-info">
+              <div class="top-player-info" style="display:flex; align-items:center; gap:12px; flex:1;">
                 <div class="top-player-name">${label}</div>
-                ${role ? `<div class="top-player-role">${role}</div>` : ''}
+                ${role ? `<div class="top-player-role" style="margin-left:auto;">${role}</div>` : ''}
               </div>
             </div>
             <div class="top-player-points">${Number(entry.points || 0).toFixed(1)}</div>
@@ -1335,22 +1335,28 @@
           h.parentElement.classList.toggle('collapsed');
         });
       });
-      // Roster accordion
-      const rosterHeader = document.querySelector('#teamRosterSection .role-header');
-      if (rosterHeader){
-        rosterHeader.addEventListener('click', (e)=>{
-          e.preventDefault();
-          e.stopPropagation();
-          const section = rosterHeader.parentElement;
-          section.classList.toggle('collapsed');
-          // Aggiorna icona (l'ultimo span, non quello con il conteggio)
-          const spans = rosterHeader.querySelectorAll('span');
-          const iconSpan = spans[spans.length - 1]; // Prendi l'ultimo span (icona)
-          if (iconSpan && !iconSpan.id) { // Escludi quello con id="rosterCount"
-            iconSpan.textContent = section.classList.contains('collapsed') ? '▾' : '▴';
-          }
-        });
-      }
+      // Roster accordion - assicurati che venga chiamato dopo il rendering
+      setTimeout(() => {
+        const rosterHeader = document.querySelector('#teamRosterSection .role-header');
+        if (rosterHeader){
+          // Rimuovi listener esistenti per evitare duplicati
+          const newHeader = rosterHeader.cloneNode(true);
+          rosterHeader.parentNode.replaceChild(newHeader, rosterHeader);
+          // Aggiungi nuovo listener
+          newHeader.addEventListener('click', (e)=>{
+            e.preventDefault();
+            e.stopPropagation();
+            const section = newHeader.parentElement;
+            section.classList.toggle('collapsed');
+            // Aggiorna icona (l'ultimo span, non quello con il conteggio)
+            const spans = newHeader.querySelectorAll('span');
+            const iconSpan = spans[spans.length - 1]; // Prendi l'ultimo span (icona)
+            if (iconSpan && !iconSpan.id) { // Escludi quello con id="rosterCount"
+              iconSpan.textContent = section.classList.contains('collapsed') ? '▾' : '▴';
+            }
+          });
+        }
+      }, 100);
       // row-wide toggle on click
       $$('#playersPool .player-pick').forEach(row=>{
         row.addEventListener('click', (e)=>{
