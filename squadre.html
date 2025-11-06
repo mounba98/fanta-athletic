@@ -435,6 +435,17 @@
             <select id="giornataSel" class="input"></select>
             <span id="lockStatus" class="muted"></span>
           </div>
+          <div id="logoNameContainer" style="margin-top: 12px; display:none;">
+            <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
+            <div class="row" style="gap:10px; align-items:center;">
+              <div id="logoBox" style="margin-left: 0;">Carica logo</div>
+              <div style="flex:1;">
+                <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
+                <input id="teamName" class="input" value="" />
+              </div>
+            </div>
+            <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" />
+          </div>
           <div class="mobile-only">
             <label class="row">
               <span class="muted">Seleziona squadra</span>
@@ -1362,20 +1373,24 @@
       const role = state.isAdmin? 'Admin' : (state.user ? (state.userTeamIdx===state.selectedTeamIdx? 'Proprietario' : 'Utente') : 'Ospite');
       const display = state.userDisplayName || (state.user?.email||'');
       const ownerInfo = `<strong>${role}</strong>${display? ' &bull; <strong>'+escapeHtml(display)+'</strong>' : ''}`;
-      // Logo e nome squadra spostati in meta-left (dopo selettore giornata)
-      const logoNameHTML = `
-        <div style="margin-top: 12px;">
-          <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
-          <div class="row" style="gap:10px; align-items:center;">
-            <div id="logoBox" style="margin-left: 0;">${logo? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>'}</div>
-            <div style="flex:1;">
-              <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
-              <input id="teamName" class="input" value="${escapeHtml(t.name||'')}" ${!canWrite?'disabled':''} />
-            </div>
-          </div>
-          <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" ${!canWrite?'disabled':''} />
-        </div>
-      `;
+      // Aggiorna logo e nome squadra in meta-left
+      const logoNameContainer = document.getElementById('logoNameContainer');
+      if (logoNameContainer) {
+        const logoBox = document.getElementById('logoBox');
+        const teamNameInput = document.getElementById('teamName');
+        const teamLogoInput = document.getElementById('teamLogoInput');
+        if (logoBox) {
+          logoBox.innerHTML = logo ? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>';
+        }
+        if (teamNameInput) {
+          teamNameInput.value = t.name || '';
+          teamNameInput.disabled = !canWrite;
+        }
+        if (teamLogoInput) {
+          teamLogoInput.disabled = !canWrite;
+        }
+        logoNameContainer.style.display = 'block';
+      }
       
       $('#teamMeta').innerHTML = `
         <div class="grid2">
@@ -1417,11 +1432,6 @@
         </div>
       `;
       
-      // Aggiungi logo e nome squadra dopo il selettore giornata
-      const metaLeft = document.querySelector('.meta-left');
-      if (metaLeft && !document.getElementById('logoBox').parentElement.closest('.meta-left')) {
-        metaLeft.insertAdjacentHTML('beforeend', logoNameHTML);
-      }
       // async owners list
       fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
         const el = document.getElementById('ownersList'); if (!el) return;
