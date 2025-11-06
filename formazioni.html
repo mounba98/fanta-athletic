@@ -1906,18 +1906,27 @@
 
       // Roster list (management only; no drag here)
       const roster = $('#teamRoster');
-      const rosterCount = (t.roster||[]).length;
+      // Deduplica: rimuovi duplicati dal roster
+      const uniqueRosterPids = Array.from(new Set(t.roster || []));
+      const rosterCount = uniqueRosterPids.length;
       const rosterCountEl = document.getElementById('rosterCount');
       if (rosterCountEl) {
         rosterCountEl.textContent = `(${rosterCount}/11)`;
       }
-      roster.innerHTML = (t.roster||[]).map(pid=>{
+      // Se ci sono duplicati, aggiorna il roster salvato
+      if (uniqueRosterPids.length !== (t.roster||[]).length) {
+        t.roster = uniqueRosterPids;
+        saveTeams();
+      }
+      roster.innerHTML = uniqueRosterPids.map(pid=>{
         const p = state.players.find(x=>x.player_id===pid);
         if (!p) {
           console.warn('⚠️ Player non trovato in roster:', pid);
         }
-        // In rosa: formato iniziale.cognome
-        const displayName = p ? getPlayerDisplayLabel(p, 'initial.surname') : `⚠️ Player non trovato (${pid.substring(0,8)}...)`;
+        // In rosa: nome completo e ruolo
+        const fullName = p ? getPlayerDisplayLabel(p, 'full') : `⚠️ Player non trovato (${pid.substring(0,8)}...)`;
+        const roleAbbr = p ? getRoleAbbr(p.role) : '';
+        const displayName = roleAbbr ? `${fullName} (${roleAbbr})` : fullName;
         const photo = p ? getPlayerPhoto(p) : '';
         const teamLabel = p?.team ? String(p.team) : '';
         return `
@@ -1925,7 +1934,7 @@
             <div class="player-chip" style="flex:1;">
               ${photo ? `<img src="${photo}" alt="${displayName}" onerror="this.src='resources/logo.png'" />` : `<span style="width:40px;height:40px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#475569;">${escapeHtml(getInitials(displayName))}</span>`}
               <div class="player-chip-text">
-                <span class="player-chip-name">${displayName}</span>
+                <span class="player-chip-name">${escapeHtml(displayName)}</span>
                 ${teamLabel ? `<span class="player-chip-meta">${teamLabel}</span>` : ''}
               </div>
             </div>
