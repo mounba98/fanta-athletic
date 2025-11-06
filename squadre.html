@@ -1310,7 +1310,7 @@
         });
         return `
           <div class="role-section" data-role-group="${role}">
-            <div class="role-header">${role}<span>?</span></div>
+            <div class="role-header">${role} <span style="font-size:12px; opacity:0.7;">(${sorted.length})</span><span>?</span></div>
             <div class="role-body">
               <div class="list">
                 ${sorted.map(p=> `
