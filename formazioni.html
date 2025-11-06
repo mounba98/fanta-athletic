@@ -124,9 +124,9 @@
     }
 
     .slot-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
       overflow: hidden;
       border: 2px solid rgba(255,255,255,0.32);
       flex-shrink: 0;
@@ -442,7 +442,7 @@
       /* Larger touch targets for mobile */
       .btn { min-height: 48px; font-size: 16px; }
       /* Layout verticale: foto SOPRA nome */
-       .slot-card-main .slot-avatar { width: 64px; height: 64px; border-radius: 18px; }
+       .slot-card-main .slot-avatar { width: 80px; height: 80px; border-radius: 20px; }
        .slot-card-main .slot-badge { font-size: 10px; }
       .btn-sm { padding: 4px 6px; font-size: 12px; min-height: 32px; }
       /* Roster mobile: mantieni orizzontale */
@@ -717,7 +717,7 @@
             </div>
             <div id="benchStripDesktop" class="strip"></div>
             <div class="role-section collapsed" id="teamRosterSection" style="margin-top:8px;">
-              <div class="role-header">Rosa della squadra <span>▾</span></div>
+              <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
               <div class="role-body">
                 <div class="roster" id="teamRoster"></div>
               </div>
@@ -1853,10 +1853,11 @@
           e.stopPropagation();
           const section = rosterHeader.parentElement;
           section.classList.toggle('collapsed');
-          // Aggiorna icona
-          const icon = rosterHeader.querySelector('span');
-          if (icon) {
-            icon.textContent = section.classList.contains('collapsed') ? '▾' : '▴';
+          // Aggiorna icona (l'ultimo span, non quello con il conteggio)
+          const spans = rosterHeader.querySelectorAll('span');
+          const iconSpan = spans[spans.length - 1]; // Prendi l'ultimo span (icona)
+          if (iconSpan && !iconSpan.id) { // Escludi quello con id="rosterCount"
+            iconSpan.textContent = section.classList.contains('collapsed') ? '▾' : '▴';
           }
         });
       }
@@ -1881,6 +1882,11 @@
 
       // Roster list (management only; no drag here)
       const roster = $('#teamRoster');
+      const rosterCount = (t.roster||[]).length;
+      const rosterCountEl = document.getElementById('rosterCount');
+      if (rosterCountEl) {
+        rosterCountEl.textContent = `(${rosterCount}/11)`;
+      }
       roster.innerHTML = (t.roster||[]).map(pid=>{
         const p = state.players.find(x=>x.player_id===pid);
         if (!p) {
