@@ -179,7 +179,7 @@
     }
 
     /* Pitch and DnD - Uniformato con formazioni */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 100%; margin: 0 !important; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 100%; margin: 0 auto !important; }
     .pitch-grid { display:grid; gap: 14px; margin-top: 10px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -873,7 +873,7 @@
             const label = escapeHtml(getPlayerDisplayLabel(second.player));
             const role = getRoleAbbr(second.player.role || second.player.ruolo);
             return `
-              <div class="top-player-podium rank-2" style="flex: 0 0 110px; min-height: 240px; padding-top: 30px; display: flex; flex-direction: column; justify-content: flex-end;">
+              <div class="top-player-podium rank-2" style="flex: 0 0 110px; min-height: 240px; padding-top: 20px; display: flex; flex-direction: column; justify-content: flex-end;">
                 <div style="text-align: center; margin-bottom: 10px;">
                   <span class="top-player-rank" style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 16px; line-height: 28px;">2</span>
                 </div>
@@ -909,7 +909,7 @@
             const label = escapeHtml(getPlayerDisplayLabel(third.player));
             const role = getRoleAbbr(third.player.role || third.player.ruolo);
             return `
-              <div class="top-player-podium rank-3" style="flex: 0 0 110px; min-height: 200px; padding-top: 50px; display: flex; flex-direction: column; justify-content: flex-end;">
+              <div class="top-player-podium rank-3" style="flex: 0 0 110px; min-height: 200px; padding-top: 60px; display: flex; flex-direction: column; justify-content: flex-end;">
                 <div style="text-align: center; margin-bottom: 10px;">
                   <span class="top-player-rank" style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 16px; line-height: 28px;">3</span>
                 </div>
