@@ -85,7 +85,7 @@
     }
 
     /* Pitch and DnD */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 32px 24px 24px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 900px; margin: 0 auto; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 32px 24px 24px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 1100px; margin: 0 auto; }
     .pitch-grid { display:grid; gap: 18px; margin-top: 12px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -688,39 +688,37 @@
       
       <!-- Info squadra -->
       <div class="desktop-only" id="teamMeta" style="background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);"></div>
-      <div class="grid2" style="margin-top:0; align-items:start; max-width: 1200px; margin-left: auto; margin-right: auto;">
-        <div id="colRight" style="width: 100%;">
-          <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-          <div class="pitch">
-            <div class="coach-badge" id="coachBadge"></div>
-            <div class="pitch-grid" id="pitchGrid">
-              <div class="line two">
-                <div class="slot" data-slot="0"></div>
-                <div class="slot" data-slot="1"></div>
+      <div style="max-width: 1400px; margin: 0 auto;">
+        <div class="desktop-only" style="display: grid; grid-template-columns: 1fr 400px; gap: 24px; align-items: start;">
+          <!-- Campo a sinistra -->
+          <div>
+            <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+            <div class="pitch">
+              <div class="coach-badge" id="coachBadge"></div>
+              <div class="pitch-grid" id="pitchGrid">
+                <div class="line two">
+                  <div class="slot" data-slot="0"></div>
+                  <div class="slot" data-slot="1"></div>
+                </div>
+                <div class="line two">
+                  <div class="slot" data-slot="2"></div>
+                  <div class="slot" data-slot="3"></div>
+                </div>
+                <div class="line one">
+                   <div class="slot" data-slot="4"></div>
+                </div>
               </div>
-              <div class="line two">
-                <div class="slot" data-slot="2"></div>
-                <div class="slot" data-slot="3"></div>
-              </div>
-              <div class="line one">
-                 <div class="slot" data-slot="4"></div>
-              </div>
+              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
             </div>
-            <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
-          </div>
-          <div class="actions-grid" style="margin:8px 0;">
-            <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-            <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-          </div>
-          <!-- Mobile: solo panchina -->
-          <div class="mobile-only" style="margin-top: 16px;">
-            <div class="sectionh">Panchina</div>
-            <div id="benchStrip" class="strip"></div>
+            <div class="actions-grid" style="margin:8px 0;">
+              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+              <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+            </div>
           </div>
           
-          <!-- Desktop: panchina completa -->
-          <div class="desktop-only">
-            <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+          <!-- Panchina a destra (desktop) -->
+          <div class="desktop-only" style="position: sticky; top: 100px; max-height: calc(100vh - 120px); overflow-y: auto;">
+            <div class="sectionh" style="margin-top:0;">Panchina / Rosa</div>
             <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
               <button class="btn btn-secondary btn-sm" data-filter-role="all" style="background: var(--primary);">Tutti</button>
               <button class="btn btn-secondary btn-sm" data-filter-role="P">P</button>
@@ -736,6 +734,14 @@
               </div>
             </div>
           </div>
+        </div>
+        
+        <!-- Mobile: solo panchina -->
+        <div class="mobile-only" style="margin-top: 16px;">
+          <div class="sectionh">Panchina</div>
+          <div id="benchStrip" class="strip"></div>
+        </div>
+      </div>
           
           <!-- Mobile: tasti fissi in basso -->
           <div class="mobile-fixed-buttons mobile-only">
