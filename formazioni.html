@@ -1788,7 +1788,7 @@
       const locked = isLockedAuto();
       const computedReadOnly = state.daysComputed && !state.isAdmin; // Giornate calcolate read-only per non-admin
       const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computedReadOnly;
-      const canSelectCoach = state.isAdmin || ((state.user && state.userTeamIdx===state.selectedTeamIdx) && (!Array.isArray(t.coach_ids) || t.coach_ids.length===0));
+      const canSelectCoach = state.isAdmin; // Solo admin possono selezionare coach (non più usato in formazioni, ma mantenuto per compatibilità)
       // snapshot iniziale per annulla modifiche: creato se assente
       if (!state.snapshots[state.selectedTeamIdx]){
         state.snapshots[state.selectedTeamIdx] = { lineup: (t.lineup||[]).slice(), captain: t.captain||null };
