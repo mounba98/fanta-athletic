@@ -56,7 +56,7 @@
     .meta-podium { align-self: center; }
     .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; }
-    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
     .meta-controls { display: flex; align-items: flex-start; gap: 20px; }
     .field-bench-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
     #colPool { max-width: 100%; }
@@ -469,7 +469,7 @@
           </div>
         </div>
         <div class="right-column">
-          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0 0 20px 0;">
+          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0 0 20px 0; max-width: 320px; width: 100%;">
             <h3>🌟 Top 3 giocatori (stagione)</h3>
             <div id="topPlayersList"></div>
             <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
