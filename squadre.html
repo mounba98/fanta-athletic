@@ -92,16 +92,29 @@
     .top-player-role { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.75; margin-left: auto; }
     .top-player-points { font-size:22px; font-weight:800; display: flex; align-items: center; }
     .top-player-card { display: flex; align-items: center; }
+    /* Podio top 3 */
+    .top-player-podium {
+      padding: 12px;
+      border-radius: 12px;
+      transition: transform 0.2s ease;
+    }
+    .top-player-podium.rank-1 {
+      background: linear-gradient(135deg,#fde68a 0%,#fbbf24 45%,#f59e0b 100%);
+      color:#1f2937;
+    }
+    .top-player-podium.rank-2 {
+      background: linear-gradient(135deg,#e2e8f0 0%,#cbd5f5 100%);
+      color:#0f172a;
+    }
+    .top-player-podium.rank-3 {
+      background: linear-gradient(135deg,#fecaca 0%,#fca5a5 100%);
+      color:#111827;
+    }
+    .top-player-podium:hover {
+      transform: translateY(-4px);
+    }
     /* PC: riduce dimensioni top 3 giocatori */
     @media (min-width: 641px) {
-      .top-player-card { padding: 10px 14px; min-height: 60px; display: flex; align-items: center; }
-      .top-player-left { display: flex; align-items: center; gap: 10px; }
-      .top-player-left img { width: 44px; height: 44px; }
-      .top-player-rank { width: 28px; height: 28px; font-size: 14px; }
-      .top-player-info { display: flex; align-items: center; gap: 10px; flex: 1; }
-      .top-player-name { font-size: 16px; }
-      .top-player-role { font-size: 14px; font-weight: 700; margin-left: auto; }
-      .top-player-points { font-size: 24px; display: flex; align-items: center; }
       .top-players-card { padding: 12px 16px; }
       .top-players-card h3 { font-size: 16px; margin: 0 0 10px 0; }
     }
@@ -312,6 +325,7 @@
     /* Accordion roles */
     .role-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; margin-bottom:8px; }
     .role-header { display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:800; }
+    .role-header > span:first-child { display:flex; align-items:center; gap:4px; }
     .role-section.collapsed .role-body { display:none; }
     .strip { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .pill { padding:6px 8px; border-radius:999px; background:#eef3f8; border:1px solid #dbe1e8; color:#2b3a42; }
@@ -727,24 +741,67 @@
         return;
       }
 
-      card.style.display = 'flex';
-      list.innerHTML = entries.map((entry, idx) => {
-        const photo = getPlayerPhoto(entry.player) || 'resources/logo.png';
-        const label = escapeHtml(getPlayerDisplayLabel(entry.player));
-        const role = getRoleAbbr(entry.player.role || entry.player.ruolo);
-        return `
-          <div class="top-player-card rank-${idx + 1}">
-            <div class="top-player-left">
-              <span class="top-player-rank">${idx + 1}</span>
-              <img src="${photo}" alt="${label}" onerror="this.src='resources/logo.png'" />
-              <div class="top-player-info" style="display:flex; align-items:center; gap:12px; flex:1;">
-                <div class="top-player-name">${label}</div>
-                ${role ? `<div class="top-player-role" style="margin-left:auto;">${role}</div>` : ''}
+      card.style.display = 'block';
+      // Podio: 2° a sinistra, 1° al centro, 3° a destra
+      const [second, first, third] = entries;
+      list.innerHTML = `
+        <div style="display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin-top: 8px;">
+          ${second ? (() => {
+            const photo = getPlayerPhoto(second.player) || 'resources/logo.png';
+            const label = escapeHtml(getPlayerDisplayLabel(second.player));
+            const role = getRoleAbbr(second.player.role || second.player.ruolo);
+            return `
+              <div class="top-player-podium rank-2" style="flex: 0 0 140px;">
+                <div style="text-align: center; margin-bottom: 8px;">
+                  <span class="top-player-rank" style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 14px; line-height: 24px;">2</span>
+                </div>
+                <img src="${photo}" alt="${label}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin: 0 auto 6px; display: block; border: 2px solid rgba(255,255,255,0.5);" onerror="this.src='resources/logo.png'" />
+                <div style="text-align: center;">
+                  <div class="top-player-name" style="font-size: 14px; font-weight: 700; margin-bottom: 2px;">${label}</div>
+                  ${role ? `<div class="top-player-role" style="font-size: 12px; opacity: 0.8;">${role}</div>` : ''}
+                  <div class="top-player-points" style="font-size: 18px; font-weight: 800; margin-top: 4px;">${Number(second.points || 0).toFixed(1)}</div>
+                </div>
               </div>
-            </div>
-            <div class="top-player-points">${Number(entry.points || 0).toFixed(1)}</div>
-          </div>`;
-      }).join('');
+            `;
+          })() : ''}
+          ${first ? (() => {
+            const photo = getPlayerPhoto(first.player) || 'resources/logo.png';
+            const label = escapeHtml(getPlayerDisplayLabel(first.player));
+            const role = getRoleAbbr(first.player.role || first.player.ruolo);
+            return `
+              <div class="top-player-podium rank-1" style="flex: 0 0 160px;">
+                <div style="text-align: center; margin-bottom: 8px;">
+                  <span class="top-player-rank" style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.3); font-size: 16px; line-height: 28px;">1</span>
+                </div>
+                <img src="${photo}" alt="${label}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; display: block; border: 3px solid rgba(255,255,255,0.6);" onerror="this.src='resources/logo.png'" />
+                <div style="text-align: center;">
+                  <div class="top-player-name" style="font-size: 16px; font-weight: 700; margin-bottom: 2px;">${label}</div>
+                  ${role ? `<div class="top-player-role" style="font-size: 13px; opacity: 0.8;">${role}</div>` : ''}
+                  <div class="top-player-points" style="font-size: 22px; font-weight: 800; margin-top: 4px;">${Number(first.points || 0).toFixed(1)}</div>
+                </div>
+              </div>
+            `;
+          })() : ''}
+          ${third ? (() => {
+            const photo = getPlayerPhoto(third.player) || 'resources/logo.png';
+            const label = escapeHtml(getPlayerDisplayLabel(third.player));
+            const role = getRoleAbbr(third.player.role || third.player.ruolo);
+            return `
+              <div class="top-player-podium rank-3" style="flex: 0 0 140px;">
+                <div style="text-align: center; margin-bottom: 8px;">
+                  <span class="top-player-rank" style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 14px; line-height: 24px;">3</span>
+                </div>
+                <img src="${photo}" alt="${label}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin: 0 auto 6px; display: block; border: 2px solid rgba(255,255,255,0.5);" onerror="this.src='resources/logo.png'" />
+                <div style="text-align: center;">
+                  <div class="top-player-name" style="font-size: 14px; font-weight: 700; margin-bottom: 2px;">${label}</div>
+                  ${role ? `<div class="top-player-role" style="font-size: 12px; opacity: 0.8;">${role}</div>` : ''}
+                  <div class="top-player-points" style="font-size: 18px; font-weight: 800; margin-top: 4px;">${Number(third.points || 0).toFixed(1)}</div>
+                </div>
+              </div>
+            `;
+          })() : ''}
+        </div>
+      `;
       if (empty) empty.style.display = 'none';
     }
 
@@ -1298,13 +1355,8 @@
             <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" ${!canWrite?'disabled':''} />
           </div>
           <div>
-            <div class="muted" style="margin:0 0 4px;">Allenatori</div>
-            <div id="coachButtons" class="row" style="gap:8px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
-              ${state.coaches.map(c=> `
-                <button class="btn btn-secondary btn-sm ${t.coach_ids.includes(c.coach_id)?'selected':''}" data-coach-id="${c.coach_id}" ${!canSelectCoach?'disabled':''}><strong>${escapeHtml(c.nome || c.coach_id || 'Coach')}</strong></button>
-              `).join('')}
-            </div>
-            <div class="row" style="gap:8px; flex-wrap:wrap; justify-content:flex-start; margin-top:8px;">
+            <div class="muted" style="margin:0 0 8px;">Allenatori</div>
+            <div class="row" style="gap:16px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
               ${state.coaches.map(c=> {
                 const coachName = c.nome || c.name || c.coach_id || 'Coach';
                 let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
@@ -1313,12 +1365,17 @@
                   coachPhoto = 'resources/tommy_guardu.png';
                 }
                 const coachInitials = coachName.split(/\s+/).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                const isSelected = t.coach_ids.includes(c.coach_id);
                 return `
-                  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-                    <div style="width:48px; height:48px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:2px solid ${t.coach_ids.includes(c.coach_id)?'var(--primary)':'rgba(148,163,184,0.3)'};">
-                      ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:18px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:18px; font-weight:700;">${coachInitials}</span>`}
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor: ${canSelectCoach ? 'pointer' : 'default'};" 
+                       ${canSelectCoach ? `onclick="selectCoach('${c.coach_id}')"` : ''}
+                       class="coach-photo-item ${isSelected ? 'coach-selected' : ''}">
+                    <div style="width:100px; height:100px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:3px solid ${isSelected?'var(--primary)':'rgba(148,163,184,0.3)'}; transition: all 0.2s ease; ${canSelectCoach ? 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);' : ''}" 
+                         ${canSelectCoach ? 'onmouseover="this.style.transform=\\'scale(1.05)\\'; this.style.boxShadow=\\'0 6px 16px rgba(0,0,0,0.2)\\';"' : ''}
+                         ${canSelectCoach ? 'onmouseout="this.style.transform=\\'scale(1)\\'; this.style.boxShadow=\\'0 4px 12px rgba(0,0,0,0.15)\\';"' : ''}>
+                      ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:32px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:32px; font-weight:700;">${coachInitials}</span>`}
                     </div>
-                    <span style="font-size:11px; color:var(--muted);">${escapeHtml(coachName)}</span>
+                    <span style="font-size:12px; color:var(--text); font-weight:${isSelected ? '700' : '500'};">${escapeHtml(coachName)}</span>
                   </div>
                 `;
               }).join('')}
@@ -1357,7 +1414,7 @@
         });
         return `
           <div class="role-section collapsed" data-role-group="${role}">
-            <div class="role-header">${role} <span style="font-size:12px; opacity:0.7;">(${sorted.length})</span> <span>▾</span></div>
+            <div class="role-header"><span>${role} <span style="font-size:12px; opacity:0.7;">(${sorted.length})</span></span> <span>▾</span></div>
             <div class="role-body">
               <div class="list">
                 ${sorted.map(p=> `
