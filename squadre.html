@@ -53,12 +53,12 @@
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
-    .main-layout { display: grid; grid-template-columns: 30% 1fr; gap: 20px; align-items: start; }
+    .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; }
-    .right-column { display: flex; flex-direction: column; gap: 20px; }
-    .right-top { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; }
+    .top-row { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; margin-bottom: 20px; }
     .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
     .podium-section { display: flex; justify-content: flex-end; align-items: flex-start; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; }
     #colPool { max-width: 100%; }
     #playersPool { max-width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
@@ -67,11 +67,11 @@
     .meta-left .mobile-only { margin: 0 0 8px !important; }
     .list { display:grid; gap:8px; }
     /* Larger players font in lists */
-    #playersPool .player-pick span { font-size: 12px; }
-    #playersPool .role-section { padding:4px 6px; margin-bottom:4px; max-width: 320px; }
-    #playersPool .role-header { font-size:12px; padding:3px 4px; }
-    #playersPool .list { max-width: 320px; }
-    #colPool { max-width: 320px; }
+    #playersPool .player-pick span { font-size: 14px; }
+    #playersPool .role-section { padding:8px 10px; margin-bottom:6px; max-width: 400px; min-height: 40px; }
+    #playersPool .role-header { font-size:15px; padding:6px 8px; font-weight:700; }
+    #playersPool .list { max-width: 400px; }
+    #colPool { max-width: 400px; }
     .tag { display:inline-block; padding:3px 8px; border-radius:999px; background:#eef3f8; color:#506070; font-size:12px; }
     .tag-success { background:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
     .tag-danger { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
@@ -442,8 +442,11 @@
     <section class="panel" id="editor" style="margin-top: 8px;">
       <div class="main-layout desktop-only">
         <div class="left-column">
-          <div class="row meta-controls">
-            <select id="giornataSel" class="input"></select>
+          <div class="top-row">
+            <div class="row meta-controls">
+              <select id="giornataSel" class="input"></select>
+            </div>
+            <div class="coach-section" id="teamMeta"></div>
           </div>
           <div id="logoNameContainer" style="display:none;">
             <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
@@ -466,17 +469,14 @@
           </div>
         </div>
         <div class="right-column">
-          <div class="right-top">
-            <div class="coach-section" id="teamMeta"></div>
-            <div class="podium-section" id="podiumContainer">
-              <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
-                <h3>🌟 Top 3 giocatori (stagione)</h3>
-                <div id="topPlayersList"></div>
-                <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
-              </div>
+          <div class="podium-section" id="podiumContainer">
+            <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
+              <h3>🌟 Top 3 giocatori (stagione)</h3>
+              <div id="topPlayersList"></div>
+              <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
             </div>
           </div>
-          <div style="margin-top: 20px;">
+          <div>
             <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
             <div class="pitch">
               <div class="pitch-grid" id="pitchGrid">
