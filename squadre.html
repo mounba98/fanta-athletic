@@ -12,7 +12,7 @@
   <style>
     body.page-squadre { background: var(--bg, #0f172a); }
     .page-squadre main.layout { margin-top: 0; padding-top: 0; }
-    .layout { display: grid; grid-template-columns: 300px 1fr 1fr; gap: 20px; align-items: start; max-width: 100%; margin-left: 0; margin-right: 0; padding: 0 20px; }
+    .layout { display: grid; grid-template-columns: 1fr 0.7fr 1.3fr; gap: 20px; align-items: start; max-width: 100%; margin-left: 0; margin-right: 0; padding: 0 20px; }
     .sidebar { width: 100%; display:flex; flex-direction:column; gap:14px; padding: 8px 18px 20px; }
     .sidebar .section-title { font-size: 20px; font-weight: 800; color: var(--text); margin: 0 0 12px 0; padding: 0; }
     .sidebar .list { width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: stretch; padding: 0; }
@@ -481,15 +481,15 @@
     
     /* 2) Layout: 3 colonne - sinistra (squadre), centro (controlli), destra (campo) */
     .layout {
-      grid-template-columns: 300px 1fr 1fr !important;
+      grid-template-columns: 1fr 0.7fr 1.3fr !important;
       max-width: 100% !important;
       padding: 0 20px !important;
     }
     
-    /* 3) Lista squadre: una sola colonna, non due */
+    /* 3) Lista squadre: 2 colonne */
     #teams {
       display: grid !important;
-      grid-template-columns: 1fr !important;
+      grid-template-columns: repeat(2, 1fr) !important;
       gap: 12px !important;
     }
     
