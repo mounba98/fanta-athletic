@@ -53,10 +53,11 @@
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
-    .meta-top-section { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: start; margin-bottom: 24px; }
-    .meta-top-left { display: flex; flex-direction: column; gap: 12px; }
-    .meta-top-center { display: flex; justify-content: center; }
-    .meta-top-right { display: flex; justify-content: flex-end; align-items: center; }
+    .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 24px; align-items: start; margin-bottom: 24px; }
+    .left-column { display: flex; flex-direction: column; gap: 16px; }
+    .right-column { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: start; }
+    .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 280px; }
+    .podium-section { display: flex; justify-content: flex-end; align-items: center; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
     .meta-left .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin: 0 !important; }
     .meta-left .row select { min-width: 160px; }
@@ -80,7 +81,7 @@
     .bench-pill { background: var(--card, rgba(255,255,255,0.95)); border:1px solid rgba(148,163,184,0.25); color: var(--text, #1f2937); }
     :root.dark .bench-pill { background: rgba(15,23,42,0.9); border-color: rgba(148,163,184,0.25); color: #f8fafc; }
     .bench-pill-active { box-shadow:0 0 0 2px var(--secondary); }
-    .top-players-card { background: var(--card, #fff); border-radius:18px; padding:10px 12px; margin-bottom:8px; border:1px solid rgba(148,163,184,0.15); box-shadow: var(--shadow); display:flex; flex-direction:column; gap:8px; max-width: 320px; width: 100%; margin-left: auto; margin-right: auto; }
+    .top-players-card { background: var(--card, #fff); border-radius:18px; padding:10px 12px; margin-bottom:8px; border:1px solid rgba(148,163,184,0.15); box-shadow: var(--shadow); display:flex; flex-direction:column; gap:8px; max-width: 400px; width: 100%; }
     :root.dark .top-players-card { background: linear-gradient(160deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.92) 100%); }
     .top-players-card h3 { margin:0; font-size:18px; font-weight:800; color:var(--text, #1f2937); display:flex; align-items:center; gap:8px; }
     :root.dark .top-players-card h3 { color:#f8fafc; }
@@ -109,7 +110,7 @@
       width: 100%;
     }
     #topPlayersList > div {
-      max-width: 280px;
+      max-width: 400px;
       margin: 0 auto;
       width: 100%;
     }
@@ -432,13 +433,12 @@
     </section>
 
     <section class="panel" id="editor" style="margin-top: 8px;">
-      <div class="meta-top-section desktop-only">
-        <div class="meta-top-left">
+      <div class="main-layout desktop-only">
+        <div class="left-column">
           <div class="row meta-controls">
             <select id="giornataSel" class="input"></select>
-            <span id="lockStatus" class="muted"></span>
           </div>
-          <div id="logoNameContainer" style="margin-top: 12px; display:none;">
+          <div id="logoNameContainer" style="display:none;">
             <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
             <div class="row" style="gap:10px; align-items:center;">
               <div id="logoBox" style="margin-left: 0;">Carica logo</div>
@@ -449,72 +449,68 @@
             </div>
             <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" />
           </div>
+          <div id="colPool">
+            <div class="sectionh">Rosa (11)</div>
+            <div class="row" style="margin-bottom:8px;">
+              <input id="playerSearch" placeholder="Cerca giocatori..." class="input" style="max-width:100%;" />
+              <button class="btn btn-secondary btn-sm" id="addSelected">Aggiungi giocatori</button>
+            </div>
+            <div class="list" id="playersPool"></div>
+          </div>
         </div>
-        <div class="meta-top-center" id="teamMeta"></div>
-        <div class="meta-top-right" id="podiumContainer">
-          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
-            <h3>🌟 Top 3 giocatori (stagione)</h3>
-            <div id="topPlayersList"></div>
-            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+        <div class="right-column">
+          <div class="coach-section" id="teamMeta"></div>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="podium-section" id="podiumContainer">
+              <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
+                <h3>🌟 Top 3 giocatori (stagione)</h3>
+                <div id="topPlayersList"></div>
+                <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+              </div>
+            </div>
+            <div>
+              <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+              <div class="pitch">
+                <div class="pitch-grid" id="pitchGrid">
+                  <div class="line two">
+                    <div class="slot" data-slot="0"></div>
+                    <div class="slot" data-slot="1"></div>
+                  </div>
+                  <div class="line two">
+                    <div class="slot" data-slot="2"></div>
+                    <div class="slot" data-slot="3"></div>
+                  </div>
+                  <div class="line one">
+                    <div class="slot" data-slot="4"></div>
+                  </div>
+                </div>
+                <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+              </div>
+              <div class="actions-grid" style="margin:8px 0;">
+                <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+                <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+                <button class="btn btn-secondary desktop-only" id="undoLineup">Annulla modifiche titolari</button>
+              </div>
+              <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+              <div id="benchStrip" class="strip"></div>
+              <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px;">
+                <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
+                <div class="role-body">
+                  <div class="roster" id="teamRoster"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div class="mobile-only" style="margin-bottom: 16px;">
         <div class="row meta-controls">
           <select id="giornataSel" class="input"></select>
-          <span id="lockStatus" class="muted"></span>
         </div>
         <label class="row" style="margin-top: 12px;">
           <span class="muted">Seleziona squadra</span>
           <select id="teamSelectMobile" class="input"></select>
         </label>
-      </div>
-      <div class="grid2" style="margin-top:0; align-items:start;">
-        <div class="desktop-only" id="colPool">
-          <div class="sectionh">Rosa (11)</div>
-          <div class="row" style="margin-bottom:8px;">
-            <input id="playerSearch" placeholder="Cerca giocatori..." class="input" style="max-width:100%;" />
-            <button class="btn btn-secondary btn-sm" id="addSelected">Aggiungi giocatori</button>
-          </div>
-          <div class="list" id="playersPool"></div>
-        </div>
-        <div id="colRight">
-          <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-          <div class="pitch">
-            <div class="pitch-grid" id="pitchGrid">
-              <div class="line two">
-                <div class="slot" data-slot="0"></div>
-                <div class="slot" data-slot="1"></div>
-              </div>
-              <div class="line two">
-                <div class="slot" data-slot="2"></div>
-                <div class="slot" data-slot="3"></div>
-              </div>
-              <div class="line one">
-                <div class="slot" data-slot="4"></div>
-              </div>
-            </div>
-            <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
-          </div>
-          <div class="actions-grid" style="margin:8px 0;">
-            <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-            <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-            <button class="btn btn-secondary desktop-only" id="undoLineup">Annulla modifiche titolari</button>
-          </div>
-          <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
-          <div id="benchStrip" class="strip"></div>
-          <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px;">
-            <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
-            <div class="role-body">
-              <div class="roster" id="teamRoster"></div>
-            </div>
-          </div>
-          <!-- Mobile: tasti fissi in basso -->
-          <div class="mobile-fixed-buttons mobile-only">
-            <button class="btn" id="saveFormationMobile">Salva</button>
-            <button class="btn btn-secondary" id="clearLineupMobile">Svuota</button>
-          </div>
-        </div>
       </div>
     </section>
   </main>
@@ -1358,9 +1354,9 @@
       }
       
       $('#teamMeta').innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+        <div style="display:flex; flex-direction:column; gap:12px;">
           <div class="muted" style="margin:0 0 4px; font-size:14px; font-weight:700;">Allenatori</div>
-          <div class="row" style="gap:40px; flex-wrap:wrap; justify-content:center; margin:0;">
+          <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
             ${state.coaches.map(c=> {
               const coachName = c.nome || c.name || c.coach_id || 'Coach';
               let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
@@ -1387,18 +1383,34 @@
               `;
             }).join('')}
           </div>
-          <div style="margin-top:16px; text-align:center;">
-            <div class="muted" style="margin-bottom:4px;">Accesso</div>
-            <div>${ownerInfo}</div>
-            <div class="muted" id="ownersList" style="margin-top:6px;">Allenatori: …</div>
+          <div style="margin-top:16px;">
+            <div class="muted" style="margin-bottom:4px; font-size:13px; font-weight:700;">Utenti squadra</div>
+            <div class="muted" id="ownersList" style="font-size:12px; line-height:1.6;">Caricamento…</div>
           </div>
         </div>
       `;
       
-      // async owners list
-      fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
+      // async owners list - mostra nome utente invece di email
+      fetchOwnersForTeam(state.selectedTeamIdx).then(async (arr)=>{
         const el = document.getElementById('ownersList'); if (!el) return;
-        el.textContent = arr.length? `Allenatori: ${arr.join(', ')}` : 'Allenatori: —';
+        if (!arr.length) {
+          el.textContent = 'Nessun utente collegato';
+          return;
+        }
+        // Cerca i nomi utente per ogni email
+        const userNames = await Promise.all(arr.map(async (email) => {
+          try {
+            const userDoc = await firebase.firestore().collection('users').where('email', '==', email).limit(1).get();
+            if (!userDoc.empty) {
+              const userData = userDoc.docs[0].data();
+              return userData.displayName || userData.name || email.split('@')[0];
+            }
+          } catch (e) {
+            console.warn('Error fetching user name for', email, e);
+          }
+          return email.split('@')[0]; // Fallback: parte prima di @
+        }));
+        el.textContent = userNames.join(', ');
       });
       
       // Render top players card AFTER teamMeta is rendered
