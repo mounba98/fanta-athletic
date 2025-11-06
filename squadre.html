@@ -46,12 +46,13 @@
     .actions-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; width:100%; }
 
     /* Logo box clickable */
-    #logoBox { width: 150px; height: 150px; border-radius: 16px; border:1px solid #dbe1e8; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; margin-left: auto; }
+    #logoBox { width: 120px; height: 120px; border-radius: 16px; border:1px solid #dbe1e8; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; }
     #logoBox img { width:100%; height:100%; object-fit:cover; }
     .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items:start; }
     #colRight { display:flex; flex-direction:column; gap:0; }
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
-    .meta-wrap { display:grid; grid-template-columns: 200px 1fr; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
+    .meta-wrap { display:grid; grid-template-columns: 200px 1fr auto; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
+    .meta-podium { align-self: center; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
     .meta-left .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin: 0 !important; }
     .meta-left .row select { min-width: 160px; }
@@ -433,7 +434,6 @@
           <div class="row meta-controls">
             <select id="giornataSel" class="input"></select>
             <span id="lockStatus" class="muted"></span>
-            <button class="btn btn-secondary btn-sm" id="saveTeam">Salva rosa</button>
           </div>
           <div class="mobile-only">
             <label class="row">
@@ -452,6 +452,13 @@
           </div>
         </div>
         <div class="meta-right desktop-only" id="teamMeta"></div>
+        <div class="meta-podium desktop-only" id="podiumContainer" style="display: flex; align-items: center; justify-content: flex-end;">
+          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
+            <h3>🌟 Top 3 giocatori (stagione)</h3>
+            <div id="topPlayersList"></div>
+            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+          </div>
+        </div>
       </div>
       <div class="grid2" style="margin-top:0; align-items:start;">
         <div class="desktop-only" id="colPool">
@@ -965,7 +972,12 @@
       const btn = document.getElementById('saveKickoff');
       const ko = getKickoff(state.giornata);
       if (ko){ input.value = new Date(ko.getTime()-ko.getTimezoneOffset()*60000).toISOString().slice(0,16); }
-      else { input.value = ''; }
+      else { 
+        // Mostra data corrente di default
+        const now = new Date();
+        const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+        input.value = localDate.toISOString().slice(0,16);
+      }
       btn.onclick = ()=>{
         const v = input.value;
         if (!v){
@@ -1350,24 +1362,23 @@
       const role = state.isAdmin? 'Admin' : (state.user ? (state.userTeamIdx===state.selectedTeamIdx? 'Proprietario' : 'Utente') : 'Ospite');
       const display = state.userDisplayName || (state.user?.email||'');
       const ownerInfo = `<strong>${role}</strong>${display? ' &bull; <strong>'+escapeHtml(display)+'</strong>' : ''}`;
-      $('#teamMeta').innerHTML = `
-        <div class="top-players-card" id="topPlayersCard" style="display:none; margin-bottom:20px;">
-          <h3>🌟 Top 3 giocatori (stagione)</h3>
-          <div id="topPlayersList"></div>
-          <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
-        </div>
-        <div class="grid2">
-          <div>
-            <div class="muted" style="font-size:16px; font-weight:800;">Logo squadra</div>
-            <div class="row" style="gap:10px; align-items:center;">
-              <div id="logoBox">${logo? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>'}</div>
-              <div style="flex:1;">
-                <div class="muted">Nome squadra</div>
-                <input id="teamName" class="input" value="${escapeHtml(t.name||'')}" ${!canWrite?'disabled':''} />
-              </div>
+      // Logo e nome squadra spostati in meta-left (dopo selettore giornata)
+      const logoNameHTML = `
+        <div style="margin-top: 12px;">
+          <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
+          <div class="row" style="gap:10px; align-items:center;">
+            <div id="logoBox" style="margin-left: 0;">${logo? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>'}</div>
+            <div style="flex:1;">
+              <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
+              <input id="teamName" class="input" value="${escapeHtml(t.name||'')}" ${!canWrite?'disabled':''} />
             </div>
-            <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" ${!canWrite?'disabled':''} />
           </div>
+          <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" ${!canWrite?'disabled':''} />
+        </div>
+      `;
+      
+      $('#teamMeta').innerHTML = `
+        <div class="grid2">
           <div>
             <div class="muted" style="margin:0 0 8px;">Allenatori</div>
             <div class="row" style="gap:40px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
@@ -1405,6 +1416,12 @@
           </div>
         </div>
       `;
+      
+      // Aggiungi logo e nome squadra dopo il selettore giornata
+      const metaLeft = document.querySelector('.meta-left');
+      if (metaLeft && !document.getElementById('logoBox').parentElement.closest('.meta-left')) {
+        metaLeft.insertAdjacentHTML('beforeend', logoNameHTML);
+      }
       // async owners list
       fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
         const el = document.getElementById('ownersList'); if (!el) return;
