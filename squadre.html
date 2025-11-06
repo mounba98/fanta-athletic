@@ -184,8 +184,8 @@
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
     .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 40%; margin: 0 auto; }
-    .slot { min-height: 110px; width: 100%; max-width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.1); border:2px dashed rgba(255,255,255,0.45); border-radius:16px; display:flex; align-items:stretch; justify-content:center; padding:12px; text-align:left; transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease, border-color 0.2s ease; }
-    .slot-card.draggable { width: 100%; height: 100%; min-height: 0; }
+    .slot { min-height: 140px; height: 140px; width: 100%; max-width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.1); border:2px dashed rgba(255,255,255,0.45); border-radius:16px; display:flex; align-items:stretch; justify-content:center; padding:12px; text-align:left; transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease, border-color 0.2s ease; }
+    .slot-card.draggable { width: 100%; height: 100%; min-height: 140px; }
     .slot.filled { background: rgba(255,255,255,0.16); border-style: solid; }
     .slot.captain-slot { background: rgba(253, 224, 71, 0.16); border-color: rgba(253, 224, 71, 0.55); }
     .slot.captain-active { background: linear-gradient(135deg, rgba(253, 224, 71, 0.28), rgba(250, 204, 21, 0.35)); border-color: rgba(250, 204, 21, 0.85); box-shadow: 0 16px 30px rgba(250, 204, 21, 0.25); }
@@ -867,21 +867,21 @@
       // Podio: 2° a sinistra, 1° al centro, 3° a destra (ordinati per punti decrescenti)
       const [first, second, third] = entries;
       list.innerHTML = `
-        <div style="display: flex; align-items: flex-end; justify-content: center; gap: 6px; margin-top: 8px; max-width: 100%; width: 100%;">
+        <div style="display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-top: 12px; max-width: 100%; width: 100%;">
           ${second ? (() => {
             const photo = getPlayerPhoto(second.player) || 'resources/logo.png';
             const label = escapeHtml(getPlayerDisplayLabel(second.player));
             const role = getRoleAbbr(second.player.role || second.player.ruolo);
             return `
-              <div class="top-player-podium rank-2" style="flex: 0 0 90px; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end;">
-                <div style="text-align: center; margin-bottom: 8px;">
-                  <span class="top-player-rank" style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 14px; line-height: 24px;">2</span>
+              <div class="top-player-podium rank-2" style="flex: 0 0 110px; min-height: 240px; padding-top: 30px; display: flex; flex-direction: column; justify-content: flex-end;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                  <span class="top-player-rank" style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 16px; line-height: 28px;">2</span>
                 </div>
-                <img src="${photo}" alt="${label}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin: 0 auto 6px; display: block; border: 2px solid rgba(255,255,255,0.5);" onerror="this.src='resources/logo.png'" />
+                <img src="${photo}" alt="${label}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; display: block; border: 3px solid rgba(255,255,255,0.6);" onerror="this.src='resources/logo.png'" />
                 <div style="text-align: center;">
-                  <div class="top-player-name" style="font-size: 14px; font-weight: 700; margin-bottom: 2px;">${label}</div>
-                  ${role ? `<div class="top-player-role" style="font-size: 12px; opacity: 0.8;">${role}</div>` : ''}
-                  <div class="top-player-points" style="font-size: 18px; font-weight: 800; margin-top: 4px;">${Number(second.points || 0).toFixed(1)}</div>
+                  <div class="top-player-name" style="font-size: 16px; font-weight: 700; margin-bottom: 3px;">${label}</div>
+                  ${role ? `<div class="top-player-role" style="font-size: 13px; opacity: 0.8;">${role}</div>` : ''}
+                  <div class="top-player-points" style="font-size: 20px; font-weight: 800; margin-top: 6px;">${Number(second.points || 0).toFixed(1)}</div>
                 </div>
               </div>
             `;
@@ -891,15 +891,15 @@
             const label = escapeHtml(getPlayerDisplayLabel(first.player));
             const role = getRoleAbbr(first.player.role || first.player.ruolo);
             return `
-              <div class="top-player-podium rank-1" style="flex: 0 0 100px; min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end;">
-                <div style="text-align: center; margin-bottom: 8px;">
-                  <span class="top-player-rank" style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.3); font-size: 16px; line-height: 28px;">1</span>
+              <div class="top-player-podium rank-1" style="flex: 0 0 120px; min-height: 280px; padding-top: 0; display: flex; flex-direction: column; justify-content: flex-end;">
+                <div style="text-align: center; margin-bottom: 12px;">
+                  <span class="top-player-rank" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.3); font-size: 18px; line-height: 32px;">1</span>
                 </div>
-                <img src="${photo}" alt="${label}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; display: block; border: 3px solid rgba(255,255,255,0.6);" onerror="this.src='resources/logo.png'" />
+                <img src="${photo}" alt="${label}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px; display: block; border: 3px solid rgba(255,255,255,0.7);" onerror="this.src='resources/logo.png'" />
                 <div style="text-align: center;">
-                  <div class="top-player-name" style="font-size: 16px; font-weight: 700; margin-bottom: 2px;">${label}</div>
-                  ${role ? `<div class="top-player-role" style="font-size: 13px; opacity: 0.8;">${role}</div>` : ''}
-                  <div class="top-player-points" style="font-size: 22px; font-weight: 800; margin-top: 4px;">${Number(first.points || 0).toFixed(1)}</div>
+                  <div class="top-player-name" style="font-size: 18px; font-weight: 700; margin-bottom: 3px;">${label}</div>
+                  ${role ? `<div class="top-player-role" style="font-size: 14px; opacity: 0.8;">${role}</div>` : ''}
+                  <div class="top-player-points" style="font-size: 24px; font-weight: 800; margin-top: 6px;">${Number(first.points || 0).toFixed(1)}</div>
                 </div>
               </div>
             `;
@@ -909,15 +909,15 @@
             const label = escapeHtml(getPlayerDisplayLabel(third.player));
             const role = getRoleAbbr(third.player.role || third.player.ruolo);
             return `
-              <div class="top-player-podium rank-3" style="flex: 0 0 90px; min-height: 120px; display: flex; flex-direction: column; justify-content: flex-end;">
-                <div style="text-align: center; margin-bottom: 8px;">
-                  <span class="top-player-rank" style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 14px; line-height: 24px;">3</span>
+              <div class="top-player-podium rank-3" style="flex: 0 0 110px; min-height: 200px; padding-top: 50px; display: flex; flex-direction: column; justify-content: flex-end;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                  <span class="top-player-rank" style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 16px; line-height: 28px;">3</span>
                 </div>
-                <img src="${photo}" alt="${label}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin: 0 auto 6px; display: block; border: 2px solid rgba(255,255,255,0.5);" onerror="this.src='resources/logo.png'" />
+                <img src="${photo}" alt="${label}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; display: block; border: 3px solid rgba(255,255,255,0.6);" onerror="this.src='resources/logo.png'" />
                 <div style="text-align: center;">
-                  <div class="top-player-name" style="font-size: 14px; font-weight: 700; margin-bottom: 2px;">${label}</div>
-                  ${role ? `<div class="top-player-role" style="font-size: 12px; opacity: 0.8;">${role}</div>` : ''}
-                  <div class="top-player-points" style="font-size: 18px; font-weight: 800; margin-top: 4px;">${Number(third.points || 0).toFixed(1)}</div>
+                  <div class="top-player-name" style="font-size: 16px; font-weight: 700; margin-bottom: 3px;">${label}</div>
+                  ${role ? `<div class="top-player-role" style="font-size: 13px; opacity: 0.8;">${role}</div>` : ''}
+                  <div class="top-player-points" style="font-size: 20px; font-weight: 800; margin-top: 6px;">${Number(third.points || 0).toFixed(1)}</div>
                 </div>
               </div>
             `;
