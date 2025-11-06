@@ -53,12 +53,14 @@
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
-    .main-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+    .main-layout { display: grid; grid-template-columns: 30% 1fr; gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; }
     .right-column { display: flex; flex-direction: column; gap: 20px; }
     .right-top { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; }
     .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
     .podium-section { display: flex; justify-content: flex-end; align-items: flex-start; }
+    #colPool { max-width: 100%; }
+    #playersPool { max-width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
     .meta-left .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin: 0 !important; }
     .meta-left .row select { min-width: 160px; }
@@ -472,7 +474,7 @@
               </div>
             </div>
           </div>
-          <div>
+          <div style="margin-top: 20px;">
             <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
             <div class="pitch">
               <div class="pitch-grid" id="pitchGrid">
