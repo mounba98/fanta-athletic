@@ -58,7 +58,6 @@
     .left-column { display: flex; flex-direction: column; gap: 16px; max-width: 400px; width: 100%; }
     .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; min-width: 0; flex: 1; }
     .meta-controls { display: flex; align-items: flex-start; gap: 20px; }
-    .field-bench-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
     #colPool { max-width: 400px; width: 100%; }
     #playersPool { max-width: 400px; width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
@@ -469,47 +468,45 @@
           </div>
         </div>
         <div class="right-column">
-          <div class="field-bench-section" style="order: 1;">
-            <div>
-              <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-              <div class="pitch">
-                <div class="pitch-grid" id="pitchGrid">
-                  <div class="line two">
-                    <div class="slot" data-slot="0"></div>
-                    <div class="slot" data-slot="1"></div>
-                  </div>
-                  <div class="line two">
-                    <div class="slot" data-slot="2"></div>
-                    <div class="slot" data-slot="3"></div>
-                  </div>
-                  <div class="line one">
-                    <div class="slot" data-slot="4"></div>
-                  </div>
+          <div>
+            <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+            <div class="pitch">
+              <div class="pitch-grid" id="pitchGrid">
+                <div class="line two">
+                  <div class="slot" data-slot="0"></div>
+                  <div class="slot" data-slot="1"></div>
                 </div>
-                <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+                <div class="line two">
+                  <div class="slot" data-slot="2"></div>
+                  <div class="slot" data-slot="3"></div>
+                </div>
+                <div class="line one">
+                  <div class="slot" data-slot="4"></div>
+                </div>
               </div>
-              <div class="actions-grid" style="margin:8px 0;">
-                <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-                <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-              </div>
+              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
             </div>
-            <div style="width: 420px;">
-              <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
-              <div id="benchStrip" class="strip"></div>
-              <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
-                <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
-                <div class="role-body">
-                  <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
-                </div>
+            <div class="actions-grid" style="margin:8px 0;">
+              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+              <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+            </div>
+          </div>
+          <div style="width: 420px;">
+            <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+            <div id="benchStrip" class="strip"></div>
+            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
+              <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
+              <div class="role-body">
+                <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
               </div>
             </div>
           </div>
-          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:20px 0 0 0; max-width: 320px; width: 100%; order: 2;">
+          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:20px 0 0 0; max-width: 320px; width: 100%;">
             <h3>🌟 Top 3 giocatori (stagione)</h3>
             <div id="topPlayersList"></div>
             <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
           </div>
-          <div id="teamMeta" style="margin-bottom: 20px; order: 3;"></div>
+          <div id="teamMeta" style="margin-bottom: 20px;"></div>
         </div>
       </div>
       <div class="mobile-only" style="margin-bottom: 16px;">
