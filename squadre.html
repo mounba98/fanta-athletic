@@ -1815,11 +1815,6 @@
         renderEditor();
       };
       
-      $('#undoLineup').onclick = ()=>{
-        const snap = state.snapshots[state.selectedTeamIdx];
-        if (!canWrite) { return; }
-        if (snap){ t.lineup = (snap.lineup||[]).slice(); t.captain = snap.captain||null; saveTeams(); renderEditor(); }
-      };
 
       // Mobile: populate team selector and confirm button
       const sel = document.getElementById('teamSelectMobile');
