@@ -55,12 +55,12 @@
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
     .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
-    .left-column { display: flex; flex-direction: column; gap: 16px; }
-    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+    .left-column { display: flex; flex-direction: column; gap: 16px; max-width: 400px; width: 100%; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; min-width: 0; }
     .meta-controls { display: flex; align-items: flex-start; gap: 20px; }
     .field-bench-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
-    #colPool { max-width: 100%; }
-    #playersPool { max-width: 100%; }
+    #colPool { max-width: 400px; width: 100%; }
+    #playersPool { max-width: 400px; width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
     .meta-left .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin: 0 !important; }
     .meta-left .row select { min-width: 160px; }
@@ -448,7 +448,7 @@
           <div class="row meta-controls">
             <select id="giornataSel" class="input"></select>
           </div>
-          <div id="logoNameContainer" style="display:none;">
+          <div id="logoNameContainer" style="display:none; max-width: 400px;">
             <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
             <div class="row" style="gap:10px; align-items:center;">
               <div id="logoBox" style="margin-left: 0;">Carica logo</div>
