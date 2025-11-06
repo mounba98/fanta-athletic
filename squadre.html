@@ -1202,8 +1202,15 @@
     }
 
     function renderEditor(){
+      // Fallback: se selectedTeamIdx non è valido, usa 0
+      if (typeof state.selectedTeamIdx !== 'number' || state.selectedTeamIdx < 0 || state.selectedTeamIdx >= (state.teams?.length || 0)) {
+        state.selectedTeamIdx = 0;
+      }
       const t = state.teams[state.selectedTeamIdx];
-      if (!t) return;
+      if (!t) {
+        console.warn('⚠️ renderEditor: team non trovato, selectedTeamIdx:', state.selectedTeamIdx, 'teams length:', state.teams?.length);
+        return;
+      }
       renderTopPlayersCard(t);
       const locked = isLockedAuto();
       const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin);
