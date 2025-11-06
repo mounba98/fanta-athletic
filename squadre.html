@@ -1759,6 +1759,29 @@
       } }
       const btnReset = $('#resetTeam'); if (btnReset) btnReset.onclick = ()=>{ /* hidden by design */ };
       $('#clearLineup').onclick = ()=>{ if (!canWrite) { return; } t.lineup=[null,null,null,null,null]; saveTeams(); renderEditor(); };
+      
+      // Coach selection handler
+      window.selectCoach = function(coachId) {
+        const t = state.teams[state.selectedTeamIdx];
+        if (!t) return;
+        const canSelectCoach = state.isAdmin || ((state.user && state.userTeamIdx===state.selectedTeamIdx) && (!Array.isArray(t.coach_ids) || t.coach_ids.length===0));
+        if (!canSelectCoach) return;
+        if (t.coach_ids.includes(coachId)) {
+          // Deseleziona se già selezionato
+          t.coach_ids = t.coach_ids.filter(id => id !== coachId);
+        } else {
+          // Aggiungi (max 3)
+          if (t.coach_ids.length < 3) {
+            t.coach_ids.push(coachId);
+          } else {
+            toast('Massimo 3 allenatori per squadra');
+            return;
+          }
+        }
+        saveTeams();
+        renderEditor();
+      };
+      
       $('#undoLineup').onclick = ()=>{
         const snap = state.snapshots[state.selectedTeamIdx];
         if (!canWrite) { return; }
