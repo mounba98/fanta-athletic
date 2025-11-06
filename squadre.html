@@ -56,13 +56,7 @@
     .meta-podium { align-self: center; }
     .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; }
-    .top-row { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; margin-bottom: 20px; }
-    .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
-    .podium-section { display: flex; justify-content: flex-end; align-items: flex-start; }
-    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
-    .field-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
-    .pitch { max-width: 600px; margin: 0 !important; }
-    #benchStrip { max-width: 600px; width: 100%; margin: 0 !important; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; }
     #colPool { max-width: 100%; }
     #playersPool { max-width: 100%; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
@@ -173,7 +167,7 @@
     }
 
     /* Pitch and DnD - Uniformato con formazioni */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; margin: 0 auto; }
     .pitch-grid { display:grid; gap: 14px; margin-top: 10px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -446,11 +440,8 @@
     <section class="panel" id="editor" style="margin-top: 8px;">
       <div class="main-layout desktop-only">
         <div class="left-column">
-          <div class="top-row">
-            <div class="row meta-controls">
-              <select id="giornataSel" class="input"></select>
-            </div>
-            <div class="coach-section" id="teamMeta"></div>
+          <div class="row meta-controls">
+            <select id="giornataSel" class="input"></select>
           </div>
           <div id="logoNameContainer" style="display:none;">
             <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
@@ -473,45 +464,40 @@
           </div>
         </div>
         <div class="right-column">
-          <div class="podium-section" id="podiumContainer">
-            <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
-              <h3>🌟 Top 3 giocatori (stagione)</h3>
-              <div id="topPlayersList"></div>
-              <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
-            </div>
+          <div id="teamMeta"></div>
+          <div class="top-players-card" id="topPlayersCard" style="display:none; margin-bottom:20px;">
+            <h3>🌟 Top 3 giocatori (stagione)</h3>
+            <div id="topPlayersList"></div>
+            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
           </div>
-          <div class="field-section">
-            <div>
-              <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-              <div class="pitch">
-                <div class="pitch-grid" id="pitchGrid">
-                  <div class="line two">
-                    <div class="slot" data-slot="0"></div>
-                    <div class="slot" data-slot="1"></div>
-                  </div>
-                  <div class="line two">
-                    <div class="slot" data-slot="2"></div>
-                    <div class="slot" data-slot="3"></div>
-                  </div>
-                  <div class="line one">
-                    <div class="slot" data-slot="4"></div>
-                  </div>
+          <div>
+            <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+            <div class="pitch">
+              <div class="pitch-grid" id="pitchGrid">
+                <div class="line two">
+                  <div class="slot" data-slot="0"></div>
+                  <div class="slot" data-slot="1"></div>
                 </div>
-                <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+                <div class="line two">
+                  <div class="slot" data-slot="2"></div>
+                  <div class="slot" data-slot="3"></div>
+                </div>
+                <div class="line one">
+                  <div class="slot" data-slot="4"></div>
+                </div>
               </div>
-              <div class="actions-grid" style="margin:8px 0; justify-content: flex-start;">
-                <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-                <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-              </div>
+              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
             </div>
-            <div style="width: 100%;">
-              <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
-              <div id="benchStrip" class="strip"></div>
-              <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
-                <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
-                <div class="role-body">
-                  <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
-                </div>
+            <div class="actions-grid" style="margin:8px 0;">
+              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+              <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+            </div>
+            <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+            <div id="benchStrip" class="strip"></div>
+            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
+              <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
+              <div class="role-body">
+                <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
               </div>
             </div>
           </div>
@@ -1375,41 +1361,50 @@
       }
       
       $('#teamMeta').innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          <div class="muted" style="margin:0 0 4px; font-size:14px; font-weight:700;">Allenatori</div>
-          <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
-            ${state.coaches.map(c=> {
-              const coachName = c.nome || c.name || c.coach_id || 'Coach';
-              let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
-              // Fallback per Tommy e Trendiu
-              if (!coachPhoto && (coachName === 'Tommy' || c.coach_id === 'tommy' || c.coach_id?.toLowerCase() === 'tommy')) {
-                coachPhoto = 'resources/tommy_guardu.png';
-              }
-              if (!coachPhoto && (coachName === 'Trendiu' || c.coach_id === 'trendiu' || c.coach_id?.toLowerCase() === 'trendiu')) {
-                coachPhoto = 'resources/trendiu_athletic.jpg';
-              }
-              const coachInitials = coachName.split(/\s+/).map(n => n[0]).join('').toUpperCase().substring(0, 2);
-              const isSelected = t.coach_ids.includes(c.coach_id);
-              return `
-                <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor: ${canSelectCoach ? 'pointer' : 'default'};" 
-                     ${canSelectCoach ? `onclick="selectCoach('${c.coach_id}')"` : ''}
-                     class="coach-photo-item ${isSelected ? 'coach-selected' : ''}">
-                  <div style="width:100px; height:100px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:3px solid ${isSelected?'var(--primary)':'rgba(148,163,184,0.3)'}; transition: all 0.2s ease; ${canSelectCoach ? 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);' : ''}" 
-                       ${canSelectCoach ? `onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.2)';"` : ''}
-                       ${canSelectCoach ? `onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';"` : ''}>
-                    ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:32px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:32px; font-weight:700;">${coachInitials}</span>`}
+        <div class="grid2">
+          <div>
+            <div class="muted" style="margin:0 0 8px;">Allenatori</div>
+            <div class="row" style="gap:40px; flex-wrap:wrap; justify-content:flex-start; margin:0;">
+              ${state.coaches.map(c=> {
+                const coachName = c.nome || c.name || c.coach_id || 'Coach';
+                let coachPhoto = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
+                // Fallback per Tommy e Trendiu
+                if (!coachPhoto && (coachName === 'Tommy' || c.coach_id === 'tommy' || c.coach_id?.toLowerCase() === 'tommy')) {
+                  coachPhoto = 'resources/tommy_guardu.png';
+                }
+                if (!coachPhoto && (coachName === 'Trendiu' || c.coach_id === 'trendiu' || c.coach_id?.toLowerCase() === 'trendiu')) {
+                  coachPhoto = 'resources/trendiu_athletic.jpg';
+                }
+                const coachInitials = coachName.split(/\s+/).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                const isSelected = t.coach_ids.includes(c.coach_id);
+                return `
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor: ${canSelectCoach ? 'pointer' : 'default'};" 
+                       ${canSelectCoach ? `onclick="selectCoach('${c.coach_id}')"` : ''}
+                       class="coach-photo-item ${isSelected ? 'coach-selected' : ''}">
+                    <div style="width:100px; height:100px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:3px solid ${isSelected?'var(--primary)':'rgba(148,163,184,0.3)'}; transition: all 0.2s ease; ${canSelectCoach ? 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);' : ''}" 
+                         ${canSelectCoach ? `onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.2)';"` : ''}
+                         ${canSelectCoach ? `onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';"` : ''}>
+                      ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:32px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:32px; font-weight:700;">${coachInitials}</span>`}
+                    </div>
+                    <span style="font-size:12px; color:var(--text); font-weight:${isSelected ? '700' : '500'};">${escapeHtml(coachName)}</span>
                   </div>
-                  <span style="font-size:12px; color:var(--text); font-weight:${isSelected ? '700' : '500'};">${escapeHtml(coachName)}</span>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          <div style="margin-top:16px;">
-            <div class="muted" style="margin-bottom:4px; font-size:13px; font-weight:700;">Utenti squadra</div>
-            <div class="muted" id="ownersList" style="font-size:12px; line-height:1.6;">Caricamento…</div>
+                `;
+              }).join('')}
+            </div>
+            <div style="margin-top:16px;">
+              <div class="muted" style="margin-bottom:4px;">Accesso</div>
+              <div>${ownerInfo}</div>
+              <div class="muted" id="ownersList" style="margin-top:6px;">Allenatori: …</div>
+            </div>
           </div>
         </div>
       `;
+      
+      // async owners list
+      fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
+        const el = document.getElementById('ownersList'); if (!el) return;
+        el.textContent = arr.length? `Allenatori: ${arr.join(', ')}` : 'Allenatori: —';
+      });
       
       // async owners list - mostra nome utente invece di email
       fetchOwnersForTeam(state.selectedTeamIdx).then(async (arr)=>{
