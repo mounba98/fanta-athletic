@@ -1437,14 +1437,14 @@
       const role = state.isAdmin? 'Admin' : (state.user ? (state.userTeamIdx===state.selectedTeamIdx? 'Proprietario' : 'Utente') : 'Ospite');
       const display = state.userDisplayName || (state.user?.email||'');
       const ownerInfo = `<strong>${role}</strong>${display? ' &bull; <strong>'+escapeHtml(display)+'</strong>' : ''}`;
-      // Aggiorna logo e nome squadra in meta-left
+      // Aggiorna logo e nome squadra nella colonna centrale
       const logoNameContainer = document.getElementById('logoNameContainer');
       if (logoNameContainer) {
         const logoBox = document.getElementById('logoBox');
         const teamNameInput = document.getElementById('teamName');
         const teamLogoInput = document.getElementById('teamLogoInput');
         if (logoBox) {
-          logoBox.innerHTML = logo ? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>';
+          logoBox.innerHTML = logo ? `<img src="${logo}" alt="logo" style="width:100%; height:100%; object-fit:cover;"/>` : '<strong class="muted">Carica logo</strong>';
         }
         if (teamNameInput) {
           teamNameInput.value = t.name || '';
@@ -1453,7 +1453,9 @@
         if (teamLogoInput) {
           teamLogoInput.disabled = !canWrite;
         }
-        logoNameContainer.style.display = 'block';
+        logoNameContainer.style.display = 'flex';
+        logoNameContainer.style.flexDirection = 'column';
+        logoNameContainer.style.alignItems = 'center';
       }
       
       // Coach section nella colonna destra
