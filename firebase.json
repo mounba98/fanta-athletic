@@ -15,11 +15,14 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
+    "redirects": [
       {
-        "source": "**/*.{js,css,png,jpg,jpeg,gif,svg,ico,woff,woff2,ttf,eot,json}",
-        "destination": "/$1"
-      },
+        "source": "/public/:path*",
+        "destination": "/:path*",
+        "type": 301
+      }
+    ],
+    "rewrites": [
       {
         "source": "**",
         "destination": "/index.html"
@@ -27,7 +30,7 @@
     ],
     "headers": [
       {
-        "source": "**/*.js",
+        "source": "**/*.@(js|mjs)",
         "headers": [
           {
             "key": "Content-Type",
