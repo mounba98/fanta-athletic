@@ -54,9 +54,9 @@
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
-    .main-layout { display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; align-items: start; }
+    .main-layout { display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 0; }
     .left-column { display: flex; flex-direction: column; gap: 16px; max-width: 400px; width: 100%; }
-    .right-column { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; min-width: 0; flex: 1; }
+    .right-column { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; min-width: 0; flex: 1; margin-top: 0; padding-top: 0; }
     .meta-controls { display: flex; align-items: flex-start; gap: 20px; }
     #colPool { max-width: 400px; width: 100%; }
     #playersPool { max-width: 400px; width: 100%; }
@@ -441,7 +441,7 @@
       <div class="list" id="teams"></div>
     </section>
 
-    <section class="panel" id="editor" style="margin-top: 8px;">
+    <section class="panel" id="editor" style="margin-top: 0; padding-top: 8px;">
       <div class="main-layout desktop-only">
         <div class="left-column">
           <div class="row meta-controls">
