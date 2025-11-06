@@ -522,75 +522,67 @@
       <div class="list" id="teams"></div>
     </section>
 
-    <section class="panel" id="editor" style="margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 22px; padding-left: 22px; padding-right: 22px;">
-      <div class="main-layout desktop-only" style="margin-top: 0; padding-top: 0;">
-        <div class="left-column">
-          <div class="row meta-controls">
-            <select id="giornataSel" class="input"></select>
-          </div>
-          <div id="lockStatus" class="muted" aria-live="polite" style="font-size:12px;"></div>
-          <div id="logoNameContainer" style="display:none; max-width: 400px;">
-            <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Logo squadra</div>
-            <div class="row" style="gap:10px; align-items:center;">
-              <div id="logoBox" style="margin-left: 0;">Carica logo</div>
-              <div style="flex:1;">
-                <div class="muted" style="margin-bottom:4px;">Nome squadra</div>
-                <input id="teamName" class="input" value="" />
-              </div>
-            </div>
-            <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" />
-          </div>
-          <div id="colPool">
-            <div class="sectionh">Rosa (11)</div>
-            <div class="row" style="margin-bottom:8px;">
-              <input id="playerSearch" placeholder="Cerca giocatori..." class="input" style="max-width:100%;" />
-              <button class="btn btn-secondary btn-sm" id="addSelected">Aggiungi giocatori</button>
-            </div>
-            <div class="list" id="playersPool"></div>
-          </div>
+    <section class="panel center-column desktop-only" id="editor" style="margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 22px; padding-left: 22px; padding-right: 22px;">
+      <div class="row meta-controls">
+        <select id="giornataSel" class="input"></select>
+      </div>
+      <div id="lockStatus" class="muted" aria-live="polite" style="font-size:12px;"></div>
+      <div id="logoNameContainer" style="display:none;">
+        <div class="muted" style="font-size:16px; font-weight:800; margin-bottom:8px;">Nome squadra</div>
+        <input id="teamName" class="input" value="" />
+      </div>
+      <div id="teamMeta" style="margin-bottom: 20px;"></div>
+      <div id="colPool">
+        <div class="sectionh">Rosa (11)</div>
+        <div class="row" style="margin-bottom:8px;">
+          <input id="playerSearch" placeholder="Cerca giocatori..." class="input" style="max-width:100%;" />
+          <button class="btn btn-secondary btn-sm" id="addSelected">Aggiungi giocatori</button>
         </div>
-        <div class="right-column" style="padding-top: 0 !important;">
-          <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0 0 12px 0;">
-            <h3>🌟 Top 3 giocatori (stagione)</h3>
-            <div id="topPlayersList"></div>
-            <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
-          </div>
-          <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 0 !important; padding-top: 0 !important;">
-            <div class="sectionh" style="margin-top:0 !important; padding-top: 0 !important;">Titolari (5 a 5)</div>
-            <div class="pitch" style="margin: 0 !important; padding-top: 0 !important;">
-              <div class="pitch-grid" id="pitchGrid">
-                <div class="line one">
-                  <div class="slot" data-slot="0"></div>
-                </div>
-                <div class="line two">
-                  <div class="slot" data-slot="1"></div>
-                  <div class="slot" data-slot="2"></div>
-                </div>
-                <div class="line two">
-                  <div class="slot" data-slot="3"></div>
-                  <div class="slot" data-slot="4"></div>
-                </div>
-              </div>
-              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+        <div class="list" id="playersPool"></div>
+      </div>
+    </section>
+    
+    <section class="panel right-column desktop-only" id="rightPanel" style="margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 22px; padding-left: 22px; padding-right: 22px;">
+      <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0 0 20px 0;">
+        <h3>🌟 Top 3 giocatori (stagione)</h3>
+        <div id="topPlayersList"></div>
+        <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
+      </div>
+      <div id="coachSection" style="margin-bottom: 20px;"></div>
+      <div style="display: flex; flex-direction: column; align-items: flex-start; margin-top: 0 !important; padding-top: 0 !important;">
+        <div class="sectionh" style="margin-top:0 !important; padding-top: 0 !important;">Titolari (5 a 5)</div>
+        <div class="pitch" style="margin: 0 !important; padding-top: 0 !important;">
+          <div class="pitch-grid" id="pitchGrid">
+            <div class="line one">
+              <div class="slot" data-slot="0"></div>
             </div>
-            <div class="actions-grid" style="margin:8px 0;">
-              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-              <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+            <div class="line two">
+              <div class="slot" data-slot="1"></div>
+              <div class="slot" data-slot="2"></div>
+            </div>
+            <div class="line two">
+              <div class="slot" data-slot="3"></div>
+              <div class="slot" data-slot="4"></div>
             </div>
           </div>
-          <div style="width: 420px; display: flex; flex-direction: column; align-items: flex-end;">
-            <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
-            <div id="benchStrip" class="strip"></div>
-            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; max-width: 400px;">
-              <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
-              <div class="role-body">
-                <div class="roster" id="teamRoster" style="max-width: 400px;"></div>
-              </div>
-            </div>
-          </div>
-          <div id="teamMeta" style="margin-bottom: 20px;"></div>
+          <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+        </div>
+        <div class="actions-grid" style="margin:8px 0;">
+          <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+          <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
         </div>
       </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; margin-top: 12px;">
+        <div class="sectionh">Panchina / Rosa (trascina sul campo)</div>
+        <div id="benchStrip" class="strip"></div>
+        <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; width: 100%;">
+          <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
+          <div class="role-body">
+            <div class="roster" id="teamRoster"></div>
+          </div>
+        </div>
+      </div>
+    </section>
       <div class="mobile-only" style="margin-bottom: 16px;">
         <div class="row meta-controls">
           <select id="giornataSel" class="input"></select>
