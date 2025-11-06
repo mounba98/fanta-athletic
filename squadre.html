@@ -179,13 +179,14 @@
     }
 
     /* Pitch and DnD - Uniformato con formazioni */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 100%; margin: 0 auto !important; }
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 24px 20px 20px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 600px; width: 100%; margin: 0 auto !important; }
     .pitch-grid { display:grid; gap: 14px; margin-top: 10px; }
     .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
     .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 40%; margin: 0 auto; }
     .slot { min-height: 140px; height: 140px; width: 100%; max-width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.1); border:2px dashed rgba(255,255,255,0.45); border-radius:16px; display:flex; align-items:stretch; justify-content:center; padding:12px; text-align:left; transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease, border-color 0.2s ease; }
-    .slot-card.draggable { width: 100%; height: 100%; min-height: 140px; max-height: 140px; }
+    .slot-card.draggable { width: 100%; height: 100%; min-height: 140px; max-height: 140px; box-sizing: border-box; }
+    .slot-card-main { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; }
     .slot.filled { background: rgba(255,255,255,0.16); border-style: solid; }
     .slot.captain-slot { background: rgba(253, 224, 71, 0.16); border-color: rgba(253, 224, 71, 0.55); }
     .slot.captain-active { background: linear-gradient(135deg, rgba(253, 224, 71, 0.28), rgba(250, 204, 21, 0.35)); border-color: rgba(250, 204, 21, 0.85); box-shadow: 0 16px 30px rgba(250, 204, 21, 0.25); }
@@ -223,12 +224,12 @@
     }
 
     .slot-avatar {
-      width: 88px;
-      height: 88px;
-      min-width: 88px;
-      min-height: 88px;
-      max-width: 88px;
-      max-height: 88px;
+      width: 88px !important;
+      height: 88px !important;
+      min-width: 88px !important;
+      min-height: 88px !important;
+      max-width: 88px !important;
+      max-height: 88px !important;
       border-radius: 18px;
       overflow: hidden;
       border: 2px solid rgba(255,255,255,0.32);
