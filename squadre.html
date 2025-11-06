@@ -100,8 +100,13 @@
       max-width: 140px;
     }
     #topPlayersList > div {
-      max-width: 320px;
+      max-width: 300px;
       margin: 0 auto;
+      width: 100%;
+    }
+    #topPlayersList > div > div {
+      max-width: 100%;
+      width: 100%;
     }
     .top-player-podium.rank-1 {
       background: linear-gradient(135deg,#fde68a 0%,#fbbf24 45%,#f59e0b 100%);
@@ -750,7 +755,7 @@
       // Podio: 2° a sinistra, 1° al centro, 3° a destra (ordinati per punti decrescenti)
       const [first, second, third] = entries;
       list.innerHTML = `
-        <div style="display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin-top: 8px;">
+        <div style="display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-top: 8px; max-width: 100%; width: 100%;">
           ${second ? (() => {
             const photo = getPlayerPhoto(second.player) || 'resources/logo.png';
             const label = escapeHtml(getPlayerDisplayLabel(second.player));
@@ -792,7 +797,7 @@
             const label = escapeHtml(getPlayerDisplayLabel(third.player));
             const role = getRoleAbbr(third.player.role || third.player.ruolo);
             return `
-              <div class="top-player-podium rank-3" style="flex: 0 0 110px; min-height: 130px; display: flex; flex-direction: column; justify-content: flex-end;">
+              <div class="top-player-podium rank-3" style="flex: 0 0 110px; min-height: 120px; display: flex; flex-direction: column; justify-content: flex-end;">
                 <div style="text-align: center; margin-bottom: 8px;">
                   <span class="top-player-rank" style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.25); font-size: 14px; line-height: 24px;">3</span>
                 </div>
