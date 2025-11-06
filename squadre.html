@@ -54,9 +54,9 @@
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
-    .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
+    .main-layout { display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; max-width: 400px; width: 100%; }
-    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; min-width: 0; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; min-width: 0; flex: 1; }
     .meta-controls { display: flex; align-items: flex-start; gap: 20px; }
     .field-bench-section { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
     #colPool { max-width: 400px; width: 100%; }
