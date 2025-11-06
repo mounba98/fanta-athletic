@@ -53,11 +53,12 @@
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
     .meta-wrap { display:grid; grid-template-columns: 280px 1fr 320px; column-gap: 24px; align-items:start; margin: 12px 0 28px; }
     .meta-podium { align-self: center; }
-    .main-layout { display: grid; grid-template-columns: 400px 1fr; gap: 24px; align-items: start; margin-bottom: 24px; }
+    .main-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
     .left-column { display: flex; flex-direction: column; gap: 16px; }
-    .right-column { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: start; }
-    .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 280px; }
-    .podium-section { display: flex; justify-content: flex-end; align-items: center; }
+    .right-column { display: flex; flex-direction: column; gap: 20px; }
+    .right-top { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; }
+    .coach-section { display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
+    .podium-section { display: flex; justify-content: flex-end; align-items: flex-start; }
     .meta-left { display:flex; flex-direction:column; gap:12px; }
     .meta-left .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin: 0 !important; }
     .meta-left .row select { min-width: 160px; }
@@ -461,8 +462,8 @@
           </div>
         </div>
         <div class="right-column">
-          <div class="coach-section" id="teamMeta"></div>
-          <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="right-top">
+            <div class="coach-section" id="teamMeta"></div>
             <div class="podium-section" id="podiumContainer">
               <div class="top-players-card" id="topPlayersCard" style="display:none; margin:0;">
                 <h3>🌟 Top 3 giocatori (stagione)</h3>
@@ -470,36 +471,36 @@
                 <div class="top-players-empty" id="topPlayersEmpty" style="display:none;">Nessun dato disponibile</div>
               </div>
             </div>
-            <div>
-              <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
-              <div class="pitch">
-                <div class="pitch-grid" id="pitchGrid">
-                  <div class="line two">
-                    <div class="slot" data-slot="0"></div>
-                    <div class="slot" data-slot="1"></div>
-                  </div>
-                  <div class="line two">
-                    <div class="slot" data-slot="2"></div>
-                    <div class="slot" data-slot="3"></div>
-                  </div>
-                  <div class="line one">
-                    <div class="slot" data-slot="4"></div>
-                  </div>
+          </div>
+          <div>
+            <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+            <div class="pitch">
+              <div class="pitch-grid" id="pitchGrid">
+                <div class="line two">
+                  <div class="slot" data-slot="0"></div>
+                  <div class="slot" data-slot="1"></div>
                 </div>
-                <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
-              </div>
-              <div class="actions-grid" style="margin:8px 0;">
-                <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
-                <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
-                <button class="btn btn-secondary desktop-only" id="undoLineup">Annulla modifiche titolari</button>
-              </div>
-              <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
-              <div id="benchStrip" class="strip"></div>
-              <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px;">
-                <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
-                <div class="role-body">
-                  <div class="roster" id="teamRoster"></div>
+                <div class="line two">
+                  <div class="slot" data-slot="2"></div>
+                  <div class="slot" data-slot="3"></div>
                 </div>
+                <div class="line one">
+                  <div class="slot" data-slot="4"></div>
+                </div>
+              </div>
+              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+            </div>
+            <div class="actions-grid" style="margin:8px 0;">
+              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+              <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
+              <button class="btn btn-secondary desktop-only" id="undoLineup">Annulla modifiche titolari</button>
+            </div>
+            <div class="sectionh" style="margin-top:12px;">Panchina / Rosa (trascina sul campo)</div>
+            <div id="benchStrip" class="strip"></div>
+            <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px;">
+              <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
+              <div class="role-body">
+                <div class="roster" id="teamRoster"></div>
               </div>
             </div>
           </div>
@@ -1933,6 +1934,7 @@
   <script src="resources/lazy-load.js?v=20251020"></script>
 </body>
 </html>
+
 
 
 
