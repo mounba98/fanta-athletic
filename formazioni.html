@@ -1815,44 +1815,7 @@
       const poolMobile = null;
       const needle = '';
       const needleMobile = '';
-      const searchNeedle = needle || needleMobile;
-      const grouped = new Map(['Portiere','Difensore','Centrocampista','Attaccante'].map(r=>[r,[]]));
-      state.players.forEach(p=>{
-        const text = (p.nome_completo+' '+(p.nickname||'')).toLowerCase();
-        if (!searchNeedle || text.includes(searchNeedle)) grouped.get(p.role).push(p);
-      });
-      const playerListHTML = Array.from(grouped.entries()).map(([role, list])=>{
-        if (!list.length) return '';
-        const sorted = list.slice().sort((a,b)=>{
-          const sa = a.nome_completo.split(/\s+/).pop().toLowerCase();
-          const sb = b.nome_completo.split(/\s+/).pop().toLowerCase();
-          return sa.localeCompare(sb,'it');
-        });
-        return `
-          <div class="role-section" data-role-group="${role}">
-            <div class="role-header">${role}<span>▾</span></div>
-            <div class="role-body">
-              <div class="list">
-                ${sorted.map(p=> `
-                  <div class="row player-pick" data-pid="${p.player_id}" style="gap:8px; align-items:center; justify-content:space-between; padding:6px 8px; border:1px solid #e7edf3; border-radius:8px;">
-                    <label class="row" style="gap:8px; align-items:center; flex:1; min-width:0;">
-                      <input type="checkbox" data-pid="${p.player_id}" ${t.roster.includes(p.player_id)?'checked':''} ${!canWrite?'disabled':''} />
-                      <div style="flex:1; min-width:0;">
-                        <div style="font-weight:600;">${getPlayerDisplayLabel(p, 'initial.surname')}${p.nickname? ' • @'+p.nickname:''}</div>
-                        <div style="font-size:11px; color:var(--muted);">${p.team || ''}</div>
-                      </div>
-                    </label>
-                    <span class="tag">${p.role[0]}</span>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      if (pool) pool.innerHTML = playerListHTML;
-      if (poolMobile) poolMobile.innerHTML = playerListHTML;
+      // Rimossa sezione playersPool - i giocatori si gestiscono da squadre.html
 
       // Roster accordion - assicurati che venga chiamato dopo il rendering
       setTimeout(() => {
