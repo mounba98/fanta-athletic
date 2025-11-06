@@ -691,15 +691,7 @@
       <!-- Info squadra -->
       <div class="desktop-only" id="teamMeta" style="background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);"></div>
       <div class="grid2" style="margin-top:0; align-items:start;">
-        <div class="desktop-only" id="colPool">
-          <div class="sectionh">Rosa (11)</div>
-          <div class="row" style="margin-bottom:8px;">
-            <input id="playerSearch" placeholder="Cerca giocatori..." class="input" style="max-width:100%;" />
-            <button class="btn btn-secondary btn-sm" id="addSelected">Aggiungi giocatori</button>
-          </div>
-          <div class="list" id="playersPool"></div>
-        </div>
-        <div id="colRight">
+        <div id="colRight" style="width: 100%;">
           <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
           <div class="pitch">
             <div class="pitch-grid" id="pitchGrid">
@@ -1818,10 +1810,11 @@
       });
 
       // Player pool with checkbox selection (desktop)
-      const pool = $('#playersPool');
-      const poolMobile = $('#playersPoolMobile');
-      const needle = ($('#playerSearch').value||'').toLowerCase();
-      const needleMobile = ($('#playerSearchMobile')?.value||'').toLowerCase();
+      // Rimossa sezione playersPool - i giocatori si gestiscono da squadre.html
+      const pool = null;
+      const poolMobile = null;
+      const needle = '';
+      const needleMobile = '';
       const searchNeedle = needle || needleMobile;
       const grouped = new Map(['Portiere','Difensore','Centrocampista','Attaccante'].map(r=>[r,[]]));
       state.players.forEach(p=>{
@@ -1861,48 +1854,28 @@
       if (pool) pool.innerHTML = playerListHTML;
       if (poolMobile) poolMobile.innerHTML = playerListHTML;
 
-      if ($('#playerSearch')) $('#playerSearch').oninput = ()=> { renderEditor(); };
-      if ($('#playerSearchMobile')) $('#playerSearchMobile').oninput = ()=> { renderEditor(); };
-      // Accordion toggles (desktop e mobile)
-      $$('#playersPool .role-section .role-header, #playersPoolMobile .role-section .role-header').forEach(h=>{
-        h.addEventListener('click', ()=>{
-          h.parentElement.classList.toggle('collapsed');
-        });
-      });
-      // Roster accordion
-      const rosterHeader = document.querySelector('#teamRosterSection .role-header');
-      if (rosterHeader){
-        rosterHeader.addEventListener('click', (e)=>{
-          e.preventDefault();
-          e.stopPropagation();
-          const section = rosterHeader.parentElement;
-          section.classList.toggle('collapsed');
-          // Aggiorna icona (l'ultimo span, non quello con il conteggio)
-          const spans = rosterHeader.querySelectorAll('span');
-          const iconSpan = spans[spans.length - 1]; // Prendi l'ultimo span (icona)
-          if (iconSpan && !iconSpan.id) { // Escludi quello con id="rosterCount"
-            iconSpan.textContent = section.classList.contains('collapsed') ? '▾' : '▴';
-          }
-        });
-      }
-      // row-wide toggle on click
-      $$('#playersPool .player-pick').forEach(row=>{
-        row.addEventListener('click', (e)=>{
-          if (e.target && (e.target.tagName==='INPUT' || e.target.tagName==='LABEL')) return;
-          const cb = row.querySelector('input[type="checkbox"]');
-          if (!cb || cb.disabled) return;
-          cb.checked = !cb.checked;
-        });
-      });
-      $('#addSelected').onclick = ()=>{
-        if (!canWrite) { alert('Formazione bloccata o non hai permessi.'); return; }
-        const ticks = $$('#playersPool input[type="checkbox"]:checked');
-        const ids = ticks.map(x=>x.dataset.pid);
-        const unique = Array.from(new Set([...(t.roster||[]), ...ids]));
-        t.roster = unique.slice(0,11);
-        saveTeams();
-        renderEditor();
-      };
+      // Roster accordion - assicurati che venga chiamato dopo il rendering
+      setTimeout(() => {
+        const rosterHeader = document.querySelector('#teamRosterSection .role-header');
+        if (rosterHeader){
+          // Rimuovi listener esistenti per evitare duplicati
+          const newHeader = rosterHeader.cloneNode(true);
+          rosterHeader.parentNode.replaceChild(newHeader, rosterHeader);
+          // Aggiungi nuovo listener
+          newHeader.addEventListener('click', (e)=>{
+            e.preventDefault();
+            e.stopPropagation();
+            const section = newHeader.parentElement;
+            section.classList.toggle('collapsed');
+            // Aggiorna icona (l'ultimo span, non quello con il conteggio)
+            const spans = newHeader.querySelectorAll('span');
+            const iconSpan = spans[spans.length - 1]; // Prendi l'ultimo span (icona)
+            if (iconSpan && !iconSpan.id) { // Escludi quello con id="rosterCount"
+              iconSpan.textContent = section.classList.contains('collapsed') ? '▾' : '▴';
+            }
+          });
+        }
+      }, 100);
 
       // Roster list (management only; no drag here)
       const roster = $('#teamRoster');
