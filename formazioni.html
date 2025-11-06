@@ -266,7 +266,7 @@
       justify-content: center;
       overflow: hidden;
       flex-shrink: 0;
-      margin-left: 40px;
+      margin-left: 60px;
     }
 
     .coach-slot-mini img {
@@ -723,7 +723,6 @@
           <div>
             <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
             <div class="pitch">
-              <div class="coach-badge" id="coachBadge"></div>
               <div class="pitch-grid" id="pitchGrid">
                 <div class="line two">
                   <div class="slot" data-slot="0"></div>
@@ -733,8 +732,8 @@
                   <div class="slot" data-slot="2"></div>
                   <div class="slot" data-slot="3"></div>
                 </div>
-                <div class="line one" style="display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; padding-right: 0;">
-                   <div class="slot" data-slot="4"></div>
+                <div class="line one" style="display: flex; align-items: center; justify-content: flex-start; gap: 12px; position: relative; padding-right: 0;">
+                   <div class="slot" data-slot="4" style="flex: 0 0 auto;"></div>
                    <div class="coach-slot-mini" id="coachSlotMini" style="margin-left: auto; margin-right: 0;"></div>
                 </div>
               </div>
@@ -1804,22 +1803,6 @@
       // Fallback per Tommy: usa immagine locale se disponibile
       if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Tommy' || selectedCoach.coach_id === 'tommy' || selectedCoach.coach_id?.toLowerCase() === 'tommy')) {
         coachPhoto = 'resources/tommy_guardu.png';
-      }
-      // Coach badge nel campo
-      const coachBadgeEl = document.getElementById('coachBadge');
-      if (coachBadgeEl) {
-        if (selectedCoach) {
-          const coachName = selectedCoach.nome || selectedCoach.name || 'Coach';
-          const coachInitials = getInitials(coachName);
-          coachBadgeEl.innerHTML = `
-            <div class="coach-badge-visual">
-              ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" onerror="this.textContent='${coachInitials}'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center';"/>` : `<span>${coachInitials}</span>`}
-            </div>
-          `;
-          coachBadgeEl.style.display = 'flex';
-        } else {
-          coachBadgeEl.style.display = 'none';
-        }
       }
       // Coach slot mini vicino al capitano
       const coachSlotMiniEl = document.getElementById('coachSlotMini');
