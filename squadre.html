@@ -1969,6 +1969,18 @@
       renderEditor();
     });
 
+    // Calcola l'offset reale dello sticky in base all'altezza dell'header
+    (function(){
+      const header = document.querySelector('header');
+      const setOffset = ()=>{
+        const extra = 8; // piccolo respiro
+        const top = (header?.offsetHeight || 72) + extra;
+        document.documentElement.style.setProperty('--sticky-top', top + 'px');
+      };
+      setOffset();
+      window.addEventListener('resize', setOffset);
+    })();
+    
     async function boot(){
       await ensureLeagueReady();
       await loadPlayersAndCoaches();
