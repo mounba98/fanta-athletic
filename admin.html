@@ -380,9 +380,10 @@
   </div>
   
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js"></script>
   <script>
     if (!firebase.apps.length) {
@@ -396,6 +397,8 @@
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/theme.js?v=202510172227"></script>
   <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
   <script src="resources/mobile-menu.js?v=2025101803"></script>
   <script src="resources/bottom-nav.js?v=2025101802"></script>
 </body>

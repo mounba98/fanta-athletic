@@ -76,7 +76,8 @@
   </div>
   
   <!-- Firebase SDKs (senza auth guard) -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js?v=20251021-fix"></script>
   <script>
     // Disabilita auth guard PRIMA di qualsiasi altro script

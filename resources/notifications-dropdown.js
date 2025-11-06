@@ -214,6 +214,7 @@
         (error) => {
           console.warn('Notification listener error:', error.message);
           updateBadge(0);
+          renderNotifications([]); // Mostra "Nessuna notifica" invece di "Caricamento..."
         }
       );
   }

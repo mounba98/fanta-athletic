@@ -572,13 +572,14 @@
   </main>
 
   <footer class="footer">
-    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+    <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js" onerror="console.error('Errore caricamento firebase-storage-compat.js')"></script>
   <script src="resources/firebase-config.js?v=20251021-6"></script>
   <script src="resources/firebase.js"></script>
 
@@ -587,6 +588,8 @@
 
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const rawDb = window.__LEGACY_DB__ || null;
+    const leagueHelper = window.LeagueHelper || null;
     
     let currentUser = null;
     let isAdmin = false;
@@ -596,6 +599,16 @@
     let selectedVideoBlob = null; // compressed webm
     const MAX_VIDEO_SIZE_MB = 25;
     const MAX_VIDEO_DURATION_SEC = 60;
+
+    async function ensureLeagueReady(timeoutMs = 7000) {
+      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
+        try {
+          await leagueHelper.waitForLeague(timeoutMs);
+        } catch (err) {
+          console.warn('[bacheca] Timeout attesa lega:', err?.message || err);
+        }
+      }
+    }
 
     // Cropper for post images (16:9)
     const postCropModal = document.createElement('div');
@@ -669,10 +682,13 @@
         const adminDoc = await db.collection('admins').doc(user.uid).get();
         isAdmin = adminDoc.exists;
       } catch (e) {
-        console.log('Admin check failed:', e);
+        console.warn('Admin check failed:', e);
         isAdmin = false;
       }
-      
+      await ensureLeagueReady();
+      loadPosts();
+    });
+    window.addEventListener('league-changed', () => {
       loadPosts();
     });
 
@@ -939,7 +955,28 @@
       return 'general';
     }
 
+    async function buildPostsList(docs) {
+      const posts = [];
+      for (const doc of docs) {
+        const postData = { id: doc.id, ...doc.data() };
+        if (postData.authorName && postData.authorName.includes('@')) {
+          try {
+            const userDoc = await db.collection('users').doc(postData.authorUid).get();
+            if (userDoc.exists) {
+              const userData = userDoc.data();
+              postData.authorName = userData.display_name || userData.displayName || userData.nickname || postData.authorName.split('@')[0];
+            }
+          } catch (e) {
+            console.warn('Errore caricamento nome utente:', e);
+          }
+        }
+        posts.push(postData);
+      }
+      return posts;
+    }
+
     async function loadPosts() {
+      await ensureLeagueReady();
       if (postsUnsubscribe) postsUnsubscribe();
 
       let query = db.collection('posts').orderBy('timestamp', 'desc').limit(50);
@@ -949,29 +986,35 @@
       }
 
       postsUnsubscribe = query.onSnapshot(async (snapshot) => {
-        const posts = [];
-        
-        // Carica i post e aggiorna i nomi utente
-        for (const doc of snapshot.docs) {
-          const postData = { id: doc.id, ...doc.data() };
-          
-          // Se authorName è un'email, prova a recuperare il vero nome
-          if (postData.authorName && postData.authorName.includes('@')) {
-            try {
-              const userDoc = await db.collection('users').doc(postData.authorUid).get();
-              if (userDoc.exists) {
-                const userData = userDoc.data();
-                postData.authorName = userData.display_name || userData.displayName || userData.nickname || postData.authorName.split('@')[0];
-              }
-            } catch (e) {
-              console.log('Errore caricamento nome utente:', e);
+        let posts = await buildPostsList(snapshot.docs);
+
+        if (!posts.length && rawDb) {
+          try {
+            const legacySnap = await rawDb.collection('posts').orderBy('timestamp', 'desc').limit(50).get();
+            const legacyPosts = await buildPostsList(legacySnap.docs);
+            if (legacyPosts.length) {
+              renderPosts(legacyPosts);
+              return;
             }
+          } catch (err) {
+            console.warn('Fallback legacy posts failed:', err);
           }
-          
-          posts.push(postData);
         }
-        
+
         renderPosts(posts);
+      }, async (error) => {
+        console.error('Errore ascolto posts:', error);
+        if (error?.code === 'permission-denied' && rawDb) {
+          try {
+            const legacySnap = await rawDb.collection('posts').orderBy('timestamp', 'desc').limit(50).get();
+            const legacyPosts = await buildPostsList(legacySnap.docs);
+            renderPosts(legacyPosts);
+            return;
+          } catch (err) {
+            console.error('Errore caricamento posts legacy:', err);
+          }
+        }
+        renderPosts([]);
       });
     }
 

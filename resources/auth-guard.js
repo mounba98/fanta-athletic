@@ -78,15 +78,29 @@
    * Carica ultima lega vista dall'utente
    */
   async function loadLastLeague() {
+    // Se siamo in modalità legacy (permission denied), salta onboarding
+    if (window.__LEAGUE_PERMISSION_DENIED__) {
+      console.warn('[auth-guard] Legacy mode - skipping league loading and onboarding');
+      return;
+    }
+    
     const lastLeagueId = localStorage.getItem('last_league_id');
     
     if (!lastLeagueId) {
       // Prima volta: verifica se ha leghe
       const userLeagues = await getUserLeagues();
       
+      // Se dopo getUserLeagues siamo in legacy mode, non mostrare onboarding
+      if (window.__LEAGUE_PERMISSION_DENIED__) {
+        console.warn('[auth-guard] Permission denied after getUserLeagues - skipping onboarding');
+        return;
+      }
+      
       if (userLeagues.length === 0) {
-        // Nessuna lega → mostra onboarding
-        showOnboardingModal();
+        // Nessuna lega → mostra onboarding solo se non siamo in legacy mode
+        if (!window.__LEAGUE_PERMISSION_DENIED__) {
+          showOnboardingModal();
+        }
       } else {
         // Ha leghe ma nessuna selezionata → prendi la prima
         setCurrentLeague(userLeagues[0].id);
@@ -110,14 +124,53 @@
    */
   async function getUserLeagues() {
     try {
-      const snapshot = await firebase.firestore()
-        .collection('leagues')
-        .where('members', 'array-contains', window.currentUser.uid)
-        .get();
+      const db = firebase.firestore();
+      const user = window.currentUser;
+      if (!user) return [];
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // PRIMA: Prova a leggere la lega dal documento utente (funziona per non-admin)
+      try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          const currentLeagueId = userData.currentLeague || (userData.leagues && userData.leagues[0]);
+          
+          if (currentLeagueId) {
+            try {
+              const leagueDoc = await db.collection('leagues').doc(currentLeagueId).get();
+              if (leagueDoc.exists) {
+                const leagueData = leagueDoc.data();
+                // Verifica che l'utente sia effettivamente membro
+                if (leagueData.members && leagueData.members.includes(user.uid)) {
+                  return [{ id: leagueDoc.id, ...leagueData }];
+                }
+              }
+            } catch (err) {
+              console.warn('[auth-guard] Error loading league from user doc:', err);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[auth-guard] Error reading user doc:', err);
+      }
+      
+      // FALLBACK: Prova query (funziona solo per admin)
+      try {
+        const snapshot = await db.collection('leagues')
+          .where('members', 'array-contains', user.uid)
+          .get();
+        
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } catch (error) {
+        if (error?.code === 'permission-denied') {
+          console.warn('[auth-guard] Permission denied on leagues query - user may not have leagues');
+        } else {
+          console.error('[auth-guard] Error loading user leagues:', error);
+        }
+        return [];
+      }
     } catch (error) {
-      console.error('Error loading user leagues:', error);
+      console.error('[auth-guard] Error in getUserLeagues:', error);
       return [];
     }
   }
@@ -156,6 +209,11 @@
    */
   async function showOnboardingModal() {
     // Check if user is super admin - they don't need onboarding
+    if (window.__LEAGUE_PERMISSION_DENIED__) {
+      console.warn('[auth-guard] onboarding skipped: league access denied');
+      return;
+    }
+
     try {
       const adminDoc = await firebase.firestore().collection('admins').doc(window.currentUser.uid).get();
       if (adminDoc.exists) {

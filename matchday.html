@@ -22,6 +22,7 @@
     .tab { padding: 10px 16px; font-weight: 700; border-radius: 999px; border: 2px solid #c7d1db; background:#fff; cursor:pointer; }
     .tab.active { background:#e8f3fc; border-color: var(--primary); color: var(--primary); box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
     .rule { display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 6px 0; border-bottom:1px dashed #eee; }
+    .rule .count { display:inline-flex; min-width:32px; justify-content:center; font-weight:700; color: var(--text); }
     .rule:last-child { border-bottom: 0; }
     .chip { padding: 6px 10px; border-radius: 999px; border: 1px solid #dbe1e8; background: #fff; cursor: pointer; }
     .muted { color: var(--muted); font-size: 12px; }
@@ -43,8 +44,8 @@
     .role-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; background:#fff; transition: all 0.2s; }
     .role-section:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .role-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:800; user-select: none; padding: 4px; }
-    .role-header .role-info { display: flex; align-items: center; gap: 8px; }
-    .role-header .role-count { font-size: 12px; color: var(--muted); font-weight: 600; background: #f0f4f8; padding: 2px 8px; border-radius: 999px; transform: none !important; }
+    .role-header .role-info { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .role-header .role-count { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 600; background: #f0f4f8; padding: 2px 8px; border-radius: 999px; transform: none !important; }
     .role-header .role-arrow { transition: transform 0.2s; }
     .role-body { display:grid; gap:8px; margin-top:6px; }
     .role-section.collapsed .role-body { display:none; }
@@ -158,6 +159,7 @@
     :root.dark .curva-section { background: #1e293b; border-color: #334155; }
     :root.dark .role-title { color: #e2e8f0; }
     :root.dark .role-count { background: #334155; color: #94a3b8; }
+    :root.dark .rule .count { color: #e2e8f0; }
     :root.dark select, :root.dark input[type="date"], :root.dark input[type="text"] {
       background: #1e293b;
       border-color: #334155;
@@ -210,12 +212,13 @@
   </main>
 
   <footer class="footer">
-    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+    <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script src="resources/rules-loader.js?v=2025110301"></script>
   <script>
@@ -262,6 +265,17 @@
       const num = Number(raw);
       if (Number.isFinite(num)) return num;
       return 5;
+    }
+
+    // Ottieni leagueId corrente
+    function getCurrentLeagueId() {
+      if (window.currentLeague && window.currentLeague.id) {
+        return window.currentLeague.id;
+      }
+      const stored = localStorage.getItem('last_league_id');
+      if (stored) return stored;
+      if (window.DEFAULT_LEAGUE_ID) return window.DEFAULT_LEAGUE_ID;
+      return null;
     }
 
     const state = {
@@ -454,20 +468,23 @@
         // Loop G1→G38 finché trova prima giornata NON calcolata
         for (let i = 1; i <= 38; i++) {
           const gid = 'G' + i;
-          const doc = await window.db.collection('days').doc(gid).get();
+          const leagueId = getCurrentLeagueId();
+          const doc = leagueId ? 
+            await window.db.collection(`leagues/${leagueId}/days`).doc(gid).get() :
+            await window.db.collection('days').doc(gid).get();
           const computed = doc.exists && (doc.data()?.computed === true);
           
           if (!computed) {
             state.giornata = gid;
             const sel = document.getElementById('giornataSel');
             if (sel) sel.value = gid;
-            console.log('✅ Auto-selected giornata attiva:', gid);
+        
             return;
           }
         }
         
         // Se tutte calcolate, lascia G1
-        console.log('⚠️ Tutte giornate calcolate, uso G1');
+        
       } catch (error) {
         console.warn('Error auto-selecting giornata:', error);
       }
@@ -579,7 +596,10 @@
       // override with Firestore if available (con validazione)
       try{
         if (window.db){
-          const doc = await window.db.collection('days').doc(state.giornata).get();
+          const leagueId = getCurrentLeagueId();
+          const doc = leagueId ?
+            await window.db.collection(`leagues/${leagueId}/days`).doc(state.giornata).get() :
+            await window.db.collection('days').doc(state.giornata).get();
           if (doc.exists){
             const d = doc.data();
             
@@ -602,10 +622,13 @@
           }
           
           // Carica anche da matchday_temp (dati non ancora salvati definitivamente)
-          const tempDoc = await window.db.collection('matchday_temp').doc(state.giornata).get();
+          // leagueId già dichiarato sopra
+          const tempDoc = leagueId ?
+            await window.db.collection(`leagues/${leagueId}/matchday_temp`).doc(state.giornata).get() :
+            await window.db.collection('matchday_temp').doc(state.giornata).get();
           if (tempDoc.exists) {
             const tempData = tempDoc.data();
-            console.log('📥 Caricati dati temporanei da altro admin:', tempData.updatedBy);
+            
             
             // Merge con dati esistenti (temp ha priorità se più recente)
             if (tempData.players) {
@@ -630,7 +653,7 @@
       // Debug: verifica integrità dati curva prima di salvare
       const curvaKeys = Object.keys(state.selCurva);
       const curvaTotal = computeTotalRules(state.selCurva, normalizeCurvaRules({ rules: state.rules }));
-      console.log('💾 saveDay() - Curva:', curvaKeys.length, 'keys, totale:', curvaTotal.toFixed(2), 'pt');
+      
       
       // Salva localStorage (backup locale)
       localStorage.setItem(keyP(), JSON.stringify(state.selPlayers));
@@ -650,7 +673,11 @@
         const user = firebase.auth().currentUser;
         if (!user) return;
         
-        await window.db.collection('matchday_temp').doc(state.giornata).set({
+        const leagueId = getCurrentLeagueId();
+        const matchdayRef = leagueId ?
+          window.db.collection(`leagues/${leagueId}/matchday_temp`).doc(state.giornata) :
+          window.db.collection('matchday_temp').doc(state.giornata);
+        await matchdayRef.set({
           players: state.selPlayers,
           coaches: state.selCoaches,
           curva: state.selCurva,
@@ -659,7 +686,7 @@
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        console.log('✅ Dati salvati su Firestore matchday_temp');
+        
       } catch (error) {
         console.error('❌ Errore salvataggio Firestore:', error);
       }
@@ -684,7 +711,7 @@
     async function saveTeamResults(){
       if (!window.db) return;
       
-      console.log('📊 Calcolo risultati squadre per', state.giornata);
+      
       
       const prules = normalizePlayersRules({ rules: state.rules });
       const crules = normalizeCoachRules({ rules: state.rules });
@@ -692,6 +719,16 @@
       
       // Curva globale
       const curvaBase = computeTotalRules(state.selCurva, vrules);
+
+      // Assicura l'esistenza del documento risultato principale (metadati giornata)
+      try {
+        await window.db.collection('results').doc(state.giornata).set({
+          giornata: state.giornata,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (metaErr) {
+        console.warn('⚠️ Errore aggiornando metadati results:', metaErr);
+      }
       
       // Load teams
       let teams = [];
@@ -723,17 +760,20 @@
         }
         
         if (!lineup || lineup.length === 0) {
-          console.log(`Team ${team.id} (${team.name}) - Nessuna formazione salvata`);
           continue;
         }
         
         // Calcola punti giocatori titolari
         const starters = lineup.filter(Boolean);
         let playerSum = 0;
+        const playerContribs = new Map();
         for (const pid of starters) {
           const sel = state.selPlayers[pid] || {};
           const pts = prules.reduce((s,r) => s + ((r.rule_id in sel) ? (r.input==='counter' ? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
           playerSum += pts;
+          const existing = playerContribs.get(pid) || { playerId: pid, points: 0, breakdown: JSON.parse(JSON.stringify(sel || {})) };
+          existing.points += pts;
+          playerContribs.set(pid, existing);
         }
         
         // Capitano (raddoppia)
@@ -742,6 +782,11 @@
           const selC = state.selPlayers[captain] || {};
           const capPts = prules.reduce((s,r) => s + ((r.rule_id in selC) ? (r.input==='counter' ? Number(selC[r.rule_id]||0)*Number(r.valore) : (selC[r.rule_id]?Number(r.valore):0)) : 0), 0);
           captainBonus = capPts;
+          if (playerContribs.has(captain)) {
+            const capEntry = playerContribs.get(captain);
+            capEntry.points += capPts;
+            playerContribs.set(captain, capEntry);
+          }
         }
         
         // Allenatore
@@ -757,7 +802,7 @@
           const selCoach = state.selCoaches[coachId] || {};
           coachPts = crules.reduce((s,r) => s + ((r.rule_id in selCoach) ? (r.input==='counter' ? Number(selCoach[r.rule_id]||0)*Number(r.valore) : (selCoach[r.rule_id]?Number(r.valore):0)) : 0), 0);
         }
-
+        
         // Formazione pubblicata bonus (feature flag)
         const formationEnabled = isFormationBonusEnabled();
         const formationValue = getFormationBonusValue();
@@ -767,8 +812,6 @@
         }
 
         const total = curvaBase + playerSum + captainBonus + coachPts + formationBonus;
-        
-        console.log(`Team ${team.id} (${team.name}): Curva ${curvaBase} + Gioc ${playerSum} + Cap ${captainBonus} + Coach ${coachPts} = ${total}`);
         
         // Salva risultato in Firestore
         try {
@@ -786,16 +829,26 @@
             lineup: lineup,
             captain: captain,
             coachId: coachId,
+            players: Array.from(playerContribs.values()).map(entry => ({
+              playerId: entry.playerId,
+              points: Number((entry.points || 0).toFixed(2)),
+              breakdown: entry.breakdown || {}
+            })),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           
-          console.log(`✅ Risultato salvato per team ${team.id}`);
         } catch(e) {
           console.error(`❌ Errore salvataggio risultato team ${team.id}:`, e);
         }
       }
       
-      console.log('✅ Calcolo risultati squadre completato!');
+      try {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('results-updated', { detail: { giornata: state.giornata } }));
+        }
+      } catch (eventErr) {
+        console.warn('⚠️ Impossibile notificare results-updated:', eventErr);
+      }
     }
     
     async function applyForfeitPenalties(){
@@ -875,7 +928,11 @@
           penalty: FORFEIT_LOSS_SCORE
         }));
 
-        await window.db.collection('days').doc(giornataId).set({
+        const leagueId = getCurrentLeagueId();
+        const daysRef = leagueId ?
+          window.db.collection(`leagues/${leagueId}/days`).doc(giornataId) :
+          window.db.collection('days').doc(giornataId);
+        await daysRef.set({
           penalties: {
             missingLineups: penaltyPayload,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -896,15 +953,10 @@
       const crules = normalizeCoachRules({ rules: state.rules });
       const vrules = normalizeCurvaRules({ rules: state.rules });
       
-      console.log('🔍 DEBUG renderSummary:');
-      console.log('- state.selPlayers:', state.selPlayers);
-      console.log('- prules count:', prules.length);
-      console.log('- Players keys:', Object.keys(state.selPlayers));
       
       const p = Object.keys(state.selPlayers).reduce((sum, pid) => {
         const playerSel = state.selPlayers[pid]||{};
         const total = prules.reduce((s, r) => s + ((r.rule_id in playerSel) ? (r.input==='counter'? Number(playerSel[r.rule_id]||0)*Number(r.valore) : (playerSel[r.rule_id]?Number(r.valore):0)) : 0), 0);
-        console.log(`- Player ${pid}: selections:`, playerSel, 'total:', total);
         return sum + total;
       }, 0);
       const c = Object.keys(state.selCoaches).reduce((sum, cid) => {
@@ -935,7 +987,6 @@
       const debugBox = document.querySelector('.debug-box');
       if (debugBox) {
         debugBox.addEventListener('click', () => {
-          console.log('Giocatori con punti:', playersWithPoints);
           alert(`${playersWithPoints.length} giocatori hanno punti.\n\nIDs: ${playersWithPoints.join(', ')}\n\nControlla la console (F12) per dettagli.`);
         });
       }
@@ -1076,7 +1127,10 @@
           );
         }).join('');
         
-        const initials = (p.nome_completo.split(' ')[0]||'?').substring(0,2).toUpperCase();
+        const nameParts = (p.nome_completo || '').split(/\s+/).filter(Boolean);
+        const initials = nameParts.length >= 2
+          ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+          : (nameParts[0] || '?').substring(0,2).toUpperCase();
         const fallbackSvg = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" fill="#1e3a8a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="24" font-weight="bold">${initials}</text></svg>`);
         const photoUrl = p.photoURL || fallbackSvg;
         const detailContent = document.getElementById('player-detail-content') || pdetail;
@@ -1098,9 +1152,7 @@
             e.stopPropagation();
             if (!state.isAdmin) return;
             const row = cb.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
-            console.log('🔵 Checkbox toggle:', { pid, rid, checked: cb.checked });
             state.selPlayers[pid]=state.selPlayers[pid]||{}; state.selPlayers[pid][rid]=cb.checked?1:0;
-            console.log('🔵 state.selPlayers after:', state.selPlayers);
             // Exclusivity: if Porta inviolata (R043) is set, zero Gol subiti (R072)
             if (rid==='R043' && cb.checked) { 
               state.selPlayers[pid]['R072']=0;
@@ -1123,7 +1175,6 @@
             e.stopPropagation();
             if (!state.isAdmin) return;
             const row = btn.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
-            console.log('🔵 INC button:', { pid, rid });
             state.selPlayers[pid]=state.selPlayers[pid]||{}; 
             const cur=Number(state.selPlayers[pid][rid]||0); 
             state.selPlayers[pid][rid]=Math.min(10,cur+1);
@@ -1146,7 +1197,6 @@
             e.stopPropagation();
             if (!state.isAdmin) return;
             const row = btn.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
-            console.log('🔵 DEC button:', { pid, rid });
             state.selPlayers[pid]=state.selPlayers[pid]||{}; 
             const cur=Number(state.selPlayers[pid][rid]||0); 
             state.selPlayers[pid][rid]=Math.max(0,cur-1);
@@ -1204,7 +1254,10 @@
           for (const p of list){
             const sel = state.selPlayers[p.player_id]||{};
             const total = prules.reduce((s,r)=> s + ((r.rule_id in sel)? (r.input==='counter'? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0);
-            const initials = (p.nome_completo.split(' ')[0]||'?').substring(0,2).toUpperCase();
+            const nameParts = (p.nome_completo || '').split(/\s+/).filter(Boolean);
+            const initials = nameParts.length >= 2
+              ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+              : (nameParts[0] || '?').substring(0,2).toUpperCase();
             const fallbackSvg = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#1e3a8a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="16" font-weight="bold">${initials}</text></svg>`);
             const photoUrl = p.photoURL || fallbackSvg;
             itemsHtml += '<div class="item" data-id="'+p.player_id+'">'+
@@ -1499,7 +1552,10 @@
         // Check se giornata già calcolata
         if (window.db && state.isAdmin) {
           try {
-            const dayDoc = await window.db.collection('days').doc(newGiornata).get();
+            const leagueId = getCurrentLeagueId();
+            const dayDoc = leagueId ?
+              await window.db.collection(`leagues/${leagueId}/days`).doc(newGiornata).get() :
+              await window.db.collection('days').doc(newGiornata).get();
             if (dayDoc.exists && dayDoc.data()?.computed === true) {
               // Mostra info, non bloccare
               toast('ℹ️ Giornata già calcolata - Modalità visualizzazione');
@@ -1525,6 +1581,29 @@
         if (!state.isAdmin) { alert('Solo admin può salvare o caricare.'); return; }
         if (!confirm('Confermi il salvataggio della giornata?')) return;
         if (!state.isAdmin) { alert('Solo admin può salvare o caricare.'); return; }
+        
+        // 🔄 CARICA DATI DA MATCHDAY_TEMP (per sicurezza, ultima versione)
+        if (window.db) {
+          try {
+            const leagueId = getCurrentLeagueId();
+            const matchdayRef = leagueId ?
+              window.db.collection(`leagues/${leagueId}/matchday_temp`).doc(state.giornata) :
+              window.db.collection('matchday_temp').doc(state.giornata);
+            const tempDoc = await matchdayRef.get();
+            if (tempDoc.exists) {
+              const tempData = tempDoc.data();
+              // Merge con dati esistenti (temp ha priorità se più recente)
+              if (tempData.players) state.selPlayers = { ...state.selPlayers, ...tempData.players };
+              if (tempData.coaches) state.selCoaches = { ...state.selCoaches, ...tempData.coaches };
+              if (tempData.curva) state.selCurva = { ...state.selCurva, ...tempData.curva };
+              if (tempData.data) $('#data').value = tempData.data;
+            
+            }
+          } catch (e) {
+            console.warn('⚠️ Errore caricamento matchday_temp prima del salvataggio:', e);
+          }
+        }
+        
         // Save to localStorage
         saveDay();
         // Prepare payload
@@ -1534,14 +1613,19 @@
         // Write to Firestore
         try{
           if (window.db){
-            await window.db.collection('days').doc(state.giornata).set(data, { merge: true });
+            const leagueId = getCurrentLeagueId();
+            const daysRef = leagueId ?
+              window.db.collection(`leagues/${leagueId}/days`).doc(state.giornata) :
+              window.db.collection('days').doc(state.giornata);
+            await daysRef.set(data, { merge: true });
             await applyForfeitPenalties();
             
             // CALCOLA E SALVA RISULTATI SQUADRE
             await saveTeamResults();
             
             // MARCA GIORNATA COME CALCOLATA
-            await window.db.collection('days').doc(state.giornata).update({ computed: true });
+            // leagueId già dichiarato sopra
+            await daysRef.update({ computed: true });
             
             // NOTIFICA TUTTI GLI UTENTI
             if (typeof window.notifyGiornataCalcolata === 'function') {
@@ -1583,8 +1667,12 @@
               updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
               updatedBy: firebase.auth().currentUser?.displayName || 'Admin'
             };
-            await window.db.collection('matchday_temp').doc(state.giornata).set(data, { merge: true });
-            console.log('✅ Dati salvati su Firestore temp per sync admin');
+            const leagueId = getCurrentLeagueId();
+            const matchdayRef = leagueId ?
+              window.db.collection(`leagues/${leagueId}/matchday_temp`).doc(state.giornata) :
+              window.db.collection('matchday_temp').doc(state.giornata);
+            await matchdayRef.set(data, { merge: true });
+            
           } catch(e) {
             console.warn('Errore salvataggio temp Firestore:', e);
           }
@@ -1612,7 +1700,6 @@
         renderTabs();
         renderSummary();
         toast('✅ Giocatori resettati!');
-        console.log('🔧 Reset giocatori completato');
         });
       }
       
@@ -1626,7 +1713,6 @@
         renderTabs();
         renderSummary();
         toast('✅ Allenatori resettati!');
-        console.log('🔧 Reset allenatori completato');
         });
       }
       
@@ -1640,7 +1726,6 @@
         renderTabs();
         renderSummary();
         toast('✅ Curva resettata!');
-        console.log('🔧 Reset curva completato');
         });
       }
       
@@ -1656,7 +1741,6 @@
         renderTabs();
         renderSummary();
         toast('✅ Giornata completamente resettata!');
-        console.log('🔧 Reset completo eseguito');
         });
       }
       
@@ -1681,8 +1765,12 @@
         try {
           // Cancella da Firestore
           if (window.db) {
-            await window.db.collection('days').doc(giornata).delete();
-            console.log(`🗑️ Giornata ${giornata} cancellata da Firestore`);
+            const leagueId = getCurrentLeagueId();
+            const daysRef = leagueId ?
+              window.db.collection(`leagues/${leagueId}/days`).doc(giornata) :
+              window.db.collection('days').doc(giornata);
+            await daysRef.delete();
+            
           }
           
           // Cancella da localStorage
@@ -1690,7 +1778,7 @@
           localStorage.removeItem(keyC());
           localStorage.removeItem(keyV());
           localStorage.removeItem(keyD());
-          console.log(`🗑️ Giornata ${giornata} cancellata da localStorage`);
+          
           
           // Reset state
           state.selPlayers = {};
@@ -1718,12 +1806,26 @@
       }
       // Admin toggle rimosso: ora automatico da Firebase admins/{uid}
       // Theme toggle
-      const savedTheme = localStorage.getItem('theme'); if (savedTheme){ document.documentElement.classList.toggle('dark', savedTheme==='dark'); }
-      document.getElementById('themeToggle')?.addEventListener('click', ()=>{
+      const savedTheme = localStorage.getItem('fantaAthletic_theme'); if (savedTheme){ document.documentElement.classList.toggle('dark', savedTheme==='dark'); }
+      const themeToggleBtn = document.getElementById('themeToggle');
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const fallbackToggle = () => {
         const nextDark = !document.documentElement.classList.contains('dark');
         document.documentElement.classList.toggle('dark', nextDark);
-        localStorage.setItem('theme', nextDark? 'dark':'light');
+            try { localStorage.setItem('fantaAthletic_theme', nextDark ? 'dark' : 'light'); } catch (_) {}
+            return nextDark;
+          };
+          if (typeof window.toggleTheme === 'function') {
+            window.toggleTheme();
+          } else {
+            fallbackToggle();
+          }
+          if (typeof window.updateThemeButton === 'function') {
+            window.updateThemeButton();
+          }
       });
+      }
     }
 
     async function loadPlayers(){
@@ -1749,12 +1851,14 @@
       try {
         if (window.db) {
           // Carica TUTTE le regole (anche nascoste), poi le normalize filtreranno per visible
-          const rulesSnap = await window.db.collection('rules').where('attivo', '==', true).get();
+          const leagueId = getCurrentLeagueId();
+          const rulesRef = leagueId ?
+            window.db.collection(`leagues/${leagueId}/rules`) :
+            window.db.collection('rules');
+          const rulesSnap = await rulesRef.where('attivo', '==', true).get();
           state.rules = rulesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          console.log('Regole caricate da Firestore:', state.rules.length);
         } else {
           state.rules = (await rulesRes.json()).rules||[];
-          console.log('Regole caricate da JSON:', state.rules.length);
         }
       } catch (e) {
         console.warn('Errore caricamento regole da Firestore, uso JSON:', e);
@@ -1766,7 +1870,7 @@
       try {
         if (window.featureFlagsLoader && typeof window.featureFlagsLoader.loadFlags === 'function') {
           featureFlags = await window.featureFlagsLoader.loadFlags();
-          console.log('[matchday] Feature flags caricati:', featureFlags);
+          
         }
       } catch (error) {
         console.warn('[matchday] Impossibile caricare i feature flags:', error);

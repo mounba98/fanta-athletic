@@ -89,19 +89,22 @@
   </main>
 
   <footer class="footer">
-    <small>&copy; <span id="year"></span> Athletic 2018 – Tutti i diritti riservati.</small>
+    <small>&copy; <span id="year"></span> Nicola Mocci – Tutti i diritti riservati.</small>
   </footer>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js?v=20251021-fix"></script>
   <script src="resources/firebase.js"></script>
   <script src="resources/app-init.js"></script>
   <script src="resources/theme.js?v=202510172227"></script>
   <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
   <script>
     // Prevent other scripts from loading on store page
     if (window.location.pathname.includes('store.html')) {
@@ -132,7 +135,7 @@
         description: 'T-shirt performance con grafica diagonale, numerazione personalizzabile e stemma termo-applicato.',
         price: { value: 34, currency: 'EUR' },
         category: 'Maglie',
-        imageUrl: 'https://images.unsplash.com/photo-1608339400020-24ac0658958b?auto=format&fit=crop&w=720&q=80',
+        imageUrl: 'https://images.unsplash.com/photo-1521579971123-1192931a1452?auto=format&fit=crop&w=720&q=80',
         tags: ['quickdry', 'custom'],
         checkoutUrl: '',
         badge: 'Nuova',
@@ -177,10 +180,11 @@
       storeGrid.innerHTML = products.map(product => {
         const tags = (product.tags || []).map(tag => `<span class="product-tag">${tag}</span>`).join('');
         const badge = product.badge ? `<span class="product-badge">${product.badge}</span>` : '';
+        const imageUrl = product.imageUrl || 'resources/logo.png';
         return `
         <article class="product-card">
           <div class="product-media">
-            <img src="${product.imageUrl || 'resources/logo.png'}" alt="${product.name}" loading="lazy" />
+            <img src="${imageUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null;this.src='resources/logo.png';" />
             ${badge}
           </div>
           <div class="product-body">
@@ -222,21 +226,16 @@
     }
 
     async function loadProducts() {
-      console.log('🛒 Caricamento prodotti store...');
       if (!db) {
-        console.warn('⚠️ Firestore non disponibile, uso fallback statico');
         renderProducts(FALLBACK_PRODUCTS);
         attachProductHandlers(FALLBACK_PRODUCTS);
         return;
       }
 
       try {
-        console.log('📡 Query Firestore store_products...');
         const snapshot = await db.collection('store_products').where('archived', '==', false).get();
-        console.log(`📦 Trovati ${snapshot.size} prodotti (archived=false)`);
         
         if (snapshot.empty) {
-          console.log('✅ Nessun prodotto in Firestore, uso fallback');
           renderProducts(FALLBACK_PRODUCTS);
           attachProductHandlers(FALLBACK_PRODUCTS);
           return;
@@ -245,8 +244,6 @@
         const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
           .filter(p => p.active !== false)
           .sort((a, b) => (b.priority || 0) - (a.priority || 0));
-
-        console.log(`✅ ${products.length} prodotti attivi da renderizzare`);
         renderProducts(products);
         attachProductHandlers(products);
       } catch (error) {
@@ -258,5 +255,10 @@
 
     document.addEventListener('DOMContentLoaded', loadProducts);
   </script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/lazy-load.js?v=20251020"></script>
 </body>
 </html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migrazione Athletic 2018 → Catalogo Globale</title>
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+    h1 { margin-top: 0; color: var(--primary); }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: var(--secondary); }
+    .btn-danger { background: #dc2626; }
+    #log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 500px;
+      overflow-y: auto;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+    .log-entry { margin: 4px 0; }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    .warning { color: #f59e0b; }
+    .info { color: #60a5fa; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: rgba(99, 102, 241, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Migrazione Athletic 2018 → Catalogo Globale V2</h1>
+    <p>Questo script migra i giocatori di Athletic 2018 dalla struttura legacy al nuovo catalogo globale.</p>
+    
+    <div class="stats" id="stats" style="display:none;">
+      <div class="stat-card">
+        <div class="stat-label">Giocatori migrati</div>
+        <div class="stat-value" id="statPlayers">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Club creato</div>
+        <div class="stat-value" id="statClub">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Roster creato</div>
+        <div class="stat-value" id="statRoster">-</div>
+      </div>
+    </div>
+
+    <div style="margin: 20px 0;">
+      <button class="btn" id="btnCheck">1️⃣ Verifica Dati Legacy</button>
+      <button class="btn btn-secondary" id="btnMigrate" disabled>2️⃣ Migra in Catalogo Globale</button>
+      <button class="btn btn-danger" id="btnReset" disabled>🔴 Reset (solo test)</button>
+    </div>
+
+    <div id="log"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    const CONFIG = {
+      legacyLeagueId: '4rq1Rr0TquRfuPLmqQTn',
+      clubId: 'athletic-2018',
+      clubName: 'Athletic 2018',
+      rosterId: 'athletic-2018-2024-25-v1',
+      rosterVersion: '1.0.0',
+      championshipRef: 'AICS_FI_AMAT',
+      regionRef: 'TOSCANA',
+      seasonRef: '2024_2025',
+      visibility: 'public',
+      status: 'published'
+    };
+
+    let currentUser = null;
+    const logEl = document.getElementById('log');
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        log('❌ Non autenticato. Effettua login.', 'error');
+        setTimeout(() => location.href = 'auth.html', 2000);
+      } else {
+        currentUser = user;
+        log(`✅ Autenticato come: ${user.email}`, 'success');
+        checkAdmin();
+      }
+    });
+
+    async function checkAdmin() {
+      if (!currentUser) return;
+      try {
+        const adminDoc = await db.collection('admins').doc(currentUser.uid).get();
+        if (!adminDoc.exists) {
+          log('⚠️ Non sei admin. Solo gli admin possono eseguire la migrazione.', 'warning');
+        } else {
+          log('✅ Permessi admin verificati', 'success');
+        }
+      } catch (e) {
+        log(`⚠️ Errore verifica admin: ${e.message}`, 'warning');
+      }
+    }
+
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info';
+      logEl.innerHTML += `<div class="log-entry ${className}">[${timestamp}] ${message}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(message);
+    }
+
+    function normalize(str = '') {
+      return str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    }
+
+    function buildCanonicalKey(player, clubId, seasonRef) {
+      const { firstName, lastName, role } = player;
+      return [normalize(lastName), normalize(firstName), role.toLowerCase(), clubId, seasonRef].join('|');
+    }
+
+    function splitFullName(fullName = '') {
+      const parts = fullName.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return { firstName: '', lastName: '' };
+      if (parts.length === 1) return { firstName: parts[0], lastName: '' };
+      const lastName = parts.pop();
+      const firstName = parts.join(' ');
+      return { firstName, lastName };
+    }
+
+    document.getElementById('btnCheck').addEventListener('click', async () => {
+      log('🔍 Verifica dati legacy...', 'info');
+      try {
+        // Controlla se esiste già il catalogo
+        const existingClub = await db.collection('clubs').doc(CONFIG.clubId).get();
+        if (existingClub.exists) {
+          log(`⚠️ Club "${CONFIG.clubId}" già esistente!`, 'warning');
+        }
+
+        const existingRoster = await db.collection('rosters').doc(CONFIG.rosterId).get();
+        if (existingRoster.exists) {
+          log(`⚠️ Roster "${CONFIG.rosterId}" già esistente!`, 'warning');
+        }
+
+        // Leggi giocatori legacy
+        const playersSnap = await db.collection('leagues').doc(CONFIG.legacyLeagueId).collection('players').get();
+        log(`📊 Giocatori legacy trovati: ${playersSnap.size}`, 'info');
+        
+        if (playersSnap.empty) {
+          log('❌ Nessun giocatore legacy trovato!', 'error');
+          return;
+        }
+
+        // Conta giocatori globali esistenti
+        const globalPlayersSnap = await db.collection('players_global').limit(10).get();
+        log(`📊 Giocatori globali esistenti: ${globalPlayersSnap.size > 0 ? 'alcuni' : 'nessuno'}`, 'info');
+
+        log('✅ Verifica completata. Puoi procedere con la migrazione.', 'success');
+        document.getElementById('btnMigrate').disabled = false;
+
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+        console.error(error);
+      }
+    });
+
+    document.getElementById('btnMigrate').addEventListener('click', async () => {
+      if (!currentUser) {
+        log('❌ Non autenticato!', 'error');
+        return;
+      }
+
+      log('🚀 INIZIO MIGRAZIONE...', 'warning');
+      document.getElementById('stats').style.display = 'grid';
+      document.getElementById('btnMigrate').disabled = true;
+
+      try {
+        // 1. Leggi giocatori legacy
+        log('📋 Step 1: Lettura giocatori legacy...', 'info');
+        const playersSnap = await db.collection('leagues').doc(CONFIG.legacyLeagueId).collection('players').get();
+        if (playersSnap.empty) {
+          log('❌ Nessun giocatore trovato!', 'error');
+          return;
+        }
+        const players = playersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        log(`✅ Letti ${players.length} giocatori`, 'success');
+
+        // 2. Crea/aggiorna club
+        log('📦 Step 2: Creazione club...', 'info');
+        const clubRef = db.collection('clubs').doc(CONFIG.clubId);
+        await clubRef.set({
+          clubId: CONFIG.clubId,
+          name: CONFIG.clubName,
+          searchName: normalize(CONFIG.clubName),
+          championshipRef: CONFIG.championshipRef,
+          regionRef: CONFIG.regionRef,
+          seasons: firebase.firestore.FieldValue.arrayUnion(CONFIG.seasonRef),
+          status: CONFIG.status,
+          createdBy: currentUser.uid,
+          updatedBy: currentUser.uid,
+          createdAt: firebase.firestore.Timestamp.now(),
+          updatedAt: firebase.firestore.Timestamp.now()
+        }, { merge: true });
+        log(`✅ Club creato: ${CONFIG.clubId}`, 'success');
+        document.getElementById('statClub').textContent = '✅';
+
+        // 3. Crea/aggiorna roster
+        log('📋 Step 3: Creazione roster...', 'info');
+        const rosterRef = db.collection('rosters').doc(CONFIG.rosterId);
+        await rosterRef.set({
+          rosterId: CONFIG.rosterId,
+          clubRef: clubRef,
+          clubId: CONFIG.clubId,
+          seasonRef: CONFIG.seasonRef,
+          version: CONFIG.rosterVersion,
+          status: CONFIG.status,
+          visibility: CONFIG.visibility,
+          maintainers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+          championshipRef: CONFIG.championshipRef,
+          regionRef: CONFIG.regionRef,
+          searchKey: `${normalize(CONFIG.clubName)}-${CONFIG.seasonRef}-${CONFIG.rosterVersion}`,
+          createdBy: currentUser.uid,
+          updatedBy: currentUser.uid,
+          createdAt: firebase.firestore.Timestamp.now(),
+          updatedAt: firebase.firestore.Timestamp.now()
+        }, { merge: true });
+        log(`✅ Roster creato: ${CONFIG.rosterId}`, 'success');
+        document.getElementById('statRoster').textContent = '✅';
+
+        // 4. Migra giocatori in players_global
+        log('👥 Step 4: Migrazione giocatori...', 'info');
+        let playerCount = 0;
+        const batch = db.batch();
+        let batchCount = 0;
+        const MAX_BATCH = 500;
+
+        for (const player of players) {
+          const { id, player_id, nome_completo, nomeCompleto, fullName, role, roleName, secondary_roles, secondaryRoles, nickname, nick } = player;
+          const primaryId = player_id || id;
+          const nameSource = nome_completo || nomeCompleto || fullName || player.fullName || '';
+          const { firstName, lastName } = splitFullName(nameSource);
+          const canonicalKey = buildCanonicalKey({ firstName, lastName, role: role || roleName || player.role }, CONFIG.clubId, CONFIG.seasonRef);
+
+          const playerRef = db.collection('players_global').doc(primaryId);
+          batch.set(playerRef, {
+            playerId: primaryId,
+            firstName,
+            lastName,
+            fullName: nameSource || `${firstName} ${lastName}`.trim(),
+            role: role || roleName || player.role,
+            secondaryRoles: secondary_roles || secondaryRoles || player.secondaryRoles || [],
+            nickname: nickname || nick || player.nickname || '',
+            defaultClubRef: CONFIG.clubId,
+            canonicalKeys: firebase.firestore.FieldValue.arrayUnion(canonicalKey),
+            sources: {
+              legacyLeagueId: CONFIG.legacyLeagueId,
+              legacyPlayerId: primaryId
+            },
+            createdBy: currentUser.uid,
+            updatedBy: currentUser.uid,
+            createdAt: firebase.firestore.Timestamp.now(),
+            updatedAt: firebase.firestore.Timestamp.now()
+          }, { merge: true });
+
+          batchCount++;
+          if (batchCount >= MAX_BATCH) {
+            await batch.commit();
+            log(`  ✅ Batch di ${batchCount} giocatori scritti`, 'success');
+            batchCount = 0;
+          }
+          playerCount++;
+        }
+
+        if (batchCount > 0) {
+          await batch.commit();
+          log(`  ✅ Batch finale di ${batchCount} giocatori scritti`, 'success');
+        }
+
+        log(`✅ ${playerCount} giocatori migrati in players_global`, 'success');
+        document.getElementById('statPlayers').textContent = playerCount;
+
+        // 5. Crea roster_members
+        log('🔗 Step 5: Creazione roster_members...', 'info');
+        const membersBatch = db.batch();
+        let membersCount = 0;
+
+        for (const player of players) {
+          const primaryId = player.player_id || player.id;
+          const memberRef = rosterRef.collection('roster_members').doc(primaryId);
+          const playerGlobalRef = db.collection('players_global').doc(primaryId);
+          
+          membersBatch.set(memberRef, {
+            playerRef: playerGlobalRef,
+            playerId: primaryId,
+            role: player.role || player.roleName || '',
+            secondaryRoles: player.secondary_roles || player.secondaryRoles || [],
+            clubRef: clubRef,
+            seasonRef: CONFIG.seasonRef,
+            sourceRosterId: CONFIG.rosterId,
+            addedBy: currentUser.uid,
+            addedAt: firebase.firestore.Timestamp.now(),
+            legacy: {
+              leagueId: CONFIG.legacyLeagueId,
+              playerId: primaryId
+            }
+          }, { merge: true });
+
+          membersCount++;
+          if (membersCount >= MAX_BATCH) {
+            await membersBatch.commit();
+            log(`  ✅ Batch di ${membersCount} roster_members scritti`, 'success');
+            membersCount = 0;
+          }
+        }
+
+        if (membersCount > 0) {
+          await membersBatch.commit();
+          log(`  ✅ Batch finale di ${membersCount} roster_members scritti`, 'success');
+        }
+
+        log(`✅ ${players.length} roster_members creati`, 'success');
+
+        log('🎉 MIGRAZIONE COMPLETATA CON SUCCESSO!', 'success');
+        log('✅ Puoi verificare in Firestore Console:', 'info');
+        log(`   - clubs/${CONFIG.clubId}`, 'info');
+        log(`   - rosters/${CONFIG.rosterId}`, 'info');
+        log(`   - players_global (${playerCount} documenti)`, 'info');
+        log(`   - rosters/${CONFIG.rosterId}/roster_members (${players.length} documenti)`, 'info');
+
+      } catch (error) {
+        log(`❌ ERRORE MIGRAZIONE: ${error.message}`, 'error');
+        console.error(error);
+      } finally {
+        document.getElementById('btnMigrate').disabled = false;
+      }
+    });
+
+    // Reset (solo per test)
+    document.getElementById('btnReset').addEventListener('click', async () => {
+      if (!confirm('⚠️ ATTENZIONE: Questo eliminerà il club, roster e roster_members. Continuare?')) return;
+      
+      try {
+        log('🗑️ Reset catalogo...', 'warning');
+        const rosterRef = db.collection('rosters').doc(CONFIG.rosterId);
+        
+        // Elimina roster_members
+        const membersSnap = await rosterRef.collection('roster_members').get();
+        const batch = db.batch();
+        membersSnap.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        log(`✅ Eliminati ${membersSnap.size} roster_members`, 'success');
+
+        // Elimina roster
+        await rosterRef.delete();
+        log('✅ Roster eliminato', 'success');
+
+        // Elimina club
+        await db.collection('clubs').doc(CONFIG.clubId).delete();
+        log('✅ Club eliminato', 'success');
+
+        log('✅ Reset completato', 'success');
+      } catch (error) {
+        log(`❌ Errore reset: ${error.message}`, 'error');
+      }
+    });
+  </script>
+</body>
+</html>
+

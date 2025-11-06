@@ -53,7 +53,8 @@
       await loadUserLeagues();
       await loadCurrentLeague();
 
-      if (userLeagues.length === 0) {
+      // Render anche se non ci sono leghe ma c'è permission denied (non-admin)
+      if (userLeagues.length === 0 && !window.__LEAGUE_PERMISSION_DENIED__) {
         console.warn('[LEAGUE-SELECTOR] No leagues found, skipping render');
         return;
       }
@@ -83,10 +84,40 @@
         return;
       }
       
-      console.log('🔍 [LEAGUE-SELECTOR] Querying leagues for user:', user.uid);
+      console.log('🔍 [LEAGUE-SELECTOR] Loading leagues for user:', user.uid);
       const db = firebase.firestore();
       const leagueMap = new Map();
+      let permissionDenied = false;
 
+      // PRIMA: Prova a leggere la lega dal documento utente (più efficiente e funziona per non-admin)
+      try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          const currentLeagueId = userData.currentLeague || (userData.leagues && userData.leagues[0]);
+          
+          if (currentLeagueId) {
+            console.log('📋 [LEAGUE-SELECTOR] Found league in user doc:', currentLeagueId);
+            try {
+              const leagueDoc = await db.collection('leagues').doc(currentLeagueId).get();
+              if (leagueDoc.exists) {
+                const leagueData = leagueDoc.data();
+                // Verifica che l'utente sia effettivamente membro
+                if (leagueData.members && leagueData.members.includes(user.uid)) {
+                  leagueMap.set(leagueDoc.id, { id: leagueDoc.id, ...leagueData });
+                  console.log('✅ [LEAGUE-SELECTOR] Loaded league from user doc:', leagueDoc.id);
+                }
+              }
+            } catch (err) {
+              console.warn('[LEAGUE-SELECTOR] Error loading league from user doc:', err);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[LEAGUE-SELECTOR] Error reading user doc:', err);
+      }
+
+      // SECONDA: Prova query (funziona solo per admin, ma proviamo comunque)
       const queries = [
         db.collection('leagues').where('members', 'array-contains', user.uid).get(),
         db.collection('leagues').where('admins', 'array-contains', user.uid).get(),
@@ -95,9 +126,25 @@
 
       const snapshots = await Promise.allSettled(queries);
 
+      let permissionErrorLogged = false;
+      // Se abbiamo già caricato leghe dal documento utente, non loggare errori sulle query
+      const hasLeaguesFromUserDoc = leagueMap.size > 0;
+      
       snapshots.forEach(result => {
         if (result.status !== 'fulfilled') {
-          console.warn('[LEAGUE-SELECTOR] query failed', result.reason);
+          if (result.reason?.code === 'permission-denied') {
+            permissionDenied = true;
+            // Non loggare se abbiamo già trovato leghe dal documento utente
+            if (!permissionErrorLogged && !hasLeaguesFromUserDoc) {
+              console.warn('[LEAGUE-SELECTOR] Permission denied - using legacy mode (this is expected for non-admin users)');
+              permissionErrorLogged = true;
+            }
+          } else {
+            // Log altri errori solo una volta e solo se non abbiamo già leghe
+            if (!permissionErrorLogged && !hasLeaguesFromUserDoc) {
+              console.warn('[LEAGUE-SELECTOR] query failed', result.reason);
+            }
+          }
           return;
         }
         result.value.docs.forEach(doc => {
@@ -116,10 +163,56 @@
       });
       
       console.log(`✅ [LEAGUE-SELECTOR] Loaded ${userLeagues.length} leagues for user`);
+      
+      // Se abbiamo trovato leghe dal documento utente, non siamo in legacy mode
+      if (userLeagues.length > 0) {
+        permissionDenied = false;
+        window.__LEAGUE_PERMISSION_DENIED__ = false;
+        // Se abbiamo già caricato la lega, non loggare il warning sulle query
+        permissionErrorLogged = true;
+      }
+
+      if (permissionDenied && userLeagues.length === 0) {
+        // Solo se non abbiamo trovato leghe e c'è stato un permission denied, logga
+        if (!permissionErrorLogged) {
+          console.warn('[LEAGUE-SELECTOR] Permission denied - using legacy mode (this is expected for non-admin users)');
+          permissionErrorLogged = true;
+        }
+        window.__LEAGUE_PERMISSION_DENIED__ = true;
+        try {
+          if (window.LeagueHelper && typeof window.LeagueHelper.disableMultiLeague === 'function') {
+            window.LeagueHelper.disableMultiLeague();
+          }
+        } catch (err) {
+          console.warn('[LEAGUE-SELECTOR] impossibile disabilitare multi-league automaticamente', err);
+        }
+      }
     } catch (error) {
-      console.error('Error loading leagues:', error);
+      // Non loggare errori permission-denied (sono attesi per non-admin)
+      if (error?.code !== 'permission-denied') {
+        console.error('Error loading leagues:', error);
+      }
+      
+      // Se abbiamo già trovato leghe dal documento utente, non impostare legacy mode
+      if (userLeagues.length > 0) {
+        // Abbiamo già leghe, non fare nulla
+        return;
+      }
+      
       userLeagues = [];
       window.currentLeague = null;
+      if (error?.code === 'permission-denied') {
+        // Solo se non abbiamo trovato leghe, logga il warning
+        console.warn('[LEAGUE-SELECTOR] Permission denied - using legacy mode (this is expected for non-admin users)');
+        window.__LEAGUE_PERMISSION_DENIED__ = true;
+        try {
+          if (window.LeagueHelper && typeof window.LeagueHelper.disableMultiLeague === 'function') {
+            window.LeagueHelper.disableMultiLeague();
+          }
+        } catch (err) {
+          console.warn('[LEAGUE-SELECTOR] impossibile disabilitare multi-league dopo errore', err);
+        }
+      }
     }
   }
   
@@ -127,6 +220,13 @@
    * Carica lega corrente
    */
   async function loadCurrentLeague() {
+    if (window.__LEAGUE_PERMISSION_DENIED__) {
+      currentLeague = null;
+      window.currentLeague = null;
+      try { localStorage.removeItem('last_league_id'); } catch (_) {}
+      window.dispatchEvent(new CustomEvent('league-ready', { detail: { league: null } }));
+      return;
+    }
     const leagueId = localStorage.getItem('last_league_id');
     
     if (!leagueId) {
@@ -166,6 +266,47 @@
    * Renderizza selettore in navbar
    */
   function renderLeagueSelector() {
+    // Anche senza permessi, mostra selettore in modalità disabled
+    const hasPermissionDenied = window.__LEAGUE_PERMISSION_DENIED__;
+    if (hasPermissionDenied) {
+      // Su mobile/tablet: crea container se non esiste
+      const isMobileOrTablet = (window.deviceInfo && (window.deviceInfo.isSmartphone || window.deviceInfo.isTablet))
+        || window.matchMedia('(max-width: 820px)').matches;
+      
+      if (isMobileOrTablet) {
+        let host = document.getElementById('leagueSelectorMobileHost');
+        if (!host) {
+          host = document.createElement('div');
+          host.id = 'leagueSelectorMobileHost';
+          host.className = 'league-selector-mobile-host';
+          const header = document.querySelector('header');
+          if (header && header.parentNode) {
+            header.parentNode.insertBefore(host, header.nextSibling);
+          } else {
+            document.body.insertBefore(host, document.body.firstChild);
+          }
+        }
+        host.innerHTML = '<div style="padding:8px 12px;background:rgba(148,163,184,0.1);border-radius:8px;color:var(--muted);font-size:13px;text-align:center;">Modalità legacy (nessuna lega selezionata)</div>';
+        return;
+      } else {
+        // Desktop: mostra selettore disabled nella navbar
+        const existing = document.getElementById('leagueSelector');
+        if (existing) {
+          existing.innerHTML = '<select disabled style="opacity:0.6;cursor:not-allowed;"><option>Modalità legacy (nessuna lega selezionata)</option></select>';
+          return;
+        }
+        // Se non esiste, crealo nella navbar
+        const nav = document.querySelector('header .nav');
+        if (nav) {
+          const selector = document.createElement('div');
+          selector.id = 'leagueSelector';
+          selector.className = 'league-selector';
+          selector.innerHTML = '<select disabled style="opacity:0.6;cursor:not-allowed;"><option>Modalità legacy (nessuna lega selezionata)</option></select>';
+          nav.insertBefore(selector, nav.firstChild);
+        }
+        return;
+      }
+    }
     // Su mobile/tablet: sotto la navbar, sopra il main
     // Su desktop: dentro la navbar
     const isMobileOrTablet = (window.deviceInfo && (window.deviceInfo.isSmartphone || window.deviceInfo.isTablet))
@@ -784,6 +925,8 @@
         width: 100%;
         position: relative;
         z-index: 1400;
+        padding: 0 16px;
+        margin: -8px 0 18px;
       }
     `;
     

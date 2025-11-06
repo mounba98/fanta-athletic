@@ -1,0 +1,121 @@
+{
+  "championships": [
+    {
+      "code": "AICS_FI_AMAT",
+      "name": "Amatori AICS Firenze",
+      "organizer": "AICS Firenze",
+      "level": "Amatori",
+      "area": "Firenze"
+    },
+    {
+      "code": "UISP_FI_AMAT",
+      "name": "Amatori UISP Firenze",
+      "organizer": "UISP Firenze",
+      "level": "Amatori",
+      "area": "Firenze"
+    },
+    {
+      "code": "UISP_PR_AMAT",
+      "name": "Amatori UISP Prato",
+      "organizer": "UISP Prato",
+      "level": "Amatori",
+      "area": "Prato"
+    },
+    {
+      "code": "UISP_PO_AMAT",
+      "name": "Amatori UISP Pistoia",
+      "organizer": "UISP Pistoia",
+      "level": "Amatori",
+      "area": "Pistoia"
+    },
+    {
+      "code": "UISP_SI_AMAT",
+      "name": "Amatori UISP Siena",
+      "organizer": "UISP Siena",
+      "level": "Amatori",
+      "area": "Siena"
+    },
+    {
+      "code": "FIGC_FI_TERZA",
+      "name": "FIGC Terza Categoria Firenze",
+      "organizer": "FIGC CR Toscana",
+      "level": "Dilettanti",
+      "area": "Firenze"
+    },
+    {
+      "code": "FIGC_FI_SECONDA",
+      "name": "FIGC Seconda Categoria Firenze",
+      "organizer": "FIGC CR Toscana",
+      "level": "Dilettanti",
+      "area": "Firenze"
+    },
+    {
+      "code": "FIGC_FI_PRIMA",
+      "name": "FIGC Prima Categoria Firenze",
+      "organizer": "FIGC CR Toscana",
+      "level": "Dilettanti",
+      "area": "Firenze"
+    },
+    {
+      "code": "FIGC_TOS_PROMO",
+      "name": "FIGC Promozione Toscana",
+      "organizer": "FIGC CR Toscana",
+      "level": "Dilettanti élite",
+      "area": "Toscana"
+    },
+    {
+      "code": "FIGC_TOS_ECC",
+      "name": "FIGC Eccellenza Toscana",
+      "organizer": "FIGC CR Toscana",
+      "level": "Dilettanti élite",
+      "area": "Toscana"
+    },
+    {
+      "code": "FIGC_IT_SERIED",
+      "name": "FIGC Serie D",
+      "organizer": "FIGC",
+      "level": "Semi-professionisti",
+      "area": "Italia"
+    },
+    {
+      "code": "SETTOREPROV_FI_JUN",
+      "name": "Juniores Provinciali Firenze",
+      "organizer": "FIGC Settore Giovanile",
+      "level": "Giovanili",
+      "area": "Firenze"
+    },
+    {
+      "code": "SETTOREPROV_FI_ALL",
+      "name": "Allievi Provinciali Firenze",
+      "organizer": "FIGC Settore Giovanile",
+      "level": "Giovanili",
+      "area": "Firenze"
+    },
+    {
+      "code": "SETTOREGIO_JUN",
+      "name": "Juniores Regionale Toscana",
+      "organizer": "FIGC Settore Giovanile",
+      "level": "Giovanili",
+      "area": "Toscana"
+    },
+    {
+      "code": "SETTOREGIO_ALL",
+      "name": "Allievi Regionali Toscana",
+      "organizer": "FIGC Settore Giovanile",
+      "level": "Giovanili",
+      "area": "Toscana"
+    }
+  ],
+  "regions": [
+    { "code": "TOSCANA", "name": "Toscana", "macroArea": "Centro" },
+    { "code": "TOSCANA_FI", "name": "Firenze e Provincia", "macroArea": "Toscana" },
+    { "code": "TOSCANA_PR", "name": "Prato e Provincia", "macroArea": "Toscana" },
+    { "code": "TOSCANA_PT", "name": "Pistoia e Provincia", "macroArea": "Toscana" },
+    { "code": "TOSCANA_SI", "name": "Siena e Provincia", "macroArea": "Toscana" }
+  ],
+  "seasons": [
+    { "code": "2024_2025", "label": "Stagione 24/25", "startYear": 2024, "endYear": 2025 },
+    { "code": "2023_2024", "label": "Stagione 23/24", "startYear": 2023, "endYear": 2024 }
+  ]
+}
+

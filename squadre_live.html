@@ -197,7 +197,7 @@
   </main>
 
   <footer class="footer">
-    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+    <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -504,11 +504,18 @@
     async function fetchOwnersForTeam(idx){
       try{
         if (!window.db) return [];
+        // Per non-admin, questa query potrebbe non essere permessa - gestisci silenziosamente
         const snap = await window.db.collection('users').where('team_index','==', idx).get();
         const list = [];
         snap.forEach(doc=>{ const d=doc.data()||{}; list.push(d.display_name||d.email||doc.id); });
         return list;
-      }catch(e){ console.warn('fetchOwnersForTeam', e); return []; }
+      }catch(e){ 
+        // Non loggare errori permission-denied per non-admin (sono attesi)
+        if (e?.code !== 'permission-denied') {
+          console.warn('fetchOwnersForTeam', e);
+        }
+        return []; 
+      }
     }
 
     function renderEditor(){

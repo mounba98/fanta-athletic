@@ -32,9 +32,9 @@
     const hamburger = document.createElement('button');
     hamburger.id = 'hamburgerBtn';
     hamburger.className = 'hamburger-btn';
+    hamburger.type = 'button';
     hamburger.innerHTML = '☰';
     hamburger.onclick = toggleMenu;
-    hamburger.style.cssText = 'background: transparent !important; position: absolute; left: 24px; top: 50%; transform: translateY(-50%); z-index: 1000; font-size: 28px; padding: 8px; color: white; border: none; cursor: pointer;';
     
     // Inserisci hamburger come PRIMO elemento del header
     header.insertBefore(hamburger, header.firstChild);
@@ -82,6 +82,7 @@
     
     document.body.appendChild(overlay);
     document.body.appendChild(menu);
+    updateThemeLabel();
     
     // Aggiungi link admin se necessario
     checkAdminStatus();
@@ -169,18 +170,23 @@
   
   // Toggle tema dal menu
   function toggleThemeFromMenu() {
-    const html = document.documentElement;
-    const isDark = html.classList.contains('dark');
     const label = document.getElementById('themeToggleLabel');
-    
-    if (isDark) {
-      html.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-      if (label) label.textContent = 'Tema Scuro';
+    let isDark;
+
+    if (typeof window.toggleTheme === 'function') {
+      isDark = window.toggleTheme();
     } else {
-      html.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      if (label) label.textContent = 'Tema Chiaro';
+      const html = document.documentElement;
+      const nextDark = !html.classList.contains('dark');
+      html.classList.toggle('dark', nextDark);
+      try {
+        localStorage.setItem('fantaAthletic_theme', nextDark ? 'dark' : 'light');
+      } catch (_) {}
+      isDark = nextDark;
+    }
+
+    if (label) {
+      label.textContent = isDark ? 'Tema Chiaro' : 'Tema Scuro';
     }
   }
   
@@ -190,6 +196,9 @@
     if (label) {
       const isDark = document.documentElement.classList.contains('dark');
       label.textContent = isDark ? 'Tema Chiaro' : 'Tema Scuro';
+    }
+    if (typeof window.updateThemeButton === 'function') {
+      window.updateThemeButton();
     }
   }
 

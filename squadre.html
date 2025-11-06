@@ -11,9 +11,24 @@
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
   <style>
     body.page-squadre { background: var(--bg, #0f172a); }
-    .page-squadre main.layout { margin-top: 18px; }
-    .layout { display: grid; grid-template-columns: minmax(320px, 0.95fr) minmax(0, 2.05fr); gap: 24px; align-items: stretch; }
-    .sidebar, .panel { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 20px; display:flex; flex-direction:column; gap:16px; min-height:0; }
+    .page-squadre main.layout { margin-top: 0; padding-top: 0; }
+    .layout { display: grid; grid-template-columns: minmax(320px, 0.95fr) minmax(0, 2.05fr); gap: 24px; align-items: start; }
+    .sidebar { width: 100%; display:flex; flex-direction:column; gap:14px; padding: 16px 18px 20px; }
+    .sidebar .list { width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: stretch; padding: 0; }
+    #teams { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
+    #teams .item { width: 100%; box-sizing: border-box; border-radius: 16px; border: 1px solid rgba(148,163,184,0.18); background: var(--card, rgba(15,23,42,0.6)); padding: 14px 18px; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease; display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:12px; }
+    :root.dark #teams .item { background: rgba(15,23,42,0.85); border-color: rgba(148,163,184,0.25); }
+    #teams .item:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(15,23,42,0.18); }
+    #teams .item.selected { border-color: var(--primary, #6366f1); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+    #teams .item .tag { font-size: 11px; padding: 2px 10px; border-radius: 999px; font-weight: 700; text-transform: uppercase; }
+    .team-status { display:inline-flex; align-items:center; gap:8px; font-size: 12px; margin-left: auto; }
+    .team-name { font-size: 18px; font-weight: 700; color: var(--text); }
+    .team-card-header { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+    .team-card-logo { width: 44px; height: 44px; border-radius: 12px; overflow:hidden; flex-shrink:0; background: rgba(148,163,184,0.15); display:flex; align-items:center; justify-content:center; font-weight:700; color: rgba(15,23,42,0.55); text-transform: uppercase; }
+    .team-card-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .team-meta { font-size: 13px; color: var(--muted); }
+    .sidebar, .panel { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 22px 22px 26px; display:flex; flex-direction:column; gap:20px; min-height:0; }
+    .sidebar { align-items: stretch; }
     /* Sticky team list on desktop */
     @media (min-width: 641px){
       .sidebar { position: sticky; top: 110px; max-height: calc(100vh - 130px); overflow: auto; }
@@ -32,27 +47,34 @@
     .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items:start; }
     #colRight { display:flex; flex-direction:column; gap:0; }
     .meta-grid { display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 0; align-items:start; }
-    .meta-wrap { display:grid; grid-template-columns: 360px 1fr; column-gap: 16px; align-items:start; margin-bottom: 24px; }
-    .meta-left .row { margin: 0 0 4px !important; }
+    .meta-wrap { display:grid; grid-template-columns: 360px 1fr; column-gap: 20px; align-items:start; margin: 12px 0 28px; }
+    .meta-left { display:flex; flex-direction:column; gap:12px; }
+    .meta-left .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin: 0 !important; }
+    .meta-left .row select { min-width: 160px; }
+    .meta-left .mobile-only { margin: 0 0 8px !important; }
     .list { display:grid; gap:8px; }
     /* Larger players font in lists */
     #playersPool .player-pick span { font-size: 16px; }
     .tag { display:inline-block; padding:3px 8px; border-radius:999px; background:#eef3f8; color:#506070; font-size:12px; }
     .tag-success { background:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
     .tag-danger { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
-    .player-pill { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:rgba(15,23,42,0.9); border:1px solid rgba(148,163,184,0.25); color:#f8fafc; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .player-pill { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:var(--card, rgba(255,255,255,0.95)); border:1px solid rgba(148,163,184,0.25); color:var(--text, #1f2937); box-shadow: var(--shadow); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    :root.dark .player-pill { background:rgba(15,23,42,0.9); border-color:rgba(148,163,184,0.25); color:#f8fafc; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
     .player-pill img { width:42px; height:42px; border-radius:50%; object-fit:cover; border:2px solid rgba(148,163,184,0.4); box-shadow:0 2px 6px rgba(15,23,42,0.45); }
     .player-pill .pill-info { display:flex; flex-direction:column; line-height:1.2; }
-    .player-pill .pill-name { font-weight:700; font-size:15px; letter-spacing:0.01em; }
-    .player-pill .pill-role { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.8; }
+    .player-pill .pill-name { font-weight:700; font-size:15px; letter-spacing:0.01em; color:inherit; }
+    .player-pill .pill-role { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.8; color:inherit; }
     .player-pill .pill-actions { display:flex; gap:6px; align-items:center; margin-left:auto; }
     .player-pill .pill-actions .btn-sm { padding:6px 10px; font-size:12px; border-radius:10px; }
     .player-pill:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(15,23,42,0.35); }
     .player-pill .badgeC { margin-left:6px; font-size:11px; display:inline-flex; align-items:center; justify-content:center; }
-    .bench-pill { background: rgba(15,23,42,0.78); border:1px solid rgba(148,163,184,0.2); }
+    .bench-pill { background: var(--card, rgba(255,255,255,0.95)); border:1px solid rgba(148,163,184,0.25); color: var(--text, #1f2937); }
+    :root.dark .bench-pill { background: rgba(15,23,42,0.9); border-color: rgba(148,163,184,0.25); color: #f8fafc; }
     .bench-pill-active { box-shadow:0 0 0 2px var(--secondary); }
-    .top-players-card { background: linear-gradient(160deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.92) 100%); border-radius:18px; padding:18px; margin-bottom:20px; border:1px solid rgba(148,163,184,0.15); box-shadow: 0 16px 32px rgba(15,23,42,0.45); display:flex; flex-direction:column; gap:12px; }
-    .top-players-card h3 { margin:0; font-size:18px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:8px; }
+    .top-players-card { background: var(--card, #fff); border-radius:18px; padding:18px; margin-bottom:20px; border:1px solid rgba(148,163,184,0.15); box-shadow: var(--shadow); display:flex; flex-direction:column; gap:12px; }
+    :root.dark .top-players-card { background: linear-gradient(160deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.92) 100%); }
+    .top-players-card h3 { margin:0; font-size:18px; font-weight:800; color:var(--text, #1f2937); display:flex; align-items:center; gap:8px; }
+    :root.dark .top-players-card h3 { color:#f8fafc; }
     .top-player-card { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:14px; background:rgba(148,163,184,0.15); border:1px solid rgba(148,163,184,0.35); transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .top-player-card.rank-1 { background:linear-gradient(135deg,#fde68a 0%,#fbbf24 45%,#f59e0b 100%); color:#1f2937; border:none; }
     .top-player-card.rank-2 { background:linear-gradient(135deg,#e2e8f0 0%,#cbd5f5 100%); color:#0f172a; border:none; }
@@ -73,26 +95,190 @@
     #giornataSel { padding: 10px 14px; font-size: 16px; border-radius: 10px; border:1px solid #dbe1e8; box-shadow: 0 0 0 4px var(--ring); }
     #playerSearch { padding: 14px 16px; font-size: 16px; }
     /* Make specific buttons match input height */
-    #saveTeam, #saveKickoff, #addSelected { padding: 14px 16px; font-size: 16px; border:1px solid #dbe1e8; box-shadow: 0 0 0 4px var(--ring); vertical-align: middle; line-height: 1; transform: translateY(-4px); }
+    #saveTeam, #saveKickoff, #addSelected { padding: 14px 16px; font-size: 16px; border:1px solid #dbe1e8; box-shadow: 0 0 0 4px var(--ring); vertical-align: middle; line-height: 1; transform: none; }
     /* Shrink 'Aggiungi giocatori' ~20% */
-    #addSelected { padding: 12px 10px; font-size: 13px; transform: translateY(-2px); width: 88px; white-space: normal; line-height: 1.1; text-align: center; }
+    #addSelected { padding: 12px 10px; font-size: 13px; transform: none; width: 88px; white-space: normal; line-height: 1.1; text-align: center; }
     /* Coach buttons restyle */
     .meta-right { display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
     #coachButtons { flex-wrap: nowrap !important; gap: 8px; justify-content:flex-start; }
     #coachButtons .btn { padding: 14px 18px; border-radius: 14px; font-weight: 800; font-size: 18px; flex: 0 0 auto; }
     #coachButtons .btn.selected { background: var(--primary); color: #fff; border: none; }
 
-    /* Pitch and DnD */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 12px; padding: 16px; color:#e8f6ee; box-shadow: var(--shadow); }
-    .pitch-grid { display:grid; gap: 10px; }
-    .pitch-grid .line { display:grid; gap: 14px; justify-content:center; align-items:center; }
-    .pitch-grid .line.two { grid-template-columns: repeat(2, minmax(170px, 1fr)); }
-    .pitch-grid .line.one { grid-template-columns: minmax(190px, 1fr); max-width: 58%; margin: 0 auto; }
-    .slot { min-height: 90px; background: rgba(255,255,255,0.12); border:2px dashed rgba(255,255,255,0.5); border-radius:10px; display:flex; align-items:center; justify-content:center; padding:10px; text-align:center; }
-    .slot.filled { background: rgba(255,255,255,0.18); border-style: solid; }
-    .draggable { background:#fff; border:1px solid #dbe1e8; border-radius:8px; padding:6px 8px; cursor:grab; color:#2b3a42; }
-    .captain { border:2px solid #f39c12; }
-    .badgeC { margin-left:6px; background:#fdf3d3; color:#8a5d00; border:1px solid #f1d592; border-radius:6px; padding:2px 6px; font-size:11px; }
+    @media (max-width: 900px) {
+      .meta-wrap { grid-template-columns: 1fr; row-gap: 16px; }
+      .meta-left { order: 1; }
+      .meta-right { order: 2; }
+    }
+
+    /* Pitch and DnD - Uniformato con formazioni */
+    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 32px 24px 24px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+    .pitch-grid { display:grid; gap: 18px; margin-top: 12px; }
+    .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
+    .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
+    .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 50%; margin: 0 auto; }
+    .slot { min-height: 110px; width: 100%; max-width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.1); border:2px dashed rgba(255,255,255,0.45); border-radius:16px; display:flex; align-items:stretch; justify-content:center; padding:12px; text-align:left; transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease, border-color 0.2s ease; }
+    .slot-card.draggable { width: 100%; height: 100%; min-height: 0; }
+    .slot.filled { background: rgba(255,255,255,0.16); border-style: solid; }
+    .slot.captain-slot { background: rgba(253, 224, 71, 0.16); border-color: rgba(253, 224, 71, 0.55); }
+    .slot.captain-active { background: linear-gradient(135deg, rgba(253, 224, 71, 0.28), rgba(250, 204, 21, 0.35)); border-color: rgba(250, 204, 21, 0.85); box-shadow: 0 16px 30px rgba(250, 204, 21, 0.25); }
+    .slot.touch-drop-target { background:rgba(34,197,94,0.3); border-color:#22c55e; border-style:solid; box-shadow: 0 8px 20px rgba(34,197,94,0.25); }
+    
+    .slot-card.draggable {
+      background: rgba(15,23,42,0.28);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 14px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      color: #f8fafc;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      box-sizing: border-box;
+    }
+
+    .slot-card-main {
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .slot-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.32);
+      flex-shrink: 0;
+      box-shadow: 0 10px 18px rgba(15,23,42,0.3);
+      background: rgba(15,23,42,0.32);
+    }
+
+    .slot-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .slot-info {
+      flex: 1;
+      min-width: 0;
+      display:flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .slot-name {
+      font-size: 16px;
+      font-weight: 700;
+      text-shadow: 0 1px 3px rgba(15,23,42,0.45);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .slot-meta {
+      display:flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items:center;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    .slot-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:4px 10px;
+      border-radius: 999px;
+      font-size:11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: rgba(15,23,42,0.45);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #f8fafc;
+    }
+
+    .slot-badge--captain {
+      background: rgba(250, 204, 21, 0.85);
+      border-color: rgba(250, 204, 21, 0.75);
+      color: #1f2937;
+      font-weight: 700;
+    }
+
+    .slot-badge--hint {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.24);
+      color: #f8fafc;
+    }
+
+    .slot-actions {
+      display:flex;
+      justify-content:flex-end;
+      gap: 8px;
+    }
+
+    .slot-empty {
+      font-size: 14px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+    }
+
+    .bench-chip {
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.12);
+      border:1px solid rgba(148,163,184,0.22);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      cursor: grab;
+    }
+
+    .bench-chip.captain-chip {
+      background: rgba(250,204,21,0.18);
+      border-color: rgba(250,204,21,0.55);
+    }
+
+    .bench-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(15,23,42,0.25);
+    }
+
+    .bench-chip img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(148,163,184,0.3);
+      flex-shrink: 0;
+    }
+
+    .bench-chip-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .slot-badge--bench {
+      font-size: 10px;
+      padding: 2px 6px;
+    }
 
     .roster { display:grid; gap:8px; border:1px solid #e7edf3; border-radius:10px; padding:8px; }
     .roster .draggable { display:flex; justify-content:space-between; align-items:center; }
@@ -121,26 +307,43 @@
       .sidebar { display:none; }
       header p { display:none; }
       .grid2 { grid-template-columns: 1fr; }
-      .panel { max-width: 380px; margin: 0 auto; }
+      .panel { max-width: 380px; margin: 0 auto; padding: 16px; }
+      .meta-wrap { max-width: 100%; margin: 0 auto; }
+      .grid2 { max-width: 100%; margin: 0 auto; }
       .pitch { max-width: 300px; margin: 0 auto; }
       .sectionh { max-width: 300px; margin-left: auto; margin-right: auto; }
       #benchStrip { max-width: 300px; margin-left: auto; margin-right: auto; justify-content: center; }
       #colRight > .row { max-width: 300px; margin-left: auto; margin-right: auto; }
-      /* shrink slots proportionally on mobile */
-      .pitch-grid .line.two { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
-      .pitch-grid .line.one { grid-template-columns: minmax(140px, 1fr); max-width: 66%; }
-      .slot { min-height: 80px; }
+      /* shrink slots proportionally on mobile - Uniformato con formazioni */
+      .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
+      .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 50%; }
+      .slot { min-height: 130px; }
+      .slot-card.draggable { padding: 12px; gap: 10px; }
+      .slot-card-main { flex-direction: column; align-items: center; text-align: center; }
+      .slot-info { align-items: center; }
+      .slot-name { white-space: normal; }
+      .slot-meta { justify-content: center; }
+      .slot-actions { justify-content: center; }
+      .slot-card-main .slot-avatar { width: 64px; height: 64px; border-radius: 18px; }
+      .slot-card-main .slot-badge { font-size: 10px; }
       #teamSelectMobile { width: 100%; }
+      .meta-left .row { flex-direction: column; align-items: stretch; gap:6px; }
+      .meta-left .row > * { width: 100% !important; max-width: 100% !important; }
+      #lockStatus { width: 100%; order: 3; text-align: left; }
+      .player-pill { flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+      .player-pill .pill-actions { width: 100%; margin-left: 0; justify-content: flex-end; }
+      .player-pill .pill-actions .btn-sm { padding:6px 12px; font-size:12px; }
+      #saveTeam { width: 100%; }
     }
     /* JS removed from style block (moved to <script>) */
     /* Hide reset anywhere */
     #resetTeam { display:none !important; }
     /* Sticky header with hide-on-scroll (mobile) */
-    header { position: sticky; top: 0; z-index: 50; background: var(--text); transition: transform .25s ease; }
+    header { position: sticky; top: 0; z-index: 50; transition: transform .25s ease; }
     header.nav-hidden { transform: translateY(-110%); }
   </style>
 </head>
-  <body class= page-squadre>
+  <body class="page-squadre">
   <header>
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
@@ -154,18 +357,18 @@
       <div class="list" id="teams"></div>
     </section>
 
-    <section class="panel" id="editor">
+    <section class="panel" id="editor" style="margin-top: 8px;">
       <div class="meta-wrap">
         <div class="meta-left">
-          <div class="row" style="gap:8px; flex-wrap:wrap; align-items:center;">
-            <select id="giornataSel" class="input" style="max-width:180px;"></select>
+          <div class="row meta-controls">
+            <select id="giornataSel" class="input"></select>
             <span id="lockStatus" class="muted"></span>
             <button class="btn btn-secondary btn-sm" id="saveTeam">Salva rosa</button>
           </div>
-          <div class="mobile-only" style="margin-bottom:8px;">
-            <label class="row" style="gap:8px; align-items:center;">
+          <div class="mobile-only">
+            <label class="row">
               <span class="muted">Seleziona squadra</span>
-              <select id="teamSelectMobile" class="input" style="flex:1;"></select>
+              <select id="teamSelectMobile" class="input"></select>
             </label>
           </div>
           <div class="row" style="gap:8px; align-items:center; margin:2px 0 6px; flex-wrap:wrap;">
@@ -234,12 +437,13 @@
   </main>
 
   <footer class="footer">
-    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+    <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script>
     // Init Firebase SUBITO
@@ -330,6 +534,39 @@
       return window.db.collection('teams').doc(String(index));
     }
 
+    function getDayDocRef(giornata) {
+      if (!window.db) return null;
+      if (window.LeagueHelper && typeof window.LeagueHelper.getLeagueDoc === 'function') {
+        try {
+          const ref = window.LeagueHelper.getLeagueDoc('days', giornata);
+          if (ref) return ref;
+        } catch (err) {
+          console.warn('LeagueHelper.getLeagueDoc(days) failed', err);
+        }
+      }
+      return window.db.collection('days').doc(giornata);
+    }
+
+    function getLeagueScopedKey(prefix, giornata) {
+      const leagueId = (window.LeagueHelper && typeof window.LeagueHelper.getCurrentLeagueId === 'function' && window.LeagueHelper.getCurrentLeagueId())
+        || localStorage.getItem('last_league_id')
+        || 'legacy';
+      return `${prefix}_${leagueId}_${giornata}`;
+    }
+
+    async function ensureLeagueReady(timeoutMs = 7000) {
+      if (window.LeagueHelper && typeof window.LeagueHelper.waitForLeague === 'function') {
+        try {
+          const info = await window.LeagueHelper.waitForLeague(timeoutMs);
+          if (info && info.id) {
+            try { localStorage.setItem('last_league_id', info.id); } catch (_) {}
+          }
+        } catch (err) {
+          console.warn('[squadre] Timeout attesa lega:', err?.message || err);
+        }
+      }
+    }
+
     function getSavedDocRef(index, giornata){
       if (!window.db) return null;
       if (window.LeagueHelper && typeof window.LeagueHelper.getLeagueSubcollection === 'function') {
@@ -345,6 +582,28 @@
       return window.db.collection('teams').doc(String(index)).collection('saved').doc(giornata);
     }
 
+    async function fetchSavedSnapshot(teamIdx, giornata) {
+      const refs = [];
+      const leagueRef = getSavedDocRef(teamIdx, giornata);
+      if (leagueRef) {
+        refs.push({ source: 'league', ref: leagueRef });
+      }
+      const legacyDb = window.__LEGACY_DB__ || firebase.firestore();
+      refs.push({ source: 'legacy', ref: legacyDb.collection('teams').doc(String(teamIdx)).collection('saved').doc(giornata) });
+
+      for (const entry of refs) {
+        try {
+          const snap = await entry.ref.get();
+          if (snap && snap.exists) {
+            return { snap, source: entry.source, ref: entry.ref };
+          }
+        } catch (err) {
+          console.warn('[squadre] fetchSavedSnapshot error', entry.source, teamIdx, giornata, err);
+        }
+      }
+      return null;
+    }
+
     function renderTopPlayersCard(team){
       const card = document.getElementById('topPlayersCard');
       const list = document.getElementById('topPlayersList');
@@ -356,19 +615,58 @@
         if (empty) empty.style.display = 'none';
         return;
       }
-      const entries = (team.roster || [])
-        .map(pid => {
-          const player = state.players.find(x => x.player_id === pid);
-          return player ? { player, pid, points: getPlayerSeasonPoints(player) } : null;
-        })
-        .filter(Boolean)
-        .sort((a,b)=> b.points - a.points)
-        .slice(0, 3);
+      let entries = [];
+      const teamId = String(state.selectedTeamIdx);
+      const teamPointsMap = state.teamPlayerPoints instanceof Map ? state.teamPlayerPoints.get(teamId) : null;
 
-      if (!entries.length){
+      if (teamPointsMap && teamPointsMap.size) {
+        entries = Array.from(teamPointsMap.entries())
+          .map(([pid, total]) => {
+            const player = state.players.find(x => x.player_id === pid);
+            if (!player) return null;
+            return { player, pid, points: Number(total) || 0 };
+          })
+          .filter(Boolean)
+          .sort((a, b) => b.points - a.points)
+          .slice(0, 3);
+      }
+
+      if (!entries.length) {
+        const statsTop = team.stats?.topPlayers || team.stats?.top_players;
+        if (Array.isArray(statsTop) && statsTop.length) {
+          entries = statsTop.map(item => {
+            const pid = item.playerId || item.player_id || item.pid || item.id || null;
+            const player = pid ? state.players.find(x => x.player_id === pid) : null;
+            const fullName = item.playerName || item.name || item.displayName || null;
+            return {
+              player: player || { nome_completo: fullName || '', player_id: pid },
+              pid: pid || (player ? player.player_id : fullName || ''),
+              points: Number(item.points ?? item.total ?? item.value ?? 0)
+            };
+          }).filter(Boolean).sort((a,b)=> b.points - a.points).slice(0,3);
+        }
+      }
+
+      if (!entries.length) {
+        entries = (team.roster || [])
+          .map(pid => {
+            const player = state.players.find(x => x.player_id === pid);
+            return player ? { player, pid, points: getPlayerSeasonPoints(player) } : null;
+          })
+          .filter(Boolean)
+          .sort((a,b)=> b.points - a.points)
+          .slice(0, 3);
+      }
+
+      const hasRealPoints = entries.some(entry => Number(entry.points || 0) !== 0);
+
+      if (!entries.length || !hasRealPoints){
         card.style.display = 'none';
         list.innerHTML = '';
-        if (empty) empty.style.display = 'block';
+        if (empty) {
+          empty.textContent = 'Calcola almeno una giornata per vedere i migliori.';
+          empty.style.display = 'block';
+        }
         return;
       }
 
@@ -387,7 +685,7 @@
                 ${role ? `<div class="top-player-role">${role}</div>` : ''}
               </div>
             </div>
-            <div class="top-player-points">${entry.points.toFixed(1)}</div>
+            <div class="top-player-points">${Number(entry.points || 0).toFixed(1)}</div>
           </div>`;
       }).join('');
       if (empty) empty.style.display = 'none';
@@ -406,7 +704,9 @@
       user: null,
       userTeamIdx: null,
       userDisplayName: '' ,
-      daysComputed: false
+      daysComputed: false,
+      teamPlayerPoints: new Map(),
+      rulesMap: null
     };
 
     function toast(msg){
@@ -467,7 +767,14 @@
       wed0030.setHours(0,30,0,0);
       return [curMon, wed0030];
     }
-    function getKickoff(g){ try { const v = localStorage.getItem(`kickoff_${g}`); return v? new Date(v): null; } catch { return null; } }
+    function getKickoff(g){
+      try {
+        const v = localStorage.getItem(getLeagueScopedKey('kickoff', g));
+        return v ? new Date(v) : null;
+      } catch {
+        return null;
+      }
+    }
     function isLockedAuto(){
       const now = new Date();
       // Weekly lock window: Mon 20:30 -> Wed 00:30
@@ -478,13 +785,33 @@
       // Reads days/{giornata}.computed from Firestore; fallback false
       try{
         if (window.db){
-          const doc = await window.db.collection('days').doc(state.giornata).get();
-          state.daysComputed = !!(doc.exists && (doc.data()?.computed===true));
+          const docRef = getDayDocRef(state.giornata);
+          const doc = docRef ? await docRef.get() : null;
+          state.daysComputed = !!(doc && doc.exists && (doc.data()?.computed === true));
           return;
         }
       }catch(e){ /* noop */ }
       state.daysComputed = false;
     }
+    async function autoSelectNextGiornata(){
+      if (!window.db) return;
+      try {
+        for (let i = 1; i <= 38; i++) {
+          const gid = `G${i}`;
+          const docRef = getDayDocRef(gid);
+          const doc = docRef ? await docRef.get() : null;
+          const computed = !!(doc && doc.exists && doc.data()?.computed === true);
+          if (!computed) {
+            state.giornata = gid;
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn('[squadre] autoSelectNextGiornata error:', error);
+      }
+      state.giornata = 'G1';
+    }
+
     async function initLockUI(){
       const sel = document.getElementById('giornataSel');
       sel.innerHTML = Array.from({length:24}, (_,i)=>`<option value=\"G${i+1}\">Giornata ${i+1}</option>`).join('');
@@ -513,9 +840,13 @@
       else { input.value = ''; }
       btn.onclick = ()=>{
         const v = input.value;
-        if (!v){ localStorage.removeItem(`kickoff_${state.giornata}`); updateLockStatus(); return; }
+        if (!v){
+          localStorage.removeItem(getLeagueScopedKey('kickoff', state.giornata));
+          updateLockStatus();
+          return;
+        }
         const iso = new Date(v).toISOString();
-        localStorage.setItem(`kickoff_${state.giornata}`, iso);
+        localStorage.setItem(getLeagueScopedKey('kickoff', state.giornata), iso);
         updateLockStatus();
       };
     }
@@ -527,18 +858,22 @@
     async function saveCurrentTeamFormation(){
       const t = state.teams[state.selectedTeamIdx]; if (!t) return;
       if (!t.captain){ toast('Seleziona il capitano prima di salvare'); return; }
-      const payload = { lineup: (t.lineup||[]).slice(), captain: t.captain||null, name: t.name||'', updated_at: firebase.firestore.FieldValue.serverTimestamp() };
-      // no local fallback: si scrive solo su Firestore per evitare stati divergenti
+      const sanitizedLineup = (t.lineup || []).slice(0, 5).concat(Array(5).fill(null)).slice(0, 5);
+      const payload = {
+        lineup: sanitizedLineup,
+        captain: t.captain || null,
+        name: t.name || '',
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      };
       const g = state.giornata;
-      // Firestore write
       try{
         const ref = getSavedDocRef(state.selectedTeamIdx, g);
         if (ref){
           await ref.set(payload, { merge:true });
-          toast(`Formazione salvata • Squadra ${state.selectedTeamIdx+1} • ${g}`);
-        } else {
-          toast('Database non disponibile');
         }
+        const legacyDb = window.__LEGACY_DB__ || firebase.firestore();
+        await legacyDb.collection('teams').doc(String(state.selectedTeamIdx)).collection('saved').doc(g).set(payload, { merge:true });
+        toast(`Formazione salvata • Squadra ${state.selectedTeamIdx+1} • ${g}`);
       }catch(e){ console.warn('FS save formation error', e); toast(`Errore salvataggio: ${e?.message||'Firestore'}`); }
     }
 
@@ -563,7 +898,16 @@
     function initTeams(){
       try { state.teams = JSON.parse(localStorage.getItem('teams_data')||'[]'); } catch { state.teams = []; }
       if (!Array.isArray(state.teams) || state.teams.length !== 19){
-        state.teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null }));
+        state.teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null, stats: {} }));
+      } else {
+        state.teams = state.teams.map((team, idx) => ({
+          name: team.name || `Squadra ${idx + 1}`,
+          coach_ids: Array.isArray(team.coach_ids) ? team.coach_ids : [],
+          roster: Array.isArray(team.roster) ? team.roster : [],
+          lineup: Array.isArray(team.lineup) ? team.lineup : [null,null,null,null,null],
+          captain: team.captain || null,
+          stats: team.stats || {}
+        }));
       }
     }
 
@@ -603,32 +947,125 @@
             if (Array.isArray(d.coach_ids)) t.coach_ids = d.coach_ids;
             if (Array.isArray(d.roster)) t.roster = d.roster;
             if (d.logo) setTeamLogo(i, d.logo);
+            if (d.stats) t.stats = d.stats;
           }
         });
       }catch(e){ console.warn('FS load teams error', e); }
     }
 
+    async function ensureRulesLoaded(){
+      if (state.rulesMap instanceof Map) return state.rulesMap;
+      const map = new Map();
+      try {
+        let rulesSnap = null;
+        try {
+          rulesSnap = await window.db.collection('rules').get();
+        } catch {}
+        if (!rulesSnap || rulesSnap.empty) {
+          const legacyDb = window.__LEGACY_DB__ || firebase.firestore();
+          rulesSnap = await legacyDb.collection('rules').where('attivo','==',true).get();
+        }
+        rulesSnap.forEach(doc => {
+          const data = doc.data() || {};
+          map.set(doc.id, { id: doc.id, ...data });
+        });
+      } catch (err) {
+        console.warn('[squadre] Impossibile caricare rules:', err);
+      }
+      state.rulesMap = map;
+      return map;
+    }
+
+    function resolveSelection(raw){
+      if (raw === undefined || raw === null) return raw;
+      if (typeof raw === 'object') {
+        if (raw.value !== undefined) return raw.value;
+        if (raw.count !== undefined) return raw.count;
+        if (raw.qty !== undefined) return raw.qty;
+      }
+      return raw;
+    }
+
+    function computePlayerPoints(selections, rulesMap){
+      if (!selections) return 0;
+      let total = 0;
+      Object.entries(selections || {}).forEach(([rid, raw]) => {
+        const rule = rulesMap.get(rid);
+        if (!rule) return;
+        const value = Number(rule.valore ?? 0);
+        if (!Number.isFinite(value) || value === 0) return;
+        const resolved = resolveSelection(raw);
+        const inputType = rule.input || (typeof resolved === 'number' ? 'counter' : 'toggle');
+        let count = 0;
+        if (inputType === 'counter') {
+          count = Number(resolved || 0);
+        } else {
+          count = resolved ? 1 : 0;
+        }
+        if (!Number.isFinite(count)) count = 0;
+        total += count * value;
+      });
+      return total;
+    }
+
+    async function loadTeamSeasonPoints(){
+      if (!window.db) return;
+      const rulesMap = await ensureRulesLoaded();
+      const playerTotals = new Map();
+      const giornataIds = Array.from({length: 38}, (_, i) => `G${i + 1}`);
+      await Promise.all(giornataIds.map(async giornataId => {
+        try {
+          const doc = await window.db.collection('days').doc(giornataId).get();
+          if (!doc.exists) return;
+          const data = doc.data() || {};
+          const players = data.players || {};
+          Object.entries(players).forEach(([pid, selections]) => {
+            const pts = computePlayerPoints(selections, rulesMap);
+            if (!pts) return;
+            playerTotals.set(pid, (playerTotals.get(pid) || 0) + pts);
+          });
+        } catch (err) {
+          console.warn('[squadre] loadTeamSeasonPoints error', giornataId, err);
+        }
+      }));
+
+      const pointsMap = new Map();
+      state.teams.forEach((team, idx) => {
+        const teamMap = new Map();
+        (team.roster || []).forEach(pid => {
+          const total = playerTotals.get(pid);
+          if (total) {
+            teamMap.set(pid, total);
+          }
+        });
+        if (teamMap.size) {
+          pointsMap.set(String(idx), teamMap);
+        }
+      });
+      state.teamPlayerPoints = pointsMap;
+    }
+
     async function applySavedFromFirestore(g){
       if (!window.db) return;
       try{
-        const tasks = Array.from({length:19}, (_,i)=>{
-          const ref = getSavedDocRef(i, g);
-          return ref ? ref.get() : Promise.resolve(null);
-        });
-        const docs = await Promise.all(tasks);
-        docs.forEach((doc,i)=>{
+        const snapshots = await Promise.all(Array.from({length:19}, (_,i)=> fetchSavedSnapshot(i, g)));
+        for (let i = 0; i < snapshots.length; i++) {
+          const result = snapshots[i];
           const t = state.teams[i]; if (!t) return;
-          if (doc && doc.exists){
-            const d = doc.data();
+          if (result && result.snap && result.snap.exists){
+            const d = result.snap.data() || {};
             if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
-            if (d.captain!==undefined) t.captain = d.captain;
+            if (d.captain !== undefined) t.captain = d.captain;
             if (d.name && !t.name) t.name = d.name;
-          } else {
-            // Reset se non esiste doc salvato per coerenza tra client
-            t.lineup = [null,null,null,null,null];
-            t.captain = null;
+
+            if (result.source === 'legacy') {
+              const leagueRef = getSavedDocRef(i, g);
+              if (leagueRef) {
+                try { await leagueRef.set(d, { merge: true }); } catch (err) { console.warn('[squadre] sync legacy saved -> league', i, g, err); }
+              }
+            }
           }
-        });
+        }
       }catch(e){ console.warn('FS load saved error', e); }
     }
 
@@ -648,9 +1085,6 @@
             if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
             if (d.captain!==undefined) t.captain = d.captain;
             if (d.name && !t.name) t.name = d.name;
-          } else {
-            t.lineup = [null,null,null,null,null];
-            t.captain = null;
           }
           renderTeamsList();
           if (state.selectedTeamIdx===i) renderEditor();
@@ -662,28 +1096,81 @@
     function renderTeamsList(){
       const list = document.getElementById('teams');
       list.innerHTML = state.teams.map((t, idx)=>{
+        const name = (t.name || (`Squadra ${idx + 1}`)).trim();
+        if (name.toLowerCase() === 'squadra 19') {
+          return '';
+        }
         const starters = (t.lineup||[]).filter(Boolean);
         const hasFormation = starters.length>=5;
         const logo = getTeamLogo(idx);
-        const coachName = t.coach_ids && t.coach_ids[0] ? (state.coaches.find(c=>c.coach_id===t.coach_ids[0])?.nome || t.coach_ids[0]) : null;
         const statusClass = hasFormation ? 'tag tag-success' : 'tag tag-danger';
         const statusText = hasFormation ? 'Schierata' : 'Non schierata';
+        const statusMeta = `${(t.roster||[]).length}/11`;
+        
+        // Migliora iniziali squadre
+        function getTeamInitials(teamName) {
+          const name = teamName.toLowerCase().trim();
+          // Mocci e Canni -> MC
+          if (name.includes('mocci') && name.includes('canni')) return 'MC';
+          // Mandragora boys -> MB
+          if (name.includes('mandragora') && name.includes('boys')) return 'MB';
+          // Trucioli in Piana forma -> TP
+          if (name.includes('trucioli') && name.includes('piana')) return 'TP';
+          // Ricchi e Poveri -> RP
+          if (name.includes('ricchi') && name.includes('poveri')) return 'RP';
+          // Curva gonfi -> CG
+          if (name.includes('curva') && name.includes('gonfi')) return 'CG';
+          // Albaninja -> AL
+          if (name.includes('albaninja')) return 'AL';
+          // Minis Blortzos -> MB (ma già preso, usiamo MB2 o meglio MB)
+          if (name.includes('minis') && name.includes('blortzos')) return 'MB';
+          // Aricazzi -> AR
+          if (name.includes('aricazzi')) return 'AR';
+          // AJ Team -> AJ
+          if (name.includes('aj team')) return 'AJ';
+          // Pettecivi -> PE
+          if (name.includes('pettecivi')) return 'PE';
+          // Avanbraccio -> AV
+          if (name.includes('avanbraccio')) return 'AV';
+          // Ale e Toti -> AT
+          if (name.includes('ale') && name.includes('toti')) return 'AT';
+          // Shoerty Team -> SH
+          if (name.includes('shoerty')) return 'SH';
+          // Fanta Dirigenti -> FD
+          if (name.includes('fanta') && name.includes('dirigenti')) return 'FD';
+          // Scout merdosi -> SM
+          if (name.includes('scout') && name.includes('merdosi')) return 'SM';
+          // Lupi furiosi -> LF
+          if (name.includes('lupi') && name.includes('furiosi')) return 'LF';
+          // Compagnia dei mezzoni -> CM
+          if (name.includes('compagnia') && name.includes('mezzoni')) return 'CM';
+          // Avangamba -> AG
+          if (name.includes('avangamba')) return 'AG';
+          // Fallback: prime due lettere o prime lettere di ogni parola
+          const words = name.split(/\s+/).filter(Boolean);
+          if (words.length >= 2) {
+            return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+          }
+          return name.slice(0, 2).toUpperCase();
+        }
+        
+        const initials = getTeamInitials(name);
+        const initialsJS = initials.replace(/'/g, "\\'");
         return `
           <div class="item ${state.selectedTeamIdx===idx?'selected':''}" data-idx="${idx}">
-            <div style="display:flex; align-items:center; gap:10px;">
-              ${logo? `<img src="${logo}" alt="logo" style="width:34px;height:34px;border-radius:8px;border:1px solid #dbe1e8;object-fit:cover;"/>` : '<div style="width:34px;height:34px;border-radius:8px;background:rgba(148,163,184,0.2);"></div>'}
-              <div>
-                <div style="font-weight:800; font-size:16px;">${escapeHtml(t.name||('Squadra '+(idx+1)))}</div>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:2px;">
-                  <span class="${statusClass}">${statusText}</span>
-                  <span class="muted">${(t.roster||[]).length}/11 in rosa</span>
-                  ${coachName ? `<span class="muted">Coach: ${escapeHtml(coachName)}</span>` : '<span class="muted">Coach: —</span>'}
+            <div class="team-card-header">
+              <div class="team-card-logo">
+                ${logo ? `<img src="${logo}" alt="${escapeHtml(name)}" onerror="this.remove();this.parentElement.textContent='${initialsJS}';" />` : escapeHtml(initials)}
                 </div>
+              <div class="team-name">${escapeHtml(name)}</div>
               </div>
+            <div class="team-status">
+              <span class="${statusClass}">${statusText}</span>
+              <span class="team-meta">${statusMeta}</span>
             </div>
           </div>
         `;
-      }).join('');
+      }).filter(Boolean).join('');
       $$('#teams .item').forEach(el=> el.addEventListener('click', ()=>{ state.selectedTeamIdx = Number(el.dataset.idx); state.mobilePick=null; renderTeamsList(); renderEditor(); }));
     }
 
@@ -700,11 +1187,18 @@
     async function fetchOwnersForTeam(idx){
       try{
         if (!window.db) return [];
+        // Per non-admin, questa query potrebbe non essere permessa - gestisci silenziosamente
         const snap = await window.db.collection('users').where('team_index','==', idx).get();
         const list = [];
         snap.forEach(doc=>{ const d=doc.data()||{}; list.push(d.display_name||d.email||doc.id); });
         return list;
-      }catch(e){ console.warn('fetchOwnersForTeam', e); return []; }
+      }catch(e){ 
+        // Non loggare errori permission-denied per non-admin (sono attesi)
+        if (e?.code !== 'permission-denied') {
+          console.warn('fetchOwnersForTeam', e);
+        }
+        return []; 
+      }
     }
 
     function renderEditor(){
@@ -828,10 +1322,11 @@
       const roster = $('#teamRoster');
       roster.innerHTML = (t.roster||[]).map(pid=>{
         const p = state.players.find(x=>x.player_id===pid);
+        const label = p ? getPlayerDisplayLabel(p, 'initial.surname') : `⚠️ ID: ${pid.substring(0,8)}...`;
         return `
           <div class="draggable" draggable="true" data-pid="${pid}">
             <div class="row" style="gap:8px; align-items:center;">
-              <strong>${p?.nome_completo||pid}</strong>
+              <strong>${escapeHtml(label)}</strong>
             </div>
             <div class="row">
               <button class="btn btn-secondary btn-sm" data-act="rm">x</button>
@@ -851,32 +1346,59 @@
         });
       });
 
-      // Fill slots
+      // Fill slots - Uniformato con formazioni
       $$('#pitchGrid .slot').forEach((slot,i)=>{
-        slot.innerHTML = '';
         const pid = t.lineup[i];
+        slot.classList.remove('captain-slot');
+        slot.classList.remove('captain-active');
+        slot.classList.remove('filled');
+        slot.innerHTML = '';
         if (pid){
           const p = state.players.find(x=>x.player_id===pid);
-          const cap = (t.captain===pid)? ' captain':'';
-          const showCapBtn = (!t.captain) || (t.captain===pid);
-          const photo = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
-          const label = escapeHtml(getPlayerDisplayLabel(p) || pid);
-          const role = getRoleAbbr(p?.role || p?.ruolo);
+          if (!p) {
+            console.warn('⚠️ Player non trovato in campo:', pid);
+          }
+          // Nel campo: mostra iniziale.cognome (es. "A. Lupi")
+          const displayName = p ? getPlayerDisplayLabel(p, 'initial.surname') : `Player ${pid.substring(0,8)}...`;
+          const safeName = escapeHtml(displayName);
+          const photoURL = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
+          const roleAbbr = p ? getRoleAbbr(p.role) : '';
+          const pointsValue = p ? getPlayerSeasonPoints(p) : null;
+          const isCaptain = t.captain === pid;
+          const badges = [];
+          if (isCaptain) {
+            badges.push('<span class="slot-badge slot-badge--captain">Capitano</span>');
+          }
+          if (roleAbbr) {
+            badges.push(`<span class="slot-badge slot-badge--hint">${roleAbbr}</span>`);
+          }
+          if (Number.isFinite(pointsValue) && pointsValue !== 0) {
+            badges.push(`<span class="slot-badge slot-badge--hint">${pointsValue.toFixed(1)} pt</span>`);
+          }
           slot.classList.add('filled');
+          if (isCaptain) {
+            slot.classList.add('captain-active');
+          }
+          const showCapBtn = (!t.captain) || isCaptain;
           slot.innerHTML = `
-            <div class="draggable${cap}" draggable="true" data-pid="${pid}" style="width:100%;">
-              <div class="player-pill" style="width:100%; justify-content:flex-start;">
-                <img src="${photo}" alt="${label}" onerror="this.src='resources/logo.png'" />
-                <div class="pill-info">
-                  <span class="pill-name">${label}${t.captain===pid? '<span class="badgeC">C</span>':''}</span>
-                  ${role ? `<span class="pill-role">${role}</span>` : ''}
-                </div>
-                <div class="pill-actions">
-                  ${showCapBtn? '<button class="btn btn-secondary btn-sm" data-act="cap">C</button>' : ''}
-                  ${isMobile()? '<button class="btn btn-secondary btn-sm" data-act="clr">x</button>' : ''}
+            <div class="slot-card draggable${isCaptain ? ' captain-card' : ''}" draggable="true" data-pid="${pid}">
+              <div class="slot-card-main">
+                <div class="slot-avatar">
+                  <img src="${photoURL}" alt="${safeName}" onerror="this.src='resources/logo.png'" />
+              </div>
+                <div class="slot-info">
+                  <span class="slot-name">${safeName}</span>
+                  <div class="slot-meta">
+                    ${badges.join('')}
+                  </div>
                 </div>
               </div>
-            </div>`;
+              <div class="slot-actions">
+                ${showCapBtn ? '<button class="btn btn-secondary btn-sm" data-act="cap" title="Imposta capitano" aria-label="Imposta capitano">⭐</button>' : ''}
+                <button class="btn btn-secondary btn-sm" data-act="remove" title="Rimuovi" aria-label="Rimuovi giocatore">×</button>
+              </div>
+            </div>
+          `;
           const dragEl = slot.querySelector('.draggable');
           dragEl.addEventListener('dragstart', ev=>{ if (!isMobile()) ev.dataTransfer.setData('text/plain', pid); });
           // Captain toggle from slot
@@ -889,17 +1411,19 @@
               saveTeams(); renderEditor();
             });
           }
-          // Clear slot on mobile
-          const clrBtn = dragEl.querySelector('[data-act="clr"]');
-          if (clrBtn){
-            clrBtn.addEventListener('click', (e)=>{
+          // Remove button
+          const removeBtn = dragEl.querySelector('[data-act="remove"]');
+          if (removeBtn){
+            removeBtn.addEventListener('click', (e)=>{
               e.stopPropagation();
               if (!canWrite) { alert('Formazione bloccata o non hai permessi.'); return; }
-              t.lineup[i] = null; saveTeams(); renderEditor();
+              t.lineup[i] = null;
+              saveTeams();
+              renderEditor();
             });
           }
         } else {
-          slot.classList.remove('filled');
+          slot.innerHTML = `<div class="slot-empty">Trascina qui</div>`;
         }
         slot.addEventListener('dragover', ev=> ev.preventDefault());
         slot.addEventListener('drop', ev=>{
@@ -934,26 +1458,22 @@
         }
       });
 
-      // Render bench/roster strip (draggable to pitch; tap-to-assign on mobile)
+      // Render bench/roster strip - Uniformato con formazioni
       const bench = $('#benchStrip');
       const onField = new Set((t.lineup||[]).filter(Boolean));
       bench.innerHTML = (t.roster||[]).filter(pid => !onField.has(pid)).map(pid=>{
         const p = state.players.find(x=>x.player_id===pid);
-        const cap = (t.captain===pid)? ' captain':'';
-        const sel = state.mobilePick===pid ? ' selected' : '';
-        const photo = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
-        const label = escapeHtml(getPlayerDisplayLabel(p) || pid);
-        const role = getRoleAbbr(p?.role || p?.ruolo);
-        const activeClass = sel ? ' bench-pill-active' : '';
-        return `<div class="draggable${cap}${sel}" draggable="true" data-pid="${pid}">
-          <div class="player-pill bench-pill${activeClass}" style="width:100%; justify-content:flex-start;">
-            <img src="${photo}" alt="${label}" onerror="this.src='resources/logo.png'" />
-            <div class="pill-info">
-              <span class="pill-name">${label}${t.captain===pid? '<span class="badgeC">C</span>':''}</span>
-              ${role ? `<span class="pill-role">${role}</span>` : ''}
-            </div>
-          </div>
-        </div>`;
+        const isCaptain = t.captain===pid;
+        const photoURL = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
+        // In panchina: formato iniziale.cognome (es. "A. Lupi")
+        const displayName = p ? getPlayerDisplayLabel(p, 'initial.surname') : pid;
+        const safeDisplayName = escapeHtml(displayName);
+        const badge = isCaptain ? '<span class="slot-badge slot-badge--captain slot-badge--bench">Capitano</span>' : '';
+        return `<div class="bench-chip${isCaptain ? ' captain-chip' : ''} draggable" draggable="true" data-pid="${pid}">
+            <img src="${photoURL}" alt="${safeDisplayName}" onerror="this.src='resources/logo.png'" />
+            <span class="bench-chip-name">${safeDisplayName}</span>
+            ${badge}
+          </div>`;
       }).join('');
       // enable drag from bench
       $$('#benchStrip .draggable').forEach(el=>{
@@ -1113,18 +1633,43 @@
         state.players = basePlayers; state.coaches = baseCoaches;
       }
     }
+    window.addEventListener('results-updated', async () => {
+      await loadTeamSeasonPoints();
+      const currentTeam = state.teams[state.selectedTeamIdx];
+      renderTopPlayersCard(currentTeam);
+    });
+
+    window.addEventListener('league-changed', async () => {
+      await ensureLeagueReady();
+      await syncTeamsFromFirestore();
+      await loadTeamSeasonPoints();
+      await autoSelectNextGiornata();
+      await applySavedFromFirestore(state.giornata);
+      subscribeSavedForGiornata(state.giornata);
+      const sel = document.getElementById('giornataSel');
+      if (sel) sel.value = state.giornata;
+      await updateDaysComputed();
+      updateLockStatus();
+      initKickoffUI();
+      renderTeamsList();
+      renderEditor();
+    });
+
     async function boot(){
+      await ensureLeagueReady();
       await loadPlayersAndCoaches();
       initTeams();
       await syncTeamsFromFirestore();
-      initLockUI();
+      await loadTeamSeasonPoints();
+      await autoSelectNextGiornata();
+      await initLockUI();
       initKickoffUI();
-      // auth
-      await loadAuth();
       await applySavedFromFirestore(state.giornata);
       subscribeSavedForGiornata(state.giornata);
       renderTeamsList();
       renderEditor();
+      // auth (aggiorna permessi e selezione squadra utente)
+      await loadAuth();
     }
     boot();
   </script>
@@ -1135,6 +1680,11 @@
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
   <script src="resources/notifications-dropdown.js?v=2025102002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/lazy-load.js?v=20251020"></script>
 </body>
 </html>
 

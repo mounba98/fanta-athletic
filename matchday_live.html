@@ -145,12 +145,13 @@
   </main>
 
   <footer class="footer">
-    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+    <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script src="resources/rules-loader.js?v=2025110301"></script>
   <script>
@@ -914,12 +915,26 @@
       try { document.getElementById('autoUpload').checked = JSON.parse(localStorage.getItem('auto_upload_enabled')||'false'); } catch {}
       document.getElementById('uploadUrl').value = localStorage.getItem('auto_upload_url')||'';
       // Theme toggle
-      const savedTheme = localStorage.getItem('theme'); if (savedTheme){ document.documentElement.classList.toggle('dark', savedTheme==='dark'); }
-      document.getElementById('themeToggle')?.addEventListener('click', ()=>{
+      const savedTheme = localStorage.getItem('fantaAthletic_theme'); if (savedTheme){ document.documentElement.classList.toggle('dark', savedTheme==='dark'); }
+      const themeToggleBtn = document.getElementById('themeToggle');
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const fallbackToggle = () => {
         const nextDark = !document.documentElement.classList.contains('dark');
         document.documentElement.classList.toggle('dark', nextDark);
-        localStorage.setItem('theme', nextDark? 'dark':'light');
+            try { localStorage.setItem('fantaAthletic_theme', nextDark ? 'dark' : 'light'); } catch (_) {}
+            return nextDark;
+          };
+          if (typeof window.toggleTheme === 'function') {
+            window.toggleTheme();
+          } else {
+            fallbackToggle();
+          }
+          if (typeof window.updateThemeButton === 'function') {
+            window.updateThemeButton();
+          }
       });
+      }
     }
 
     async function loadPlayers(){

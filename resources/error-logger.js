@@ -3,6 +3,8 @@
 (function() {
   'use strict';
 
+  const SESSION_START = Date.now();
+
   const ERROR_TYPES = {
     JAVASCRIPT: 'javascript',
     FIREBASE: 'firebase',
@@ -114,12 +116,19 @@
     }
     
     // Mostra solo errori recenti (ultime 24h)
-    if (recentErrors.length > 0) {
+    const sessionErrors = recentErrors.filter(error => {
+      const errorTime = new Date(error.timestamp).getTime();
+      return errorTime >= SESSION_START;
+    });
+
+    if (sessionErrors.length > 0) {
       console.group('🔍 Recent Errors (24h)');
-      recentErrors.forEach((error, index) => {
+      sessionErrors.forEach((error, index) => {
         console.error(`[${index + 1}] ${error.type.toUpperCase()}: ${error.message}`, error);
       });
       console.groupEnd();
+    } else if (recentErrors.length > 0) {
+      console.info(`🔍 Error logger: ${recentErrors.length} errori storici nelle ultime 24h (non mostrati per questa sessione). Usa clearErrorLogs() per pulire.`);
     }
   } catch (e) {
     console.warn('Error cleaning old logs:', e);

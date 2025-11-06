@@ -24,8 +24,9 @@
   <div>
     <button class="btn" onclick="getLeagueInfo()">1️⃣ Info Lega Fanta Athletic</button>
     <button class="btn" onclick="addAllUsersToLeague()">2️⃣ Aggiungi Tutti Utenti</button>
-    <button class="btn" onclick="addTeamOwnersToLeague()">3️⃣ Aggiungi Proprietari Squadre</button>
-    <button class="btn" onclick="fixSpecificUsers()">4️⃣ Fix Utenti Specifici</button>
+    <button class="btn" onclick="updateUsersWithLeague()">3️⃣ Aggiorna Documenti Utenti</button>
+    <button class="btn" onclick="addTeamOwnersToLeague()">4️⃣ Aggiungi Proprietari Squadre</button>
+    <button class="btn" onclick="fixSpecificUsers()">5️⃣ Fix Utenti Specifici</button>
   </div>
   
   <div id="log" class="log">Pronto...</div>
@@ -148,6 +149,72 @@
           const user = doc.data();
           log(`  ✓ ${user.displayName || user.email || doc.id}`, 'info');
         });
+        
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+      }
+    }
+    
+    async function updateUsersWithLeague() {
+      log('📝 Aggiornando documenti utenti con currentLeague...', 'warning');
+      
+      if (!fantaAthleticLeagueId) {
+        fantaAthleticLeagueId = await getLeagueInfo();
+        if (!fantaAthleticLeagueId) return;
+      }
+      
+      try {
+        // Get all users
+        const usersSnap = await db.collection('users').get();
+        log(`📊 Trovati ${usersSnap.size} utenti`, 'info');
+        
+        if (usersSnap.empty) {
+          log('⚠️ Nessun utente trovato!', 'warning');
+          return;
+        }
+        
+        let updated = 0;
+        let skipped = 0;
+        
+        // Update each user document
+        for (const userDoc of usersSnap.docs) {
+          const userId = userDoc.id;
+          const userData = userDoc.data();
+          
+          // Check if user is already in league members
+          const leagueDoc = await db.collection('leagues').doc(fantaAthleticLeagueId).get();
+          const leagueData = leagueDoc.data();
+          const isMember = leagueData.members && leagueData.members.includes(userId);
+          
+          if (!isMember) {
+            log(`  ⏭️ ${userData.displayName || userData.email || userId} - non è membro, skip`, 'warning');
+            skipped++;
+            continue;
+          }
+          
+          // Check if already has currentLeague set
+          if (userData.currentLeague === fantaAthleticLeagueId) {
+            log(`  ✓ ${userData.displayName || userData.email || userId} - già aggiornato`, 'info');
+            skipped++;
+            continue;
+          }
+          
+          // Update user document
+          await db.collection('users').doc(userId).set({
+            currentLeague: fantaAthleticLeagueId,
+            leagues: firebase.firestore.FieldValue.arrayUnion(fantaAthleticLeagueId),
+            email: userData.email || '',
+            displayName: userData.displayName || userData.email || 'Utente',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+          
+          log(`  ✅ ${userData.displayName || userData.email || userId} - aggiornato`, 'success');
+          updated++;
+        }
+        
+        log(`✅ Aggiornati ${updated} utenti`, 'success');
+        log(`⏭️ Saltati ${skipped} utenti (già aggiornati o non membri)`, 'info');
+        log('🎉 Operazione completata!', 'success');
         
       } catch (error) {
         log(`❌ Errore: ${error.message}`, 'error');

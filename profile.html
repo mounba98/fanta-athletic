@@ -249,12 +249,13 @@
   </main>
 
   <footer class="footer">
-    <small>&copy; <span id="year"></span> Fanta Athletic</small>
+    <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js?v=20251021-fix"></script>
   <script>
@@ -386,6 +387,21 @@
     cropModal.querySelector('#cropStage').addEventListener('mousedown', (e)=>{ dragging=true; start={x:e.clientX,y:e.clientY}; cropImg.style.cursor='grabbing'; });
     window.addEventListener('mousemove', (e)=>{ if(!dragging) return; pan.x += (e.clientX-start.x); pan.y += (e.clientY-start.y); start={x:e.clientX,y:e.clientY}; applyTransform(); });
     window.addEventListener('mouseup', ()=>{ dragging=false; if(cropImg) cropImg.style.cursor='grab'; });
+    cropModal.querySelector('#cropStage').addEventListener('touchstart', (e)=>{
+      if (!e.touches || !e.touches.length) return;
+      dragging = true;
+      start = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      if (cropImg) cropImg.style.cursor = 'grabbing';
+    }, { passive: true });
+    window.addEventListener('touchmove', (e)=>{
+      if (!dragging || !e.touches || !e.touches.length) return;
+      pan.x += (e.touches[0].clientX - start.x);
+      pan.y += (e.touches[0].clientY - start.y);
+      start = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      applyTransform();
+      e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('touchend', ()=>{ dragging=false; if(cropImg) cropImg.style.cursor='grab'; });
     async function renderCroppedAvatar(){
       const canvas = document.createElement('canvas'); canvas.width=512; canvas.height=512; const ctx=canvas.getContext('2d');
       ctx.fillStyle='#000'; ctx.fillRect(0,0,512,512);
@@ -577,6 +593,12 @@
           document.documentElement.classList.add('dark');
         } else {
           document.documentElement.classList.remove('dark');
+        }
+        try {
+          localStorage.setItem('fantaAthletic_theme', preferences.darkMode ? 'dark' : 'light');
+        } catch (_) {}
+        if (typeof window.updateThemeButton === 'function') {
+          window.updateThemeButton();
         }
       } catch (error) {
         console.error('Errore salvataggio preferenze:', error);

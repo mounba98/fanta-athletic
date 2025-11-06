@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Centro Notifiche - Fanta Athletic</title>
+  <meta name="description" content="Consulta tutte le notifiche ricevute su Fanta Athletic." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20251018" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <style>
+    .notifications-page {
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .notifications-card {
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .notifications-card h2 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--text);
+    }
+
+    .notifications-empty {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .notifications-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .notification-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .notification-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .notification-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .notification-title {
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .notification-body {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .notification-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notification-actions {
+      display: inline-flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .notification-actions a {
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--primary);
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(220, 20, 60, 0.1);
+      transition: background 0.2s;
+    }
+
+    .notification-actions a:hover {
+      background: rgba(220, 20, 60, 0.2);
+    }
+
+    @media (max-width: 640px) {
+      .notifications-card {
+        padding: 18px;
+      }
+
+      .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body class="page-notifiche">
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>🔔 Notifiche</h1>
+  </header>
+
+  <main class="notifications-page">
+    <section class="notifications-card" aria-live="polite">
+      <h2>Notifiche recenti</h2>
+      <p class="notifications-empty" id="notificationsEmpty">Caricamento…</p>
+      <ul class="notifications-list" id="notificationsList"></ul>
+    </section>
+  </main>
+
+  <footer style="text-align:center; margin-top:auto;">
+    <small>&copy; <span id="year"></span> Nicola Mocci</small>
+  </footer>
+
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+
+  <script src="resources/app-init.js"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-menu.js?v=2025101803"></script>
+  <script src="resources/bottom-nav.js?v=2025101802"></script>
+  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/league-context.js?v=2025101901"></script>
+  <script src="resources/notifications.js?v=2025101706"></script>
+  <script src="resources/error-logger.js?v=20251018"></script>
+  <script>
+    (function() {
+      'use strict';
+
+      const yearEl = document.getElementById('year');
+      if (yearEl) {
+        yearEl.textContent = new Date().getFullYear();
+      }
+
+      const listEl = document.getElementById('notificationsList');
+      const emptyEl = document.getElementById('notificationsEmpty');
+
+      function setEmpty(message) {
+        if (emptyEl) {
+          emptyEl.textContent = message;
+          emptyEl.style.display = 'block';
+        }
+        if (listEl) {
+          listEl.innerHTML = '';
+        }
+      }
+
+      function renderNotification(doc) {
+        const data = doc.data() || {};
+        const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : (data.createdAt ? new Date(data.createdAt) : null);
+        const icon = data.icon || '🔔';
+        const title = data.title || 'Notifica';
+        const body = data.message || data.body || '';
+        const link = data.link || data.href || '';
+        const leagueName = data.leagueName || data.league || '';
+
+        const metaParts = [];
+        if (createdAt && !Number.isNaN(createdAt.getTime())) {
+          metaParts.push(createdAt.toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }));
+        }
+        if (leagueName) {
+          metaParts.push(leagueName);
+        }
+
+        const meta = metaParts.join(' • ');
+
+        return `
+          <li class="notification-item">
+            <span class="notification-icon">${icon}</span>
+            <div class="notification-content">
+              <p class="notification-title">${escapeHtml(title)}</p>
+              ${body ? `<p class="notification-body">${escapeHtml(body)}</p>` : ''}
+              ${meta ? `<div class="notification-meta">${escapeHtml(meta)}</div>` : ''}
+              ${link ? `<div class="notification-actions"><a href="${escapeAttribute(link)}">Apri</a></div>` : ''}
+            </div>
+          </li>
+        `;
+      }
+
+      function escapeHtml(value) {
+        const div = document.createElement('div');
+        div.textContent = value ?? '';
+        return div.innerHTML;
+      }
+
+      function escapeAttribute(value) {
+        const div = document.createElement('div');
+        div.textContent = value ?? '';
+        return div.innerHTML.replace(/"/g, '&quot;');
+      }
+
+      if (typeof firebase === 'undefined' || !firebase.auth) {
+        setEmpty('Impossibile caricare le notifiche (Firebase non disponibile).');
+        return;
+      }
+
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          setEmpty('Accedi per vedere le tue notifiche.');
+          return;
+        }
+
+        const db = firebase.firestore();
+        emptyEl.textContent = 'Caricamento…';
+
+        db.collection('notifications')
+          .where('userId', '==', user.uid)
+          .orderBy('createdAt', 'desc')
+          .limit(50)
+          .onSnapshot((snapshot) => {
+            if (!snapshot || snapshot.empty) {
+              setEmpty('Ancora nessuna notifica.');
+              return;
+            }
+
+            if (emptyEl) {
+              emptyEl.style.display = 'none';
+            }
+
+            const items = snapshot.docs.map(renderNotification).join('');
+            listEl.innerHTML = items;
+          }, (error) => {
+            console.error('Errore caricamento notifiche:', error);
+            setEmpty('Errore nel caricamento delle notifiche.');
+          });
+      });
+    })();
+  </script>
+</body>
+</html>
+
+

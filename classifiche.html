@@ -148,9 +148,10 @@
     </div>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js?v=20251021-fix"></script>
   <script>
     // Init Firebase IMMEDIATAMENTE
@@ -160,7 +161,7 @@
     window.db = firebase.firestore();
     window.auth = firebase.auth();
     const db = window.db; // Alias locale per compatibilità
-    console.log('✅ Classifiche: Firebase initialized');
+    
   </script>
   <script src="resources/firebase.js"></script>
   <script src="resources/app-init.js"></script>
@@ -168,6 +169,74 @@
   <script src="resources/podium-animation.js"></script>
   <script>
     const SEASON = '2024-25';
+    const rawDb = window.__LEGACY_DB__ || null;
+    const leagueHelper = window.LeagueHelper || null;
+    
+    async function ensureLeagueReady(timeoutMs = 7000) {
+      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
+        try {
+          await leagueHelper.waitForLeague(timeoutMs);
+        } catch (err) {
+          console.warn('[classifiche] Timeout attesa lega:', err?.message || err);
+        }
+      }
+    }
+
+    async function fetchH2HScheduleSnapshot() {
+      try {
+        return await db.collection('h2h_schedule').doc(SEASON).collection('giornate').get();
+      } catch (err) {
+        if (err?.code === 'permission-denied' && rawDb) {
+          try {
+            return await rawDb.collection('h2h_schedule').doc(SEASON).collection('giornate').get();
+          } catch (legacyErr) {
+            console.warn('[classifiche] Legacy h2h_schedule fallback failed:', legacyErr);
+          }
+        } else {
+          console.warn('[classifiche] Errore caricamento h2h_schedule:', err);
+        }
+        return { docs: [] };
+      }
+    }
+
+    async function fetchH2HResultData(giornataId) {
+      try {
+        const doc = await db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornataId).get();
+        return doc.exists ? doc.data() : null;
+      } catch (err) {
+        if (err?.code === 'permission-denied' && rawDb) {
+          try {
+            const legacyDoc = await rawDb.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornataId).get();
+            return legacyDoc.exists ? legacyDoc.data() : null;
+          } catch (legacyErr) {
+            console.warn('[classifiche] Legacy h2h_results fallback failed:', legacyErr);
+          }
+        } else {
+          console.warn('[classifiche] Errore caricamento h2h_results per', giornataId, err);
+        }
+        return null;
+      }
+    }
+    
+    // Ottieni leagueId corrente
+    let currentLeagueId = null;
+    function getCurrentLeagueId() {
+      if (currentLeagueId) return currentLeagueId;
+      if (window.currentLeague && window.currentLeague.id) {
+        currentLeagueId = window.currentLeague.id;
+        return currentLeagueId;
+      }
+      const stored = localStorage.getItem('last_league_id');
+      if (stored) {
+        currentLeagueId = stored;
+        return currentLeagueId;
+      }
+      if (window.DEFAULT_LEAGUE_ID) {
+        currentLeagueId = window.DEFAULT_LEAGUE_ID;
+        return currentLeagueId;
+      }
+      return null;
+    }
 
     function switchTab(tab, ev) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -258,10 +327,8 @@
       });
 
       // NUOVO: Somma punti da results/{giornata}/teams/{teamId}
-      console.log('📊 [CLASSIFICA] Calcolo punti da', state.results.size, 'giornate');
       state.results.forEach((giornataData, giornataId) => {
         const teams = giornataData.teams || {};
-        console.log(`  ${giornataId}:`, Object.keys(teams).length, 'teams');
         Object.entries(teams).forEach(([teamId, teamData]) => {
           const aggregate = aggregateById.get(teamId);
           if (!aggregate) {
@@ -269,7 +336,6 @@
             return;
           }
           const pts = extractPoints(teamData);
-            console.log(`    Team ${teamId}: +${pts}pt`);
           aggregate.total += pts;
           aggregate.giornate += 1;
           if (teamData.forfeit) {
@@ -277,8 +343,6 @@
           }
         });
       });
-      console.log('📊 [CLASSIFICA] Punti finali:', aggregates.map(a => `${a.name}: ${a.total}pt`));
-
       const rows = aggregates
         .slice()
         .sort((a, b) => (b.total - a.total) || a.name.localeCompare(b.name, 'it'));
@@ -484,13 +548,57 @@
 
     async function loadClassificheData() {
       try {
-        console.log('📊 Caricamento classifiche...');
+        await ensureLeagueReady();
         
-        const [teamsSnap, coachesSnap, scheduleSnap] = await Promise.all([
-          db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get(),
-          db.collection('coaches').get().catch(() => null),
-          db.collection('h2h_schedule').doc(SEASON).collection('giornate').get()
-        ]);
+        const leagueId = getCurrentLeagueId();
+        const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
+        
+        let teamsSnap, coachesSnap;
+        let scheduleSnap;
+        
+        try {
+          if (isLegacyMode) {
+            // Fallback per non-admin: usa collezioni legacy
+            teamsSnap = await db.collection('teams').get();
+          } else {
+            teamsSnap = await db.collection(`leagues/${leagueId}/teams`).get();
+          }
+        } catch (err) {
+          if (err?.code === 'permission-denied') {
+            // Anche legacy mode fallisce - mostra messaggio chiaro
+            const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
+            tables.forEach(sel => {
+              const tbody = document.querySelector(sel);
+              if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Non hai i permessi per visualizzare le classifiche. Contatta un amministratore per essere aggiunto a una lega.</td></tr>';
+              }
+            });
+            return; // Esci dalla funzione invece di throw
+          } else {
+            console.error(`❌ Errore caricamento teams:`, err);
+            throw err;
+          }
+        }
+        
+        try {
+          if (isLegacyMode) {
+            coachesSnap = await db.collection('coaches').get();
+          } else {
+            coachesSnap = await db.collection(`leagues/${leagueId}/coaches`).get();
+          }
+        } catch (err) {
+          if (err?.code === 'permission-denied' && !isLegacyMode) {
+            try {
+              coachesSnap = await db.collection('coaches').get();
+            } catch (legacyErr) {
+              coachesSnap = null;
+            }
+          } else {
+            coachesSnap = null;
+          }
+        }
+        
+        scheduleSnap = await fetchH2HScheduleSnapshot();
 
         state.coaches.clear();
         if (coachesSnap) {
@@ -518,6 +626,7 @@
           };
         });
 
+        // Ordina per ID numerico o alfabetico
         state.teams = rawTeams.sort((a, b) => {
           if (a.numericId !== null && b.numericId !== null) {
             return a.numericId - b.numericId;
@@ -539,25 +648,44 @@
         state.schedule.clear();
         scheduleSnap.docs.forEach(doc => state.schedule.set(doc.id, doc.data() || {}));
 
-        // NUOVO: Carica risultati da results/{giornata}/teams/*
+        // NUOVO: Carica risultati da leagues/{leagueId}/results/{giornata}/teams/*
         state.results.clear();
-        console.log('📊 Caricamento risultati da Firestore results/...');
+        
         
         const giornataIds = Array.from({ length: 24 }, (_, i) => `G${i + 1}`);
 
         const giornateResults = await Promise.all(
-          giornataIds.map(giornataId =>
-            db.collection('results').doc(giornataId).collection('teams').get()
-              .then(snap => ({ giornataId, snap }))
-              .catch(error => ({ giornataId, snap: null, error }))
-          )
+          giornataIds.map(giornataId => {
+            if (isLegacyMode) {
+              // Legacy: results/G1/teams
+              return db.collection('results').doc(giornataId).collection('teams').get()
+                .then(snap => ({ giornataId, snap }))
+                .catch(error => ({ giornataId, snap: null, error }));
+            } else {
+              // Multi-league: leagues/{leagueId}/results/G1/teams
+              return db.collection(`leagues/${leagueId}/results`).doc(giornataId).collection('teams').get()
+                .then(snap => ({ giornataId, snap }))
+                .catch(error => {
+                  // Se fallisce con multi-league, prova legacy
+                  if (error?.code === 'permission-denied') {
+                    return db.collection('results').doc(giornataId).collection('teams').get()
+                      .then(snap => ({ giornataId, snap }))
+                      .catch(legacyErr => ({ giornataId, snap: null, error: legacyErr }));
+                  }
+                  return { giornataId, snap: null, error };
+                });
+            }
+          })
         );
 
         giornateResults.forEach(({ giornataId, snap, error }) => {
           const giornataData = state.results.get(giornataId) || { teams: {}, matches: [] };
 
           if (error) {
-            console.warn(`⚠️ Errore caricamento risultati ${giornataId}:`, error);
+            // Log solo se c'è un errore reale (non solo "non trovato")
+            if (error.code !== 'not-found') {
+              console.warn(`⚠️ Errore caricamento risultati ${giornataId}:`, error);
+            }
           }
 
           if (snap && !snap.empty) {
@@ -565,18 +693,17 @@
           snap.docs.forEach(doc => {
             giornataData.teams[doc.id] = doc.data();
           });
-            console.log(`✅ ${giornataId}: ${snap.size} squadre`);
+            // Rimuovi log dettagliato per ogni giornata
           }
           
           state.results.set(giornataId, giornataData);
         });
 
         const h2hResults = await Promise.all(
-          giornataIds.map(giornataId =>
-            db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornataId).get()
-              .then(doc => ({ giornataId, data: doc.exists ? doc.data() : null }))
-              .catch(() => ({ giornataId, data: null }))
-          )
+          giornataIds.map(async giornataId => ({
+            giornataId,
+            data: await fetchH2HResultData(giornataId)
+          }))
         );
 
         h2hResults.forEach(({ giornataId, data }) => {
@@ -586,7 +713,11 @@
           state.results.set(giornataId, existing);
         });
         
-        console.log('✅ Risultati caricati:', state.results.size, 'giornate con dati');
+        // Log solo se ci sono giornate con dati
+        const giornateConDati = Array.from(state.results.values()).filter(g => Object.keys(g.teams || {}).length > 0).length;
+        if (giornateConDati > 0) {
+          // Summary available for debugging if needed
+        }
 
         renderTeamsRanking();
         renderH2HTable();
@@ -594,10 +725,13 @@
       } catch (error) {
         console.error('Errore caricamento classifiche:', error);
         const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
+        const errorMessage = error?.code === 'permission-denied' 
+          ? 'Non hai i permessi per visualizzare le classifiche. Contatta un amministratore per essere aggiunto a una lega.'
+          : 'Errore nel caricamento dei dati.';
         tables.forEach(sel => {
           const tbody = document.querySelector(sel);
           if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#ff6b6b;">Errore nel caricamento dei dati.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${errorMessage}</td></tr>`;
           }
         });
       }
@@ -605,9 +739,19 @@
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
-        location.href = 'auth.html';
+        // Mostra messaggio invece di redirect immediato
+        const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
+        tables.forEach(sel => {
+          const tbody = document.querySelector(sel);
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Effettua il <a href="auth.html" style="color:var(--primary);text-decoration:underline;">login</a> per visualizzare le classifiche.</td></tr>';
+          }
+        });
         return;
       }
+      loadClassificheData();
+    });
+    window.addEventListener('league-changed', () => {
       loadClassificheData();
     });
     
@@ -673,6 +817,7 @@
   <script src="resources/navbar.js?v=202510172227"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
   <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/auth-guard.js?v=2025101901"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>
 </body>

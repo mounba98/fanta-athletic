@@ -138,9 +138,10 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script>
     // Init Firebase SUBITO
@@ -174,30 +175,30 @@
         if (!descrizione) return showToast('Descrizione obbligatoria!', 'error');
         
         try {
-          // Genera codice automatico: trova primo slot libero R001, R002, etc
-          const existingCodes = rulesData.map(r=> r.rule_id).filter(id=> /^R\d+$/.test(id));
-          const numbers = existingCodes.map(id=> parseInt(id.substring(1))).sort((a,b)=> a-b);
-          let nextNum = 1;
-          for (let i = 0; i < numbers.length; i++) {
-            if (numbers[i] !== nextNum) break;
-            nextNum++;
-          }
-          const rule_id = `R${String(nextNum).padStart(3, '0')}`;
-          
-          const maxOrder = rulesData.length ? Math.max(...rulesData.map(r=>r.ordine||0)) : 0;
-          await db.collection('rules').add({ 
-            rule_id, 
-            nome_bonus: descrizione,
-            descrizione, 
-            valore, 
-            attivo: true, 
-            visible: true,
-            ordine: maxOrder+1, 
-            createdAt: Date.now() 
-          });
-          document.getElementById('ruleDesc').value='';
-          document.getElementById('ruleValue').value='';
-          showToast('Regola aggiunta!', 'success');
+        // Genera codice automatico: trova primo slot libero R001, R002, etc
+        const existingCodes = rulesData.map(r=> r.rule_id).filter(id=> /^R\d+$/.test(id));
+        const numbers = existingCodes.map(id=> parseInt(id.substring(1))).sort((a,b)=> a-b);
+        let nextNum = 1;
+        for (let i = 0; i < numbers.length; i++) {
+          if (numbers[i] !== nextNum) break;
+          nextNum++;
+        }
+        const rule_id = `R${String(nextNum).padStart(3, '0')}`;
+        
+        const maxOrder = rulesData.length ? Math.max(...rulesData.map(r=>r.ordine||0)) : 0;
+        await db.collection('rules').add({ 
+          rule_id, 
+          nome_bonus: descrizione,
+          descrizione, 
+          valore, 
+          attivo: true, 
+          visible: true,
+          ordine: maxOrder+1, 
+          createdAt: Date.now() 
+        });
+        document.getElementById('ruleDesc').value='';
+        document.getElementById('ruleValue').value='';
+        showToast('Regola aggiunta!', 'success');
           requestRulesSync('create');
         } catch (error) {
           console.error('Errore creazione regola:', error);
@@ -225,7 +226,7 @@
       const subjectFilter = document.getElementById('subjectFilter')?.value || 'ALL';
       const filtered = rulesData.filter(r => 
         (!searchTerm || 
-          (r.nome_bonus||'').toLowerCase().includes(searchTerm) || 
+        (r.nome_bonus||'').toLowerCase().includes(searchTerm) || 
           (r.rule_id||'').toLowerCase().includes(searchTerm)) &&
         (subjectFilter === 'ALL' || (r.soggetto || 'Giocatore') === subjectFilter)
       );

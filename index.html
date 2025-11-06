@@ -60,13 +60,20 @@
     .section:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
     .section h2 { color: var(--primary); margin-top: 0; font-size: 22px; }
     .section p { font-size: 14px; color: var(--muted); margin: 10px 0; }
-    .home-main { padding: 24px 20px 80px; }
+    .home-main { padding: 24px 20px 80px; margin-top: 0; }
     @media (max-width: 768px) {
       .home-main { padding: 14px 14px 80px; }
     }
+    
+    /* Fix card squadra nascosta sotto navbar */
+    #myTeamCard {
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
     #myTeamCard { width: 100%; }
     @media (max-width: 600px) {
-      #myTeamCard { padding: 18px !important; }
+      #myTeamCard { padding: 18px !important; margin-top: 8px !important; }
       #myTeamName { font-size: 20px !important; }
     .page-with-ads { display: flex; flex-direction: column; gap: 24px; }
     .home-content { display: flex; flex-direction: column; gap: 24px; }
@@ -301,6 +308,27 @@
       color: rgba(30,41,59,0.7);
       font-size: 14px;
     }
+    .home-highlight-card {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, rgba(102,126,234,1) 0%, rgba(118,75,162,1) 100%);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .home-highlight-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+    }
+    :root.dark .home-highlight-card {
+      background: linear-gradient(135deg, rgba(79,70,229,0.9) 0%, rgba(190,24,93,0.9) 100%);
+      box-shadow: 0 18px 36px rgba(2,6,23,0.55);
+    }
+    @media (max-width: 600px) {
+      .home-highlight-card { padding: 18px; }
+    }
     @media (max-width: 768px) {
       .match-summary-card {
         margin: 0 0 20px;
@@ -370,12 +398,12 @@
     /* PWA install prompt gestito da pwa-install.js */
   </style>
 </head>
-<body data-disable-mobile-dashboard="true">
+<body class="page-home" data-disable-mobile-dashboard="true">
   <header>
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Benvenuti in Fanta Athletic</h1>
+    <h1 class="visually-hidden">Benvenuti in Fanta Athletic</h1>
     <div class="auth-buttons" id="authButtons" style="display:none;">
       <a href="auth.html" class="btn" style="background:#28a745;">🔐 Accedi</a>
     </div>
@@ -383,7 +411,7 @@
 
   <main class="home-main">
     <!-- La Mia Squadra Card -->
-    <div id="myTeamCard" style="max-width: 800px; margin: 0 auto 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s;" onclick="window.location.href='formazioni.html'">
+    <div id="myTeamCard" class="home-highlight-card" onclick="window.location.href='formazioni.html'">
       <div style="display: flex; align-items: center; justify-content: space-between; color: white;">
         <div>
           <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">La Mia Squadra</div>
@@ -437,7 +465,7 @@
           max-width: 1400px;
           margin: 20px auto 0;
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          grid-template-columns: repeat(3, 1fr);
           gap: 20px;
           grid-auto-rows: 1fr;
         }
@@ -449,8 +477,11 @@
         .home-cards .section .btn {
           margin-top: auto;
         }
-        @media (max-width: 900px) {
-          .home-cards { gap: 16px; }
+        @media (max-width: 1024px) {
+          .home-cards { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        }
+        @media (max-width: 640px) {
+          .home-cards { grid-template-columns: 1fr; gap: 16px; }
         }
       </style>
 
@@ -517,20 +548,41 @@
     <small style="display: block; margin-top: 4px; opacity: 0.7;">Developed by Nicola Mocci</small>
   </footer>
 
-  <!-- Firebase SDKs - DA CARICARE PRIMA DI TUTTO -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <!-- Firebase SDKs - CDN con fallback locale -->
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-storage-compat.js" data-fallback="resources/firebase-storage-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script src="resources/firebase-config.js?v=20251021-fix"></script>
   <script>
+    // Verifica che Firebase sia caricato prima di inizializzare
+    if (typeof firebase === 'undefined') {
+      console.error('❌ Firebase SDK non caricato! Verifica connessione internet.');
+      // Mostra messaggio all'utente
+      document.addEventListener('DOMContentLoaded', function() {
+        const errorMsg = document.createElement('div');
+        errorMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#dc143c;color:white;padding:12px;text-align:center;z-index:10000;font-weight:bold;';
+        errorMsg.textContent = '⚠️ Errore caricamento Firebase. Verifica connessione internet e ricarica la pagina.';
+        document.body.appendChild(errorMsg);
+      });
+    } else {
     // Init Firebase IMMEDIATAMENTE
+      try {
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
     window.db = firebase.firestore();
     window.auth = firebase.auth();
     window.storage = firebase.storage();
+        console.log('✅ Firebase inizializzato correttamente');
+      } catch (e) {
+        console.error('❌ Errore inizializzazione Firebase:', e);
+        if (window.errorLogger) {
+          window.errorLogger.log('firebase_init_error', e);
+        }
+      }
+    }
   </script>
   <script src="resources/firebase.js"></script>
   <script src="resources/feature-flags.js?v=20251103"></script>
@@ -558,7 +610,7 @@
     }
   </script>
   <script src="resources/app-init.js"></script>
-  <script src="resources/matchday-summary.js?v=20251103"></script>
+  <script src="resources/matchday-summary.js?v=20251105"></script>
   <!-- dashboard-widgets.js RIMOSSO - causava duplicati -->
   <script src="resources/push-notifications.js"></script>
   <script src="resources/pwa-install.js"></script>
@@ -577,8 +629,42 @@
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/league-context.js?v=2025101901"></script>
   <script src="resources/notifications.js?v=2025101706"></script>
-  <script src="resources/classifiche-preview.js?v=2025102408"></script>
+  <script src="resources/classifiche-preview.js?v=20251105"></script>
   <script>
+    const leagueHelper = window.LeagueHelper || null;
+    const primaryDb = window.db || firebase.firestore();
+    const legacyDb = window.__LEGACY_DB__ || firebase.firestore();
+
+    async function resolveLeagueId(timeoutMs = 7000) {
+      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
+        try {
+          const info = await leagueHelper.waitForLeague(timeoutMs);
+          if (info && info.id) return info.id;
+        } catch (err) {
+          console.warn('[home] Timeout attesa lega:', err?.message || err);
+        }
+      }
+      if (window.currentLeague && window.currentLeague.id) {
+        return window.currentLeague.id;
+      }
+      try {
+        const stored = localStorage.getItem('last_league_id');
+        if (stored) return stored;
+      } catch (_) {}
+      return null;
+    }
+
+    function getTeamDocRef(teamIndex, leagueId) {
+      if (leagueHelper && typeof leagueHelper.getLeagueDoc === 'function') {
+        const ref = leagueHelper.getLeagueDoc('teams', String(teamIndex), leagueId);
+        if (ref) return ref;
+      }
+      if (leagueId) {
+        return primaryDb.collection(`leagues/${leagueId}/teams`).doc(String(teamIndex));
+      }
+      return primaryDb.collection('teams').doc(String(teamIndex));
+    }
+
     // Carica nome squadra utente - usa team_index da users collection
     async function loadMyTeamName() {
       const user = firebase.auth().currentUser;
@@ -598,15 +684,12 @@
         return;
       }
       
-      console.log('🔍 Dashboard: Carico squadra per user', user.uid);
-      
       try {
         // Leggi team_index da /users/{uid}
-        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        const userDoc = await primaryDb.collection('users').doc(user.uid).get();
         
         if (!userDoc.exists) {
           if (myTeamName) myTeamName.textContent = 'Nessuna squadra assegnata';
-          console.warn('⚠️ Dashboard: User doc non esiste');
           updateUnauthenticatedMessages('Nessuna squadra assegnata');
           return;
         }
@@ -614,28 +697,46 @@
         const userData = userDoc.data();
         const teamIndex = userData.team_index;
         
-        console.log('📊 Dashboard: User team_index:', teamIndex);
-        
         if (teamIndex === null || teamIndex === undefined) {
           if (myTeamName) myTeamName.textContent = 'Nessuna squadra assegnata';
-          console.warn('⚠️ Dashboard: team_index non impostato');
           updateUnauthenticatedMessages('Unisciti a una competizione per vedere la tua squadra');
           return;
         }
         
-        // Leggi squadra da /teams/{teamIndex}
-        const teamDoc = await firebase.firestore().collection('teams').doc(String(teamIndex)).get();
+        const leagueId = await resolveLeagueId();
+        if (!leagueId) {
+          if (myTeamName) myTeamName.textContent = 'Seleziona una lega';
+          updateUnauthenticatedMessages('Seleziona una lega per vedere i dati');
+          return;
+        }
         
-        if (!teamDoc.exists) {
+        // Leggi squadra da percorso lega
+        let teamDoc = null;
+        try {
+          teamDoc = await getTeamDocRef(teamIndex, leagueId).get();
+        } catch (err) {
+          console.warn('[home] errore lettura team multi-lega', err);
+        }
+        
+        if (!teamDoc || !teamDoc.exists) {
+          try {
+            const legacyDoc = await legacyDb.collection('teams').doc(String(teamIndex)).get();
+            if (legacyDoc.exists) {
+              teamDoc = legacyDoc;
+            }
+          } catch (legacyErr) {
+            console.warn('[home] errore lettura team legacy', legacyErr);
+          }
+        }
+
+        if (!teamDoc || !teamDoc.exists) {
           if (myTeamName) myTeamName.textContent = 'Squadra non trovata';
-          console.warn('⚠️ Dashboard: Team', teamIndex, 'non esiste');
           updateUnauthenticatedMessages('Squadra non trovata nella competizione');
           return;
         }
         
         const teamData = teamDoc.data();
         if (myTeamName) myTeamName.textContent = teamData.name || 'La Mia Squadra';
-        console.log('✅ Dashboard: Nome squadra:', teamData.name);
         
         // Reset click handler se tutto ok
         if (myTeamCard) {

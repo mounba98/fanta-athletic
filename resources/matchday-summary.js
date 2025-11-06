@@ -6,6 +6,12 @@
     return;
   }
 
+  const leagueHelper = window.LeagueHelper || null;
+  const primaryDb = (window.db && typeof window.db.collection === 'function')
+    ? window.db
+    : firebase.firestore();
+  const legacyDb = window.__LEGACY_DB__ || firebase.firestore();
+
   const labelEl = document.getElementById('lastMatchLabel');
   const contentEl = document.getElementById('lastMatchContent');
   const actionEl = document.getElementById('lastMatchAction');
@@ -15,6 +21,47 @@
 
   let detailHref = null;
   const FALLBACK_GIORNATE = Array.from({ length: 24 }, (_, i) => `G${i + 1}`);
+
+  async function resolveLeagueId(timeoutMs = 6000) {
+    if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
+      try {
+        const info = await leagueHelper.waitForLeague(timeoutMs);
+        if (info && info.id) return info.id;
+      } catch (err) {
+        console.warn('[matchday-summary] Timeout attesa lega:', err?.message || err);
+      }
+    }
+    if (window.currentLeague && window.currentLeague.id) {
+      return window.currentLeague.id;
+    }
+    try {
+      const stored = localStorage.getItem('last_league_id');
+      if (stored) return stored;
+    } catch (_) {}
+    return null;
+  }
+
+  function getLeagueCollection(collection, leagueId) {
+    if (leagueHelper && typeof leagueHelper.getLeagueCollection === 'function') {
+      const ref = leagueHelper.getLeagueCollection(collection, leagueId);
+      if (ref) return ref;
+    }
+    if (leagueId) {
+      return primaryDb.collection(`leagues/${leagueId}/${collection}`);
+    }
+    return primaryDb.collection(collection);
+  }
+
+  function getLeagueDoc(collection, docId, leagueId) {
+    if (leagueHelper && typeof leagueHelper.getLeagueDoc === 'function') {
+      const ref = leagueHelper.getLeagueDoc(collection, docId, leagueId);
+      if (ref) return ref;
+    }
+    if (leagueId) {
+      return primaryDb.collection(`leagues/${leagueId}/${collection}`).doc(docId);
+    }
+    return primaryDb.collection(collection).doc(docId);
+  }
   
   function escapeHtml(value) {
     return String(value ?? '')
@@ -124,7 +171,6 @@
 
     if (labelEl) {
       labelEl.innerHTML = `
-        <span class="match-summary-team">${escapeHtml(teamName)}</span>
         <span class="match-summary-giornata">${escapeHtml(formatGiornata(giornataId))}</span>
       `;
     }
@@ -142,7 +188,7 @@
     }
 
     const metaText = tiles.length
-      ? 'Dettagli disponibili nei riquadri sottostanti.'
+      ? ''
       : 'Nessun dettaglio registrato per questa giornata.';
 
     if (contentEl) {
@@ -185,7 +231,8 @@
       return;
     }
 
-    recentResultsEl.innerHTML = entries.map(entry => {
+    const orderedEntries = entries.slice().reverse();
+    recentResultsEl.innerHTML = orderedEntries.map(entry => {
       const breakdownMeta = formatBreakdownMeta(entry.data?.breakdown || {});
       return `
         <div class="recent-result-item">
@@ -216,9 +263,15 @@
     return parts.join(' • ');
   }
 
-  async function findLatestGiornate(db) {
+  async function findLatestGiornate(leagueId) {
     try {
-      const daysSnap = await db.collection('days').get();
+      let daysSnap;
+      try {
+        daysSnap = await getLeagueCollection('days', leagueId).get();
+      } catch (err) {
+        console.warn('matchday-summary: errore lettura days, fallback legacy', err);
+        daysSnap = await legacyDb.collection('days').get();
+      }
       const computed = daysSnap.docs
         .filter(doc => (doc.data() || {}).computed)
         .map(doc => ({
@@ -239,7 +292,7 @@
     }
   }
 
-  async function fetchRecentResults(db, teamId, giornate, limit = 3) {
+  async function fetchRecentResults(teamId, giornate, leagueId, limit = 3) {
     const collected = [];
     const checked = new Set();
 
@@ -247,7 +300,7 @@
     for (const gid of ordered) {
       checked.add(gid);
       try {
-        const doc = await db.collection('results').doc(gid).collection('teams').doc(teamId).get();
+        const doc = await getLeagueCollection('results', leagueId).doc(gid).collection('teams').doc(teamId).get();
         if (doc.exists) {
           collected.push({ giornataId: gid, data: doc.data() || {} });
           if (collected.length === limit) {
@@ -267,7 +320,7 @@
     for (const gid of fallbackIds) {
       if (checked.has(gid)) continue;
       try {
-        const doc = await db.collection('results').doc(gid).collection('teams').doc(teamId).get();
+        const doc = await getLeagueCollection('results', leagueId).doc(gid).collection('teams').doc(teamId).get();
         if (doc.exists) {
           collected.push({ giornataId: gid, data: doc.data() || {} });
           if (collected.length === limit) {
@@ -275,22 +328,41 @@
           }
         }
       } catch (error) {
-        console.warn('matchday-summary: errore lettura results', gid, error);
+        try {
+          const legacyDoc = await legacyDb.collection('results').doc(gid).collection('teams').doc(teamId).get();
+          if (legacyDoc.exists) {
+            collected.push({ giornataId: gid, data: legacyDoc.data() || {} });
+            if (collected.length === limit) {
+              break;
+            }
+          }
+        } catch (legacyErr) {
+          console.warn('matchday-summary: errore lettura legacy results', gid, legacyErr);
+        }
       }
     }
 
     return collected;
   }
 
-  async function loadTeamName(db, teamId) {
+  async function loadTeamName(teamId, leagueId) {
     try {
-      const doc = await db.collection('teams').doc(teamId).get();
+      const doc = await getLeagueDoc('teams', teamId, leagueId).get();
       if (!doc.exists) {
         return `Squadra ${Number(teamId) + 1 || ''}`.trim();
       }
       const data = doc.data() || {};
       return data.name || `Squadra ${Number(teamId) + 1 || ''}`.trim();
     } catch (error) {
+      try {
+        const legacyDoc = await legacyDb.collection('teams').doc(teamId).get();
+        if (legacyDoc.exists) {
+          const data = legacyDoc.data() || {};
+          return data.name || `Squadra ${Number(teamId) + 1 || ''}`.trim();
+        }
+      } catch (legacyErr) {
+        console.warn('matchday-summary: errore lettura team legacy', legacyErr);
+      }
       console.warn('matchday-summary: errore lettura team', error);
       return `Squadra ${Number(teamId) + 1 || ''}`.trim();
     }
@@ -300,8 +372,8 @@
     setLoading('Caricamento…');
 
     try {
-      const db = firebase.firestore();
-      const userDoc = await db.collection('users').doc(user.uid).get();
+      const leagueId = await resolveLeagueId();
+      const userDoc = await primaryDb.collection('users').doc(user.uid).get();
       if (!userDoc.exists) {
         setEmpty('Completa il profilo squadra per iniziare.');
         return;
@@ -314,15 +386,15 @@
       }
 
       const teamId = String(userData.team_index);
-      const giornate = await findLatestGiornate(db);
-      const recent = await fetchRecentResults(db, teamId, giornate, 3);
+      const giornate = await findLatestGiornate(leagueId);
+      const recent = await fetchRecentResults(teamId, giornate, leagueId, 3);
 
       if (!recent.length) {
         setEmpty('Nessun risultato calcolato finora.');
         return;
       }
 
-      const teamName = await loadTeamName(db, teamId);
+      const teamName = await loadTeamName(teamId, leagueId);
       renderResult(recent[0].giornataId, teamName, recent[0].data, teamId);
       renderRecentResults(recent);
     } catch (error) {

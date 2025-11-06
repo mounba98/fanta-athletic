@@ -16,12 +16,42 @@ class NotificationManager {
       return false;
     }
 
+    const isSecureContext =
+      window.isSecureContext === true ||
+      location.protocol === 'https:' ||
+      location.hostname === 'localhost' ||
+      location.hostname === '127.0.0.1';
+
+    if (!isSecureContext) {
+      console.warn('Service Worker non registrato: contesto non sicuro (usa HTTPS o localhost).');
+      return false;
+    }
+
     try {
-      this.registration = await navigator.serviceWorker.register('/sw.js');
+      // Verifica che siamo in un contesto sicuro prima di registrare
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        console.warn('Service Worker non registrato: richiesto HTTPS o localhost');
+        return false;
+      }
+      
+      // Verifica che il Service Worker sia supportato
+      if (!navigator.serviceWorker) {
+        console.warn('Service Worker non supportato da questo browser');
+        return false;
+      }
+      
+      this.registration = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/'
+      });
       console.log('Service Worker registrato');
       return true;
     } catch (error) {
-      console.error('Errore registrazione Service Worker:', error);
+      // Non loggare errori di sicurezza come errori critici
+      if (error.message && error.message.includes('insecure')) {
+        console.warn('Service Worker non registrato: contesto non sicuro (normale in sviluppo)');
+      } else {
+        console.warn('Errore registrazione Service Worker:', error.message || error);
+      }
       return false;
     }
   }

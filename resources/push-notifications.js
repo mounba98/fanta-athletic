@@ -242,16 +242,11 @@
     firebase.auth().onAuthStateChanged(async user => {
       if (!user) return;
       
-      // Request permission on first visit
-      const hasAsked = localStorage.getItem('notification_permission_asked');
-      if (!hasAsked) {
-        const granted = await requestPermission();
-        localStorage.setItem('notification_permission_asked', 'true');
-        if (granted) {
-          showNotification('Notifiche attive! 🔔', {
-            body: 'Riceverai aggiornamenti su tag, reazioni e giornate'
-          });
-        }
+      // Non chiedere più automaticamente: il permesso va richiesto con gesto utente
+      const hasShownInfo = localStorage.getItem('notification_permission_prompt_info');
+      if (!hasShownInfo && Notification.permission === 'default') {
+        console.info('Notifiche: mostra un pulsante o una UI per richiedere il permesso con un gesto utente.');
+        localStorage.setItem('notification_permission_prompt_info', 'true');
       }
       
       // Listen to new notifications

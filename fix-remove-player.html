@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix: Rimuovi Giocatore Problematico</title>
+  <link rel="stylesheet" href="resources/sheet.css?v=202510172227">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+    h1 { margin-top: 0; color: var(--primary); }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-danger { background: #dc2626; }
+    #log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 500px;
+      overflow-y: auto;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+    .log-entry { margin: 4px 0; }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    .warning { color: #f59e0b; }
+    .info { color: #60a5fa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Fix: Corregge Giocatore con ID Errato</h1>
+    <p>Questo script corregge il giocatore con ID lungo assegnando un player_id P0XX corretto.</p>
+    
+    <div style="margin: 20px 0;">
+      <button class="btn" id="btnCheck">1️⃣ Verifica Giocatore</button>
+      <button class="btn" id="btnFix" disabled>2️⃣ Corregge Giocatore</button>
+    </div>
+
+    <div id="log"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  
+  <script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ID problematici trovati (sono case-sensitive!)
+    const PROBLEMATIC_PLAYER_IDS = ['c4fyWntWj1mTj4fekijo', 'c4fyWntWj1mTj4fekijO', 'c4fyWntWj1mTj4fekjiO'];
+    const ROSTER_ID = 'athletic-2018-2024-25-v1';
+    // Nuovo player_id corretto (P031 è il prossimo dopo P030)
+    let CORRECT_PLAYER_ID = 'P031';
+
+    let currentUser = null;
+    const logEl = document.getElementById('log');
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        log('❌ Non autenticato. Effettua login.', 'error');
+        setTimeout(() => location.href = 'auth.html', 2000);
+      } else {
+        currentUser = user;
+        log(`✅ Autenticato come: ${user.email}`, 'success');
+        checkAdmin();
+      }
+    });
+
+    async function checkAdmin() {
+      if (!currentUser) return;
+      try {
+        const adminDoc = await db.collection('admins').doc(currentUser.uid).get();
+        if (!adminDoc.exists) {
+          log('⚠️ Non sei admin. Solo gli admin possono eseguire questa operazione.', 'warning');
+        } else {
+          log('✅ Permessi admin verificati', 'success');
+        }
+      } catch (e) {
+        log(`⚠️ Errore verifica admin: ${e.message}`, 'warning');
+      }
+    }
+
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info';
+      logEl.innerHTML += `<div class="log-entry ${className}">[${timestamp}] ${message}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(message);
+    }
+
+    document.getElementById('btnCheck').addEventListener('click', async () => {
+      log('🔍 Verifica giocatore problematico...', 'info');
+      try {
+        // Cerca tutti i giocatori con lastName "Porcoddio"
+        log('🔍 Cerca tutti i giocatori con lastName "Porcoddio"...', 'info');
+        const allPlayers = await db.collection('players_global')
+          .where('lastName', '==', 'Porcoddio')
+          .get();
+        
+        if (!allPlayers.empty) {
+          log(`⚠️ Trovati ${allPlayers.size} giocatori con lastName "Porcoddio":`, 'warning');
+          allPlayers.forEach(doc => {
+            const data = doc.data();
+            log(`   - ID: ${doc.id}`, 'warning');
+            log(`   - Nome: ${data.fullName || data.firstName + ' ' + data.lastName}`, 'info');
+            log(`   - Ruolo: ${data.role}`, 'info');
+            log(`   - PlayerId: ${data.playerId || 'N/A'}`, 'info');
+          });
+        } else {
+          log(`ℹ️ Nessun giocatore con lastName "Porcoddio" trovato`, 'info');
+        }
+
+        // Cerca anche in roster_members
+        const allMembers = await db.collection('rosters').doc(ROSTER_ID)
+          .collection('roster_members').get();
+        const problematicMembers = allMembers.docs.filter(doc => 
+          PROBLEMATIC_PLAYER_IDS.includes(doc.id) || doc.data().lastName === 'Porcoddio'
+        );
+        
+        if (problematicMembers.length > 0) {
+          log(`⚠️ Trovati ${problematicMembers.length} roster_members problematici:`, 'warning');
+          problematicMembers.forEach(doc => {
+            log(`   - ${doc.id}`, 'warning');
+          });
+        }
+
+        log('✅ Verifica completata. Puoi procedere con la correzione.', 'success');
+        document.getElementById('btnFix').disabled = false;
+
+      } catch (error) {
+        log(`❌ Errore: ${error.message}`, 'error');
+        console.error(error);
+      }
+    });
+
+    document.getElementById('btnFix').addEventListener('click', async () => {
+      if (!currentUser) {
+        log('❌ Non autenticato!', 'error');
+        return;
+      }
+
+      if (!confirm('⚠️ Questo correggerà il giocatore assegnando un player_id P0XX corretto. Continuare?')) {
+        return;
+      }
+
+      log('🔧 Correzione giocatore...', 'warning');
+      document.getElementById('btnFix').disabled = true;
+
+      try {
+        // 1. Cerca tutti i giocatori problematici con lastName "Porcoddio"
+        log('📋 Step 1: Cerca giocatori problematici...', 'info');
+        const allProblematic = await db.collection('players_global')
+          .where('lastName', '==', 'Porcoddio')
+          .get();
+        
+        if (allProblematic.empty) {
+          log('❌ Nessun giocatore problematico trovato!', 'error');
+          return;
+        }
+
+        // Prendi il primo (o quello con ID più lungo se ci sono più duplicati)
+        const problematicDoc = allProblematic.docs[0];
+        const oldData = problematicDoc.data();
+        const oldPlayerId = problematicDoc.id;
+        
+        log(`✅ Giocatore trovato: ${oldData.fullName || oldData.firstName + ' ' + oldData.lastName}`, 'success');
+        log(`   - ID attuale: ${oldPlayerId}`, 'info');
+        
+        // Se ci sono più duplicati, eliminali dopo
+        const duplicates = allProblematic.docs.filter(doc => doc.id !== oldPlayerId);
+        if (duplicates.length > 0) {
+          log(`⚠️ Trovati ${duplicates.length} duplicati da eliminare`, 'warning');
+        }
+
+        // 2. Verifica se P031 esiste già
+        let correctPlayerId = CORRECT_PLAYER_ID;
+        const newPlayerRefCheck = db.collection('players_global').doc(correctPlayerId);
+        const newPlayerDoc = await newPlayerRefCheck.get();
+        
+        if (newPlayerDoc.exists) {
+          log(`⚠️ ${CORRECT_PLAYER_ID} esiste già! Cercando il prossimo ID disponibile...`, 'warning');
+          // Trova il prossimo ID disponibile
+          let nextId = 31;
+          let foundAvailable = false;
+          while (!foundAvailable && nextId < 100) {
+            const testId = `P${String(nextId).padStart(3, '0')}`;
+            const testDoc = await db.collection('players_global').doc(testId).get();
+            if (!testDoc.exists) {
+              foundAvailable = true;
+              correctPlayerId = testId;
+              log(`✅ Trovato ID disponibile: ${correctPlayerId}`, 'success');
+            } else {
+              nextId++;
+            }
+          }
+          if (!foundAvailable) {
+            log('❌ Nessun ID disponibile trovato!', 'error');
+            return;
+          }
+        }
+
+        // 3. Crea nuovo documento con player_id corretto
+        log(`📝 Step 2: Creazione documento con ID ${correctPlayerId}...`, 'info');
+        const newPlayerRef = db.collection('players_global').doc(correctPlayerId);
+        const newData = {
+          ...oldData,
+          playerId: correctPlayerId,
+          updatedBy: currentUser.uid,
+          updatedAt: firebase.firestore.Timestamp.now()
+        };
+        
+        await newPlayerRef.set(newData, { merge: true });
+        log(`✅ Creato nuovo documento: ${correctPlayerId}`, 'success');
+
+        // 4. Aggiorna roster_members per puntare al nuovo ID
+        log('🔗 Step 3: Aggiornamento roster_members...', 'info');
+        
+        // Cerca tutti i roster_members con ID problematici
+        const allMembers = await db.collection('rosters').doc(ROSTER_ID)
+          .collection('roster_members').get();
+        
+        const problematicMembers = allMembers.docs.filter(doc => 
+          PROBLEMATIC_PLAYER_IDS.includes(doc.id) || doc.id === oldPlayerId
+        );
+        
+        if (problematicMembers.length > 0) {
+          // Prendi il primo (o quello che corrisponde)
+          const oldMemberDoc = problematicMembers[0];
+          const memberData = oldMemberDoc.data();
+          const newMemberRef = db.collection('rosters').doc(ROSTER_ID)
+            .collection('roster_members').doc(correctPlayerId);
+          
+          await newMemberRef.set({
+            ...memberData,
+            playerRef: newPlayerRef,
+            playerId: correctPlayerId,
+            updatedBy: currentUser.uid,
+            updatedAt: firebase.firestore.Timestamp.now()
+          }, { merge: true });
+          
+          // Elimina tutti i vecchi roster_members problematici
+          const batch = db.batch();
+          problematicMembers.forEach(doc => {
+            if (doc.id !== correctPlayerId) {
+              batch.delete(doc.ref);
+            }
+          });
+          await batch.commit();
+          log(`✅ Roster_member aggiornato (eliminati ${problematicMembers.length} vecchi)`, 'success');
+        } else {
+          log('ℹ️ Nessun roster_member trovato da aggiornare', 'info');
+        }
+
+        // 5. Elimina vecchio documento e tutti i duplicati
+        log('🗑️ Step 4: Eliminazione documenti vecchi...', 'info');
+        const deleteBatch = db.batch();
+        allProblematic.docs.forEach(doc => {
+          if (doc.id !== correctPlayerId) {
+            deleteBatch.delete(doc.ref);
+          }
+        });
+        await deleteBatch.commit();
+        log(`✅ Eliminati ${allProblematic.docs.length} documenti vecchi/duplicati`, 'success');
+
+        log('🎉 Correzione completata!', 'success');
+        log(`✅ Giocatore corretto:`, 'info');
+        log(`   - Vecchio ID: ${oldPlayerId}`, 'info');
+        log(`   - Nuovo ID: ${correctPlayerId}`, 'success');
+        log(`   - Nome: ${newData.fullName}`, 'info');
+        log(`   - Ruolo: ${newData.role}`, 'info');
+        if (duplicates.length > 0) {
+          log(`   - Duplicati eliminati: ${duplicates.length}`, 'success');
+        }
+
+      } catch (error) {
+        log(`❌ ERRORE: ${error.message}`, 'error');
+        console.error(error);
+      } finally {
+        document.getElementById('btnFix').disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+
