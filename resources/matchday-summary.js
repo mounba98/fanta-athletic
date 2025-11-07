@@ -31,9 +31,20 @@
         console.warn('[matchday-summary] Timeout attesa lega:', err?.message || err);
       }
     }
+
     if (window.currentLeague && window.currentLeague.id) {
       return window.currentLeague.id;
     }
+
+    // Polla brevemente per consentire al league-selector di popolarsi alla prima visita
+    const start = Date.now();
+    while (Date.now() - start < 1500) {
+      if (window.currentLeague && window.currentLeague.id) {
+        return window.currentLeague.id;
+      }
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+
     try {
       const stored = localStorage.getItem('last_league_id');
       if (stored) return stored;
@@ -232,11 +243,24 @@
     }
 
     const orderedEntries = entries.slice().reverse();
+    const isMobile = window.innerWidth <= 768 || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
     recentResultsEl.innerHTML = orderedEntries.map(entry => {
-      const breakdownMeta = formatBreakdownMeta(entry.data?.breakdown || {});
+      // Su mobile: usa formato "G1", "G2", "G3" invece di "GIORNATA X"
+      let giornataLabel;
+      if (isMobile) {
+        const num = Number((entry.giornataId || '').replace(/[^0-9]/g, ''));
+        giornataLabel = Number.isFinite(num) ? `G${num}` : entry.giornataId;
+      } else {
+        giornataLabel = formatGiornata(entry.giornataId);
+      }
+      
+      // Su mobile: nascondi breakdown
+      const breakdownMeta = isMobile ? '' : formatBreakdownMeta(entry.data?.breakdown || {});
+      
       return `
         <div class="recent-result-item">
-          <div class="recent-result-round">${escapeHtml(formatGiornata(entry.giornataId))}</div>
+          <div class="recent-result-round">${escapeHtml(giornataLabel)}</div>
           <div class="recent-result-points">${escapeHtml(formatPoints(entry.data?.points))}</div>
           ${breakdownMeta ? `<div class="recent-result-meta">${escapeHtml(breakdownMeta)}</div>` : ''}
         </div>

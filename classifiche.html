@@ -39,27 +39,41 @@
     @media (max-width: 768px) {
       .container { padding: 8px; max-width: 100vw; overflow-x: hidden; }
       .tabs { padding: 6px; gap: 4px; }
-      .tab-btn { padding: 8px 12px; font-size: 12px; }
+      .tab-btn { padding: 8px 12px; font-size: 14px; }
       .export-buttons { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-      .export-btn { width: 100%; min-width: 0; padding: 8px 12px; font-size: 12px; }
+      .export-btn { width: 100%; min-width: 0; padding: 8px 12px; font-size: 14px; }
       .table-wrapper { max-width: calc(100vw - 24px); }
-      .table { min-width: 380px; font-size: 12px; }
-      .table th, .table td { padding: 6px 4px; font-size: 12px; }
+      .table { min-width: 380px; font-size: 16px; }
+      .table th, .table td { padding: 10px 6px; font-size: 16px; }
       .card { padding: 12px; max-width: 100%; }
       .giornata-controls { flex-direction: column; align-items: stretch; }
-      #myLineupBtn { width: 100%; }
+      #myLineupBtn { width: 100%; font-size: 16px; }
     }
     
     @media (max-width: 480px) {
       .container { padding: 4px; }
       .tabs { padding: 4px; gap: 3px; }
-      .tab-btn { padding: 6px 10px; font-size: 11px; }
+      .tab-btn { padding: 6px 10px; font-size: 13px; }
       .export-buttons { grid-template-columns: 1fr; }
-      .export-btn { padding: 6px 10px; font-size: 11px; }
+      .export-btn { padding: 6px 10px; font-size: 14px; }
       .table-wrapper { max-width: calc(100vw - 12px); }
-      .table { min-width: 320px; font-size: 11px; }
-      .table th, .table td { padding: 4px 2px; font-size: 10px; }
+      .table { min-width: 320px; font-size: 14px; }
+      .table th, .table td { padding: 8px 4px; font-size: 14px; }
       .card { padding: 8px; }
+    }
+    
+    /* Mobile device classes */
+    .device-smartphone .table,
+    .device-tablet .table {
+      font-size: 16px !important;
+    }
+    
+    .device-smartphone .table th,
+    .device-smartphone .table td,
+    .device-tablet .table th,
+    .device-tablet .table td {
+      font-size: 16px !important;
+      padding: 10px 6px !important;
     }
   </style>
 </head>
@@ -98,7 +112,7 @@
         <div class="table-wrapper">
           <table class="table" id="teamsRank">
             <thead>
-              <tr><th>#</th><th>Squadra</th><th>Coach</th><th>Totale</th></tr>
+              <tr><th>#</th><th>Squadra</th><th>Totale</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -315,7 +329,7 @@
         name: team.name,
         coach: team.coachLabel,
         total: 0,
-          giornate: 0,
+        giornate: 0,
           forfeit: 0
         };
         aggregateById.set(team.id, entry);
@@ -354,7 +368,6 @@
           <tr style="background:${style.bg};color:${style.color};">
             <td>${index + 1}</td>
             <td style="font-weight:${index < 3 ? '800' : '600'};">${row.name}${forfeitIndicator}</td>
-            <td>${row.coach}</td>
             <td>${row.total.toFixed(2)}</td>
           </tr>
         `;

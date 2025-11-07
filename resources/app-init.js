@@ -67,4 +67,9 @@ const leagueSelectorScript = document.createElement('script');
 leagueSelectorScript.src = 'resources/league-selector.js?v=2025101905';
 document.head.appendChild(leagueSelectorScript);
 
+// Load mobile-header-fix (forza header identico a home su tutte le pagine mobile)
+const mobileHeaderFixScript = document.createElement('script');
+mobileHeaderFixScript.src = 'resources/mobile-header-fix.js?v=20251107';
+document.head.appendChild(mobileHeaderFixScript);
+
 console.log('✅ App initialization scripts loaded');

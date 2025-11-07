@@ -50,9 +50,9 @@
     }
   }, { passive: true });
 
-  // Ensure header is positioned correctly
+  // Ensure header is positioned correctly - SOLO su desktop, non su mobile
   const header = document.querySelector('header');
-  if (header) {
+  if (header && !isMobile) {
     header.style.position = 'fixed';
     header.style.top = '0';
     header.style.left = '0';
@@ -63,11 +63,36 @@
     header.style.transition = 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
   }
   
-  // Add padding to body to compensate for fixed header
+  // Su mobile, rimuovi qualsiasi stile inline che potrebbe interferire
   if (header && isMobile) {
-    const headerHeight = header.offsetHeight;
-    document.body.style.paddingTop = headerHeight + 'px';
+    // Rimuovi tutti gli stili inline che potrebbero interferire
+    header.style.position = '';
+    header.style.top = '';
+    header.style.left = '';
+    header.style.right = '';
+    header.style.zIndex = '';
+    header.style.willChange = '';
+    header.style.transform = '';
+    header.style.transition = '';
+    // Non aggiungere padding-top al body su mobile
+    document.body.style.paddingTop = '';
   }
+  
+  // Su resize, ricontrolla se siamo su mobile e rimuovi stili se necessario
+  window.addEventListener('resize', function() {
+    const nowMobile = window.innerWidth <= 768;
+    if (header && nowMobile) {
+      header.style.position = '';
+      header.style.top = '';
+      header.style.left = '';
+      header.style.right = '';
+      header.style.zIndex = '';
+      header.style.willChange = '';
+      header.style.transform = '';
+      header.style.transition = '';
+      document.body.style.paddingTop = '';
+    }
+  });
   
   console.log('✅ Navbar auto-hide initialized (mobile:', isMobile + ')');
 })();

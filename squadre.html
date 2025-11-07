@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fanta Athletic - Squadre</title>
   <meta name="description" content="Gestione squadre: nome, allenatori, rosa e titolari (5)." />
+  <script src="resources/theme-preload.js"></script>
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
   <style>
     body.page-squadre { background: var(--bg, #0f172a); }
@@ -407,10 +408,14 @@
     @media (max-width: 640px){
       .mobile-only { display:block; }
       .desktop-only { display:none !important; }
-      .sidebar { display:none; }
+      .sidebar { display:none !important; }
       header p { display:none; }
+      /* Layout mobile: solo una colonna, niente sidebar - 100vw - 10px */
+      .layout { grid-template-columns: 1fr !important; padding: 0 !important; margin: 0 !important; max-width: calc(100vw - 10px) !important; width: calc(100vw - 10px) !important; }
       .grid2 { grid-template-columns: 1fr; }
-      .panel { max-width: 100%; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+      .panel { max-width: 100vw !important; width: 100vw !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+      main.layout { padding: 0 !important; margin: 0 !important; width: calc(100vw - 10px) !important; max-width: calc(100vw - 10px) !important; }
+      body.page-squadre { padding: 0 !important; margin: 0 !important; width: 100vw !important; max-width: 100vw !important; overflow-x: hidden; }
       /* Tasti fissi in basso sopra bottom nav */
       .mobile-fixed-buttons {
         position: fixed;
@@ -438,22 +443,24 @@
       .podium-top-right { justify-content: center; margin-top: 12px; }
       .field-bench-section { align-items: center; }
       .grid2 { max-width: 100%; margin: 0 auto; }
-      .pitch { max-width: 300px; margin: 0 auto; }
-      .sectionh { max-width: 300px; margin-left: auto; margin-right: auto; }
-      #benchStrip { max-width: 300px; margin-left: auto; margin-right: auto; justify-content: center; }
-      #colRight > .row { max-width: 300px; margin-left: auto; margin-right: auto; }
-      /* shrink slots proportionally on mobile - Uniformato con formazioni */
-      .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
-      .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 50%; }
-      .slot { min-height: 130px; }
-      .slot-card.draggable { padding: 12px; gap: 10px; }
-      .slot-card-main { flex-direction: column; align-items: center; text-align: center; }
-      .slot-info { align-items: center; }
-      .slot-name { white-space: normal; }
-      .slot-meta { justify-content: center; }
-      .slot-actions { justify-content: center; }
-      .slot-card-main .slot-avatar { width: 64px; height: 64px; border-radius: 18px; }
-      .slot-card-main .slot-badge { font-size: 10px; }
+      .pitch { max-width: 100vw !important; width: 100vw !important; margin: 0 !important; padding: 4px !important; box-sizing: border-box !important; }
+      .sectionh { width: 100vw !important; margin-left: 0 !important; margin-right: 0 !important; text-align: center; padding: 0 4px !important; box-sizing: border-box !important; }
+      #benchStrip { max-width: 100vw !important; width: 100vw !important; margin-left: 0 !important; margin-right: 0 !important; justify-content: center; padding: 8px 4px !important; box-sizing: border-box !important; }
+      #colRight > .row { max-width: 100vw !important; width: 100vw !important; margin-left: 0 !important; margin-right: 0 !important; }
+      /* ALLARGA slots al massimo - niente limiti */
+      .pitch-grid { width: 100vw !important; max-width: 100vw !important; gap: 8px !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important; }
+      .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; justify-content: stretch !important; width: 100% !important; margin: 0 !important; }
+      .pitch-grid .line.one { grid-template-columns: 1fr !important; width: 100% !important; justify-content: stretch !important; margin: 0 !important; }
+      .pitch-grid .slot { min-height: 120px; width: 100% !important; max-width: none !important; flex: 1 1 0 !important; margin: 0 !important; }
+      /* Allarga le card giocatori */
+      .slot-card.draggable { width: 100%; max-width: 100%; padding: 10px; gap: 8px; }
+      .slot-card-main { flex-direction: column; align-items: center; text-align: center; width: 100%; }
+      .slot-info { align-items: center; width: 100%; }
+      .slot-name { white-space: normal; width: 100%; text-align: center; }
+      .slot-meta { justify-content: center; width: 100%; }
+      .slot-actions { justify-content: center; width: 100%; }
+      .slot-card-main .slot-avatar { width: 60px; height: 60px; border-radius: 16px; }
+      .slot-card-main .slot-badge { font-size: 9px; }
       #teamSelectMobile { width: 100%; }
       .meta-left .row { flex-direction: column; align-items: stretch; gap:6px; }
       .meta-left .row > * { width: 100% !important; max-width: 100% !important; }
@@ -565,8 +572,15 @@
     </section>
 
     <section class="panel center-column desktop-only" id="editor" style="margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 22px; padding-left: 22px; padding-right: 22px;">
-      <div class="row meta-controls">
-        <select id="giornataSel" class="input"></select>
+      <div class="row meta-controls" style="display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 12px; color: var(--muted); font-weight: 600;">Squadra</label>
+          <select id="teamSel" class="input" style="min-width: 180px;"></select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 12px; color: var(--muted); font-weight: 600;">Giornata</label>
+          <select id="giornataSel" class="input" style="min-width: 180px;"></select>
+        </div>
       </div>
       <div id="lockStatus" class="muted" aria-live="polite" style="font-size:12px;"></div>
       <div id="logoNameContainer" style="display:none; width: 100%; align-items: center; text-align: center;">
@@ -620,6 +634,13 @@
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; margin-top: 12px;">
         <div class="sectionh">Panchina / Rosa (trascina sul campo)</div>
+        <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm" data-filter-role="all" style="background: var(--primary);">Tutti</button>
+          <button class="btn btn-secondary btn-sm" data-filter-role="P">P</button>
+          <button class="btn btn-secondary btn-sm" data-filter-role="D">D</button>
+          <button class="btn btn-secondary btn-sm" data-filter-role="C">C</button>
+          <button class="btn btn-secondary btn-sm" data-filter-role="A">A</button>
+        </div>
         <div id="benchStrip" class="strip"></div>
         <div class="role-section desktop-only collapsed" id="teamRosterSection" style="margin-top:8px; width: 100%;">
           <div class="role-header">Rosa della squadra <span id="rosterCount">(0/11)</span> <span>▾</span></div>
@@ -629,15 +650,48 @@
         </div>
       </div>
     </section>
-      <div class="mobile-only" style="margin-bottom: 16px;">
-        <div class="row meta-controls">
-          <select id="giornataSel" class="input"></select>
+      <!-- Mobile: versione mobile-friendly -->
+      <div class="mobile-only" style="margin: 0 !important; padding: 4px !important; width: calc(100vw - 10px) !important; max-width: calc(100vw - 10px) !important; box-sizing: border-box !important;">
+        <!-- Selettori -->
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; width: 100%; align-items: stretch; padding: 0; box-sizing: border-box;">
+          <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+            <label style="font-size: 12px; color: var(--muted); font-weight: 600; text-align: center;">Squadra</label>
+            <select id="teamSelMobile" class="input" style="width: 100%; padding: 12px; font-size: 16px; box-sizing: border-box;"></select>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+            <label style="font-size: 12px; color: var(--muted); font-weight: 600; text-align: center;">Giornata</label>
+            <select id="giornataSelMobile" class="input" style="width: 100%; padding: 12px; font-size: 16px; box-sizing: border-box;"></select>
+          </div>
         </div>
-        <label class="row" style="margin-top: 12px;">
-          <span class="muted">Seleziona squadra</span>
-          <select id="teamSelectMobile" class="input"></select>
-        </label>
+        
+        <!-- Campo formazione salvata -->
+        <div style="margin-bottom: 12px; width: 100%; padding: 0; box-sizing: border-box;">
+          <div class="sectionh" style="text-align: center; margin-bottom: 6px; font-size: 16px; width: 100%; padding: 0; box-sizing: border-box;">Formazione salvata</div>
+          <div class="pitch" style="margin: 0 auto !important; width: 100% !important; max-width: 100% !important; padding: 4px !important; box-sizing: border-box !important;">
+            <div class="pitch-grid" id="pitchGridMobileSquadre" style="width: 100% !important; max-width: 100% !important; gap: 8px !important; padding: 0 !important; margin: 0 !important;">
+              <div class="line one" style="justify-content: stretch; width: 100%; margin: 0;">
+                <div class="slot" data-slot="0" style="width: 100%; flex: 1;"></div>
+              </div>
+              <div class="line two" style="justify-content: stretch; width: 100%; gap: 8px; margin: 0;">
+                <div class="slot" data-slot="1" style="width: 100%; flex: 1;"></div>
+                <div class="slot" data-slot="2" style="width: 100%; flex: 1;"></div>
+              </div>
+              <div class="line two" style="justify-content: stretch; width: 100%; gap: 8px; margin: 0;">
+                <div class="slot" data-slot="3" style="width: 100%; flex: 1;"></div>
+                <div class="slot" data-slot="4" style="width: 100%; flex: 1;"></div>
+              </div>
+            </div>
+            <div class="hint" style="font-size: 10px; padding: 4px; text-align: center; width: 100%;">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+          </div>
+        </div>
+        
+        <!-- Panchina -->
+        <div style="margin-bottom: 12px; width: 100%; padding: 0; box-sizing: border-box;">
+          <div class="sectionh" style="text-align: center; margin-bottom: 6px; font-size: 16px; width: 100%;">Panchina</div>
+          <div id="benchStripMobileSquadre" class="strip" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 8px; background: rgba(148,163,184,0.1); border-radius: 12px; width: 100%; box-sizing: border-box;"></div>
+        </div>
       </div>
+      
     </section>
   </main>
 
@@ -893,10 +947,10 @@
         return;
       }
 
-      card.style.display = 'block';
-      // Podio: 2° a sinistra, 1° al centro, 3° a destra (ordinati per punti decrescenti)
+      // Render desktop
+      if (card) card.style.display = 'block';
       const [first, second, third] = entries;
-      list.innerHTML = `
+      const podioHtml = `
         <div style="display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-top: 12px; max-width: 100%; width: 100%;">
           ${second ? (() => {
             const photo = getPlayerPhoto(second.player) || 'resources/logo.png';
@@ -954,6 +1008,7 @@
           })() : ''}
         </div>
       `;
+      if (list) list.innerHTML = podioHtml;
       if (empty) empty.style.display = 'none';
     }
 
@@ -972,7 +1027,8 @@
       userDisplayName: '' ,
       daysComputed: false,
       teamPlayerPoints: new Map(),
-      rulesMap: null
+      rulesMap: null,
+      benchFilter: 'all' // Filtro ruoli panchina: 'all', 'P', 'D', 'C', 'A'
     };
 
     function toast(msg){
@@ -1016,6 +1072,65 @@
 
     function canEdit(idx){
       return state.isAdmin || (state.user && state.userTeamIdx===idx);
+    }
+
+    // ========== DRAG HANDLERS ==========
+    function handleDragStart(e) {
+      const draggable = e.target.closest('[data-pid]');
+      if (!draggable) return;
+      
+      e.dataTransfer.setData('text/plain', draggable.dataset.pid);
+      draggable.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      const draggable = e.target.closest('[data-pid]');
+      if (draggable) {
+        draggable.classList.remove('dragging');
+      }
+      // Rimuovi tutte le classi drag-over
+      $$('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    }
+
+    // ========== BENCH DOUBLE CLICK ==========
+    function handleBenchDoubleClick(pid) {
+      const t = state.teams[state.selectedTeamIdx];
+      if (!t) return;
+      
+      const locked = isLockedAuto();
+      const computed = state.daysComputed && !state.isAdmin;
+      const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computed;
+      
+      if (computed) {
+        toast('📊 Giornata già calcolata! Non puoi modificare.');
+        return;
+      }
+      
+      if (!canWrite) {
+        toast('Formazione bloccata o non hai permessi.');
+        return;
+      }
+      
+      // Trova il primo slot vuoto
+      const emptySlotIndex = t.lineup.findIndex(p => p === null);
+      if (emptySlotIndex === -1) {
+        toast('Tutti gli slot sono occupati! Rimuovi prima un giocatore dal campo.');
+        return;
+      }
+      
+      // Rimuovi il giocatore dalla sua posizione attuale (se presente)
+      const oldIndex = t.lineup.indexOf(pid);
+      if (oldIndex !== -1) {
+        t.lineup[oldIndex] = null;
+      }
+      
+      // Aggiungi il giocatore al primo slot vuoto
+      t.lineup[emptySlotIndex] = pid;
+      
+      saveTeams();
+      renderEditor();
+      toast('Giocatore aggiunto al campo!');
     }
 
     function mondayWindow(now){
@@ -1069,12 +1184,96 @@
       }
       state.giornata = 'G1';
     }
+    
+    // Trova ultima giornata calcolata
+    async function findLastComputedGiornata() {
+      if (!window.db) return 'G1';
+      try {
+        const daysRef = window.db.collection('days');
+        const snapshot = await daysRef.where('computed', '==', true).get();
+        if (!snapshot.empty) {
+          // Ordina manualmente per numero giornata (G1, G2, ...)
+          const sortedDays = snapshot.docs
+            .map(doc => ({ id: doc.id, num: parseInt(doc.id.replace(/[^0-9]/g, '')) || 0 }))
+            .sort((a, b) => b.num - a.num);
+          if (sortedDays.length > 0) {
+            return sortedDays[0].id;
+          }
+        }
+      } catch (e) {
+        console.warn('[squadre] Errore ricerca ultima giornata calcolata:', e);
+      }
+      return 'G1';
+    }
 
     async function initLockUI(){
       const sel = document.getElementById('giornataSel');
       sel.innerHTML = Array.from({length:24}, (_,i)=>`<option value=\"G${i+1}\">Giornata ${i+1}</option>`).join('');
+      
+      // Seleziona ultima giornata calcolata di default
+      const lastComputed = await findLastComputedGiornata();
+      state.giornata = lastComputed;
       sel.value = state.giornata;
-      sel.onchange = async ()=>{ state.giornata = sel.value; await updateDaysComputed(); updateLockStatus(); await applySavedFromFirestore(state.giornata); subscribeSavedForGiornata(state.giornata); renderEditor(); };
+      // Selettore giornata mobile
+      const giornataSelMobile = document.getElementById('giornataSelMobile');
+      
+      sel.onchange = async ()=>{ 
+        state.giornata = sel.value; 
+        // Sincronizza con mobile
+        if (giornataSelMobile && giornataSelMobile.value !== state.giornata) giornataSelMobile.value = state.giornata;
+        await updateDaysComputed(); 
+        updateLockStatus(); 
+        await applySavedFromFirestore(state.giornata); 
+        subscribeSavedForGiornata(state.giornata); 
+        renderEditor(); 
+      };
+      
+      if (giornataSelMobile) {
+        giornataSelMobile.innerHTML = Array.from({length:24}, (_,i)=>`<option value=\"G${i+1}\">Giornata ${i+1}</option>`).join('');
+        giornataSelMobile.value = state.giornata;
+        giornataSelMobile.onchange = async () => {
+          state.giornata = giornataSelMobile.value;
+          // Sincronizza con desktop
+          if (sel && sel.value !== state.giornata) sel.value = state.giornata;
+          await updateDaysComputed();
+          updateLockStatus();
+          await applySavedFromFirestore(state.giornata);
+          subscribeSavedForGiornata(state.giornata);
+          renderEditor();
+        };
+      }
+      
+      // Selettore squadra (desktop e mobile)
+      const teamSel = document.getElementById('teamSel');
+      const teamSelMobile = document.getElementById('teamSelMobile');
+      const updateTeamSelector = (sel) => {
+        if (!sel) return;
+        sel.innerHTML = state.teams.map((t, idx) => {
+          const name = t.name || `Squadra ${idx + 1}`;
+          return `<option value="${idx}">${escapeHtml(name)}</option>`;
+        }).join('');
+        // Seleziona squadra utente di default (se disponibile)
+        if (state.userTeamIdx !== null && state.userTeamIdx !== undefined) {
+          state.selectedTeamIdx = state.userTeamIdx;
+        }
+        sel.value = state.selectedTeamIdx;
+        sel.onchange = () => {
+          state.selectedTeamIdx = Number(sel.value);
+          // Sincronizza entrambi i selettori
+          if (teamSel && teamSel.value !== String(state.selectedTeamIdx)) teamSel.value = state.selectedTeamIdx;
+          if (teamSelMobile && teamSelMobile.value !== String(state.selectedTeamIdx)) teamSelMobile.value = state.selectedTeamIdx;
+          renderTeamsList();
+          renderEditor();
+        };
+      };
+      updateTeamSelector(teamSel);
+      updateTeamSelector(teamSelMobile);
+      
+      // Sincronizza anche il selettore mobile con la giornata
+      if (giornataSelMobile) {
+        giornataSelMobile.value = state.giornata;
+      }
+      
       await updateDaysComputed();
       updateLockStatus();
       setInterval(()=>{ 
@@ -1699,8 +1898,9 @@
         });
       });
 
-      // Fill slots - Uniformato con formazioni
-      $$('#pitchGrid .slot').forEach((slot,i)=>{
+      // Fill slots - desktop e mobile (Uniformato con formazioni)
+      const fillSlots = (gridSelector) => {
+        $$(`${gridSelector} .slot`).forEach((slot,i)=>{
         const pid = t.lineup[i];
         slot.classList.remove('captain-slot');
         slot.classList.remove('captain-active');
@@ -1804,28 +2004,58 @@
             saveTeams(); renderEditor();
           });
         }
-      });
+        });
+      };
+      
+      // Riempie entrambi i grid (desktop e mobile)
+      fillSlots('#pitchGrid');
+      fillSlots('#pitchGridMobileSquadre');
 
       // Render bench/roster strip - Uniformato con formazioni
       const bench = $('#benchStrip');
       const onField = new Set((t.lineup||[]).filter(Boolean));
-      bench.innerHTML = (t.roster||[]).filter(pid => !onField.has(pid)).map(pid=>{
-        const p = state.players.find(x=>x.player_id===pid);
-        const isCaptain = t.captain===pid;
-        const photoURL = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
-        // In panchina: formato iniziale.cognome (es. "A. Lupi")
-        const displayName = p ? getPlayerDisplayLabel(p, 'initial.surname') : pid;
-        const safeDisplayName = escapeHtml(displayName);
-        const badge = isCaptain ? '<span class="slot-badge slot-badge--captain slot-badge--bench">Capitano</span>' : '';
-        return `<div class="bench-chip${isCaptain ? ' captain-chip' : ''} draggable" draggable="true" data-pid="${pid}">
+      
+      // Filtro ruoli
+      const roleMap = { 'Portiere': 'P', 'Difensore': 'D', 'Centrocampista': 'C', 'Attaccante': 'A' };
+      const filteredRoster = (t.roster||[])
+        .filter(pid => !onField.has(pid))
+        .filter(pid => {
+          if (state.benchFilter === 'all') return true;
+          const p = state.players.find(x => x.player_id === pid);
+          return p && roleMap[p.role] === state.benchFilter;
+        });
+      
+      const benchHTML = filteredRoster
+        .map(pid=>{
+          const p = state.players.find(x=>x.player_id===pid);
+          const isCaptain = t.captain===pid;
+          const photoURL = p ? (getPlayerPhoto(p) || 'resources/logo.png') : 'resources/logo.png';
+          // In panchina: formato iniziale.cognome (es. "A. Lupi")
+          const displayName = p ? getPlayerDisplayLabel(p, 'initial.surname') : pid;
+          const safeDisplayName = escapeHtml(displayName);
+          const badge = isCaptain ? '<span class="slot-badge slot-badge--captain slot-badge--bench">Capitano</span>' : '';
+          return `<div class="bench-chip${isCaptain ? ' captain-chip' : ''} draggable" draggable="true" data-pid="${pid}">
             <img src="${photoURL}" alt="${safeDisplayName}" onerror="this.src='resources/logo.png'" />
             <span class="bench-chip-name">${safeDisplayName}</span>
             ${badge}
           </div>`;
-      }).join('');
+        }).join('');
+      
+      bench.innerHTML = benchHTML;
+      
+      // Render panchina mobile
+      const benchMobile = document.getElementById('benchStripMobileSquadre');
+      if (benchMobile) {
+        benchMobile.innerHTML = benchHTML;
+      }
+      
       // enable drag from bench
       $$('#benchStrip .draggable').forEach(el=>{
-        el.addEventListener('dragstart', ev=>{ if (!isMobile()) ev.dataTransfer.setData('text/plain', el.dataset.pid); });
+        // Drag handlers
+        el.addEventListener('dragstart', handleDragStart);
+        el.addEventListener('dragend', handleDragEnd);
+        
+        // Click singolo per mobile
         if (isMobile()){
           el.addEventListener('click', ()=>{
             if (locked) { alert('Formazione bloccata per la giornata selezionata.'); return; }
@@ -1834,6 +2064,12 @@
             renderEditor();
           });
         }
+        
+        // Doppio click per aggiungere al campo
+        el.addEventListener('dblclick', ()=>{
+          if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+          handleBenchDoubleClick(el.dataset.pid);
+        });
       });
       // allow dropping from pitch back to bench to remove from that slot
       bench.addEventListener('dragover', ev=> ev.preventDefault());
@@ -1849,6 +2085,47 @@
       });
 
       $('#teamName').oninput = ()=>{ if (!canWrite) return; t.name = $('#teamName').value; saveTeams(); renderTeamsList(); };
+      
+      // Event listeners per filtro ruoli panchina
+      $$('[data-filter-role]').forEach(btn => {
+        // Inizializza stato visivo del bottone
+        if (btn.dataset.filterRole === state.benchFilter) {
+          btn.style.background = 'var(--primary)';
+          btn.style.color = 'white';
+        } else {
+          btn.style.background = '';
+          btn.style.color = '';
+        }
+        
+        // Rimuovi listener precedenti per evitare duplicati
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', () => {
+          const role = newBtn.dataset.filterRole;
+          state.benchFilter = role;
+          
+          // Update UI bottoni (evidenzia selezionato)
+          $$('[data-filter-role]').forEach(b => {
+            if (b.dataset.filterRole === role) {
+              b.style.background = 'var(--primary)';
+              b.style.color = 'white';
+            } else {
+              b.style.background = '';
+              b.style.color = '';
+            }
+          });
+          
+          renderEditor(); // Re-render panchina con filtro
+        });
+        
+        // Re-inizializza stato visivo dopo clone
+        if (newBtn.dataset.filterRole === state.benchFilter) {
+          newBtn.style.background = 'var(--primary)';
+          newBtn.style.color = 'white';
+        }
+      });
+      
       const coachWrap = document.getElementById('coachButtons');
       if (coachWrap){
         coachWrap.querySelectorAll('button[data-coach-id]').forEach(btn=>{
@@ -2078,6 +2355,7 @@
   <script src="resources/mobile-menu.js?v=2025101803"></script>
   <script src="resources/bottom-nav.js?v=2025101802"></script>
   <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/mobile-header-fix.js?v=20251107"></script>
   <script src="resources/lazy-load.js?v=20251020"></script>
 </body>
 </html>

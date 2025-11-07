@@ -1,7 +1,9 @@
-// Carica tema IMMEDIATAMENTE per evitare flash
+// Carica il tema salvato quanto prima per evitare flash
 (function() {
-  const savedTheme = localStorage.getItem('fantaAthletic_theme') || 'dark';
-  if (savedTheme === 'dark') {
-    document.documentElement.classList.add('dark');
+  try {
+    const savedTheme = localStorage.getItem('fantaAthletic_theme') || 'light';
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+  } catch (_) {
+    // Se localStorage non è disponibile, resta in tema chiaro
   }
 })();

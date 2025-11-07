@@ -155,12 +155,31 @@
   <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-
+  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script>
+    // Verifica che Firebase sia caricato prima di inizializzare
+    if (typeof firebase === 'undefined') {
+      console.error('❌ Firebase SDK non caricato! Verifica connessione internet.');
+    } else {
+      // Init Firebase IMMEDIATAMENTE
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(window.firebaseConfig);
+        }
+        window.db = firebase.firestore();
+        window.auth = firebase.auth();
+        console.log('✅ Firebase inizializzato correttamente');
+      } catch (e) {
+        console.error('❌ Errore inizializzazione Firebase:', e);
+      }
+    }
+  </script>
   <script src="resources/app-init.js"></script>
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/mobile-menu.js?v=2025101803"></script>
   <script src="resources/bottom-nav.js?v=2025101802"></script>
   <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
+  <script src="resources/mobile-header-fix.js?v=20251107"></script>
   <script src="resources/theme.js?v=202510172227"></script>
   <script src="resources/navbar.js?v=2025101901"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>

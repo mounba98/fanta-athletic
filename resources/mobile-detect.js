@@ -1,21 +1,28 @@
 // Mobile Device Detection & Responsive Utilities
-// Version: 2025101801
+// Version: 2025101802 - Supporto DevTools mobile view
 (function() {
   'use strict';
 
   // Detect device type
   const userAgent = navigator.userAgent;
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  const viewportWidth = window.innerWidth;
+  
+  // Rileva mobile basandosi su userAgent OPPURE larghezza viewport (per DevTools)
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  const isMobileViewport = viewportWidth < 768; // Se viewport < 768px, considera mobile
+  const isMobile = isMobileUA || isMobileViewport;
+  
   const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   
   // Migliore detection tablet (include landscape)
   const isTablet = (
     (/iPad/i.test(userAgent)) || 
     (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent)) ||
-    (hasTouch && window.innerWidth >= 600 && window.innerWidth <= 1366)
+    (hasTouch && viewportWidth >= 600 && viewportWidth <= 1366) ||
+    (!isMobileUA && viewportWidth >= 600 && viewportWidth < 1024) // Tablet in DevTools
   );
   
-  const isSmartphone = isMobile && !isTablet && window.innerWidth < 768;
+  const isSmartphone = (isMobile && !isTablet && viewportWidth < 768) || (!isMobileUA && viewportWidth < 600);
   
   const orientation = window.matchMedia("(orientation: landscape)").matches ? 'landscape' : 'portrait';
   
@@ -54,16 +61,28 @@
     const newWidth = window.innerWidth;
     const newHeight = window.innerHeight;
     const newOrientation = newWidth > newHeight ? 'landscape' : 'portrait';
+    const userAgent = navigator.userAgent;
     
-    // Ricontrolla se è tablet
+    // Ricalcola device type basandosi su viewport (per DevTools)
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const isMobileViewport = newWidth < 768;
+    const isMobileNow = isMobileUA || isMobileViewport;
+    
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const isTabletNow = (
-      (/iPad/i.test(navigator.userAgent)) || 
-      (/Android/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent)) ||
-      (hasTouch && newWidth >= 600 && newWidth <= 1366)
+      (/iPad/i.test(userAgent)) || 
+      (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent)) ||
+      (hasTouch && newWidth >= 600 && newWidth <= 1366) ||
+      (!isMobileUA && newWidth >= 600 && newWidth < 1024) // Tablet in DevTools
     );
     
+    const isSmartphoneNow = (isMobileNow && !isTabletNow && newWidth < 768) || (!isMobileUA && newWidth < 600);
+    
+    // Update deviceInfo
+    window.deviceInfo.isMobile = isMobileNow;
     window.deviceInfo.isTablet = isTabletNow;
+    window.deviceInfo.isSmartphone = isSmartphoneNow;
+    window.deviceInfo.isDesktop = !isMobileNow && !isTabletNow;
     window.deviceInfo.screenWidth = newWidth;
     window.deviceInfo.screenHeight = newHeight;
     window.deviceInfo.orientation = newOrientation;
@@ -75,7 +94,7 @@
     
     // Update device class
     body.classList.remove('device-smartphone', 'device-tablet', 'device-desktop');
-    if (window.deviceInfo.isSmartphone) {
+    if (isSmartphoneNow) {
       body.classList.add('device-smartphone');
     } else if (isTabletNow) {
       body.classList.add('device-tablet');

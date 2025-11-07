@@ -17,8 +17,9 @@
       return;
     }
 
-    // Solo su mobile/tablet
-    if (!window.deviceInfo || window.deviceInfo.isDesktop) {
+    // DISABILITATO su mobile - header deve essere relative come in home
+    // Solo su desktop
+    if (!window.deviceInfo || !window.deviceInfo.isDesktop) {
       return;
     }
 

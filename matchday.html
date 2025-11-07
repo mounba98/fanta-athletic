@@ -52,10 +52,10 @@
     .role-section.collapsed .role-header .role-arrow { transform: rotate(-90deg); }
     /* Accordion gruppi (Bonus/Malus) */
     .group-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; background:#fff; margin-bottom:8px; transition: all 0.2s; }
-    .group-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:800; user-select: none; padding: 4px; }
-    .group-header span:last-child { transition: transform 0.2s; }
+    .group-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:800; user-select: none; padding: 8px 4px; }
+    .group-header span:last-child { transition: transform 0.2s; font-size: 18px; }
     .group-body { display:grid; gap:8px; margin-top:6px; }
-    .group-section.collapsed .group-body { display:none; }
+    .group-section.collapsed .group-body { display:none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
     .group-section.collapsed .group-header span:last-child { transform: rotate(-90deg); }
     /* Curva layout */
     .curva-wrap { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
@@ -75,15 +75,73 @@
       .curva-wrap { grid-template-columns: 1fr 1fr; }
     }
     
-    /* Mobile: lista/dettaglio esclusivi */
+    /* Mobile: lista/dettaglio - lista sempre visibile sotto */
     @media (max-width: 768px) {
-      .players-wrap.showing-detail #plist { display: none !important; }
-      .players-wrap.showing-detail #pdetail { display: block !important; border-top: none; margin-top: 0; padding-top: 0; width: 100%; }
+      .players-wrap.showing-detail #plist { display: block !important; }
+      .players-wrap.showing-detail #pdetail { display: block !important; border-top: 2px solid #c7d1db; margin-top: 16px; padding-top: 16px; width: 100%; }
       #pdetail { display: none; }
-      .mobile-back-btn { display: block !important; margin-bottom: 12px; }
+      .mobile-back-btn { display: none !important; }
       .mobile-save-btn { display: none !important; }
-      /* Dettaglio giocatore mobile: full-width */
-      #pdetail .group-body { display: block !important; }
+      /* Dettaglio giocatore mobile: full-width - ma rispetta collapsed */
+      #pdetail .group-section:not(.collapsed) .group-body { display: block !important; }
+      
+      /* Tendina fissa in alto su mobile */
+      .mobile-fixed-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+      }
+      
+      /* Lista continua giocatori - rimuovi limite altezza */
+      #plist {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      
+      /* Scroll continuo - lista giocatori sotto */
+      #pdetail {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      
+      .player-sticky-close-bar {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+      }
+      
+      :root.dark .player-sticky-close-bar {
+        background: var(--card, #1e293b) !important;
+        border-color: rgba(148,163,184,0.3) !important;
+      }
+      
+      .player-sticky-close-bar #sticky-player-surname {
+        color: var(--text, #1e293b) !important;
+      }
+      
+      :root.dark .player-sticky-close-bar #sticky-player-surname {
+        color: var(--text, #e2e8f0) !important;
+      }
+      
+      .player-sticky-close-bar #sticky-player-firstname {
+        color: var(--text, #64748b) !important;
+      }
+      
+      :root.dark .player-sticky-close-bar #sticky-player-firstname {
+        color: var(--text, #94a3b8) !important;
+      }
+      
+      .player-close-bar {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      
+      :root.dark .player-close-bar {
+        background: var(--bg, #0f172a) !important;
+      }
     }
     @media (min-width: 769px) {
       .mobile-back-btn, .mobile-save-btn { display: none !important; }
@@ -195,15 +253,13 @@
         <div class="muted">Riepilogo (senza squadre)</div>
         <div id="summary" class="list"></div>
       </div>
-      <div id="saveRow" style="margin-top:14px; display:grid; gap:6px;">
-        <button class="btn" id="saveAll" style="background:#22c55e; border-color:#16a34a;">💾 Salva giornata</button>
-        <button class="btn" id="saveTempBtn" style="background:#f59e0b; border-color:#d97706;">📝 Salva Live</button>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; margin-top:4px;">
-          <button class="btn btn-secondary" id="resetPlayers" style="font-size:11px; padding:6px;">🗑️ Giocatori</button>
-          <button class="btn btn-secondary" id="resetCoaches" style="font-size:11px; padding:6px;">🗑️ Allenatori</button>
-          <button class="btn btn-secondary" id="resetCurva" style="font-size:11px; padding:6px;">🗑️ Curva</button>
+      <div id="saveRow" style="margin-top:10px; display:grid; gap:4px;">
+        <button class="btn" id="saveAll" style="background:#22c55e; border-color:#16a34a; padding:8px 12px; font-size:13px;">💾 Salva giornata</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
+          <button class="btn btn-secondary" id="resetGiornata" style="font-size:12px; padding:8px 12px;">🗑️ Reset Giornata</button>
+          <button class="btn" id="saveTempBtn" style="background:#f59e0b; border-color:#d97706; padding:8px 12px; font-size:13px;">📝 Salva Live</button>
         </div>
-        <button class="btn btn-secondary" id="resetAll" style="font-size:12px;">🗑️ Reset TUTTO</button>
+        <button class="btn btn-secondary" id="resetAll" style="font-size:12px; padding:8px 12px;">🗑️ Reset TUTTO</button>
       </div>
     </section>
     <section class="panel">
@@ -276,6 +332,28 @@
       if (stored) return stored;
       if (window.DEFAULT_LEAGUE_ID) return window.DEFAULT_LEAGUE_ID;
       return null;
+    }
+    
+    // Helper multilega - unica fonte di verità per i path
+    window.FEATURES = window.FEATURES || { USE_MULTILEAGUE_RESULTS: true };
+    
+    function isLegacyMode() {
+      const leagueId = getCurrentLeagueId();
+      return !window.FEATURES.USE_MULTILEAGUE_RESULTS || !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
+    }
+    
+    function leagueCol(colName) {
+      if (isLegacyMode()) return window.db.collection(colName);
+      const leagueId = getCurrentLeagueId();
+      return window.db.collection('leagues').doc(leagueId).collection(colName);
+    }
+    
+    function leagueDoc(colName, docId) {
+      return leagueCol(colName).doc(docId);
+    }
+    
+    function leagueSubDoc(colName, docId, subCol, subDocId) {
+      return leagueDoc(colName, docId).collection(subCol).doc(subDocId);
     }
 
     const state = {
@@ -711,7 +789,11 @@
     async function saveTeamResults(){
       if (!window.db) return;
       
+      // Ottieni leagueId per multilega
+      const leagueId = getCurrentLeagueId();
+      const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
       
+      console.log(`[saveTeamResults] LeagueId: ${leagueId}, LegacyMode: ${isLegacyMode}`);
       
       const prules = normalizePlayersRules({ rules: state.rules });
       const crules = normalizeCoachRules({ rules: state.rules });
@@ -720,25 +802,30 @@
       // Curva globale
       const curvaBase = computeTotalRules(state.selCurva, vrules);
 
-      // Assicura l'esistenza del documento risultato principale (metadati giornata)
+      // 1) Salva/aggiorna metadati della giornata (multilega)
       try {
-        await window.db.collection('results').doc(state.giornata).set({
-          giornata: state.giornata,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        await leagueDoc('days', state.giornata).set({
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          computedBy: (firebase.auth().currentUser || {}).uid || 'system',
+          status: 'computed'
         }, { merge: true });
       } catch (metaErr) {
-        console.warn('⚠️ Errore aggiornando metadati results:', metaErr);
+        console.warn('[ML] Errore aggiornando metadati days:', metaErr);
       }
       
       // Load teams
       let teams = [];
       try {
-        const teamsSnap = await window.db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
+        const teamsSnap = await leagueCol('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
         teams = teamsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       } catch(e) {
-        console.warn('Errore caricamento teams:', e);
+        console.warn('[ML] Errore caricamento teams:', e);
         return;
       }
+      
+      // Batch scritture risultati team
+      let batch = window.db.batch();
+      let pending = 0;
       
       // Calcola punti per ogni squadra
       for (const team of teams) {
@@ -748,7 +835,9 @@
         let coachId = null;
         
         try {
-          const savedDoc = await window.db.collection('teams').doc(team.id).collection('saved').doc(state.giornata).get();
+          // 2a) carica formazione salvata corretta (multilega)
+          const savedSnap = await leagueSubDoc('teams', team.id, 'saved', state.giornata).get();
+          const savedDoc = savedSnap;
           if (savedDoc.exists) {
             const savedData = savedDoc.data();
             lineup = savedData.lineup || [];
@@ -813,41 +902,60 @@
 
         const total = curvaBase + playerSum + captainBonus + coachPts + formationBonus;
         
-        // Salva risultato in Firestore
-        try {
-          await window.db.collection('results').doc(state.giornata).collection('teams').doc(team.id).set({
-            teamId: team.id,
-            teamName: team.name || `Squadra ${parseInt(team.id)+1}`,
-            points: total,
-            breakdown: {
-              curva: curvaBase,
-              players: playerSum,
-              captain: captainBonus,
-              coach: coachPts,
-              formation: formationBonus
-            },
-            lineup: lineup,
-            captain: captain,
-            coachId: coachId,
-            players: Array.from(playerContribs.values()).map(entry => ({
-              playerId: entry.playerId,
-              points: Number((entry.points || 0).toFixed(2)),
-              breakdown: entry.breakdown || {}
-            })),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          
-        } catch(e) {
-          console.error(`❌ Errore salvataggio risultato team ${team.id}:`, e);
+        // Prepara payload risultato
+        const payload = {
+          teamId: team.id,
+          teamName: team.name || `Squadra ${parseInt(team.id)+1}`,
+          points: total,
+          breakdown: {
+            curva: curvaBase,
+            players: playerSum,
+            captain: captainBonus,
+            coach: coachPts,
+            formation: formationBonus
+          },
+          lineup: lineup,
+          captain: captain,
+          coachId: coachId,
+          players: Array.from(playerContribs.values()).map(entry => ({
+            playerId: entry.playerId,
+            points: Number((entry.points || 0).toFixed(2)),
+            breakdown: entry.breakdown || {}
+          })),
+          giornata: state.giornata,
+          fromSaved: !!savedDoc.exists,
+          savedMeta: savedDoc.exists ? { by: savedDoc.data().userId || null, at: savedDoc.data().savedAt || null } : null,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Aggiungi al batch
+        const ref = leagueSubDoc('results', state.giornata, 'teams', team.id);
+        batch.set(ref, payload, { merge: true });
+        pending++;
+        
+        // Commit chunk per limiti batch (<=500)
+        if (pending >= 400) {
+          await batch.commit();
+          console.info('[ML] batch committed (chunk)');
+          batch = window.db.batch();
+          pending = 0;
         }
       }
+      
+      // Commit batch finale
+      if (pending > 0) {
+        await batch.commit();
+        console.info('[ML] batch committed (final)');
+      }
+      
+      console.info('[ML] saveTeamResults done');
       
       try {
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('results-updated', { detail: { giornata: state.giornata } }));
         }
       } catch (eventErr) {
-        console.warn('⚠️ Impossibile notificare results-updated:', eventErr);
+        console.warn('[ML] Impossibile notificare results-updated:', eventErr);
       }
     }
     
@@ -981,6 +1089,11 @@
           <span class="muted">🔍 Debug: ${playersWithPoints.length} giocatori con punti</span>
           <span class="muted" style="font-size:10px;">Click per dettagli</span>
         </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; margin-top:8px;">
+          <button class="btn btn-secondary" id="resetPlayers" style="font-size:11px; padding:6px 8px;">🗑️ Giocatori</button>
+          <button class="btn btn-secondary" id="resetCoaches" style="font-size:11px; padding:6px 8px;">🗑️ Allenatori</button>
+          <button class="btn btn-secondary" id="resetCurva" style="font-size:11px; padding:6px 8px;">🗑️ Curva</button>
+        </div>
       `;
       
       // Bind debug click
@@ -1020,9 +1133,31 @@
           <input id="searchPlayers" placeholder="Cerca giocatori..." style="width:100%; padding:8px; border:1px solid #dbe1e8; border-radius:8px;" />
           <div class="filters" id="roleFilters">${ROLE_ORDER.map(r=>`<button class="chip toggle ${state.roleFilters[r]?'on':''}" data-role="${r}">${r}</button>`).join('')}</div>
         </div>
-        <div class="players-wrap" style="grid-template-columns: minmax(200px, 0.8fr) 2.2fr;">
+        <div class="players-wrap" style="display:flex; flex-direction:column; gap:0; position:relative;">
+          <!-- Barra fissa per chiudere giocatore quando esce dalla vista -->
+          <div id="player-sticky-close-bar" class="player-sticky-close-bar" style="display:none; position:sticky; top:0; z-index:1000; width:100%; background:var(--card, #fff); padding:12px 16px; margin-bottom:8px; border-radius:8px; border:1px solid rgba(148,163,184,0.2); box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px; width:100%;">
+              <div style="flex:1; min-width:0;" id="sticky-player-name">
+                <div style="font-weight:700; font-size:18px; color:var(--text, #1e293b); line-height:1.2;" id="sticky-player-surname"></div>
+                <div style="font-weight:400; font-size:14px; color:var(--text, #64748b); margin-top:2px;" id="sticky-player-firstname"></div>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="sticky-close-btn" style="padding:8px 12px; font-size:16px; flex-shrink:0; border-radius:6px; min-width:44px; height:44px; display:flex; align-items:center; justify-content:center;">✕</button>
+            </div>
+          </div>
           <div id="plist" style="display:grid; gap:12px;"></div>
-          <div id="pdetail" style="border-left:2px solid #c7d1db; padding-left:20px;">
+          <div id="pdetail" style="border-top:2px solid #c7d1db; padding-top:16px; margin-top:16px;">
+            <!-- Mobile: tendina fissa in alto -->
+            <div id="mobile-player-header" class="mobile-fixed-header" style="display:none;">
+              <div id="mobile-player-info" style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--card); border-radius:8px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                <div id="mobile-player-photo" style="width:48px; height:48px; border-radius:50%; background:#e0e7ff; flex-shrink:0;"></div>
+                <div id="mobile-player-name" style="flex:1; font-weight:700; font-size:16px;"></div>
+                <button class="btn btn-secondary btn-sm" onclick="closeMobilePlayerDetail()" style="padding:6px 12px; font-size:12px;">✕</button>
+              </div>
+              <div id="mobile-bm-toggles" class="mobile-bm-toggles" style="display:flex; gap:8px; margin-bottom:12px;">
+                <button class="chip toggle" data-bm="Bonus" style="flex:1; padding:8px 12px; font-weight:600;">Bonus</button>
+                <button class="chip toggle" data-bm="Malus" style="flex:1; padding:8px 12px; font-weight:600;">Malus</button>
+              </div>
+            </div>
             <button class="btn btn-secondary mobile-back-btn" style="display:none;" onclick="closeMobilePlayerDetail()">← Indietro</button>
             <!-- Rimosso bmToggles: ci sono già gli accordion Bonus/Malus -->
             <div id="player-detail-content"></div>
@@ -1075,7 +1210,7 @@
         }
       }
 
-      function renderPlayerPanel(p){
+      function renderPlayerPanel(p, targetContainer = null){
         const sel = state.selPlayers[p.player_id]||{};
         const applicable = prules.filter(r=>matchesPlayer(r,p));
         const PORTIERE_ORDER = { R043:0, R072:1, R045:2, R044:3 };
@@ -1119,9 +1254,12 @@
               </div>`
             );
           }).join('');
+          // Su mobile e desktop, le sezioni Bonus/Malus sono chiuse di default
+          const collapsedClass = ' collapsed';
+          const arrowIcon = collapsedClass.includes('collapsed') ? '▸' : '▾';
           return (
-            `<div class="group-section" data-cat="${cat}">
-              <div class="group-header">${cat} <span>▾</span></div>
+            `<div class="group-section${collapsedClass}" data-cat="${cat}">
+              <div class="group-header">${cat} <span>${arrowIcon}</span></div>
               <div class="group-body">${body}</div>
             </div>`
           );
@@ -1133,105 +1271,219 @@
           : (nameParts[0] || '?').substring(0,2).toUpperCase();
         const fallbackSvg = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" fill="#1e3a8a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="24" font-weight="bold">${initials}</text></svg>`);
         const photoUrl = p.photoURL || fallbackSvg;
-        const detailContent = document.getElementById('player-detail-content') || pdetail;
+        // Usa il container fornito o quello standard
+        const detailContent = targetContainer || document.getElementById('player-detail-content') || pdetail;
+        // Mostra solo bonus/malus, senza header giocatore
         detailContent.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:12px;">
-            <img src="${photoUrl}" alt="${p.nome_completo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:3px solid #e0e7ff;" onerror="this.src='${fallbackSvg}'" />
-            <div style="flex:1;">
-              <div style="font-weight:800;">${formatDisplayName(p.nome_completo, p.nickname||'')}</div>
-              <div class="muted">${p.role}${p.secondary_roles&&p.secondary_roles.length? ' (2°: '+p.secondary_roles.join(', ')+')':''}</div>
-            </div>
-            <div class="muted">${total.toFixed(2)} pt</div>
-            ${state.isAdmin ? `<button class="btn btn-secondary" style="padding:6px 12px; font-size:12px;" data-reset-player="${p.player_id}">🗑️ Reset</button>` : ''}
-          </div>
           ${sectionHtml}
+          ${state.isAdmin ? `<div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(148,163,184,0.2);">
+            <button class="btn btn-secondary" style="width:100%; padding:8px 12px; font-size:12px;" data-reset-player="${p.player_id}">🗑️ Reset Giocatore</button>
+          </div>` : ''}
         `;
-        // CHECKBOX: change event
-        $$('#pdetail .rule [data-act="toggle"]').forEach(cb=>{
-          cb.addEventListener('change',(e)=>{
-            e.stopPropagation();
-            if (!state.isAdmin) return;
-            const row = cb.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
-            state.selPlayers[pid]=state.selPlayers[pid]||{}; state.selPlayers[pid][rid]=cb.checked?1:0;
-            // Exclusivity: if Porta inviolata (R043) is set, zero Gol subiti (R072)
-            if (rid==='R043' && cb.checked) { 
-              state.selPlayers[pid]['R072']=0;
-              // Aggiorna anche checkbox R072 se esiste
-              const r072cb = document.querySelector(`[data-rule-id="R072"] input[type="checkbox"]`);
-              if (r072cb) r072cb.checked = false;
+        
+        // Non serve più spostare le sezioni, sono già nel posto giusto
+        // CHECKBOX: change event - usa delegazione eventi per funzionare anche con dettaglio inline
+        if (detailContent) {
+          detailContent.addEventListener('change', (e) => {
+            if (e.target.matches('[data-act="toggle"]')) {
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              if (!state.isAdmin) return;
+              const cb = e.target;
+              const row = cb.closest('.rule'); 
+              if (!row) return;
+              const pid = row.dataset.player; 
+              const rid = row.dataset.ruleId;
+              state.selPlayers[pid] = state.selPlayers[pid] || {}; 
+              state.selPlayers[pid][rid] = cb.checked ? 1 : 0;
+              // Exclusivity: if Porta inviolata (R043) is set, zero Gol subiti (R072)
+              if (rid === 'R043' && cb.checked) { 
+                state.selPlayers[pid]['R072'] = 0;
+                // Aggiorna anche checkbox R072 se esiste
+                const r072cb = document.querySelector(`[data-rule-id="R072"] input[type="checkbox"]`);
+                if (r072cb) r072cb.checked = false;
+              }
+              saveDay(); 
+              // NON ricaricare panel (causa reset checkbox), solo aggiorna totale
+              updatePlayerTotal(p);
+              renderSummary(); 
+              // NON chiamare draw() qui - causerebbe chiusura del pannello
             }
-            saveDay(); 
-            // NON ricaricare panel (causa reset checkbox), solo aggiorna totale
-            updatePlayerTotal(p);
-            renderSummary(); 
-            draw();
           });
-        });
+        }
         
-        // BOTTONE +: click E touchend per mobile reale
-        $$('#pdetail .rule [data-act="inc"]').forEach(btn=>{
-          const handleInc = (e) => {
+        // BOTTONE + e -: usa delegazione eventi per funzionare anche con dettaglio inline
+        // Gestisci sia click che touchend per migliorare reattività
+        if (detailContent) {
+          const handleButtonClick = (e) => {
+            if (e.target.matches('[data-act="inc"]') || e.target.matches('[data-act="dec"]')) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              if (!state.isAdmin) return;
+              
+              const btn = e.target;
+              const row = btn.closest('.rule'); 
+              if (!row) return;
+              const pid = row.dataset.player; 
+              const rid = row.dataset.ruleId;
+              state.selPlayers[pid] = state.selPlayers[pid] || {}; 
+              const cur = Number(state.selPlayers[pid][rid] || 0);
+              
+              if (btn.matches('[data-act="inc"]')) {
+                state.selPlayers[pid][rid] = Math.min(10, cur + 1);
+              } else {
+                state.selPlayers[pid][rid] = Math.max(0, cur - 1);
+              }
+              
+              // Aggiorna counter visivamente
+              const countSpan = row.querySelector('.count');
+              if (countSpan) countSpan.textContent = state.selPlayers[pid][rid];
+              saveDay(); 
+              updatePlayerTotal(p);
+              renderSummary(); 
+              // NON chiamare draw() qui - causerebbe chiusura del pannello
+            }
+          };
+          
+          // Rimuovi listener precedenti se esistono
+          if (detailContent._buttonHandler) {
+            detailContent.removeEventListener('click', detailContent._buttonHandler);
+            detailContent.removeEventListener('touchend', detailContent._buttonHandler);
+          }
+          
+          detailContent._buttonHandler = handleButtonClick;
+          detailContent.addEventListener('click', handleButtonClick, { passive: false });
+          detailContent.addEventListener('touchend', handleButtonClick, { passive: false });
+        }
+        // row-wide toggle for checkbox rules - cliccare sulla riga attiva/disattiva toggle
+        if (detailContent) {
+          const handleRuleClick = (e) => {
+            const rule = e.target.closest('.rule');
+            if (!rule) return;
+            if (!state.isAdmin) return;
+            
+            // Non fare nulla se clicchi direttamente su bottoni, input, chip, group-header, group-body, count
+            if (e.target.matches('button,[data-act="inc"],[data-act="dec"],input,.chip,.group-header,.group-body,.count') || 
+                e.target.closest('button,[data-act="inc"],[data-act="dec"],.chip,.group-header,.group-body')) {
+              return;
+            }
+            
+            // Se clicchi sulla riga (ma non su elementi interattivi), toggle checkbox
+            const cb = rule.querySelector('input[type="checkbox"][data-act="toggle"]');
+            if (cb && !cb.disabled) { 
+              e.preventDefault();
+              e.stopPropagation();
+              cb.checked = !cb.checked; 
+              cb.dispatchEvent(new Event('change', { bubbles: true })); 
+            }
+          };
+          
+          // Rimuovi listener precedenti se esistono
+          if (detailContent._ruleClickHandler) {
+            detailContent.removeEventListener('click', detailContent._ruleClickHandler);
+          }
+          
+          detailContent._ruleClickHandler = handleRuleClick;
+          detailContent.addEventListener('click', handleRuleClick, { passive: false });
+        }
+        // collapsible Bonus/Malus sections - fix toggle con delegazione eventi
+        // Usa delegazione eventi sul container per evitare problemi con listener multipli
+        if (detailContent) {
+          // Rimuovi listener precedenti se esistono
+          const existingHandler = detailContent._groupHeaderHandler;
+          if (existingHandler) {
+            detailContent.removeEventListener('click', existingHandler);
+          }
+          
+          // Crea nuovo handler
+          const groupHeaderHandler = (e) => {
+            // NON fare toggle se clicchi su elementi interni (bottoni, input, chip, rule, group-body, count, etc)
+            if (e.target.closest('button, input, .chip, .rule, .group-body, .count, [data-act]')) {
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              return;
+            }
+            
+            const header = e.target.closest('.group-header');
+            if (!header) return;
+            
+            // Se clicchi direttamente sul testo o sulla freccia del header, fai toggle
             e.preventDefault();
             e.stopPropagation();
-            if (!state.isAdmin) return;
-            const row = btn.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
-            state.selPlayers[pid]=state.selPlayers[pid]||{}; 
-            const cur=Number(state.selPlayers[pid][rid]||0); 
-            state.selPlayers[pid][rid]=Math.min(10,cur+1);
-            // Aggiorna counter visivamente
-            const countSpan = row.querySelector('.count');
-            if (countSpan) countSpan.textContent = state.selPlayers[pid][rid];
-            saveDay(); 
-            updatePlayerTotal(p);
-            renderSummary(); 
-            draw();
+            e.stopImmediatePropagation();
+            const section = header.parentElement;
+            if (!section || !section.classList.contains('group-section')) return;
+            
+            section.classList.toggle('collapsed');
+            
+            // Aggiorna freccia
+            const arrow = header.querySelector('span:last-child');
+            if (arrow) {
+              arrow.textContent = section.classList.contains('collapsed') ? '▸' : '▾';
+            }
           };
-          btn.addEventListener('click', handleInc);
-          btn.addEventListener('touchend', handleInc);
-        });
+          
+          detailContent._groupHeaderHandler = groupHeaderHandler;
+          detailContent.addEventListener('click', groupHeaderHandler);
+        }
         
-        // BOTTONE -: click E touchend per mobile reale
-        $$('#pdetail .rule [data-act="dec"]').forEach(btn=>{
-          const handleDec = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!state.isAdmin) return;
-            const row = btn.closest('.rule'); const pid=row.dataset.player; const rid=row.dataset.ruleId;
-            state.selPlayers[pid]=state.selPlayers[pid]||{}; 
-            const cur=Number(state.selPlayers[pid][rid]||0); 
-            state.selPlayers[pid][rid]=Math.max(0,cur-1);
-            // Aggiorna counter visivamente
-            const countSpan = row.querySelector('.count');
-            if (countSpan) countSpan.textContent = state.selPlayers[pid][rid];
-            saveDay(); 
-            updatePlayerTotal(p);
-            renderSummary(); 
-            draw();
-          };
-          btn.addEventListener('click', handleDec);
-          btn.addEventListener('touchend', handleDec);
-        });
-        // row-wide toggle for checkbox rules
-        $$('#pdetail .rule').forEach(el=> el.addEventListener('click', (e)=>{
-          if (!state.isAdmin) return;
-          if (e.target.closest('button,[data-act="inc"],[data-act="dec"],input')) return;
-          const cb = el.querySelector('input[type="checkbox"][data-act="toggle"]');
-          if (cb && !cb.disabled){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
-        }));
-        // collapsible Bonus/Malus sections
-        $$('#pdetail .group-section .group-header').forEach(h=> h.addEventListener('click', ()=> h.parentElement.classList.toggle('collapsed')));
-        
-        // Reset singolo giocatore
-        const resetPlayerBtn = document.querySelector(`[data-reset-player="${p.player_id}"]`);
-        if (resetPlayerBtn) {
-          resetPlayerBtn.addEventListener('click', ()=> {
-            if (!confirm(`Resettare tutti i punti di ${p.nome_completo}?`)) return;
-            delete state.selPlayers[p.player_id];
-            saveDay();
-            renderPlayerPanel(p);
-            renderSummary();
-            toast(`✅ ${p.nome_completo} resettato!`);
+        // Mobile: toggle Bonus/Malus dalla tendina fissa
+        const isMobile = window.innerWidth <= 768 || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+          $$('#mobile-bm-toggles .toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const bm = btn.dataset.bm;
+              const isActive = btn.classList.contains('on');
+              btn.classList.toggle('on', !isActive);
+              
+              // Mostra/nascondi sezione corrispondente
+              const section = detailContent.querySelector(`.group-section[data-cat="${bm}"]`);
+              if (section) {
+                if (isActive) {
+                  section.classList.add('collapsed');
+                } else {
+                  section.classList.remove('collapsed');
+                }
+              }
+            });
           });
+          
+          // Inizializza stato toggle
+          const bonusSection = detailContent.querySelector('.group-section[data-cat="Bonus"]');
+          const malusSection = detailContent.querySelector('.group-section[data-cat="Malus"]');
+          const bonusBtn = document.querySelector('#mobile-bm-toggles [data-bm="Bonus"]');
+          const malusBtn = document.querySelector('#mobile-bm-toggles [data-bm="Malus"]');
+          if (bonusBtn && bonusSection) bonusBtn.classList.toggle('on', !bonusSection.classList.contains('collapsed'));
+          if (malusBtn && malusSection) malusBtn.classList.toggle('on', !malusSection.classList.contains('collapsed'));
+        }
+        
+        // Reset singolo giocatore - usa delegazione eventi per funzionare anche con dettaglio inline
+        if (detailContent) {
+          const handleResetPlayer = (e) => {
+            if (e.target.matches('[data-reset-player]')) {
+              e.preventDefault();
+              e.stopPropagation();
+              const playerId = e.target.getAttribute('data-reset-player');
+              const player = state.players.find(x => x.player_id === playerId);
+              if (!player) return;
+              
+              if (!confirm(`Resettare tutti i punti di ${player.nome_completo}?`)) return;
+              delete state.selPlayers[playerId];
+              saveDay();
+              renderPlayerPanel(player, targetContainer);
+              renderSummary();
+              toast(`✅ ${player.nome_completo} resettato!`);
+            }
+          };
+          
+          // Rimuovi listener precedenti se esistono
+          if (detailContent._resetPlayerHandler) {
+            detailContent.removeEventListener('click', detailContent._resetPlayerHandler);
+          }
+          
+          detailContent._resetPlayerHandler = handleResetPlayer;
+          detailContent.addEventListener('click', handleResetPlayer);
         }
       }
 
@@ -1286,11 +1538,119 @@
         // bind item clicks
         $$('#plist .item').forEach(el=> el.addEventListener('click', ()=>{
           const pid = el.dataset.id; state.selectedPlayerId = pid; const p = state.players.find(x=>x.player_id===pid);
-          renderPlayerPanel(p);
+          
+          // Rimuovi dettaglio precedente se esiste
+          const existingDetail = document.querySelector('.player-detail-inline');
+          if (existingDetail) {
+            existingDetail.remove();
+          }
+          
+          // Nascondi barra sticky precedente
+          const stickyBar = document.getElementById('player-sticky-close-bar');
+          if (stickyBar) {
+            stickyBar.style.display = 'none';
+          }
+          
+          // Aggiorna nome nella barra sticky (cognome grande, nome piccolo)
+          const stickySurname = document.getElementById('sticky-player-surname');
+          const stickyFirstname = document.getElementById('sticky-player-firstname');
+          if (stickySurname && stickyFirstname) {
+            // Usa getSurname per estrarre correttamente il cognome
+            const cognome = getSurname(p.nome_completo || '');
+            const nomeCompleto = (p.nome_completo || '').trim();
+            const parts = nomeCompleto.split(/\s+/).filter(Boolean);
+            
+            if (parts.length >= 2) {
+              // Rimuovi il cognome dal nome completo per ottenere il nome
+              const cognomeParts = cognome.split(/\s+/);
+              const nomeParts = parts.slice(0, parts.length - cognomeParts.length);
+              stickySurname.textContent = cognome;
+              stickyFirstname.textContent = nomeParts.join(' ') || '';
+            } else {
+              stickySurname.textContent = cognome || nomeCompleto;
+              stickyFirstname.textContent = '';
+            }
+          }
+          
+          // Crea contenitore per dettaglio inline (subito dopo il giocatore)
+          const detailWrapper = document.createElement('div');
+          detailWrapper.className = 'player-detail-inline';
+          detailWrapper.style.cssText = 'width: 100%; margin-top: 12px; padding-top: 12px; border-top: 2px solid #c7d1db;';
+          detailWrapper.id = 'player-detail-content-inline';
+          
+          // Inserisci dopo l'item cliccato
+          el.insertAdjacentElement('afterend', detailWrapper);
+          
+          // Renderizza il pannello nel contenitore inline
+          renderPlayerPanel(p, detailWrapper);
+          
           // Mobile: mostra dettaglio, nascondi lista
           if (window.innerWidth <= 768) {
             container.querySelector('.players-wrap').classList.add('showing-detail');
           }
+          
+          // Observer per mostrare/nascondere barra sticky quando il giocatore esce dalla vista
+          const stickyBarEl = document.getElementById('player-sticky-close-bar');
+          if (stickyBarEl && el) {
+            const observer = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                  // Il giocatore è uscito dalla vista sopra lo schermo
+                  stickyBarEl.style.display = 'block';
+                } else {
+                  // Il giocatore è visibile
+                  stickyBarEl.style.display = 'none';
+                }
+              });
+            }, { 
+              threshold: 0,
+              rootMargin: '0px'
+            });
+            observer.observe(el);
+            
+            // Salva observer per cleanup
+            el._stickyObserver = observer;
+          }
+          
+          // Listener per bottone chiudi nella barra sticky
+          const stickyCloseBtn = document.getElementById('sticky-close-btn');
+          if (stickyCloseBtn) {
+            // Rimuovi listener precedenti
+            const newStickyCloseBtn = stickyCloseBtn.cloneNode(true);
+            stickyCloseBtn.parentNode.replaceChild(newStickyCloseBtn, stickyCloseBtn);
+            
+            newStickyCloseBtn.addEventListener('click', () => {
+              // Rimuovi dettaglio
+              const detailToRemove = document.querySelector('.player-detail-inline');
+              if (detailToRemove) {
+                detailToRemove.remove();
+              }
+              
+              // Nascondi barra sticky
+              if (stickyBarEl) {
+                stickyBarEl.style.display = 'none';
+              }
+              
+              // Rimuovi observer
+              if (el && el._stickyObserver) {
+                el._stickyObserver.disconnect();
+                delete el._stickyObserver;
+              }
+              
+              // Reset stato
+              state.selectedPlayerId = null;
+              
+              // Mobile: nascondi dettaglio
+              if (window.innerWidth <= 768) {
+                container.querySelector('.players-wrap').classList.remove('showing-detail');
+              }
+            });
+          }
+          
+          // Scroll al dettaglio quando si apre un giocatore (non in basso)
+          setTimeout(() => {
+            detailWrapper.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+          }, 50);
         }));
         // accordion toggles
         $$('#plist .role-section .role-header').forEach(h=> h.addEventListener('click', ()=> h.parentElement.classList.toggle('collapsed')));
@@ -1321,6 +1681,8 @@
         state.selectedPlayerId = null;
         const detailContent = document.getElementById('player-detail-content');
         if (detailContent) detailContent.innerHTML = '';
+        const mobileHeader = document.getElementById('mobile-player-header');
+        if (mobileHeader) mobileHeader.style.display = 'none';
       };
       
       window.saveMobilePlayerDetail = function() {
@@ -1680,12 +2042,20 @@
         
         const now = new Date();
         const timeStr = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('tempSaveTime').textContent = `alle ${timeStr}`;
-        document.getElementById('tempSaveInfo').style.display = 'block';
+        const tempSaveTimeEl = document.getElementById('tempSaveTime');
+        const tempSaveInfoEl = document.getElementById('tempSaveInfo');
+        if (tempSaveTimeEl) {
+          tempSaveTimeEl.textContent = `alle ${timeStr}`;
+        }
+        if (tempSaveInfoEl) {
+          tempSaveInfoEl.style.display = 'block';
+        }
         toast('💾 Dati salvati temporaneamente + sync admin!');
-        setTimeout(() => {
-          document.getElementById('tempSaveInfo').style.display = 'none';
-        }, 5000);
+        if (tempSaveInfoEl) {
+          setTimeout(() => {
+            tempSaveInfoEl.style.display = 'none';
+          }, 5000);
+        }
         });
       }
       
@@ -1741,6 +2111,22 @@
         renderTabs();
         renderSummary();
         toast('✅ Giornata completamente resettata!');
+        });
+      }
+      
+      // Reset giornata (giocatori + allenatori + curva)
+      const resetGiornataBtn = document.getElementById('resetGiornata');
+      if (resetGiornataBtn) {
+        resetGiornataBtn.addEventListener('click', ()=> {
+          if (!state.isAdmin) return;
+          if (!confirm('⚠️ Resettare tutta la giornata?\n\nQuesto cancellerà:\n• TUTTI i giocatori\n• TUTTI gli allenatori\n• TUTTA la curva\n\nVuoi continuare?')) return;
+          state.selPlayers = {};
+          state.selCoaches = {};
+          state.selCurva = {};
+          saveDay();
+          renderTabs();
+          renderSummary();
+          toast('✅ Giornata resettata!');
         });
       }
       
@@ -1912,3 +2298,4 @@
   <script src="resources/auth-ui.js?v=202510172227"></script>
 </body>
 </html>
+

@@ -562,7 +562,7 @@
       
       <!-- User Picker per Tag -->
       <div id="userPicker" class="user-picker" style="display: none;">
-        <input type="text" id="userSearch" placeholder="Cerca utente..." class="input" style="margin-bottom: 10px;" />
+        <input type="text" id="userSearch" placeholder="Cerca utente..." class="input" style="margin-bottom: 10px;" oninput="filterUsers(this.value)" />
         <div id="userList"></div>
       </div>
     </div>
@@ -687,10 +687,84 @@
       }
       await ensureLeagueReady();
       loadPosts();
+      
+      // Listener per @ mention sulla textarea
+      const textarea = document.getElementById('postContent');
+      if (textarea) {
+        textarea.addEventListener('input', (e) => {
+          const text = e.target.value;
+          const cursorPos = e.target.selectionStart;
+          const textBeforeCursor = text.substring(0, cursorPos);
+          const lastAtIndex = textBeforeCursor.lastIndexOf('@');
+          
+          // Se c'è una @ e non c'è spazio dopo, apri il picker
+          if (lastAtIndex !== -1) {
+            const textAfterAt = textBeforeCursor.substring(lastAtIndex + 1);
+            // Se non c'è spazio dopo la @, apri il picker
+            if (!textAfterAt.includes(' ') && !textAfterAt.includes('\n')) {
+              const picker = document.getElementById('userPicker');
+              if (picker.style.display === 'none' || picker.style.display === '') {
+                picker.style.display = 'block';
+                const searchText = textAfterAt;
+                loadUsers(searchText);
+                // Aggiorna search input
+                const searchInput = document.getElementById('userSearch');
+                if (searchInput) {
+                  searchInput.value = searchText;
+                }
+              } else {
+                // Aggiorna filtro mentre si digita - ma solo se ci sono già utenti caricati
+                const searchText = textAfterAt;
+                const userList = document.getElementById('userList');
+                const items = userList ? userList.querySelectorAll('.user-item') : [];
+                if (items.length > 0) {
+                  filterUsers(searchText);
+                } else {
+                  // Se non ci sono utenti, ricarica
+                  loadUsers(searchText);
+                }
+              }
+            } else {
+              // Chiudi picker se c'è spazio dopo la @
+              const picker = document.getElementById('userPicker');
+              if (picker.style.display !== 'none') {
+                picker.style.display = 'none';
+              }
+            }
+          } else {
+            // Chiudi picker se non c'è @
+            const picker = document.getElementById('userPicker');
+            if (picker.style.display !== 'none') {
+              picker.style.display = 'none';
+            }
+          }
+        });
+      }
     });
     window.addEventListener('league-changed', () => {
       loadPosts();
     });
+    
+    function filterUsers(searchText) {
+      const userList = document.getElementById('userList');
+      if (!userList) return;
+      
+      const items = userList.querySelectorAll('.user-item');
+      if (items.length === 0) {
+        // Se non ci sono items, ricarica gli utenti
+        loadUsers(searchText);
+        return;
+      }
+      
+      items.forEach(item => {
+        const userName = item.textContent.toLowerCase();
+        if (userName.includes(searchText.toLowerCase()) || !searchText) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
 
     function addEmoji(emoji) {
       const textarea = document.getElementById('postContent');
@@ -705,30 +779,117 @@
     
     function toggleUserPicker() {
       const picker = document.getElementById('userPicker');
-      if (picker.style.display === 'none') {
+      if (picker.style.display === 'none' || picker.style.display === '') {
         picker.style.display = 'block';
         loadUsers();
+        // Reset search
+        const searchInput = document.getElementById('userSearch');
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.focus();
+        }
       } else {
         picker.style.display = 'none';
       }
     }
     
-    async function loadUsers() {
+    async function loadUsers(searchText = '') {
       try {
-        const usersSnapshot = await db.collection('users').get();
+        await ensureLeagueReady();
+        
         const userList = document.getElementById('userList');
+        if (!userList) {
+          console.warn('[bacheca] userList element not found');
+          return;
+        }
+        
+        // Mostra loading
+        userList.innerHTML = '<div class="user-item" style="opacity:0.6;">Caricamento...</div>';
+        
+        // Ottieni leagueId corrente
+        let leagueId = null;
+        if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
+          leagueId = leagueHelper.getCurrentLeagueId();
+        } else {
+          const userDoc = await db.collection('users').doc(currentUser.uid).get();
+          const userData = userDoc.data() || {};
+          leagueId = userData.currentLeague || (userData.leagues && userData.leagues[0]);
+        }
+        
+        if (!leagueId) {
+          console.warn('[bacheca] Nessuna lega trovata per filtrare utenti');
+          userList.innerHTML = '<div class="user-item" style="opacity:0.6;">Nessuna lega selezionata</div>';
+          return;
+        }
+        
+        console.log('[bacheca] Loading users for league:', leagueId);
+        
+        // Carica membri della lega
+        const leagueDoc = await db.collection('leagues').doc(leagueId).get();
+        const leagueData = leagueDoc.data() || {};
+        const members = leagueData.members || [];
+        
+        if (members.length === 0) {
+          document.getElementById('userList').innerHTML = '<div class="user-item" style="opacity:0.6;">Nessun utente nella lega</div>';
+          return;
+        }
+        
+        // Carica dati utenti (solo membri della lega)
+        const userPromises = members.map(uid => db.collection('users').doc(uid).get());
+        const userDocs = await Promise.all(userPromises);
+        
         userList.innerHTML = '';
         
-        usersSnapshot.forEach(doc => {
-          const user = doc.data();
-          const displayName = user.displayName || user.nickname || user.email;
+        let filteredUsers = userDocs
+          .filter(doc => doc.exists)
+          .map(doc => ({
+            uid: doc.id,
+            ...doc.data()
+          }))
+          .filter(user => {
+            // Escludi l'utente corrente
+            if (user.uid === currentUser.uid) return false;
+            // Se c'è searchText, filtra, altrimenti mostra tutti
+            if (!searchText || searchText.trim() === '') return true;
+            const searchLower = searchText.toLowerCase().trim();
+            const displayName = (user.displayName || user.display_name || user.nickname || user.email || '').toLowerCase();
+            return displayName.includes(searchLower);
+          });
+        
+        console.log('[bacheca] Found', filteredUsers.length, 'users (filtered from', userDocs.length, 'members)');
+        
+        if (filteredUsers.length === 0) {
+          userList.innerHTML = searchText && searchText.trim() 
+            ? '<div class="user-item" style="opacity:0.6;">Nessun utente trovato per "' + escapeHtml(searchText) + '"</div>'
+            : '<div class="user-item" style="opacity:0.6;">Nessun utente nella lega</div>';
+          return;
+        }
+        
+        filteredUsers.forEach(user => {
+          const displayName = user.displayName || user.nickname || user.email || 'Utente';
           
           const userItem = document.createElement('div');
           userItem.className = 'user-item';
           userItem.textContent = displayName;
           userItem.onclick = () => {
             const textarea = document.getElementById('postContent');
-            textarea.value += `@${displayName} `;
+            const currentText = textarea.value;
+            const cursorPos = textarea.selectionStart;
+            
+            // Trova l'ultima @ prima del cursore
+            const textBeforeCursor = currentText.substring(0, cursorPos);
+            const lastAtIndex = textBeforeCursor.lastIndexOf('@');
+            
+            if (lastAtIndex !== -1) {
+              // Sostituisci da @ fino al cursore con @displayName
+              const textAfterCursor = currentText.substring(cursorPos);
+              textarea.value = currentText.substring(0, lastAtIndex) + `@${displayName} ` + textAfterCursor;
+              textarea.selectionStart = textarea.selectionEnd = lastAtIndex + displayName.length + 2;
+            } else {
+              // Aggiungi semplicemente @displayName
+              textarea.value += `@${displayName} `;
+            }
+            
             textarea.focus();
             toggleUserPicker();
           };
@@ -736,6 +897,7 @@
         });
       } catch (error) {
         console.error('Errore caricamento utenti:', error);
+        document.getElementById('userList').innerHTML = '<div class="user-item" style="opacity:0.6; color:red;">Errore caricamento utenti</div>';
       }
     }
     

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Riepilogo Titolari - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script src="resources/theme-preload.js"></script>
   <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
   <style>
     :root {
@@ -120,6 +121,8 @@
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.18);
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .pitch-summary::before,
@@ -172,6 +175,63 @@
       align-items: center;
       justify-content: center;
     }
+    
+    @media (max-width: 768px) {
+      /* Ingrandisci campo su mobile - come in squadre.html */
+      .pitch-summary {
+        padding: 20px 12px !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+      }
+      
+      .pitch-grid {
+        gap: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      
+      .pitch-line {
+        gap: 12px !important;
+        width: 100% !important;
+        justify-content: stretch !important;
+      }
+      
+      .pitch-line.two {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+      }
+      
+      .pitch-line.one {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        max-width: 100% !important;
+      }
+      
+      .field-slot {
+        width: 100% !important;
+        max-width: 100% !important;
+        aspect-ratio: 4 / 5;
+        min-height: 160px;
+      }
+      
+      .field-player {
+        padding: 12px 10px 14px;
+        gap: 8px;
+      }
+      
+      .field-name {
+        font-size: 13px;
+        line-height: 1.2;
+      }
+      
+      .field-score {
+        font-size: 20px;
+        font-weight: 900;
+      }
+    }
 
     .field-player {
       background: rgba(12, 20, 33, 0.85);
@@ -184,10 +244,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       text-align: center;
       position: relative;
       overflow: hidden;
+      gap: 8px;
     }
 
     .field-player::after {
@@ -214,6 +275,20 @@
       opacity: 0.7;
     }
 
+    .coach-indicator {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      font-size: 12px;
+      line-height: 18px;
+      text-align: center;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
     .field-avatar {
       width: 64px;
       height: 64px;
@@ -235,16 +310,17 @@
     }
 
     .field-name {
-      font-size: 17px;
-      font-weight: 800;
+      font-size: 15px;
+      font-weight: 700;
       letter-spacing: 0.02em;
       text-transform: uppercase;
+      margin-top: 4px;
     }
 
     .field-score {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 900;
-      margin-top: 6px;
+      margin-top: 8px;
       display: flex;
       align-items: center;
       gap: 4px;
@@ -822,6 +898,31 @@
       .players-header {
         align-items: flex-start;
       }
+
+      /* Nascondi ruolo su mobile */
+      .field-role {
+        display: none !important;
+      }
+
+      /* Ingrandisci avatar su mobile - come in squadre.html */
+      .field-avatar {
+        width: 70px !important;
+        height: 70px !important;
+        margin: 6px 0 10px !important;
+        border-width: 3px !important;
+      }
+
+      .field-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    /* Nascondi ruolo anche con classi device */
+    .device-smartphone .field-role,
+    .device-tablet .field-role {
+      display: none !important;
     }
   </style>
 </head>
@@ -864,10 +965,30 @@
     </section>
   </main>
 
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script>
+    if (!window.firebase) {
+      document.write('<script src="resources/firebase-app-compat.js?v=20251107"><\\/script>');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script>
+    if (!(window.firebase && firebase.auth)) {
+      document.write('<script src="resources/firebase-auth-compat.js?v=20251107"><\\/script>');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+    if (!(window.firebase && firebase.firestore)) {
+      document.write('<script src="resources/firebase-firestore-compat.js?v=20251107"><\\/script>');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script>
+    if (!(window.firebase && firebase.storage)) {
+      document.write('<script src="resources/firebase-storage-compat.js?v=20251107"><\\/script>');
+    }
+  </script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script src="resources/rules-loader.js?v=2025110301"></script>
   <script>
@@ -875,6 +996,91 @@
       firebase.initializeApp(window.firebaseConfig);
     }
     window.db = firebase.firestore();
+    if (firebase.storage) {
+      window.storage = firebase.storage();
+    }
+    
+    // Interceptor: blocca richieste sbagliate PRIMA che vengano inviate
+    (function(){
+      const BAD_BUCKET = /firebasestorage\.googleapis\.com\/v0\/b\/fanta-athletic\.firebasestorage\.app/i;
+      const NO_TOKEN   = /firebasestorage\.googleapis\.com\/.*\balt=media(?!.*\btoken=)/i;
+      const PLACEHOLDER = '/assets/player-placeholder.svg';
+      
+      const needsFix = (u) => BAD_BUCKET.test(u) || NO_TOKEN.test(u);
+      const extractId = (u) => (u.match(/\/players\/(?:[^\/]+\/)?(P\d+)\.jpg/i) || [])[1];
+      
+      async function resolveAndSet(img, id){
+        if (!id || !window.getPlayerPhotoURL) return;
+        try {
+          const leagueId = (window.LeagueHelper?.getCurrentLeagueId?.()) || null;
+          const hintsMap = window.__PLAYER_PHOTO_HINTS || {};
+          const lowerId = typeof id === 'string' ? id.toLowerCase() : id;
+          const hint = hintsMap[id] || (lowerId ? hintsMap[lowerId] : null) || null;
+          const good = await window.getPlayerPhotoURL(id, leagueId, hint);
+          if (good) img.setAttribute('src', good);
+        } catch(_) {}
+      }
+      
+      // Intercetta assegnazioni a img.src
+      const proto = HTMLImageElement.prototype;
+      const desc  = Object.getOwnPropertyDescriptor(proto, 'src');
+      Object.defineProperty(proto, 'src', {
+        set(v){
+          const url = String(v || '');
+          if (needsFix(url)){
+            const id = extractId(url);
+            desc.set.call(this, PLACEHOLDER);          // nessuna richiesta sbagliata
+            queueMicrotask(()=> resolveAndSet(this, id)); // poi sostituisco con l'URL corretto
+          } else {
+            desc.set.call(this, url);
+          }
+        },
+        get: desc.get
+      });
+      
+      // Intercetta setAttribute('src', …) sulle <img>
+      const origSetAttribute = Element.prototype.setAttribute;
+      Element.prototype.setAttribute = function(name, value){
+        if (this instanceof HTMLImageElement && String(name).toLowerCase() === 'src'){
+          const url = String(value || '');
+          if (needsFix(url)){
+            const id = extractId(url);
+            origSetAttribute.call(this, 'src', PLACEHOLDER);
+            queueMicrotask(()=> resolveAndSet(this, id));
+            return;
+          }
+        }
+        return origSetAttribute.call(this, name, value);
+      };
+      
+      // Safety net: se qualche immagine fallisce, mostra placeholder
+      window.addEventListener('error', (e)=>{
+        const el = e.target;
+        if (el instanceof HTMLImageElement && !el.dataset._ph){
+          el.dataset._ph = '1';
+          el.src = PLACEHOLDER;
+        }
+      }, true);
+      
+      console.log('[IMG-PATCH] interceptor attivo');
+    })();
+    
+    // Blocco fetch REST diretti (previene preflight CORS per file inesistenti)
+    (function(){
+      // Pattern: URL REST senza token (es. /o/players/P013.jpg senza ?alt=media&token=...)
+      const bad = /firebasestorage\.googleapis\.com\/v0\/b\/fanta-athletic\.appspot\.com\/o\/players\/P\d+\.jpg(?!\?)/i;
+      const _fetch = window.fetch;
+      window.fetch = function(input, init){
+        const url = typeof input === 'string' ? input : input?.url || '';
+        if (bad.test(url)) {
+          console.warn('[photo] ⚠️ Bloccato fetch REST diretto (usa getDownloadURL()):', url);
+          // Non fare la richiesta - evita preflight CORS
+          return Promise.reject(new Error('Usa getDownloadURL() per le foto, non fetch diretto a REST endpoint'));
+        }
+        return _fetch.apply(this, arguments);
+      };
+      console.log('[FETCH-BLOCK] ✅ Blocco fetch REST diretti attivo');
+    })();
   </script>
 
   <script>
@@ -972,8 +1178,29 @@
       }
     }
 
+    // Ottieni leagueId per multilega
+    const leagueHelper = window.LeagueHelper || null;
+    function getCurrentLeagueId() {
+      if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
+        return leagueHelper.getCurrentLeagueId();
+      }
+      if (window.currentLeague && window.currentLeague.id) {
+        return window.currentLeague.id;
+      }
+      try {
+        const stored = localStorage.getItem('last_league_id');
+        if (stored) return stored;
+      } catch (_) {}
+      return null;
+    }
+
     async function loadTeams() {
-      const snapshot = await window.db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
+      const leagueId = getCurrentLeagueId();
+      const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
+      const teamsRef = isLegacyMode
+        ? window.db.collection('teams')
+        : window.db.collection(`leagues/${leagueId}/teams`);
+      const snapshot = await teamsRef.orderBy(firebase.firestore.FieldPath.documentId()).get();
       state.teamMap.clear();
       state.teams = snapshot.docs.map(doc => {
         const data = doc.data() || {};
@@ -997,6 +1224,78 @@
       (data.players || []).forEach(player => {
         state.players.set(player.player_id, player);
       });
+      
+      // Carica foto durante loadPlayers - usa funzione centralizzata
+      if (window.getPlayerPhotoURL && typeof window.getPlayerPhotoURL === 'function') {
+        const leagueId = getCurrentLeagueId() || null;
+        console.log('[lineup-summary] Caricamento foto per', state.players.size, 'giocatori, leagueId:', leagueId);
+        
+        // Carica foto in batch per evitare troppe richieste parallele
+        const playersArray = Array.from(state.players.values());
+        const hintsMap = window.__PLAYER_PHOTO_HINTS = window.__PLAYER_PHOTO_HINTS || {};
+        const forceAllPhotos = Boolean(window.PLAYER_PHOTO_OPTIONS?.forceAll);
+        const BATCH_SIZE = 5; // Carica 5 foto alla volta
+        
+        for (let i = 0; i < playersArray.length; i += BATCH_SIZE) {
+          const batch = playersArray.slice(i, i + BATCH_SIZE);
+          const photoPromises = batch.map(async (player) => {
+            const rawHint = (player.image_url || player.photo_url || '').trim();
+            if (rawHint) {
+              hintsMap[player.player_id] = rawHint;
+              if (typeof player.player_id === 'string') {
+                hintsMap[player.player_id.toLowerCase()] = rawHint;
+              }
+            } else if (hintsMap[player.player_id]) {
+              delete hintsMap[player.player_id];
+              if (typeof player.player_id === 'string') {
+                delete hintsMap[player.player_id.toLowerCase()];
+              }
+            }
+            const hint = rawHint || null;
+            if (!player.photoURL && !player.photo_url && player.player_id) {
+              if (!hint && !forceAllPhotos) {
+                return;
+              }
+              try {
+                const photoURL = await window.getPlayerPhotoURL(player.player_id, leagueId, hint);
+                if (photoURL) {
+                  player.photoURL = photoURL;
+                  player.photo_url = photoURL; // Salva anche qui per compatibilità
+                  // Non loggare ogni foto caricata per evitare spam in console
+                }
+              } catch (err) {
+                // Ignora silenziosamente - in assenza foto useremo placeholder
+              }
+            } else if (player.photoURL || player.photo_url) {
+              // Verifica che l'URL sia valido (contiene token)
+              if (player.photoURL && !player.photoURL.includes('token=')) {
+                // URL senza token = costruito manualmente, rimuovi
+                player.photoURL = null;
+                player.photo_url = null;
+                try {
+                  const photoURL = await window.getPlayerPhotoURL(player.player_id, leagueId, hint);
+                  if (photoURL) {
+                    player.photoURL = photoURL;
+                    player.photo_url = photoURL;
+                  }
+                } catch (err) {
+                  // Ignora
+                }
+              }
+            }
+          });
+          
+          await Promise.all(photoPromises);
+          // Piccola pausa tra i batch per evitare rate limiting
+          if (i + BATCH_SIZE < playersArray.length) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+        
+        console.log('[lineup-summary] ✅ Caricamento foto completato');
+      } else {
+        console.warn('[lineup-summary] player-photo-loader.js non caricato, foto non caricate');
+      }
     }
 
     async function loadCoaches() {
@@ -1047,7 +1346,12 @@
 
     async function loadGiornate() {
       try {
-        const snapshot = await window.db.collection('days').get();
+        const leagueId = getCurrentLeagueId();
+        const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
+        const daysRef = isLegacyMode
+          ? window.db.collection('days')
+          : window.db.collection(`leagues/${leagueId}/days`);
+        const snapshot = await daysRef.get();
         const ids = snapshot.docs
           .filter(doc => doc.exists && doc.data()?.computed)
           .map(doc => doc.id);
@@ -1068,10 +1372,15 @@
     }
 
     async function fallbackGiornateFromResults() {
+      const leagueId = getCurrentLeagueId();
+      const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
       const available = [];
       await Promise.all(giornateFallback.map(async gid => {
         try {
-          const snap = await window.db.collection('results').doc(gid).collection('teams').limit(1).get();
+          const resultsRef = isLegacyMode
+            ? window.db.collection('results').doc(gid).collection('teams')
+            : window.db.collection(`leagues/${leagueId}/results`).doc(gid).collection('teams');
+          const snap = await resultsRef.limit(1).get();
           if (!snap.empty) {
             available.push(gid);
           }
@@ -1173,9 +1482,17 @@
       if (curvaContent) curvaContent.innerHTML = '<div class="loading">Caricamento curva…</div>';
 
       try {
+        const leagueId = getCurrentLeagueId();
+        const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
+        const resultsRef = isLegacyMode
+          ? window.db.collection('results').doc(state.selectedGiornata).collection('teams').doc(state.selectedTeamId)
+          : window.db.collection(`leagues/${leagueId}/results`).doc(state.selectedGiornata).collection('teams').doc(state.selectedTeamId);
+        const daysRef = isLegacyMode
+          ? window.db.collection('days').doc(state.selectedGiornata)
+          : window.db.collection(`leagues/${leagueId}/days`).doc(state.selectedGiornata);
         const [resultSnap, daySnap] = await Promise.all([
-          window.db.collection('results').doc(state.selectedGiornata).collection('teams').doc(state.selectedTeamId).get(),
-          window.db.collection('days').doc(state.selectedGiornata).get()
+          resultsRef.get(),
+          daysRef.get()
         ]);
 
         if (!resultSnap.exists) {
@@ -1201,10 +1518,10 @@
       }
     }
 
-    function renderFromCache() {
+    async function renderFromCache() {
       if (!state.cache) return;
       renderSummary(state.cache.resultData);
-      renderPlayersSection(state.cache.resultData, state.cache.dayData);
+      await renderPlayersSection(state.cache.resultData, state.cache.dayData);
       renderCoachSection(state.cache.resultData, state.cache.dayData);
       renderCurvaSection(state.cache.resultData, state.cache.dayData);
     }
@@ -1235,7 +1552,7 @@
       `;
     }
 
-    function renderPlayersSection(resultData, dayData) {
+    async function renderPlayersSection(resultData, dayData) {
       const lineup = Array.isArray(resultData.lineup) ? resultData.lineup.filter(Boolean) : [];
       if (!lineup.length) {
         playersContent.innerHTML = '<div class="empty-state">Nessuna formazione salvata per questa giornata.</div>';
@@ -1245,24 +1562,43 @@
       const playerSelections = (dayData.players || {});
       const captainId = resultData.captain || null;
 
-      const playersData = lineup.map((playerId, index) => {
+      // Ottieni coach_ids della squadra per identificare il coach designato
+      const team = state.teamMap.get(state.selectedTeamId) || {};
+      const coachIds = Array.isArray(team.coachIds) ? team.coachIds : (Array.isArray(team.coach_ids) ? team.coach_ids : []);
+      
+      const playersData = await Promise.all(lineup.map(async (playerId, index) => {
         const info = state.players.get(playerId) || {};
         const selections = playerSelections[playerId] || {};
         const metrics = calculateMetrics(selections, state.playerRules);
         const isCaptain = captainId && String(captainId) === String(playerId);
+        const isCoach = coachIds.some(cid => String(cid) === String(playerId));
         const totalWithCaptain = metrics.total + (isCaptain ? metrics.total : 0);
+        
+        // Carica foto - usa photoURL già caricato durante loadPlayers()
+        // IMPORTANTE: usa SOLO photoURL già caricato, NON costruire URL manualmente
+        let photoUrl = info.photoURL || info.photo_url || getEntityPhoto(info);
+        
+        // Se non c'è photoURL, significa che non è stato caricato durante loadPlayers()
+        // In questo caso, NON provare a costruire URL manualmente - usa placeholder
+        if (!photoUrl || photoUrl.includes('firebasestorage.googleapis.com') && !photoUrl.includes('token=')) {
+          // Se è un URL Firebase Storage ma senza token, potrebbe essere costruito manualmente
+          // Ignora e usa placeholder
+          photoUrl = null;
+        }
+        
         return {
           playerId,
           lineupIndex: index,
           info,
           displayLabel: getPlayerDisplayLabel(info),
-          photoUrl: getEntityPhoto(info),
+          photoUrl: photoUrl,
           selections,
           metrics,
           isCaptain,
+          isCoach,
           totalWithCaptain
         };
-      });
+      }));
 
       if (state.viewMode === 'list') {
         playersContent.innerHTML = renderPlayersList(playersData);
@@ -1437,19 +1773,51 @@
 
       const info = playerData.info;
       const label = playerData.displayLabel || info.nome_completo || info.name || `Giocatore ${slotIndex + 1}`;
-      const role = (info.role || '—').substring(0, 1);
       const score = playerData.totalWithCaptain;
       const baseScore = playerData.metrics.total;
-      const photo = playerData.photoUrl ? `<img src="${escapeHtml(playerData.photoUrl)}" alt="${escapeHtml(label)}" />` : '<span style="font-size:28px;">⚽</span>';
+      
+      // Carica foto - usa photoUrl già caricato durante loadPlayers()
+      // IMPORTANTE: usa SOLO photoURL già caricato, NON costruire URL manualmente
+      let photoUrl = playerData.photoUrl || info.photoURL || info.photo_url || getEntityPhoto(info);
+      
+      // Se non c'è photoURL, significa che non è stato caricato durante loadPlayers()
+      // In questo caso, NON provare a costruire URL manualmente - usa placeholder
+      if (photoUrl && photoUrl.includes('firebasestorage.googleapis.com') && !photoUrl.includes('token=')) {
+        // Se è un URL Firebase Storage ma senza token, potrebbe essere costruito manualmente
+        // Ignora e usa placeholder
+        photoUrl = null;
+      }
+      
+      // Fallback a placeholder con iniziali
+      const nameParts = (label || '').split(/\s+/).filter(Boolean);
+      const initials = nameParts.length >= 2
+        ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+        : (nameParts[0] || '?').substring(0, 2).toUpperCase();
+      const fallbackSvg = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" fill="#1e3a8a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="24" font-weight="bold">${initials}</text></svg>`);
+      
+      const placeholderPath = '/assets/player-placeholder.svg';
+      
+      // Usa placeholder se non c'è photoUrl valido (deve contenere token=)
+      const photo = photoUrl && photoUrl.includes('token=')
+        ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(label)}" onerror="this.src='${placeholderPath}'" />` 
+        : `<img src="${placeholderPath}" alt="${escapeHtml(label)}" />`;
+      
+      // Indicatore coach (quadratino/cerchietto)
+      const coachIndicator = playerData.isCoach 
+        ? '<span class="coach-indicator" title="Coach designato">👔</span>' 
+        : '';
 
+      // Layout: Foto -> Punteggio -> Nome (come richiesto)
       return `
         <div class="field-slot">
           <div class="field-player${playerData.isCaptain ? ' captain' : ''}">
-            <div class="field-role">${escapeHtml(role)}</div>
             <div class="field-avatar">${photo}</div>
-            <div class="field-name">${escapeHtml(label)}</div>
             <div class="field-score" title="Totale (base ${baseScore.toFixed(2)}${playerData.isCaptain ? ` + bonus ${baseScore.toFixed(2)}` : ''})">
               ${score.toFixed(2)}${playerData.isCaptain ? ' ⭐' : ''}
+            </div>
+            <div class="field-name">
+              ${escapeHtml(label)}
+              ${coachIndicator}
             </div>
           </div>
         </div>
@@ -1698,8 +2066,8 @@
     }
   </script>
 
-  <script src="resources/firebase.js"></script>
   <script src="resources/feature-flags.js?v=20251103"></script>
+  <script src="resources/player-photo-loader.js?v=2025110701"></script>
   <script src="resources/app-init.js"></script>
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/mobile-menu.js?v=2025101803"></script>

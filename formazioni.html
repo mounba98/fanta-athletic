@@ -268,6 +268,44 @@
       flex-shrink: 0;
       margin-left: 60px;
     }
+    
+    @media (max-width: 768px) {
+      .coach-slot-mini {
+        width: 80px;
+        height: 80px;
+        margin-left: 4px !important; /* Ridotto da 8px a 4px per fix scomparsa foto */
+        border-width: 3px;
+        border-style: solid;
+        border-color: rgba(255,255,255,0.6);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10;
+        position: relative;
+      }
+      
+      /* Accorcia carte giocatori verticalmente */
+      .slot {
+        min-height: 100px !important;
+      }
+      
+      .slot-card.draggable {
+        padding: 8px !important;
+        gap: 6px !important;
+      }
+      
+      .slot-card-main {
+        gap: 6px !important;
+      }
+      
+      .slot-avatar {
+        width: 50px !important;
+        height: 50px !important;
+      }
+      
+      .slot-name {
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+      }
+    }
 
     .coach-slot-mini img {
       width: 100%;
@@ -766,6 +804,28 @@
         </div>
         
         <!-- Mobile: solo panchina -->
+        <!-- Campo mobile -->
+        <div class="mobile-only" style="margin-top: 16px;">
+          <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+          <div class="pitch">
+            <div class="pitch-grid" id="pitchGridMobile">
+              <div class="line two">
+                <div class="slot" data-slot="0"></div>
+                <div class="slot" data-slot="1"></div>
+              </div>
+              <div class="line two">
+                <div class="slot" data-slot="2"></div>
+                <div class="slot" data-slot="3"></div>
+              </div>
+              <div class="line one" style="display: flex; align-items: center; justify-content: flex-start; gap: 12px; position: relative; padding-right: 0;">
+                <div class="slot" data-slot="4" style="flex: 0 0 auto;"></div>
+                <div class="coach-slot-mini" id="coachSlotMiniMobile" style="margin-left: auto; margin-right: 0;"></div>
+              </div>
+            </div>
+            <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+          </div>
+        </div>
+        
         <div class="mobile-only" style="margin-top: 16px;">
           <div class="sectionh">Panchina</div>
           <div id="benchStrip" class="strip"></div>
@@ -862,6 +922,116 @@
       }
       // Rimuovi tutte le classi drag-over
       $$('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    }
+
+    // ========== FINESTRA SELEZIONE GIOCATORE PER SLOT VUOTO ==========
+    function openPlayerPickerForSlot(slotIndex) {
+      const t = state.teams[state.selectedTeamIdx];
+      if (!t) return;
+      
+      const locked = isLockedAuto();
+      const computed = state.daysComputed && !state.isAdmin;
+      const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computed;
+      
+      if (!canWrite) {
+        toast('Formazione bloccata o non hai permessi.');
+        return;
+      }
+      
+      const onField = new Set((t.lineup||[]).filter(Boolean));
+      const availablePlayers = (t.roster||[])
+        .filter(pid => !onField.has(pid))
+        .map(pid => {
+          const p = state.players.find(x => x.player_id === pid);
+          return p ? { ...p, player_id: pid } : null;
+        })
+        .filter(Boolean);
+      
+      if (!availablePlayers.length) {
+        toast('Nessun giocatore disponibile in panchina!');
+        return;
+      }
+      
+      // Crea modal semplice
+      const modal = document.createElement('div');
+      modal.id = 'playerPickerModal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      `;
+      
+      modal.innerHTML = `
+        <div style="background: var(--card); border-radius: 16px; padding: 20px; max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700;">Seleziona giocatore</h3>
+            <button id="closePicker" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text);">×</button>
+          </div>
+          <div id="pickerPlayersList" style="display: grid; gap: 8px;">
+            ${availablePlayers.map(p => {
+              const photoURL = getPlayerPhoto(p) || 'resources/logo.png';
+              const displayName = getPlayerDisplayLabel(p, 'full');
+              return `
+                <div class="picker-player-item" data-pid="${p.player_id}" style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  padding: 12px;
+                  border: 1px solid var(--border);
+                  border-radius: 12px;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                ">
+                  <img src="${photoURL}" alt="${displayName}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" onerror="this.src='resources/logo.png'" />
+                  <div style="flex: 1;">
+                    <div style="font-weight: 600;">${escapeHtml(displayName)}</div>
+                    <div style="font-size: 12px; color: var(--muted);">${escapeHtml(p.role || '')}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      // Chiudi modal
+      const closeBtn = modal.querySelector('#closePicker');
+      closeBtn.addEventListener('click', () => modal.remove());
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+      });
+      
+      // Click su giocatore
+      modal.querySelectorAll('.picker-player-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const pid = item.dataset.pid;
+          t.lineup[slotIndex] = pid;
+          saveTeams();
+          renderEditor();
+          modal.remove();
+          toast('✅ Giocatore aggiunto al campo!');
+        });
+        
+        // Hover effect
+        item.addEventListener('mouseenter', () => {
+          item.style.background = 'var(--ring)';
+          item.style.transform = 'translateY(-2px)';
+        });
+        item.addEventListener('mouseleave', () => {
+          item.style.background = '';
+          item.style.transform = '';
+        });
+      });
     }
 
     // ========== CLICK SINGOLO per MOBILE (no drag complicato) ==========
@@ -1807,9 +1977,10 @@
       if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Trendiu' || selectedCoach.coach_id === 'trendiu' || selectedCoach.coach_id?.toLowerCase() === 'trendiu')) {
         coachPhoto = 'resources/trendiu_athletic.jpg';
       }
-      // Coach slot mini vicino al capitano
-      const coachSlotMiniEl = document.getElementById('coachSlotMini');
-      if (coachSlotMiniEl) {
+      // Coach slot mini vicino al capitano (desktop e mobile)
+      const updateCoachSlot = (slotId) => {
+        const coachSlotMiniEl = document.getElementById(slotId);
+        if (!coachSlotMiniEl) return;
         if (selectedCoach) {
           const coachName = selectedCoach.nome || selectedCoach.name || 'Coach';
           const coachInitials = getInitials(coachName);
@@ -1833,7 +2004,11 @@
           coachSlotMiniEl.innerHTML = '';
           coachSlotMiniEl.style.display = 'flex';
         }
-      }
+      };
+      
+      // Aggiorna entrambi i coach slot
+      updateCoachSlot('coachSlotMini');
+      updateCoachSlot('coachSlotMiniMobile');
       const coachPreview = selectedCoach ? `
         <div class="coach-preview">
           <div class="coach-preview-avatar">
@@ -1977,9 +2152,9 @@
         });
       });
 
-      // Fill slots
-      const grid = $('#pitchGrid');
-      $$('#pitchGrid .slot').forEach((slot,i)=>{
+      // Fill slots - desktop e mobile
+      const fillSlots = (gridSelector) => {
+        $$(`${gridSelector} .slot`).forEach((slot,i)=>{
         const pid = t.lineup[i];
         // Rimuovi la logica che fa diventare automaticamente lo slot 4 il captain slot
         slot.classList.remove('captain-slot');
@@ -2078,6 +2253,20 @@
           }
         } else {
           slot.innerHTML = `<div class="slot-empty">Trascina qui</div>`;
+          
+          // Mobile: click su slot vuoto apre finestra con giocatori in panchina
+          if (isMobile()) {
+            slot.style.cursor = 'pointer';
+            slot.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!canWrite) {
+                toast('Formazione bloccata o non hai permessi.');
+                return;
+              }
+              openPlayerPickerForSlot(i);
+            });
+          }
         }
         
         // Drop handlers
@@ -2085,8 +2274,12 @@
         slot.addEventListener('dragenter', handleDragEnter);
         slot.addEventListener('dragleave', handleDragLeave);
         slot.addEventListener('drop', (e)=> handleDrop(e, i));
-        // Mobile: slot vuoti non hanno click (si clicca su giocatore dalla panchina)
-      });
+        });
+      };
+      
+      // Riempie entrambi i grid (desktop e mobile)
+      fillSlots('#pitchGrid');
+      fillSlots('#pitchGridMobile');
 
       // Render bench/roster strip (draggable to pitch; tap-to-assign on mobile)
       const bench = $('#benchStrip');

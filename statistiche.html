@@ -296,7 +296,18 @@
             <div style="display:flex; justify-content:space-between;"><span class="muted">Coach</span><strong>${data.coach.toFixed(2)}</strong></div>
             <div style="display:flex; justify-content:space-between; border-top:1px solid #eee; padding-top:6px;"><span class="muted">Totale</span><strong>${data.total.toFixed(2)}</strong></div>
           </div>`;
-        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ 
+          panel.hidden = true; 
+          panel.innerHTML=''; 
+          // Ricarica lista dopo chiusura dettaglio
+          if (statsState.currentTab === 'players') {
+            renderPlayers();
+          } else if (statsState.currentTab === 'coaches') {
+            renderCoaches();
+          } else if (statsState.currentTab === 'curva') {
+            renderCurva();
+          }
+        });
       }
 
       const ROLE_ORDER = ['Portiere','Difensore','Centrocampista','Attaccante'];
@@ -379,7 +390,18 @@
               </div>
             </div>
           </div>`;
-        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ 
+          panel.hidden = true; 
+          panel.innerHTML=''; 
+          // Ricarica lista dopo chiusura dettaglio
+          if (statsState.currentTab === 'players') {
+            renderPlayers();
+          } else if (statsState.currentTab === 'coaches') {
+            renderCoaches();
+          } else if (statsState.currentTab === 'curva') {
+            renderCurva();
+          }
+        });
       }
 
       // Coaches aggregation
@@ -444,7 +466,18 @@
             <div class="muted">Dettaglio bonus/malus</div>
             <div style="display:grid; gap:6px; margin-top:6px;">${rows}</div>
           </div>`;
-        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ 
+          panel.hidden = true; 
+          panel.innerHTML=''; 
+          // Ricarica lista dopo chiusura dettaglio
+          if (statsState.currentTab === 'players') {
+            renderPlayers();
+          } else if (statsState.currentTab === 'coaches') {
+            renderCoaches();
+          } else if (statsState.currentTab === 'curva') {
+            renderCurva();
+          }
+        });
       }
 
       // Curva aggregation
@@ -488,7 +521,18 @@
             <div class="muted">Dettaglio bonus/malus</div>
             <div style="display:grid; gap:6px; margin-top:6px;">${rows}</div>
           </div>`;
-        panel.querySelector('#closePanel').addEventListener('click', ()=>{ panel.hidden = true; panel.innerHTML=''; });
+        panel.querySelector('#closePanel').addEventListener('click', ()=>{ 
+          panel.hidden = true; 
+          panel.innerHTML=''; 
+          // Ricarica lista dopo chiusura dettaglio
+          if (statsState.currentTab === 'players') {
+            renderPlayers();
+          } else if (statsState.currentTab === 'coaches') {
+            renderCoaches();
+          } else if (statsState.currentTab === 'curva') {
+            renderCurva();
+          }
+        });
       }
 
       // initial render and filters binding
@@ -581,9 +625,25 @@
     function handleClose(detailEl) {
       if (detailEl === inlineDetail) {
         clearInlineDetail();
+        // Ricarica lista giocatori dopo chiusura dettaglio
+        if (statsState.currentTab === 'players') {
+          renderPlayers();
+        } else if (statsState.currentTab === 'coaches') {
+          renderCoaches();
+        } else if (statsState.currentTab === 'curva') {
+          renderCurva();
+        }
       } else if (detailEl === detailPanel) {
         detailPanel.hidden = true;
         detailPanel.innerHTML = '';
+        // Ricarica lista giocatori dopo chiusura dettaglio
+        if (statsState.currentTab === 'players') {
+          renderPlayers();
+        } else if (statsState.currentTab === 'coaches') {
+          renderCoaches();
+        } else if (statsState.currentTab === 'curva') {
+          renderCurva();
+        }
       }
     }
 
@@ -863,7 +923,14 @@
         .join('');
 
       playersGrid.querySelectorAll('[data-player-id]').forEach(button => {
-        button.addEventListener('click', () => openPlayerStats(button.getAttribute('data-player-id'), button));
+        button.addEventListener('click', () => {
+          clearInlineDetail();
+          if (detailPanel) {
+            detailPanel.hidden = true;
+            detailPanel.innerHTML = '';
+          }
+          openPlayerStats(button.getAttribute('data-player-id'), button);
+        });
       });
     }
 
@@ -884,7 +951,14 @@
         .join('');
 
       coachesGrid.querySelectorAll('[data-coach-id]').forEach(button => {
-        button.addEventListener('click', () => openCoachStats(button.getAttribute('data-coach-id'), button));
+        button.addEventListener('click', () => {
+          clearInlineDetail();
+          if (detailPanel) {
+            detailPanel.hidden = true;
+            detailPanel.innerHTML = '';
+          }
+          openCoachStats(button.getAttribute('data-coach-id'), button);
+        });
       });
     }
 

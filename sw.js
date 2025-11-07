@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fanta-athletic-v2025110524';
+const CACHE_NAME = 'fanta-athletic-v2025110701';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -21,6 +21,9 @@ const urlsToCache = [
 
 // Install event - cache resources
 self.addEventListener('install', event => {
+  // Forza skipWaiting per aggiornare immediatamente il Service Worker
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -41,7 +44,6 @@ self.addEventListener('install', event => {
         console.log(`Cache install: ${successful} successful, ${failed} failed`);
       })
   );
-  self.skipWaiting();
 });
 
 // Fetch event - NETWORK FIRST (no cache for HTML/JS/CSS)
