@@ -72,4 +72,9 @@ const mobileHeaderFixScript = document.createElement('script');
 mobileHeaderFixScript.src = 'resources/mobile-header-fix.js?v=20251107';
 document.head.appendChild(mobileHeaderFixScript);
 
+// Load cup-service (supporto coppe opzionali)
+const cupServiceScript = document.createElement('script');
+cupServiceScript.src = 'resources/cup-service.js?v=20251107';
+document.head.appendChild(cupServiceScript);
+
 console.log('✅ App initialization scripts loaded');
