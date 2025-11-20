@@ -3,7 +3,7 @@ const serviceAccount = require('./fanta-athletic-firebase-adminsdk.json'); // So
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'fanta-athletic.appspot.com'
+  storageBucket: 'fanta-athletic.firebasestorage.app'
 });
 
 const bucket = admin.storage().bucket();

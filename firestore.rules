@@ -170,47 +170,52 @@ service cloud.firestore {
     
     // ========== Legacy Collections (backward compatibility) ==========
     // Results legacy (top-level) - per migrazione
+    // LEGACY_READONLY: dati di versioni precedenti, non più scrivibili.
     match /results/{giornata} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow write: if false;
       
       match /teams/{teamId} {
         allow read: if true;
-        allow create, update, delete: if isAdmin();
+        allow write: if false;
       }
     }
     
     // Days legacy (top-level) - per migrazione
+    // LEGACY_READONLY: dati di versioni precedenti, non più scrivibili.
     match /days/{giornata} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if false;
     }
     
     // Matchday_temp legacy (top-level) - per migrazione
+    // LEGACY_READONLY: bozze giornate di versioni precedenti, non più scrivibili.
     match /matchday_temp/{giornataId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if false;
     }
     
     // H2H Schedule (top-level)
+    // LEGACY_READONLY: scheduler H2H legacy, uso solo storico.
     match /h2h_schedule/{seasonId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if false;
       
       match /giornate/{giornataId} {
         allow read: if isSignedIn();
-        allow write: if isAdmin();
+        allow write: if false;
       }
     }
     
     // H2H Results (top-level)
+    // LEGACY_READONLY: risultati H2H legacy, uso solo storico.
     match /h2h_results/{seasonId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if false;
       
       match /giornate/{giornataId} {
         allow read: if isSignedIn();
-        allow write: if isAdmin();
+        allow write: if false;
       }
     }
 
@@ -220,27 +225,31 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Teams legacy (top-level) - per backward compatibility
+    // Teams legacy (top-level) - sola lettura durante la migrazione
+    // LEGACY_READONLY: dati squadre legacy, non più scrivibili.
     match /teams/{teamId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn();
+      allow write: if false;
       
+      // LEGACY_READONLY: formazioni salvate legacy.
       match /saved/{giornata} {
         allow read: if isSignedIn();
-        allow write: if isSignedIn();
+        allow write: if false;
       }
     }
     
     // Players legacy (top-level)
+    // LEGACY_READONLY: catalogo giocatori legacy, non più scrivibile.
     match /players/{playerId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if false;
     }
     
     // Coaches legacy (top-level)
+    // LEGACY_READONLY: catalogo allenatori legacy, non più scrivibile.
     match /coaches/{coachId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if false;
     }
     
     // ========== Global Catalog ==========
@@ -285,6 +294,12 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+
+    // Config per lega (es. rules_cache e override sport)
+    match /leagues/{leagueId}/config/{configId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
+    }
     
     // ========== Rules (legacy top-level) ==========
     match /rules/{ruleId} {
@@ -298,6 +313,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // ========== Username cache (lookup pubblico per login) ==========
+    match /usernames/{usernameKey} {
+      // consentiamo solo letture dirette per facilitare il login da username
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isSignedIn() && (request.resource.data.uid == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+    
     // ========== Users ==========
     match /users/{userId} {
       allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
@@ -305,28 +329,51 @@ service cloud.firestore {
     }
     
     // ========== Notifications ==========
+    // Legacy flat notifications - sola lettura durante la migrazione
     match /notifications/{notificationId} {
-      allow read: if isSignedIn() && (
-        request.auth.uid == resource.data.userId ||
-        isAdmin()
-      );
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && (
-        request.auth.uid == resource.data.userId ||
-        isAdmin()
-      );
+      allow read: if isSignedIn();
+      allow write: if false;
     }
     
-    // Notifications subcollection (per social-notifications.js)
-    match /notifications/{userId}/items/{itemId} {
-      allow read: if isSignedIn() && (
-        request.auth.uid == userId ||
-        isAdmin()
-      );
-      allow write: if isSignedIn() && (
-        request.auth.uid == userId ||
-        isAdmin()
-      );
+    // Per-lega: notifiche utenti scoped
+    match /leagues/{leagueId}/notifications/{notificationId} {
+      allow read, update, delete: if isLeagueMember(leagueId) &&
+        request.auth.uid == resource.data.userId;
+      allow create: if isLeagueMember(leagueId);
+    }
+
+    // Team invites per lega (chiunque loggato può leggere/usare un codice)
+    match /leagues/{leagueId}/teamInvites/{inviteId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isLeagueAdmin(leagueId);
+    }
+
+    // Cups e relative sottocollezioni
+    match /leagues/{leagueId}/cups/{cupId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
+
+      match /rounds/{roundId} {
+        allow read: if isLeagueMember(leagueId);
+        allow write: if isLeagueAdmin(leagueId);
+
+        match /matches/{matchId} {
+          allow read: if isLeagueMember(leagueId);
+          allow write: if isLeagueAdmin(leagueId);
+        }
+      }
+    }
+
+    // Achievements per lega
+    match /leagues/{leagueId}/achievements/{achievementId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
+    }
+
+    // Trades per lega (per ora solo admin)
+    match /leagues/{leagueId}/trades/{tradeId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
     }
   }
 }

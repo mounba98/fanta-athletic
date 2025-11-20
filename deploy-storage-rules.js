@@ -4,7 +4,7 @@ const serviceAccount = require('./fanta-athletic-firebase-adminsdk.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'fanta-athletic.appspot.com'
+  storageBucket: 'fanta-athletic.firebasestorage.app'
 });
 
 // Le regole Storage non possono essere deployate via Admin SDK

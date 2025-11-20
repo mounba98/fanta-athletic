@@ -8,7 +8,7 @@ const storage = new Storage({
 
 async function createBucket() {
   try {
-    const bucketName = 'fanta-athletic.appspot.com';
+    const bucketName = 'fanta-athletic.firebasestorage.app';
     
     console.log('🔨 Creazione bucket:', bucketName);
     
