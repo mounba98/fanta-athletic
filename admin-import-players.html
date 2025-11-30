@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
@@ -134,7 +134,7 @@
     <a class="logo-home" href="index.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>📂 Import Giocatori</h1>
+    <h1>?? Import Giocatori</h1>
   </header>
 
   <main class="container">
@@ -149,25 +149,25 @@
 
     <!-- Upload Section -->
     <div class="card">
-      <h2>📥 Carica File Excel o CSV</h2>
+      <h2>?? Carica File Excel o CSV</h2>
       <p style="color: var(--muted); margin-bottom: 20px;">
         Importa la rosa della tua competizione da un file Excel (.xlsx, .xls) o CSV (.csv)
       </p>
       
       <!-- Template Download -->
       <div style="margin-bottom: 20px; padding: 16px; background: #fff3cd; border-radius: 8px;">
-        <strong>💡 Non hai ancora un file?</strong>
+        <strong>?? Non hai ancora un file?</strong>
         <p style="margin: 8px 0; font-size: 14px;">Scarica il template e compilalo con i tuoi giocatori:</p>
-        <button class="btn btn-secondary" onclick="downloadTemplate()">📥 Scarica Template Excel</button>
+        <button class="btn btn-secondary" onclick="downloadTemplate()">?? Scarica Template Excel</button>
       </div>
       
       <!-- Drag & Drop Area -->
       <div id="dropArea" class="drop-area">
-        <div class="drop-icon">📁</div>
+        <div class="drop-icon">??</div>
         <h3>Trascina qui il file Excel o CSV</h3>
         <p>oppure</p>
         <button class="btn" onclick="document.getElementById('fileInput').click()" style="margin: 16px 0;">
-          📂 Sfoglia File
+          ?? Sfoglia File
         </button>
         <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden />
         <p style="font-size: 12px; color: var(--muted); margin-top: 12px;">
@@ -180,7 +180,7 @@
     <!-- Preview Section -->
     <div id="previewSection" style="display: none;">
       <div class="card">
-        <h2>👁️ Anteprima Dati</h2>
+        <h2>??? Anteprima Dati</h2>
         <p style="color: var(--muted); margin-bottom: 20px;">
           Verifica che i dati siano corretti prima di importare
         </p>
@@ -212,8 +212,8 @@
         
         <!-- Action Buttons -->
         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
-          <button class="btn btn-secondary" onclick="cancelImport()">❌ Annulla</button>
-          <button class="btn" onclick="confirmImport()" id="confirmBtn">✅ Conferma Importa (<span id="validCount">0</span> giocatori)</button>
+          <button class="btn btn-secondary" onclick="cancelImport()">? Annulla</button>
+          <button class="btn" onclick="confirmImport()" id="confirmBtn">? Conferma Importa (<span id="validCount">0</span> giocatori)</button>
         </div>
       </div>
     </div>
@@ -221,14 +221,14 @@
     <!-- Success Section -->
     <div id="successSection" style="display: none;">
       <div class="success-message">
-        <div style="font-size: 64px; margin-bottom: 16px;">✅</div>
+        <div style="font-size: 64px; margin-bottom: 16px;">?</div>
         <h2>Import Completato!</h2>
         <p id="successMessage"></p>
         <button class="btn" onclick="location.reload()" style="margin-top: 20px;">
-          📂 Importa Altri Giocatori
+          ?? Importa Altri Giocatori
         </button>
         <a href="admin-roster.html" class="btn btn-secondary" style="margin-top: 20px; text-decoration: none; display: inline-block;">
-          👥 Vai a Gestione Rosa
+          ?? Vai a Gestione Rosa
         </a>
       </div>
     </div>
@@ -302,7 +302,7 @@
         
         currentLeague = { id: doc.id, ...doc.data() };
         document.getElementById('leagueName').textContent = currentLeague.name;
-        document.getElementById('leagueDetails').textContent = `${currentLeague.type === 'multi' ? '🏆 Multi' : '👤 Mono'} • ${currentLeague.season || ''}`;
+        document.getElementById('leagueDetails').textContent = `${currentLeague.type === 'multi' ? '?? Multi' : '?? Mono'} � ${currentLeague.season || ''}`;
       } catch (error) {
         console.error('Error loading league:', error);
       }
@@ -364,7 +364,7 @@
       }
       
       // Show loading
-      document.getElementById('dropArea').innerHTML = '<div class="drop-icon">⏳</div><h3>Elaborazione in corso...</h3>';
+      document.getElementById('dropArea').innerHTML = '<div class="drop-icon">?</div><h3>Elaborazione in corso...</h3>';
       
       try {
         if (ext === '.csv') {
@@ -418,7 +418,7 @@
         // Auto-detect columns (case insensitive)
         const nome = getColumn(row, ['nome', 'name', 'first name', 'firstname', 'nome giocatore']);
         const cognome = getColumn(row, ['cognome', 'surname', 'last name', 'lastname']);
-        const squadra = getColumn(row, ['squadra', 'team', 'club', 'società']);
+        const squadra = getColumn(row, ['squadra', 'team', 'club', 'societ�']);
         const ruolo = normalizeRole(getColumn(row, ['ruolo', 'role', 'position', 'pos']));
         const valore = parseInt(getColumn(row, ['valore', 'value', 'prezzo', 'price', 'costo'])) || 0;
         
@@ -497,11 +497,11 @@
         </div>
         <div class="stat-card" style="border: 2px solid #4caf50;">
           <div class="stat-value" style="color: #4caf50;">${validPlayers.length}</div>
-          <div class="stat-label">✅ Validi</div>
+          <div class="stat-label">? Validi</div>
         </div>
         <div class="stat-card" style="border: 2px solid #f44336;">
           <div class="stat-value" style="color: #f44336;">${invalidPlayers.length}</div>
-          <div class="stat-label">❌ Errori</div>
+          <div class="stat-label">? Errori</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">${roleCount.P}</div>
@@ -525,7 +525,7 @@
       if (invalidPlayers.length > 0) {
         document.getElementById('errorsList').innerHTML = `
           <div class="error-message">
-            <h4 style="margin: 0 0 12px;">⚠️ ${invalidPlayers.length} righe con errori</h4>
+            <h4 style="margin: 0 0 12px;">?? ${invalidPlayers.length} righe con errori</h4>
             <p style="margin: 0; font-size: 14px;">Queste righe non verranno importate. Correggi il file e riprova.</p>
           </div>
         `;
@@ -543,7 +543,7 @@
           <td>${p.squadra}</td>
           <td><span class="role-badge role-${p.ruolo}">${p.ruolo}</span></td>
           <td>${p.valore}</td>
-          <td>${p.valid ? '<span style="color: #4caf50;">✓ OK</span>' : '<span style="color: #f44336;">✗ ' + p.errors.join(', ') + '</span>'}</td>
+          <td>${p.valid ? '<span style="color: #4caf50;">? OK</span>' : '<span style="color: #f44336;">? ' + p.errors.join(', ') + '</span>'}</td>
         </tr>
       `).join('');
       
@@ -617,7 +617,7 @@
         console.error('Import error:', error);
         alert('Errore durante l\'importazione: ' + error.message);
         btn.disabled = false;
-        btn.innerHTML = '✅ Conferma Importa (<span id="validCount">' + validPlayers.length + '</span> giocatori)';
+        btn.innerHTML = '? Conferma Importa (<span id="validCount">' + validPlayers.length + '</span> giocatori)';
       }
     }
     

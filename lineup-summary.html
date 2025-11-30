@@ -35,6 +35,41 @@
       font-size: 22px;
     }
 
+    .card-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      color: inherit;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .card-toggle:hover {
+      color: var(--primary);
+    }
+
+    .card-toggle .toggle-icon {
+      font-size: 20px;
+      transition: transform 0.2s ease;
+    }
+
+    .card-toggle.open .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .filters-card .filters-body {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -195,26 +230,27 @@
       .pitch-line {
         gap: 12px !important;
         width: 100% !important;
-        justify-content: stretch !important;
+        justify-content: center !important;
       }
       
       .pitch-line.two {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 12px !important;
+        justify-items: center;
       }
       
       .pitch-line.one {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
+        display: flex !important;
+        justify-content: center !important;
         max-width: 100% !important;
       }
       
       .field-slot {
-        width: 100% !important;
-        max-width: 100% !important;
-        aspect-ratio: 4 / 5;
-        min-height: 160px;
+        width: clamp(120px, 42vw, 160px) !important;
+        max-width: 160px !important;
+        aspect-ratio: 3 / 4;
+        min-height: auto;
       }
       
       .field-player {
@@ -287,6 +323,11 @@
       text-align: center;
       margin-left: 6px;
       vertical-align: middle;
+    }
+
+    .player-row-name .badge.convocato {
+      padding: 2px 6px;
+      font-size: 10px;
     }
 
     .field-avatar {
@@ -438,6 +479,18 @@
     .badge.negative {
       background: rgba(239, 68, 68, 0.08);
       color: #b91c1c;
+    }
+
+    .badge.convocato {
+      background: rgba(34, 197, 94, 0.12);
+      color: #15803d;
+      border: 1px solid rgba(34, 197, 94, 0.28);
+    }
+
+    :root.dark .badge.convocato {
+      background: rgba(34, 197, 94, 0.24);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.45);
     }
 
     .badge.captain {
@@ -928,21 +981,26 @@
 </head>
 <body data-header-title="👥 Riepilogo Titolari" data-header-subtitle="Analizza i punteggi della tua formazione">
   <main>
-    <section class="card">
-      <h2>Seleziona giornata e squadra</h2>
-      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
-        Seleziona la giornata e la squadra per vedere i punti dei 5 titolari schierati. Il riepilogo usa i dati ufficiali salvati in `results` e `days`.
-      </p>
-      <div class="controls">
-        <div class="control-group">
-          <label for="giornataSelect">Giornata</label>
-          <select id="giornataSelect"></select>
+    <section class="card filters-card">
+      <button type="button" class="card-toggle" id="filtersToggle" aria-expanded="false">
+        <span>🎯 Seleziona giornata e squadra</span>
+        <span class="toggle-icon">▾</span>
+      </button>
+      <div class="filters-body" id="filtersBody" hidden>
+        <p style="color: var(--text-muted); font-size: 14px; margin: 0;">
+          Scegli la giornata e la squadra da analizzare. I dati arrivano dai risultati ufficiali salvati in `results` e `days`.
+        </p>
+        <div class="controls">
+          <div class="control-group">
+            <label for="giornataSelect">Giornata</label>
+            <select id="giornataSelect"></select>
+          </div>
+          <div class="control-group">
+            <label for="teamSelect">Squadra</label>
+            <select id="teamSelect"></select>
+          </div>
+          <button id="refreshBtn" class="btn-primary">Aggiorna riepilogo</button>
         </div>
-        <div class="control-group">
-          <label for="teamSelect">Squadra</label>
-          <select id="teamSelect"></select>
-        </div>
-        <button id="refreshBtn" class="btn-primary">Aggiorna riepilogo</button>
       </div>
     </section>
 
@@ -1100,6 +1158,7 @@
 
     const state = {
       user: null,
+      leagueId: null,
       teams: [],
       teamMap: new Map(),
       players: new Map(),
@@ -1121,11 +1180,28 @@
     const giornataSelect = document.getElementById('giornataSelect');
     const teamSelect = document.getElementById('teamSelect');
     const refreshBtn = document.getElementById('refreshBtn');
+    const filtersToggle = document.getElementById('filtersToggle');
+    const filtersBody = document.getElementById('filtersBody');
     const summaryContent = document.getElementById('summaryContent');
     const playersContent = document.getElementById('playersContent');
     const coachContent = document.getElementById('coachContent');
     const curvaContent = document.getElementById('curvaContent');
     const viewToggle = document.getElementById('viewToggle');
+
+    if (filtersToggle && filtersBody) {
+      filtersToggle.addEventListener('click', () => {
+        const isOpen = !filtersBody.hasAttribute('hidden');
+        if (isOpen) {
+          filtersBody.hidden = true;
+          filtersToggle.setAttribute('aria-expanded', 'false');
+          filtersToggle.classList.remove('open');
+        } else {
+          filtersBody.hidden = false;
+          filtersToggle.setAttribute('aria-expanded', 'true');
+          filtersToggle.classList.add('open');
+        }
+      });
+    }
 
     firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
@@ -1138,6 +1214,13 @@
 
     async function initializePage() {
       try {
+        const leagueId = await ensureLeagueReady(10000);
+        if (!leagueId) {
+          notifyMissingLeague('visualizzare il riepilogo della giornata');
+          return;
+        }
+        state.leagueId = leagueId;
+
         await Promise.all([
           loadTeams(),
           loadPlayers(),
@@ -1153,7 +1236,8 @@
         setupViewToggle();
         await loadLineupSummary();
       } catch (error) {
-        console.error('Errore inizializzazione riepilogo:', error);
+        console.error('[lineup-summary] Errore inizializzazione riepilogo:', error);
+        showToast('❌ Errore nel caricamento del riepilogo per questa lega.');
         summaryContent.innerHTML = `<div class="empty-state">❌ Errore durante il caricamento: ${error.message || 'riprovare più tardi'}</div>`;
         playersContent.innerHTML = '';
         if (coachContent) coachContent.innerHTML = '';
@@ -1178,42 +1262,175 @@
       }
     }
 
-    // Ottieni leagueId per multilega
     const leagueHelper = window.LeagueHelper || null;
-    function getCurrentLeagueId() {
+    let missingLeagueToastShown = false;
+    let currentLeagueOnPage = null;
+
+    function firestore() {
+      return window.db || firebase.firestore();
+    }
+
+    function showFallbackToast(msg) {
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.position = 'fixed';
+      el.style.bottom = '16px';
+      el.style.right = '16px';
+      el.style.background = '#2d6cdf';
+      el.style.color = '#fff';
+      el.style.padding = '10px 14px';
+      el.style.borderRadius = '8px';
+      el.style.boxShadow = '0 10px 30px rgba(15,23,42,0.4)';
+      el.style.zIndex = '9999';
+      document.body.appendChild(el);
+      setTimeout(() => { el.remove(); }, 2500);
+    }
+
+    function showToast(msg) {
+      if (typeof window.toast === 'function') {
+        window.toast(msg);
+      } else {
+        showFallbackToast(msg);
+      }
+    }
+
+    function notifyMissingLeague(context = 'questa operazione') {
+      console.warn(`[lineup-summary] League ID mancante (${context})`);
+      if (!missingLeagueToastShown) {
+        missingLeagueToastShown = true;
+        showToast('❌ Seleziona una lega valida per vedere il riepilogo della giornata.');
+        setTimeout(() => { missingLeagueToastShown = false; }, 4000);
+      }
+    }
+
+    function getCurrentLeagueIdCached() {
       if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
-        return leagueHelper.getCurrentLeagueId();
+        const id = leagueHelper.getCurrentLeagueId();
+        if (id) return id;
       }
       if (window.currentLeague && window.currentLeague.id) {
         return window.currentLeague.id;
       }
-      try {
-        const stored = localStorage.getItem('last_league_id');
-        if (stored) return stored;
-      } catch (_) {}
       return null;
     }
 
+    function getCurrentLeagueId() {
+      return getCurrentLeagueIdCached();
+    }
+
+    async function ensureLeagueReady(timeoutMs = 7000) {
+      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
+        try {
+          const info = await leagueHelper.waitForLeague(timeoutMs);
+          if (info && info.id) {
+            return info.id;
+          }
+        } catch (err) {
+          console.warn('[lineup-summary] Timeout attesa lega:', err?.message || err);
+        }
+      }
+      return getCurrentLeagueIdCached();
+    }
+
+    function getLeagueDoc(collection, docId, leagueId = null) {
+      const db = firestore();
+      if (leagueHelper && typeof leagueHelper.getLeagueDoc === 'function') {
+        try {
+          const ref = leagueHelper.getLeagueDoc(collection, docId, leagueId || undefined);
+          if (ref) return ref;
+        } catch (err) {
+          console.warn('[lineup-summary] LeagueHelper.getLeagueDoc failed', err);
+        }
+      }
+      const targetLeague = leagueId || getCurrentLeagueIdCached();
+      if (!targetLeague) {
+        notifyMissingLeague(`getLeagueDoc(${collection}/${docId})`);
+        return null;
+      }
+      return db.collection(`leagues/${targetLeague}/${collection}`).doc(docId);
+    }
+
+    function getLeagueCollection(collection, leagueId = null) {
+      const db = firestore();
+      if (leagueHelper && typeof leagueHelper.getLeagueCollection === 'function') {
+        try {
+          const ref = leagueHelper.getLeagueCollection(collection, leagueId || undefined);
+          if (ref) return ref;
+        } catch (err) {
+          console.warn('[lineup-summary] LeagueHelper.getLeagueCollection failed', err);
+        }
+      }
+      const targetLeague = leagueId || getCurrentLeagueIdCached();
+      if (!targetLeague) {
+        notifyMissingLeague(`getLeagueCollection(${collection})`);
+        return null;
+      }
+      return db.collection(`leagues/${targetLeague}/${collection}`);
+    }
+
+    function getTeamDocRef(teamId, leagueId = null) {
+      const teamsCol = getLeagueCollection('teams', leagueId);
+      return teamsCol ? teamsCol.doc(String(teamId)) : null;
+    }
+
+    function getDayDocRef(giornataId, leagueId = null) {
+      return getLeagueDoc('days', giornataId, leagueId);
+    }
+
+    function getSavedDocRef(teamIndex, giornataId, leagueId = null) {
+      const teamsCol = getLeagueCollection('teams', leagueId);
+      if (!teamsCol) return null;
+      const teamId = String(teamIndex);
+      return teamsCol.doc(teamId).collection('saved').doc(giornataId);
+    }
+
+    function getResultDocRef(giornataId, teamId, leagueId = null) {
+      const resultsCol = getLeagueCollection('results', leagueId);
+      if (!resultsCol) return null;
+      return resultsCol.doc(giornataId).collection('teams').doc(String(teamId));
+    }
+
+    async function getLeagueIdOrNotify(context = 'questa operazione', opts = {}) {
+      const { notify = true, timeoutMs } = opts || {};
+      const id = await ensureLeagueReady(typeof timeoutMs === 'number' ? timeoutMs : 7000);
+      if (!id && notify) {
+        notifyMissingLeague(context);
+      }
+      return id;
+    }
+
     async function loadTeams() {
-      const leagueId = getCurrentLeagueId();
-      const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
-      const teamsRef = isLegacyMode
-        ? window.db.collection('teams')
-        : window.db.collection(`leagues/${leagueId}/teams`);
-      const snapshot = await teamsRef.orderBy(firebase.firestore.FieldPath.documentId()).get();
-      state.teamMap.clear();
-      state.teams = snapshot.docs.map(doc => {
-        const data = doc.data() || {};
-        const numericId = Number(doc.id);
-        const entry = {
-          id: doc.id,
-          numericId: Number.isFinite(numericId) ? numericId : null,
-          name: data.name || (Number.isFinite(numericId) ? `Squadra ${numericId + 1}` : `Team ${doc.id}`),
-          coachIds: Array.isArray(data.coach_ids) ? data.coach_ids : []
-        };
-        state.teamMap.set(entry.id, entry);
-        return entry;
-      });
+      try {
+        const leagueId = state.leagueId || await getLeagueIdOrNotify('caricare le squadre per il riepilogo', { notify: false });
+        if (!leagueId || !window.db) {
+          state.teams = [];
+          state.teamMap.clear();
+          return;
+        }
+        const teamsCol = getLeagueCollection('teams', leagueId);
+        if (!teamsCol) {
+          state.teams = [];
+          state.teamMap.clear();
+          return;
+        }
+        const snapshot = await teamsCol.orderBy(firebase.firestore.FieldPath.documentId()).get();
+        state.teamMap.clear();
+        state.teams = snapshot.docs.map(doc => {
+          const data = doc.data() || {};
+          const numericId = Number(doc.id);
+          const entry = {
+            id: doc.id,
+            numericId: Number.isFinite(numericId) ? numericId : null,
+            name: data.name || (Number.isFinite(numericId) ? `Squadra ${numericId + 1}` : `Team ${doc.id}`),
+            coachIds: Array.isArray(data.coach_ids) ? data.coach_ids : []
+          };
+          state.teamMap.set(entry.id, entry);
+          return entry;
+        });
+      } catch (error) {
+        console.error('[lineup-summary] Errore caricamento teams:', error);
+        showToast('❌ Errore nel caricamento delle squadre per questa lega.');
+      }
     }
 
     async function loadPlayers() {
@@ -1227,7 +1444,7 @@
       
       // Carica foto durante loadPlayers - usa funzione centralizzata
       if (window.getPlayerPhotoURL && typeof window.getPlayerPhotoURL === 'function') {
-        const leagueId = getCurrentLeagueId() || null;
+        const leagueId = state.leagueId || getCurrentLeagueIdCached() || null;
         console.log('[lineup-summary] Caricamento foto per', state.players.size, 'giocatori, leagueId:', leagueId);
         
         // Carica foto in batch per evitare troppe richieste parallele
@@ -1299,14 +1516,25 @@
     }
 
     async function loadCoaches() {
+      if (!window.db) return;
       try {
-        const snapshot = await window.db.collection('coaches').get();
+        const leagueId = state.leagueId || await getLeagueIdOrNotify('caricare la lista allenatori', { notify: false });
+        if (!leagueId) {
+          state.coaches.clear();
+          return;
+        }
+        const coachesCol = getLeagueCollection('coaches', leagueId);
+        if (!coachesCol) {
+          state.coaches.clear();
+          return;
+        }
+        const snapshot = await coachesCol.get();
         state.coaches.clear();
         snapshot.docs.forEach(doc => {
           state.coaches.set(doc.id, doc.data() || {});
         });
       } catch (error) {
-        console.warn('Impossibile caricare lista allenatori:', error);
+        console.warn('[lineup-summary] Impossibile caricare lista allenatori:', error);
       }
     }
 
@@ -1346,24 +1574,30 @@
 
     async function loadGiornate() {
       try {
-        const leagueId = getCurrentLeagueId();
-        const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
-        const daysRef = isLegacyMode
-          ? window.db.collection('days')
-          : window.db.collection(`leagues/${leagueId}/days`);
-        const snapshot = await daysRef.get();
-        const ids = snapshot.docs
-          .filter(doc => doc.exists && doc.data()?.computed)
-          .map(doc => doc.id);
-
-        if (ids.length) {
-          state.giornate = sortGiornate(ids);
+        const leagueId = state.leagueId || await getLeagueIdOrNotify('caricare le giornate disponibili', { notify: false });
+        if (!leagueId || !window.db) {
+          state.giornate = [];
         } else {
-          state.giornate = await fallbackGiornateFromResults();
+          const daysCol = getLeagueCollection('days', leagueId);
+          if (daysCol) {
+            const snapshot = await daysCol.get();
+            const ids = snapshot.docs
+              .filter(doc => doc.exists && doc.data()?.computed)
+              .map(doc => doc.id);
+
+            if (ids.length) {
+              state.giornate = sortGiornate(ids);
+            } else {
+              state.giornate = await fallbackGiornateFromResults(leagueId);
+            }
+          } else {
+            state.giornate = await fallbackGiornateFromResults(leagueId);
+          }
         }
       } catch (error) {
-        console.warn('Impossibile leggere days:', error);
-        state.giornate = await fallbackGiornateFromResults();
+        console.warn('[lineup-summary] Impossibile leggere days:', error);
+        const leagueId = state.leagueId || getCurrentLeagueIdCached();
+        state.giornate = await fallbackGiornateFromResults(leagueId);
       }
 
       if (!state.selectedGiornata) {
@@ -1371,21 +1605,25 @@
       }
     }
 
-    async function fallbackGiornateFromResults() {
-      const leagueId = getCurrentLeagueId();
-      const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
+    async function fallbackGiornateFromResults(leagueIdParam) {
+      const leagueId = leagueIdParam || state.leagueId || getCurrentLeagueIdCached();
+      if (!leagueId || !window.db) {
+        return sortGiornate(['G1']);
+      }
+      const resultsCol = getLeagueCollection('results', leagueId);
+      if (!resultsCol) {
+        return sortGiornate(['G1']);
+      }
       const available = [];
       await Promise.all(giornateFallback.map(async gid => {
         try {
-          const resultsRef = isLegacyMode
-            ? window.db.collection('results').doc(gid).collection('teams')
-            : window.db.collection(`leagues/${leagueId}/results`).doc(gid).collection('teams');
+          const resultsRef = resultsCol.doc(gid).collection('teams');
           const snap = await resultsRef.limit(1).get();
           if (!snap.empty) {
             available.push(gid);
           }
         } catch (error) {
-          console.warn(`Errore verifica risultati ${gid}:`, error);
+          console.warn(`[lineup-summary] Errore verifica risultati ${gid}:`, error);
         }
       }));
       return sortGiornate(available.length ? available : ['G1']);
@@ -1406,7 +1644,7 @@
           state.userTeamId = String(data.team_index);
         }
       } catch (error) {
-        console.warn('Impossibile leggere profilo utente:', error);
+        console.warn('[lineup-summary] Impossibile leggere profilo utente:', error);
       }
 
       if (!state.selectedTeamId) {
@@ -1472,6 +1710,7 @@
         summaryContent.innerHTML = '<div class="empty-state">Seleziona giornata e squadra per vedere il riepilogo.</div>';
         playersContent.innerHTML = '';
         if (coachContent) coachContent.innerHTML = '';
+        if (curvaContent) curvaContent.innerHTML = '';
         state.cache = null;
         return;
       }
@@ -1482,17 +1721,31 @@
       if (curvaContent) curvaContent.innerHTML = '<div class="loading">Caricamento curva…</div>';
 
       try {
-        const leagueId = getCurrentLeagueId();
-        const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
-        const resultsRef = isLegacyMode
-          ? window.db.collection('results').doc(state.selectedGiornata).collection('teams').doc(state.selectedTeamId)
-          : window.db.collection(`leagues/${leagueId}/results`).doc(state.selectedGiornata).collection('teams').doc(state.selectedTeamId);
-        const daysRef = isLegacyMode
-          ? window.db.collection('days').doc(state.selectedGiornata)
-          : window.db.collection(`leagues/${leagueId}/days`).doc(state.selectedGiornata);
+        const leagueId = state.leagueId || await getLeagueIdOrNotify('caricare il riepilogo giornata');
+        if (!leagueId || !window.db) {
+          summaryContent.innerHTML = '<div class="empty-state">❌ Seleziona una lega valida per vedere il riepilogo della giornata.</div>';
+          playersContent.innerHTML = '';
+          if (coachContent) coachContent.innerHTML = '';
+          if (curvaContent) curvaContent.innerHTML = '';
+          state.cache = null;
+          return;
+        }
+
+        const resultRef = getResultDocRef(state.selectedGiornata, state.selectedTeamId, leagueId);
+        const dayRef = getDayDocRef(state.selectedGiornata, leagueId);
+        if (!resultRef || !dayRef) {
+          notifyMissingLeague('caricare il riepilogo giornata');
+          summaryContent.innerHTML = '<div class="empty-state">❌ Seleziona una lega valida per vedere il riepilogo della giornata.</div>';
+          playersContent.innerHTML = '';
+          if (coachContent) coachContent.innerHTML = '';
+          if (curvaContent) curvaContent.innerHTML = '';
+          state.cache = null;
+          return;
+        }
+
         const [resultSnap, daySnap] = await Promise.all([
-          resultsRef.get(),
-          daysRef.get()
+          resultRef.get(),
+          dayRef.get()
         ]);
 
         if (!resultSnap.exists) {
@@ -1509,8 +1762,12 @@
         state.cache = { resultData, dayData };
         renderFromCache();
       } catch (error) {
-        console.error('Errore caricamento riepilogo titolari:', error);
-        summaryContent.innerHTML = `<div class="empty-state">❌ Errore: ${error.message || 'impossibile caricare i dati'}</div>`;
+        console.error('[lineup-summary] Errore caricamento riepilogo titolari:', error);
+        const msg = (error && (error.code === 'permission-denied' || (error.message && error.message.includes('Missing or insufficient permissions'))))
+          ? '❌ Non hai i permessi per visualizzare il riepilogo di questa lega.'
+          : '❌ Errore nel caricamento del riepilogo per questa lega.';
+        showToast(msg);
+        summaryContent.innerHTML = `<div class="empty-state">${msg}</div>`;
         playersContent.innerHTML = '';
         if (coachContent) coachContent.innerHTML = '';
         if (curvaContent) curvaContent.innerHTML = '';
@@ -1520,24 +1777,48 @@
 
     async function renderFromCache() {
       if (!state.cache) return;
-      renderSummary(state.cache.resultData);
+      renderSummary(state.cache.resultData, state.cache.dayData);
       await renderPlayersSection(state.cache.resultData, state.cache.dayData);
       renderCoachSection(state.cache.resultData, state.cache.dayData);
       renderCurvaSection(state.cache.resultData, state.cache.dayData);
     }
 
-    function renderSummary(resultData) {
+    function renderSummary(resultData, dayData) {
       const breakdown = resultData.breakdown || {};
+      const coachTotal = Number(breakdown.coach || 0);
+      const curvaTotal = Number(breakdown.curva || 0);
+      const formationTotal = Number(breakdown.formation || 0);
+
+      let playersTotal = Number(breakdown.players || 0);
+      let captainBonus = Number(breakdown.captain || 0);
+      let totalTeam = Number(resultData.points || 0);
+
+      const recomputed = computePlayersTotalsFromDay(
+        resultData.lineup,
+        resultData.captain,
+        dayData && dayData.players,
+        state.playerRules
+      );
+
+      if (recomputed) {
+        playersTotal = recomputed.playersTotal;
+        captainBonus = recomputed.captainBonus;
+        totalTeam = playersTotal + captainBonus + coachTotal + curvaTotal + formationTotal;
+      } else {
+        // Se non c'è recomputed, ricalcola comunque il totale per assicurarsi che includa il raddoppio del capitano
+        totalTeam = playersTotal + captainBonus + coachTotal + curvaTotal + formationTotal;
+      }
+
       const tiles = [
-        { label: 'Totale squadra', value: Number(resultData.points || 0).toFixed(2), highlight: true },
-        { label: 'Giocatori', value: Number(breakdown.players || 0).toFixed(2) },
-        { label: 'Bonus Capitano', value: Number(breakdown.captain || 0).toFixed(2) },
-        { label: 'Allenatore', value: Number(breakdown.coach || 0).toFixed(2) },
-        { label: 'Curva', value: Number(breakdown.curva || 0).toFixed(2) }
+        { label: 'Totale squadra', value: totalTeam.toFixed(2), highlight: true },
+        { label: 'Giocatori', value: playersTotal.toFixed(2) },
+        { label: 'Bonus Capitano', value: captainBonus.toFixed(2) },
+        { label: 'Allenatore', value: coachTotal.toFixed(2) },
+        { label: 'Curva', value: curvaTotal.toFixed(2) }
       ];
 
-      if (breakdown.formation) {
-        tiles.splice(1, 0, { label: 'Formazione pubblicata', value: Number(breakdown.formation || 0).toFixed(2) });
+      if (formationTotal) {
+        tiles.splice(1, 0, { label: 'Formazione pubblicata', value: formationTotal.toFixed(2) });
       }
 
       summaryContent.innerHTML = `
@@ -1550,6 +1831,30 @@
           `).join('')}
         </div>
       `;
+    }
+
+    function computePlayersTotalsFromDay(lineup = [], captainId = null, playerSelections = {}, rules = []) {
+      if (!Array.isArray(lineup) || !Array.isArray(rules) || !rules.length || !playerSelections) {
+        return null;
+      }
+
+      let playersTotal = 0;
+      let captainBase = 0;
+
+      lineup.filter(Boolean).forEach(playerId => {
+        const selections = playerSelections[playerId] || {};
+        const metrics = calculateMetrics(selections, rules);
+        applyConvocatoBonus(metrics, selections);
+        playersTotal += metrics.total;
+        if (captainId && String(playerId) === String(captainId)) {
+          captainBase = metrics.total;
+        }
+      });
+
+      return {
+        playersTotal,
+        captainBonus: captainBase
+      };
     }
 
     async function renderPlayersSection(resultData, dayData) {
@@ -1570,6 +1875,7 @@
         const info = state.players.get(playerId) || {};
         const selections = playerSelections[playerId] || {};
         const metrics = calculateMetrics(selections, state.playerRules);
+        const convocatoBonus = applyConvocatoBonus(metrics, selections);
         const isCaptain = captainId && String(captainId) === String(playerId);
         const isCoach = coachIds.some(cid => String(cid) === String(playerId));
         const totalWithCaptain = metrics.total + (isCaptain ? metrics.total : 0);
@@ -1596,7 +1902,9 @@
           metrics,
           isCaptain,
           isCoach,
-          totalWithCaptain
+          totalWithCaptain,
+          isConvocato: Boolean(convocatoBonus),
+          convocatoBonus: convocatoBonus
         };
       }));
 
@@ -1643,7 +1951,13 @@
         const breakdown = formatPlayerBreakdown(playerData);
         return `
           <tr>
-            <td><strong>${escapeHtml(displayName)}</strong>${info.nickname ? `<div style="font-size:11px;color:var(--text-muted);">${escapeHtml(capitalizeDisplay(info.nickname))}</div>` : ''}</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <strong>${escapeHtml(displayName)}</strong>
+                ${playerData.isConvocato ? '<span class="badge convocato">Convocato +1</span>' : ''}
+              </div>
+              ${info.nickname ? `<div style="font-size:11px;color:var(--text-muted);">${escapeHtml(capitalizeDisplay(info.nickname))}</div>` : ''}
+            </td>
             <td>${escapeHtml(info.role || '—')}</td>
             <td style="font-weight:700;color:${playerData.totalWithCaptain < 0 ? '#dc2626' : 'var(--primary)'};">${playerData.totalWithCaptain.toFixed(2)}${playerData.isCaptain ? ' ⭐' : ''}</td>
             <td class="breakdown-text">${escapeHtml(breakdown.text)}</td>
@@ -1677,6 +1991,7 @@
               <div class="player-row-name">
                 <strong>${escapeHtml(displayName)}</strong>
                 ${playerData.isCaptain ? '<span class="player-row-captain">Capitano</span>' : ''}
+                ${playerData.isConvocato ? '<span class="badge convocato">Convocato +1</span>' : ''}
                 <span class="player-row-role">${escapeHtml(roleLabel)}</span>
               </div>
               <div class="player-row-meta" style="display:flex; align-items:center; gap:12px;">
@@ -1916,6 +2231,51 @@
       `;
     }
 
+    function applyConvocatoBonus(metrics, selections) {
+      if (!metrics || !selections || selections.__convocato === undefined || selections.__convocato === null) {
+        return 0;
+      }
+
+      let bonus = 0;
+      const raw = selections.__convocato;
+      if (typeof raw === 'number') {
+        bonus = raw;
+      } else if (typeof raw === 'string') {
+        bonus = Number(raw);
+        if (isNaN(bonus)) {
+          bonus = raw === 'true' ? 1 : 0;
+        }
+      } else if (raw === true) {
+        bonus = 1;
+      }
+
+      if (!bonus) return 0;
+
+      if (!Array.isArray(metrics.breakdown)) {
+        metrics.breakdown = [];
+      }
+
+      const existing = metrics.breakdown.find(item => item && item.ruleId === '__convocato');
+      if (existing) {
+        const prev = Number(existing.points) || 0;
+        const delta = bonus - prev;
+        existing.points = bonus;
+        existing.value = bonus;
+        existing.label = existing.label || 'Convocato';
+        metrics.total += delta;
+      } else {
+        metrics.breakdown.push({
+          ruleId: '__convocato',
+          label: 'Convocato',
+          value: bonus,
+          points: bonus
+        });
+        metrics.total += bonus;
+      }
+
+      return bonus;
+    }
+
     function calculateMetrics(selections, rules) {
       let total = 0;
       const breakdown = [];
@@ -2032,9 +2392,13 @@
       const items = playerData.metrics.breakdown || [];
       const breakdownItems = items.map(item => {
         const multiplier = (item.value !== undefined && item.value !== null) ? Number(item.value) : null;
+        const points = Number(item.points) || 0;
+        const label = item.ruleId === '__convocato'
+          ? 'Convocato'
+          : (item.label || item.ruleId);
         return {
-          label: item.label || item.ruleId,
-          value: Number(item.points) || 0,
+          label,
+          value: points,
           multiplier,
           multiplierLabel: multiplier !== null && multiplier !== 0 && multiplier !== 1 ? `${multiplier}x` : null
         };
@@ -2064,6 +2428,21 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
+
+    window.addEventListener('league-changed', (event) => {
+      try {
+        const newId = (event && event.detail && event.detail.leagueId) || getCurrentLeagueIdCached();
+        if (!newId) return;
+        if (!currentLeagueOnPage) {
+          currentLeagueOnPage = newId;
+          return;
+        }
+        if (newId === currentLeagueOnPage) return;
+        currentLeagueOnPage = newId;
+        window.location.reload();
+      } catch (_) {}
+    });
+
   </script>
 
   <script src="resources/feature-flags.js?v=20251103"></script>
@@ -2074,9 +2453,9 @@
   <script src="resources/bottom-nav.js?v=2025101802"></script>
   <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
 </body>
 </html>
 

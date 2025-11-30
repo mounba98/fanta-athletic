@@ -10,7 +10,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 20px;
     }
@@ -132,12 +132,13 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
-    const db = firebase.firestore();
+    const db = window.db || firebase.firestore();
     
     let selectedTeamId = null;
     let teams = [];
     let currentUser = null;
     let currentLeagueId = null;
+    let teamMembersMap = {};
 
     // Auth check
     firebase.auth().onAuthStateChanged(async (user) => {
@@ -179,15 +180,42 @@
 
     async function loadTeams() {
       try {
-        // Carica squadre da /teams collection
-        const teamsSnap = await db.collection('teams').get();
+        // Carica squadre dalla sottocollezione della lega corrente
+        const teamsSnap = await db.collection(`leagues/${currentLeagueId}/teams`).get();
         teams = teamsSnap.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })).sort((a, b) => parseInt(a.id) - parseInt(b.id));
-        
-        console.log('📊 Teams loaded:', teams.length);
-        
+
+        console.log('📊 Teams loaded:', teams.length, teams);
+
+        // Prova a calcolare i membri per squadra usando users.team_index nella lega corrente.
+        // Questa query richiede permessi "forti" (lettura di /users per altri utenti) e
+        // può fallire per gli utenti non admin: in tal caso ignoriamo il conteggio ma
+        // continuiamo a mostrare le squadre.
+        try {
+          const usersSnap = await db.collection('users')
+            .where('currentLeague', '==', currentLeagueId)
+            .get();
+
+          const membersMap = {};
+          usersSnap.docs.forEach(doc => {
+            const data = doc.data() || {};
+            const teamIdx = data.team_index;
+            if (teamIdx !== null && teamIdx !== undefined) {
+              const key = String(teamIdx);
+              membersMap[key] = (membersMap[key] || 0) + 1;
+            }
+          });
+
+          teamMembersMap = membersMap;
+          console.log('👥 Members per team:', teamMembersMap);
+        } catch (membersError) {
+          console.warn('[scegli-squadra] Impossibile caricare membri per squadra (permessi limitati?):', membersError);
+          // Fallback: nessun conteggio membri, ma le squadre restano selezionabili
+          teamMembersMap = {};
+        }
+
         if (teams.length === 0) {
           document.getElementById('teamsContainer').innerHTML = `
             <p style="color:#ef4444;">❌ Nessuna squadra disponibile.</p>
@@ -217,7 +245,7 @@
       
       container.className = 'teams-grid';
       container.innerHTML = teams.map(team => {
-        const membersCount = team.members?.length || 0;
+        const membersCount = teamMembersMap[String(team.id)] || 0;
         const teamEmoji = getTeamEmoji(team.nome || team.name);
         
         return `

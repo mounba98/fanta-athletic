@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin â€¢ Gestione Admin</title>
+  <title>Admin • Gestione Admin</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
@@ -24,7 +24,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Admin â€¢ Gestione Admin</h1>
+    <h1>Admin • Gestione Admin</h1>
   </header>
 
   <main class="container">
@@ -32,9 +32,9 @@
       <h2>Aggiungi Admin</h2>
       <div class="row" style="align-items:stretch;">
         <input id="adminEmail" class="input" placeholder="Email utente" type="email" style="flex:1;" />
-        <button class="btn" id="addAdminBtn" style="align-self:center;">â• Aggiungi Admin</button>
+        <button class="btn" id="addAdminBtn" style="align-self:center;">? Aggiungi Admin</button>
       </div>
-      <p style="color:var(--muted);font-size:12px;margin-top:8px;">L'utente deve essere giÃ  registrato. Inserisci la sua email.</p>
+      <p style="color:var(--muted);font-size:12px;margin-top:8px;">L'utente deve essere già registrato. Inserisci la sua email.</p>
     </section>
 
     <section class="card">
@@ -95,13 +95,13 @@
         
         // Find user by email
         const userEntry = Array.from(usersMap.entries()).find(([uid, data])=> data.email?.toLowerCase() === email);
-        if (!userEntry) return alert('Utente non trovato. Deve essere giÃ  registrato.');
+        if (!userEntry) return alert('Utente non trovato. Deve essere già registrato.');
         
         const [uid, userData] = userEntry;
         
         // Check if already admin
         const adminDoc = await db.collection('admins').doc(uid).get();
-        if (adminDoc.exists) return alert('Utente giÃ  admin');
+        if (adminDoc.exists) return alert('Utente già admin');
         
         await db.collection('admins').doc(uid).set({ 
           email: userData.email,
@@ -111,7 +111,7 @@
         });
         
         document.getElementById('adminEmail').value='';
-        alert('âœ… Admin aggiunto!');
+        alert('? Admin aggiunto!');
       };
 
       db.collection('admins').onSnapshot(s=>{
@@ -124,8 +124,8 @@
       const tb = document.querySelector('#adminsTable tbody');
       tb.innerHTML = adminsData.map(a=>{
         const userData = usersMap.get(a.id);
-        const name = a.display_name || userData?.display_name || 'â€”';
-        const email = a.email || userData?.email || 'â€”';
+        const name = a.display_name || userData?.display_name || '—';
+        const email = a.email || userData?.email || '—';
         const canDelete = a.id !== currentUser.uid; // Can't delete yourself
         
         return `<tr>
@@ -133,7 +133,7 @@
           <td>${email}</td>
           <td style="font-family:monospace;font-size:11px;">${a.id}</td>
           <td>
-            ${canDelete ? `<button class="btn btn-sm btn-secondary" onclick="deleteAdmin('${a.id}')">ğŸ—‘ï¸ Rimuovi</button>` : '<span style="color:var(--muted);font-size:12px;">Tu</span>'}
+            ${canDelete ? `<button class="btn btn-sm btn-secondary" onclick="deleteAdmin('${a.id}')">??? Rimuovi</button>` : '<span style="color:var(--muted);font-size:12px;">Tu</span>'}
           </td>
         </tr>`;
       }).join('');
@@ -148,7 +148,7 @@
   <script src="resources/bottom-nav.js?v=2025101802"></script>
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
   <script src="resources/notifications-dropdown.js?v=2025102002"></script>
 </body>

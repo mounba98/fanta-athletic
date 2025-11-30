@@ -11,7 +11,6 @@
   const primaryDb = (window.db && typeof window.db.collection === 'function')
     ? window.db
     : firebase.firestore();
-  const legacyDb = window.__LEGACY_DB__ || firebase.firestore();
 
   let currentLeagueId = null;
   let cachedResults = null;
@@ -113,19 +112,8 @@
       }
 
       if (teamsSnapshot.empty) {
-        try {
-          const legacyTeams = await legacyDb.collection('teams').get();
-          if (!legacyTeams.empty) {
-            teamsSnapshot = legacyTeams;
-          } else {
-            container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">Nessuna squadra trovata</div>';
-            return;
-          }
-        } catch (legacyErr) {
-          console.warn('Fallback legacy teams failed:', legacyErr);
-          container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">Nessuna squadra trovata</div>';
+        container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">Dati squadra non disponibili per questa lega.</div>';
           return;
-        }
       }
 
       // Trova giornate calcolate (struttura multileghe)
@@ -133,8 +121,9 @@
       try {
         daysSnap = await getLeagueCollection('days', currentLeagueId).where('computed', '==', true).get();
       } catch (err) {
-        console.warn('classifiche-preview: errore lettura days, fallback legacy', err);
-        daysSnap = await legacyDb.collection('days').where('computed', '==', true).get();
+        console.warn('classifiche-preview: errore lettura days', err);
+        container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">Giornate non disponibili per questa lega.</div>';
+        return;
       }
       const computedDays = daysSnap.docs.map(doc => doc.id);
       const sortedDays = daysSnap.docs
@@ -149,10 +138,7 @@
         try {
           const testResultsSnap = await resultsCollection.doc(testGiornata).collection('teams').limit(1).get();
           if (testResultsSnap.size === 0) {
-            const legacyTest = await legacyDb.collection('results').doc(testGiornata).collection('teams').limit(1).get();
-            if (legacyTest.size === 0) {
               console.warn(`⚠️ Giornata ${testGiornata} non ha risultati salvati.`);
-            }
           }
         } catch (err) {
           console.warn('classifiche-preview: errore test risultati', err);
@@ -187,16 +173,6 @@
                 // Salva punti ultima giornata
                 if (lastDay && giornataId === lastDay.id) {
                   lastDayPoints = pts;
-                }
-              } else {
-                const legacyDoc = await legacyDb.collection('results').doc(giornataId).collection('teams').doc(doc.id).get();
-                if (legacyDoc.exists) {
-                  const legacyData = legacyDoc.data() || {};
-                  const ptsLegacy = parseFloat(legacyData.points) || parseFloat(legacyData.total) || 0;
-                  totalPoints += ptsLegacy;
-                  if (lastDay && giornataId === lastDay.id) {
-                    lastDayPoints = ptsLegacy;
-                  }
                 }
               }
             } catch (giornataError) {

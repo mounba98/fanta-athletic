@@ -1,0 +1,21 @@
+{
+  "players": [
+    { "player_id": "T001", "role": "Portiere", "secondary_roles": [], "nome_completo": "Test Portiere 1", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T002", "role": "Portiere", "secondary_roles": [], "nome_completo": "Test Portiere 2", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+
+    { "player_id": "T101", "role": "Difensore", "secondary_roles": [], "nome_completo": "Test Difensore 1", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T102", "role": "Difensore", "secondary_roles": [], "nome_completo": "Test Difensore 2", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T103", "role": "Difensore", "secondary_roles": [], "nome_completo": "Test Difensore 3", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T104", "role": "Difensore", "secondary_roles": [], "nome_completo": "Test Difensore 4", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+
+    { "player_id": "T201", "role": "Centrocampista", "secondary_roles": [], "nome_completo": "Test Centrocampista 1", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T202", "role": "Centrocampista", "secondary_roles": [], "nome_completo": "Test Centrocampista 2", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T203", "role": "Centrocampista", "secondary_roles": [], "nome_completo": "Test Centrocampista 3", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T204", "role": "Centrocampista", "secondary_roles": [], "nome_completo": "Test Centrocampista 4", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+
+    { "player_id": "T301", "role": "Attaccante", "secondary_roles": [], "nome_completo": "Test Attaccante 1", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T302", "role": "Attaccante", "secondary_roles": [], "nome_completo": "Test Attaccante 2", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T303", "role": "Attaccante", "secondary_roles": [], "nome_completo": "Test Attaccante 3", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 },
+    { "player_id": "T304", "role": "Attaccante", "secondary_roles": [], "nome_completo": "Test Attaccante 4", "nickname": "", "image_url": "", "special_bonus": "", "special_note": "", "is_dead": false, "is_ambulance": false, "total_points": 0 }
+  ]
+}

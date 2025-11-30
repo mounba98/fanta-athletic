@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -88,7 +88,7 @@
         </label>
       </div>
       <div id="adminRow" class="row" style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
-        <div class="muted">ModalitÃ  admin: <strong id="adminStatus">Disattivata</strong></div>
+        <div class="muted">Modalità admin: <strong id="adminStatus">Disattivata</strong></div>
         <button class="btn btn-secondary" id="toggleAdmin">Entra admin</button>
       </div>
       <div class="tabs">
@@ -114,7 +114,7 @@
         <input id="uploadUrl" placeholder="https://example.com/webhook" class="input" />
       </div>
       <div id="adminTools" style="margin-top:10px; display:none;">
-        <div class="muted" style="font-weight:800; margin-bottom:6px;">Admin â€¢ Giocatori</div>
+        <div class="muted" style="font-weight:800; margin-bottom:6px;">Admin • Giocatori</div>
         <div class="grid2" style="margin-bottom:6px;">
           <input id="admName" class="input" placeholder="Nome completo" />
           <select id="admRole" class="input">
@@ -265,7 +265,7 @@
         <div class="item">
           <div>
             <div style="font-weight:700;">${r.name}</div>
-            <div class="muted">Curva ${r.curvaBase.toFixed(2)} â€¢ Giocatori ${r.playerSum.toFixed(2)} â€¢ Cap ${r.captainBonus.toFixed(2)} â€¢ Coach ${r.coachPts.toFixed(2)}</div>
+            <div class="muted">Curva ${r.curvaBase.toFixed(2)} • Giocatori ${r.playerSum.toFixed(2)} • Cap ${r.captainBonus.toFixed(2)} • Coach ${r.coachPts.toFixed(2)}</div>
           </div>
           <div class="muted">${r.total.toFixed(2)} pt</div>
         </div>
@@ -277,7 +277,7 @@
       const btn = document.getElementById('toggleAdmin');
       if (!as || !btn) return;
       const email = (window.auth && window.auth.currentUser && window.auth.currentUser.email) || '';
-      as.textContent = state.isAdmin ? (email? `Attiva â€¢ ${email}` : 'Attiva') : 'Disattivata';
+      as.textContent = state.isAdmin ? (email? `Attiva • ${email}` : 'Attiva') : 'Disattivata';
       btn.textContent = state.isAdmin ? 'Esci admin' : 'Entra admin';
       // enable/disable editing controls
       document.getElementById('saveAll').disabled = !state.isAdmin;
@@ -348,7 +348,7 @@
       const email = window.prompt('Email admin?'); if (email===null) return;
       const password = window.prompt('Password?'); if (password===null) return;
       if (!window.signIn){ alert('Firebase non inizializzato'); return; }
-      window.signIn(email, password).then(()=>{ /* onAuthStateChanged gestirÃ  UI */ }).catch(()=> alert('Login fallito'));
+      window.signIn(email, password).then(()=>{ /* onAuthStateChanged gestirà UI */ }).catch(()=> alert('Login fallito'));
     }
     function exitAdmin(){ if (window.signOutFirebase){ window.signOutFirebase(); } }
 
@@ -371,14 +371,14 @@
     let dirHandle = null;
     async function pickDirectory(){
       if (!window.showDirectoryPicker) {
-        alert('Il salvataggio diretto richiede un browser Chromium (es. Chrome/Edge). UserÃ² il download del file.');
+        alert('Il salvataggio diretto richiede un browser Chromium (es. Chrome/Edge). Userò il download del file.');
         return;
       }
       try {
         dirHandle = await window.showDirectoryPicker();
         // Richiedi permessi di scrittura
         const perm = await dirHandle.requestPermission({ mode: 'readwrite' });
-        if (perm !== 'granted') { dirHandle = null; alert('Permesso negato: userÃ² il download del file.'); }
+        if (perm !== 'granted') { dirHandle = null; alert('Permesso negato: userò il download del file.'); }
       } catch (e) {
         console.warn('Directory non selezionata:', e);
       }
@@ -592,7 +592,7 @@
           }).join('');
           return (
             `<div class="group-section collapsed" data-cat="${cat}">
-              <div class="group-header">${cat} <span>â–¾</span></div>
+              <div class="group-header">${cat} <span>?</span></div>
               <div class="group-body">${body}</div>
             </div>`
           );
@@ -601,7 +601,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
             <div>
               <div style="font-weight:800;">${formatDisplayName(p.nome_completo, p.nickname||'')}</div>
-              <div class="muted">${p.role}${p.secondary_roles&&p.secondary_roles.length? ' (2Â°: '+p.secondary_roles.join(', ')+')':''}</div>
+              <div class="muted">${p.role}${p.secondary_roles&&p.secondary_roles.length? ' (2°: '+p.secondary_roles.join(', ')+')':''}</div>
             </div>
             <div class="muted">${total.toFixed(2)} pt</div>
           </div>
@@ -662,7 +662,7 @@
           }
           sections.push(
             '<div class="role-section collapsed" data-role="'+role+'">'+
-              '<div class="role-header">'+role+' <span>â–¾</span></div>'+
+              '<div class="role-header">'+role+' <span>?</span></div>'+
               '<div class="role-body">'+itemsHtml+'</div>'+
             '</div>'
           );
@@ -692,7 +692,7 @@
         const bm = btn.dataset.bm; if (bm==='Bonus') state.showBonus=!state.showBonus; else state.showMalus=!state.showMalus; btn.classList.toggle('on');
         if (state.selectedPlayerId){ const p=state.players.find(x=>x.player_id===state.selectedPlayerId); if (p) renderPlayerPanel(p); }
       }));
-      // (admin add/remove pannello rimosso per stabilitÃ  in questa versione)
+      // (admin add/remove pannello rimosso per stabilità in questa versione)
       draw();
     }
 
@@ -842,7 +842,7 @@
         }).join('');
         return `
           <div class="curva-section" data-curva="${title}">
-            <div class="curva-header">${title} <span>â–¾</span></div>
+            <div class="curva-header">${title} <span>?</span></div>
             <div class="curva-body">${body}</div>
           </div>`;
       };
@@ -870,9 +870,9 @@
       $('#data').addEventListener('change', saveDay);
       $$('.tab').forEach(t=> t.addEventListener('click', ()=>{ state.tab=t.dataset.tab; renderTabs(); }));
       $('#saveAll').addEventListener('click', async () => {
-        if (!state.isAdmin) { alert('Solo admin puÃ² salvare o caricare.'); return; }
+        if (!state.isAdmin) { alert('Solo admin può salvare o caricare.'); return; }
         if (!confirm('Confermi il salvataggio della giornata?')) return;
-        if (!state.isAdmin) { alert('Solo admin puÃ² salvare o caricare.'); return; }
+        if (!state.isAdmin) { alert('Solo admin può salvare o caricare.'); return; }
         // Save to localStorage
         saveDay();
         // Prepare payload

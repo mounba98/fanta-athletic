@@ -43,6 +43,42 @@
     .badge-difensore { background: #dbeafe; color: #1e40af; }
     .badge-centrocampista { background: #dcfce7; color: #166534; }
     .badge-attaccante { background: #fee2e2; color: #991b1b; }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+    .modal-content {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      width: min(480px, 100%);
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
     @media (max-width: 768px) {
       .admin-grid { grid-template-columns: 1fr; }
       .stats { grid-template-columns: repeat(2, 1fr); }
@@ -144,6 +180,7 @@
         <div class="btn-group">
           <button class="btn btn-secondary" id="exportBtn">📄 Export JSON</button>
           <button class="btn btn-secondary" id="syncBtn">🔄 Sync da JSON</button>
+          <button class="btn btn-secondary" id="bulkTeamBtn">🏟️ Squadra Athletic 2018</button>
         </div>
       </div>
 
@@ -180,10 +217,46 @@
     <small>&copy; <span id="year"></span> Nicola Mocci - Admin Panel</small>
   </footer>
 
+  <div id="editModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="editModalTitle">✏️ Modifica Giocatore</h2>
+        <button id="closeEditModal" class="btn btn-secondary" style="padding:6px 10px;">✕</button>
+      </div>
+      <div class="form-group">
+        <label for="modalPlayerName">Nome Completo *</label>
+        <input type="text" id="modalPlayerName" required />
+      </div>
+      <div class="form-group">
+        <label for="modalPlayerRole">Ruolo *</label>
+        <select id="modalPlayerRole" required>
+          <option value="">Seleziona ruolo</option>
+          <option value="Portiere">Portiere</option>
+          <option value="Difensore">Difensore</option>
+          <option value="Centrocampista">Centrocampista</option>
+          <option value="Attaccante">Attaccante</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="modalPlayerNickname">Nickname</label>
+        <input type="text" id="modalPlayerNickname" />
+      </div>
+      <div class="form-group">
+        <label for="modalPlayerTeam">Squadra Reale</label>
+        <input type="text" id="modalPlayerTeam" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelEditModal">Annulla</button>
+        <button class="btn btn-primary" id="saveEditModal">Salva modifiche</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script>
     if (!firebase.apps.length) {
@@ -200,6 +273,7 @@
     let allPlayers = [];
     let jsonPlayers = [];
     let isEditing = false;
+    let currentEditPlayerId = null;
 
     // Auth check
     firebase.auth().onAuthStateChanged(async (user) => {
@@ -355,17 +429,15 @@
       const player = allPlayers.find(p => p.player_id === playerId);
       if (!player) return;
 
-      document.getElementById('formTitle').textContent = '✏️ Modifica Giocatore';
-      document.getElementById('editPlayerId').value = playerId;
-      document.getElementById('playerName').value = player.nome_completo;
-      document.getElementById('playerRole').value = player.role;
-      document.getElementById('playerNickname').value = player.nickname || '';
-      document.getElementById('playerTeam').value = player.team || '';
-      document.getElementById('saveBtn').textContent = '💾 Aggiorna Giocatore';
-      document.getElementById('cancelBtn').style.display = 'inline-block';
-      
-      isEditing = true;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      currentEditPlayerId = playerId;
+      document.getElementById('modalPlayerName').value = player.nome_completo || '';
+      document.getElementById('modalPlayerRole').value = player.role || '';
+      document.getElementById('modalPlayerNickname').value = player.nickname || '';
+      document.getElementById('modalPlayerTeam').value = player.team || 'Athletic 2018';
+      const modal = document.getElementById('editModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
     };
 
     // Delete player
@@ -436,12 +508,79 @@
       }
     });
 
+    document.getElementById('bulkTeamBtn').addEventListener('click', async () => {
+      if (!confirm('Impostare "Athletic 2018" come squadra reale per tutti i giocatori?')) {
+        return;
+      }
+      try {
+        const batch = db.batch();
+        let counter = 0;
+        allPlayers.forEach(player => {
+          if (!player.player_id) return;
+          const ref = db.collection('players').doc(player.player_id);
+          batch.set(ref, { team: 'Athletic 2018' }, { merge: true });
+          counter += 1;
+        });
+        await batch.commit();
+        showAlert(`✅ Aggiornati ${counter} giocatori con squadra "Athletic 2018"`, 'success');
+        await loadPlayers();
+      } catch (error) {
+        console.error('Error bulk updating team:', error);
+        showAlert('❌ Errore aggiornamento squadra: ' + error.message, 'error');
+      }
+    });
+
     // Generate player ID
     function generatePlayerId() {
       return 'P' + Date.now() + Math.random().toString(36).substr(2, 9);
     }
 
     // Show alert
+    function closeEditModal() {
+      const modal = document.getElementById('editModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+      currentEditPlayerId = null;
+    }
+
+    document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
+    document.getElementById('cancelEditModal').addEventListener('click', closeEditModal);
+    document.getElementById('editModal').addEventListener('click', (event) => {
+      if (event.target === event.currentTarget) {
+        closeEditModal();
+      }
+    });
+
+    document.getElementById('saveEditModal').addEventListener('click', async () => {
+      if (!currentEditPlayerId) {
+        showAlert('Giocatore non trovato', 'error');
+        return;
+      }
+      const nome = document.getElementById('modalPlayerName').value.trim();
+      const ruolo = document.getElementById('modalPlayerRole').value;
+      const nickname = document.getElementById('modalPlayerNickname').value.trim();
+      const squadra = document.getElementById('modalPlayerTeam').value.trim() || 'Athletic 2018';
+      if (!nome || !ruolo) {
+        showAlert('Nome e ruolo sono obbligatori!', 'error');
+        return;
+      }
+      try {
+        await db.collection('players').doc(currentEditPlayerId).update({
+          nome_completo: nome,
+          role: ruolo,
+          nickname,
+          team: squadra
+        });
+        showAlert('✅ Giocatore aggiornato!', 'success');
+        closeEditModal();
+        await loadPlayers();
+      } catch (error) {
+        console.error('Error saving player:', error);
+        showAlert('❌ Errore salvataggio: ' + error.message, 'error');
+      }
+    });
+
     function showAlert(message, type = 'success') {
       const container = document.getElementById('alertContainer');
       const alert = document.createElement('div');
@@ -459,8 +598,8 @@
   <script src="resources/mobile-menu.js?v=2025101803"></script>
   <script src="resources/bottom-nav.js?v=2025101802"></script>
   <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
 </body>
 </html>

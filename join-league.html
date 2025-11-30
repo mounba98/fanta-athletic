@@ -263,14 +263,17 @@
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
 
   <script>
     let currentLeague = null;
     let selectedTeamId = null;
     let availableTeams = [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const leagueIdFromURL = urlParams.get('leagueId');
+    const codeFromURL = urlParams.get('code');
 
     async function checkCode() {
       const input = document.getElementById('codeInput');
@@ -296,70 +299,139 @@
           return;
         }
 
-        // Cerca lega per codice invito
-        console.log('🔍 Searching for code:', code, 'Length:', code.length);
-        const snapshot = await db.collection('leagues')
-          .where('inviteCode', '==', code)
-          .limit(1)
-          .get();
-
-        console.log('📊 Query results:', snapshot.size);
-        
-        if (snapshot.empty) {
-          console.log('❌ Code not found with .where(), trying client-side filter...');
-          // Fallback: carica tutte le leghe e filtra client-side
-          const allLeagues = await db.collection('leagues').get();
-          console.log('📋 All leagues in DB:', allLeagues.size);
-          
-          let foundLeague = null;
-          allLeagues.docs.forEach(doc => {
-            const data = doc.data();
+        let leagueSnapshot = null;
+        if (leagueIdFromURL) {
+          const docSnap = await db.collection('leagues').doc(leagueIdFromURL).get();
+          if (docSnap.exists) {
+            const data = docSnap.data();
             const storedCode = (data.inviteCode || '').trim().toUpperCase();
-            console.log(`  - ${doc.id}: inviteCode="${data.inviteCode}" (stored: "${storedCode}", searching: "${code}")`);
-            
             if (storedCode === code) {
-              console.log('✅ FOUND via client-side filter!');
-              foundLeague = { doc, data };
+              leagueSnapshot = docSnap;
             }
-          });
-          
-          if (!foundLeague) {
-            showError('Codice invito non valido');
-            return;
           }
-          
-          // Usa lega trovata con filtro client-side
-          currentLeague = { id: foundLeague.doc.id, ...foundLeague.data };
-        } else {
-          const leagueDoc = snapshot.docs[0];
-          currentLeague = { id: leagueDoc.id, ...leagueDoc.data() };
         }
 
-        // Verifica se già membro
-        if (currentLeague.members && currentLeague.members.includes(user.uid)) {
-          showError('Sei già membro di questa lega!');
-          return;
+        if (!leagueSnapshot) {
+          // Cerca lega per codice invito
+          console.log('🔍 Searching for code:', code, 'Length:', code.length);
+          const snapshot = await db.collection('leagues')
+            .where('inviteCode', '==', code)
+            .limit(1)
+            .get();
+
+          console.log('📊 Query results:', snapshot.size);
+          
+          if (snapshot.empty) {
+            console.log('❌ Code not found with .where(), trying client-side filter...');
+            // Fallback: carica tutte le leghe e filtra client-side
+            const allLeagues = await db.collection('leagues').get();
+            console.log('📋 All leagues in DB:', allLeagues.size);
+            
+            let foundLeague = null;
+            allLeagues.docs.forEach(doc => {
+              const data = doc.data();
+              const storedCode = (data.inviteCode || '').trim().toUpperCase();
+              if (storedCode === code) {
+                foundLeague = { doc, data };
+              }
+            });
+            
+            if (!foundLeague) {
+              showError('Codice invito non valido');
+              return;
+            }
+            
+            leagueSnapshot = foundLeague.doc;
+            currentLeague = { id: foundLeague.doc.id, ...foundLeague.data };
+          } else {
+            leagueSnapshot = snapshot.docs[0];
+            currentLeague = { id: leagueSnapshot.id, ...leagueSnapshot.data() };
+          }
+        } else {
+          currentLeague = { id: leagueSnapshot.id, ...leagueSnapshot.data() };
+        }
+
+        // Verifica se già membro e se ha già una squadra
+        let alreadyMember = currentLeague.members && currentLeague.members.includes(user.uid);
+        if (alreadyMember) {
+          try {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            const userData = userDoc.exists ? (userDoc.data() || {}) : {};
+            const hasTeam = typeof userData.team_index === 'number';
+
+            if (hasTeam) {
+              showError('Sei già membro di questa lega e hai già una squadra assegnata.');
+              setTimeout(() => {
+                window.location.href = 'index.html';
+              }, 1500);
+              return;
+            } else {
+              console.log('[join-league] Utente già membro senza squadra, mostro selezione squadre in questa pagina');
+              // Nessun redirect: continuiamo per mostrare le squadre direttamente qui
+            }
+          } catch (err) {
+            console.error('Error checking existing membership/team_index:', err);
+            // Se non riusciamo a leggere il doc utente, continuiamo comunque a mostrare le squadre
+          }
+        }
+
+        // Nuovo membro: aggiungi subito l'utente alla lega per permettere la lettura delle squadre
+        if (!alreadyMember) {
+          try {
+            await db.collection('leagues').doc(currentLeague.id).update({
+              members: firebase.firestore.FieldValue.arrayUnion(user.uid)
+            });
+            console.log('[join-league] Utente aggiunto ai members della lega prima del caricamento squadre');
+
+            // Aggiorna stato locale dei membri
+            if (!currentLeague.members) {
+              currentLeague.members = [];
+            }
+            if (!currentLeague.members.includes(user.uid)) {
+              currentLeague.members.push(user.uid);
+            }
+
+            // Aggiorna profilo utente con lega corrente (senza team_index per ora)
+            await db.collection('users').doc(user.uid).set({
+              leagues: firebase.firestore.FieldValue.arrayUnion(currentLeague.id),
+              currentLeague: currentLeague.id,
+              email: user.email || '',
+              displayName: user.displayName || user.email || 'Utente'
+            }, { merge: true });
+            console.log('[join-league] Profilo utente aggiornato con currentLeague (senza team_index)');
+          } catch (membershipError) {
+            console.error('[join-league] Errore durante l\'aggiunta utente alla lega prima del caricamento squadre:', membershipError);
+            showError('Impossibile completare la verifica della lega. Riprova più tardi.');
+            return;
+          }
         }
 
         // Mostra info lega
         document.getElementById('leagueName').textContent = currentLeague.name || 'Lega Senza Nome';
         document.getElementById('leagueMembers').textContent = `${(currentLeague.members || []).length} membri`;
         
-        // Carica squadre da /teams collection
-        const teamsSnapshot = await db.collection('teams').get();
+        // Carica squadre scoped alla lega selezionata
+        const teamsSnapshot = await db.collection(`leagues/${currentLeague.id}/teams`).get();
         
-        // Carica tutti gli users per vedere chi ha già una squadra
-        const usersSnapshot = await db.collection('users')
-          .where('currentLeague', '==', currentLeague.id)
-          .get();
-        
-        const usedTeamIndexes = new Set();
-        usersSnapshot.docs.forEach(doc => {
-          const teamIdx = doc.data().team_index;
-          if (teamIdx !== null && teamIdx !== undefined) {
-            usedTeamIndexes.add(teamIdx);
-          }
-        });
+        // Prova a caricare tutti gli users per vedere chi ha già una squadra.
+        // Su utenti non admin questa query può essere bloccata dalle regole di sicurezza,
+        // quindi in caso di errore consideriamo tutte le squadre come disponibili.
+        let usedTeamIndexes = new Set();
+        try {
+          const usersSnapshot = await db.collection('users')
+            .where('currentLeague', '==', currentLeague.id)
+            .get();
+          
+          usersSnapshot.docs.forEach(doc => {
+            const teamIdx = doc.data().team_index;
+            if (teamIdx !== null && teamIdx !== undefined) {
+              usedTeamIndexes.add(teamIdx);
+            }
+          });
+        } catch (membersError) {
+          console.warn('[join-league] Impossibile caricare utenti per calcolare squadre occupate (permessi limitati?):', membersError);
+          usedTeamIndexes = new Set();
+        }
         
         availableTeams = teamsSnapshot.docs
           .filter(doc => !usedTeamIndexes.has(parseInt(doc.id)))
@@ -432,15 +504,7 @@
 
         console.log('Joining league:', currentLeague.id, 'Team:', selectedTeamId, 'User:', user.uid);
 
-        // 1. Update lega: aggiungi membro
-        await db.collection('leagues').doc(currentLeague.id).update({
-          members: firebase.firestore.FieldValue.arrayUnion(user.uid)
-        }).catch(err => {
-          console.error('Error updating league members:', err);
-          throw new Error('Impossibile aggiornare la lega');
-        });
-
-        // 2. Update user: aggiungi lega + team_index
+        // Update user: aggiungi lega + team_index (l'utente è già stato aggiunto ai members in checkCode)
         await db.collection('users').doc(user.uid).set({
           leagues: firebase.firestore.FieldValue.arrayUnion(currentLeague.id),
           currentLeague: currentLeague.id,
@@ -452,7 +516,14 @@
           throw new Error('Impossibile aggiornare profilo utente');
         });
 
-        console.log('✅ Join league success!');
+        console.log('✅ Join league success! (user profile updated with team_index)');
+
+        // Salva lega corrente anche in localStorage per coerenza con league-selector
+        try {
+          localStorage.setItem('last_league_id', currentLeague.id);
+        } catch (e) {
+          console.warn('Impossibile salvare last_league_id in localStorage:', e);
+        }
 
         // Success!
         showSuccess('✅ Ti sei unito alla lega con successo!');
@@ -493,8 +564,7 @@
       console.log('User authenticated:', user.uid, user.email);
       
       // Check se utente è già in una lega (e non ha codice URL)
-      const urlParams = new URLSearchParams(window.location.search);
-      const codeParam = urlParams.get('code');
+      const codeParam = codeFromURL;
       const joinedParam = urlParams.get('joined');
       
       // Non redirectare se utente ha appena fatto join (evita loop)
@@ -519,14 +589,14 @@
         
       // Check URL params per codice precompilato (già definito sopra)
       if (codeParam) {
-          document.getElementById('codeInput').value = codeParam.toUpperCase();
-          console.log('✅ Codice precompilato da URL:', codeParam);
-          // Aspetta che Firebase sia completamente inizializzato
-          setTimeout(() => {
-            console.log('🔍 Verifica automatica codice...');
-            checkCode().catch(err => console.error('Error in checkCode:', err));
-          }, 1000);
-        }
+        document.getElementById('codeInput').value = codeParam.toUpperCase();
+        console.log('✅ Codice precompilato da URL:', codeParam);
+        // Aspetta che Firebase sia completamente inizializzato
+        setTimeout(() => {
+          console.log('🔍 Verifica automatica codice...');
+          checkCode().catch(err => console.error('Error in checkCode:', err));
+        }, 1000);
+      }
         
       // Listener input per verifica automatica quando utente digita 6 caratteri
       const codeInput = document.getElementById('codeInput');

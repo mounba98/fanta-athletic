@@ -148,6 +148,12 @@
             <label for="giornataSel">Seleziona Giornata</label>
           <select id="giornataSel" class="input" style="max-width:200px;"></select>
           </div>
+          <div class="control-group">
+            <label for="teamFilterSel">Filtra Squadra</label>
+          <select id="teamFilterSel" class="input" style="max-width:200px;">
+            <option value="">Tutte le squadre</option>
+          </select>
+          </div>
           <button id="myLineupBtn">👥 I miei titolari</button>
         </div>
         <div class="table-wrapper">
@@ -158,6 +164,7 @@
             <tbody></tbody>
           </table>
         </div>
+        <div class="muted" style="font-size:12px;margin-top:6px;">* Formazione non inviata</div>
       </div>
     </div>
   </main>
@@ -183,73 +190,202 @@
   <script src="resources/podium-animation.js"></script>
   <script>
     const SEASON = '2024-25';
-    const rawDb = window.__LEGACY_DB__ || null;
     const leagueHelper = window.LeagueHelper || null;
-    
+    let missingLeagueToastShown = false;
+
+    let standingsUi = {
+      dayLabelSingular: 'Giornata',
+      dayLabelPlural: 'Giornate',
+      teamLabelSingular: 'Squadra',
+      teamLabelPlural: 'Squadre',
+      participantSingular: 'giocatore',
+      participantPlural: 'giocatori'
+    };
+    let isRealityLeague = false;
+
+    function applyClassificheUiStrings() {
+      const league = leagueHelper?.getCurrentLeague?.() || window.currentLeague || null;
+      const isReality = leagueHelper?.isRealityLeague?.() ||
+        (typeof window.isRealityLeague === 'function' ? window.isRealityLeague(league) : false);
+      const ui = (typeof window.getLeagueUiStrings === 'function')
+        ? window.getLeagueUiStrings(league)
+        : {
+            dayLabelSingular: 'Giornata',
+            dayLabelPlural: 'Giornate',
+            teamLabelSingular: 'Squadra',
+            teamLabelPlural: 'Squadre',
+            participantSingular: 'giocatore',
+            participantPlural: 'giocatori'
+          };
+
+      standingsUi = ui;
+      isRealityLeague = !!isReality;
+
+      if (typeof window.getLeagueType === 'function') {
+        console.log('[classifiche] leagueType:', window.getLeagueType(league), 'isReality:', isRealityLeague);
+      } else {
+        console.log('[classifiche] leagueType: (fallback sport_league)', 'isReality:', isRealityLeague);
+      }
+
+      // reality_show: solo cambio testi (Giornata -> Puntata), dati invariati.
+      try {
+        const dayLabelSingular = ui.dayLabelSingular || 'Giornata';
+        const dayLabelPlural = ui.dayLabelPlural || 'Giornate';
+
+        // Tab "Per Giornata" -> Per <label>
+        const tabGiornateBtn = document.querySelector('.tab-btn[data-tab="giornate"]');
+        if (tabGiornateBtn) {
+          tabGiornateBtn.textContent = `📅 Per ${dayLabelSingular}`;
+        }
+
+        // Titolo sezione dettaglio
+        const dettaglioTitle = document.querySelector('#tab-giornate h2');
+        if (dettaglioTitle) {
+          dettaglioTitle.textContent = `Dettaglio per ${dayLabelSingular}`;
+        }
+
+        // Label selettore giornata
+        const giornataLabel = document.querySelector('label[for="giornataSel"]');
+        if (giornataLabel) {
+          giornataLabel.textContent = `Seleziona ${dayLabelSingular}`;
+        }
+      } catch (err) {
+        console.warn('[classifiche] applyClassificheUiStrings error:', err);
+      }
+    }
+
+    function firestore() {
+      return window.db || firebase.firestore();
+    }
+
+    function showFallbackToast(msg) {
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.position = 'fixed';
+      el.style.bottom = '16px';
+      el.style.right = '16px';
+      el.style.background = '#2d6cdf';
+      el.style.color = '#fff';
+      el.style.padding = '10px 14px';
+      el.style.borderRadius = '8px';
+      el.style.boxShadow = '0 10px 30px rgba(15,23,42,0.4)';
+      el.style.zIndex = '9999';
+      document.body.appendChild(el);
+      setTimeout(() => { el.remove(); }, 2500);
+    }
+
+    function showToast(msg) {
+      if (typeof window.toast === 'function') {
+        window.toast(msg);
+      } else {
+        showFallbackToast(msg);
+      }
+    }
+
+    function notifyMissingLeague(context = 'questa operazione') {
+      console.warn(`[classifiche] League ID mancante (${context})`);
+      if (!missingLeagueToastShown) {
+        missingLeagueToastShown = true;
+        showToast('❌ Seleziona una lega valida per vedere le classifiche della lega.');
+        setTimeout(() => { missingLeagueToastShown = false; }, 4000);
+      }
+    }
+
+    function getCurrentLeagueIdCached() {
+      if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
+        const id = leagueHelper.getCurrentLeagueId();
+        if (id) return id;
+      }
+      if (window.currentLeague && window.currentLeague.id) {
+        return window.currentLeague.id;
+      }
+      return null;
+    }
+
+    function getCurrentLeagueId() {
+      return getCurrentLeagueIdCached();
+    }
+
     async function ensureLeagueReady(timeoutMs = 7000) {
       if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
         try {
-          await leagueHelper.waitForLeague(timeoutMs);
+          const info = await leagueHelper.waitForLeague(timeoutMs);
+          if (info && info.id) {
+            return info.id;
+          }
         } catch (err) {
           console.warn('[classifiche] Timeout attesa lega:', err?.message || err);
         }
       }
+      return getCurrentLeagueIdCached();
     }
 
-    async function fetchH2HScheduleSnapshot() {
-      try {
-        return await db.collection('h2h_schedule').doc(SEASON).collection('giornate').get();
-      } catch (err) {
-        if (err?.code === 'permission-denied' && rawDb) {
-          try {
-            return await rawDb.collection('h2h_schedule').doc(SEASON).collection('giornate').get();
-          } catch (legacyErr) {
-            console.warn('[classifiche] Legacy h2h_schedule fallback failed:', legacyErr);
-          }
-        } else {
-          console.warn('[classifiche] Errore caricamento h2h_schedule:', err);
+    function getLeagueCollection(collection, leagueId = null) {
+      const dbRef = firestore();
+      if (leagueHelper && typeof leagueHelper.getLeagueCollection === 'function') {
+        try {
+          const ref = leagueHelper.getLeagueCollection(collection, leagueId || undefined);
+          if (ref) return ref;
+        } catch (err) {
+          console.warn('[classifiche] LeagueHelper.getLeagueCollection failed', err);
         }
+      }
+      const targetLeague = leagueId || getCurrentLeagueIdCached();
+      if (!targetLeague) {
+        notifyMissingLeague(`getLeagueCollection(${collection})`);
+        return null;
+      }
+      return dbRef.collection(`leagues/${targetLeague}/${collection}`);
+    }
+
+    function getLeagueDoc(collection, docId, leagueId = null) {
+      const col = getLeagueCollection(collection, leagueId);
+      return col ? col.doc(docId) : null;
+    }
+
+    function getTeamDocRef(teamId, leagueId = null) {
+      const teamsCol = getLeagueCollection('teams', leagueId);
+      return teamsCol ? teamsCol.doc(String(teamId)) : null;
+    }
+
+    function getResultDocRef(giornataId, teamId, leagueId = null) {
+      const resultsCol = getLeagueCollection('results', leagueId);
+      if (!resultsCol) return null;
+      return resultsCol.doc(giornataId).collection('teams').doc(String(teamId));
+    }
+
+    async function getLeagueIdOrNotify(context = 'questa operazione', opts = {}) {
+      const { notify = true, timeoutMs } = opts || {};
+      const id = await ensureLeagueReady(typeof timeoutMs === 'number' ? timeoutMs : 7000);
+      if (!id && notify) {
+        notifyMissingLeague(context);
+      }
+      return id;
+    }
+
+    async function fetchH2HScheduleSnapshot(leagueId) {
+      if (!window.db) return { docs: [] };
+      try {
+        const baseCol = getLeagueCollection('h2h_schedule', leagueId);
+        if (!baseCol) return { docs: [] };
+        return await baseCol.doc(SEASON).collection('giornate').get();
+      } catch (err) {
+        console.warn('[classifiche] Errore caricamento h2h_schedule:', err);
         return { docs: [] };
       }
     }
 
-    async function fetchH2HResultData(giornataId) {
+    async function fetchH2HResultData(giornataId, leagueId) {
+      if (!window.db) return null;
       try {
-        const doc = await db.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornataId).get();
+        const baseCol = getLeagueCollection('h2h_results', leagueId);
+        if (!baseCol) return null;
+        const doc = await baseCol.doc(SEASON).collection('giornate').doc(giornataId).get();
         return doc.exists ? doc.data() : null;
       } catch (err) {
-        if (err?.code === 'permission-denied' && rawDb) {
-          try {
-            const legacyDoc = await rawDb.collection('h2h_results').doc(SEASON).collection('giornate').doc(giornataId).get();
-            return legacyDoc.exists ? legacyDoc.data() : null;
-          } catch (legacyErr) {
-            console.warn('[classifiche] Legacy h2h_results fallback failed:', legacyErr);
-          }
-        } else {
-          console.warn('[classifiche] Errore caricamento h2h_results per', giornataId, err);
-        }
+        console.warn('[classifiche] Errore caricamento h2h_results per', giornataId, err);
         return null;
       }
-    }
-    
-    // Ottieni leagueId corrente
-    let currentLeagueId = null;
-    function getCurrentLeagueId() {
-      if (currentLeagueId) return currentLeagueId;
-      if (window.currentLeague && window.currentLeague.id) {
-        currentLeagueId = window.currentLeague.id;
-        return currentLeagueId;
-      }
-      const stored = localStorage.getItem('last_league_id');
-      if (stored) {
-        currentLeagueId = stored;
-        return currentLeagueId;
-      }
-      if (window.DEFAULT_LEAGUE_ID) {
-        currentLeagueId = window.DEFAULT_LEAGUE_ID;
-        return currentLeagueId;
-      }
-      return null;
     }
 
     function switchTab(tab, ev) {
@@ -263,12 +399,14 @@
     }
 
     const state = {
+      leagueId: null,
       teams: [],
       coaches: new Map(),
       schedule: new Map(),
       results: new Map(),
       teamMetaByKey: new Map(),
-      selectedGiornata: null
+      selectedGiornata: null,
+      hasH2H: false
     };
 
     const lineupBtn = document.getElementById('myLineupBtn');
@@ -352,8 +490,12 @@
           const pts = extractPoints(teamData);
           aggregate.total += pts;
           aggregate.giornate += 1;
-          if (teamData.forfeit) {
-            aggregate.forfeit = (aggregate.forfeit || 0) + Number(teamData.forfeit);
+          const forfeits = Number(teamData.forfeit || 0);
+          if (forfeits) {
+            aggregate.forfeit = (aggregate.forfeit || 0) + forfeits;
+          }
+          if (teamData.missingLineup) {
+            aggregate.forfeit = (aggregate.forfeit || 0) + 1;
           }
         });
       });
@@ -375,6 +517,13 @@
     }
 
     function renderH2HTable() {
+      if (!state.hasH2H) {
+        const pane = document.getElementById('tab-h2h');
+        if (pane) {
+          pane.innerHTML = '<div class="card"><p style="text-align:center;color:var(--muted);padding:20px;">Gli scontri diretti non sono configurati per questa lega.</p></div>';
+        }
+        return;
+      }
       const tbody = document.querySelector('#h2hTable tbody');
       if (!tbody) return;
 
@@ -481,13 +630,27 @@
       });
 
       if (!giornate.length) {
-        select.innerHTML = '<option value="">Nessuna giornata calcolata</option>';
+        const dayLabelSingular = standingsUi.dayLabelSingular || 'Giornata';
+        const lower = dayLabelSingular.toLowerCase();
+        select.innerHTML = `<option value="">Nessuna ${lower} calcolata</option>`;
         renderGiornata(null);
         return;
       }
 
-      select.innerHTML = giornate.map(id => `<option value="${id}">Giornata ${id.replace('G', '')}</option>`).join('');
+      const dayLabelSingular = standingsUi.dayLabelSingular || 'Giornata';
+      select.innerHTML = giornate.map(id => `<option value="${id}">${dayLabelSingular} ${id.replace('G', '')}</option>`).join('');
       select.onchange = (e) => renderGiornata(e.target.value);
+      
+      // Listener per filtro squadra
+      const teamFilterSel = document.getElementById('teamFilterSel');
+      if (teamFilterSel) {
+        teamFilterSel.onchange = () => {
+          if (state.selectedGiornata) {
+            renderGiornata(state.selectedGiornata);
+          }
+        };
+      }
+      
       renderGiornata(giornate[0]);
 
       if (lineupBtn) {
@@ -511,8 +674,10 @@
         lineupBtn.disabled = !state.selectedGiornata;
       }
 
+      const dayLabelSingular = standingsUi.dayLabelSingular || 'Giornata';
+
       if (!giornataId || !state.results.has(giornataId)) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">Nessun dato disponibile per questa giornata.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">Nessun dato disponibile per questa ${dayLabelSingular.toLowerCase()}.</td></tr>`;
         return;
       }
 
@@ -524,28 +689,36 @@
         const meta = getTeamMeta(teamId);
         const points = extractPoints(teamData);
         const breakdown = teamData.breakdown || {};
+        const missingLineup = !!teamData.missingLineup;
         const fallbackName = meta?.numericId != null ? `Squadra ${meta.numericId + 1}` : `Squadra ${teamId}`;
         return {
           teamKey: teamId,
           name: teamData.teamName || meta?.name || fallbackName,
           points,
-          breakdown
+          breakdown,
+          missingLineup
         };
       });
 
       if (!rows.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">Giornata non ancora calcolata.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">${dayLabelSingular} non ancora calcolata.</td></tr>`;
         return;
       }
 
-      rows.sort((a, b) => b.points - a.points || a.name.localeCompare(b.name, 'it'));
+      // Applica filtro squadra se presente
+      const teamFilterSel = document.getElementById('teamFilterSel');
+      const selectedTeamId = teamFilterSel ? teamFilterSel.value : '';
+      const filteredRows = selectedTeamId ? rows.filter(row => row.teamKey === selectedTeamId) : rows;
+      
+      filteredRows.sort((a, b) => b.points - a.points || a.name.localeCompare(b.name, 'it'));
 
-      tbody.innerHTML = rows.map((row, index) => {
+      tbody.innerHTML = filteredRows.map((row, index) => {
         const { curva, players, captain, coach } = row.breakdown;
+        const nameLabel = row.missingLineup ? `${row.name} *` : row.name;
         return `
           <tr>
             <td style="font-weight:${index < 3 ? '800' : '600'};">${index + 1}</td>
-            <td style="font-weight:${index < 3 ? '700' : '600'};">${row.name}</td>
+            <td style="font-weight:${index < 3 ? '700' : '600'};">${nameLabel}</td>
             <td>${row.points.toFixed(2)}</td>
             <td style="font-size:11px;color:var(--muted);">
               Curva ${(curva || 0).toFixed(1)} | 
@@ -561,57 +734,79 @@
 
     async function loadClassificheData() {
       try {
-        await ensureLeagueReady();
-        
-        const leagueId = getCurrentLeagueId();
-        const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
-        
-        let teamsSnap, coachesSnap;
-        let scheduleSnap;
-        
+        const leagueId = state.leagueId || await getLeagueIdOrNotify('caricare le classifiche della lega');
+        if (!leagueId || !window.db) {
+          const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
+          const msg = '❌ Seleziona una lega valida per vedere le classifiche della lega.';
+          tables.forEach(sel => {
+            const tbody = document.querySelector(sel);
+            if (tbody) {
+              tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${msg}</td></tr>`;
+            }
+          });
+          return;
+        }
+        state.leagueId = leagueId;
+
+        let teamsSnap = null;
+        let coachesSnap = null;
+        let scheduleSnap = { docs: [] };
+
+        // Carica squadre dalla lega corrente
         try {
-          if (isLegacyMode) {
-            // Fallback per non-admin: usa collezioni legacy
-            teamsSnap = await db.collection('teams').get();
-          } else {
-            teamsSnap = await db.collection(`leagues/${leagueId}/teams`).get();
+          const teamsCol = getLeagueCollection('teams', leagueId);
+          if (!teamsCol) {
+            throw new Error('Impossibile ottenere la collection teams per questa lega');
           }
+          teamsSnap = await teamsCol.get();
         } catch (err) {
           if (err?.code === 'permission-denied') {
-            // Anche legacy mode fallisce - mostra messaggio chiaro
             const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
+            const errorMessage = 'Non hai i permessi per visualizzare le classifiche. Contatta un amministratore per essere aggiunto a una lega.';
             tables.forEach(sel => {
               const tbody = document.querySelector(sel);
               if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Non hai i permessi per visualizzare le classifiche. Contatta un amministratore per essere aggiunto a una lega.</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${errorMessage}</td></tr>`;
               }
             });
-            return; // Esci dalla funzione invece di throw
+            showToast('❌ Non hai i permessi per visualizzare le classifiche di questa lega.');
+            return;
           } else {
-            console.error(`❌ Errore caricamento teams:`, err);
+            console.error('[classifiche] Errore caricamento teams:', err);
+            showToast('❌ Errore nel caricamento della classifica per questa lega.');
             throw err;
           }
         }
-        
+
+        // Carica allenatori dalla lega corrente (se esistono)
         try {
-          if (isLegacyMode) {
-            coachesSnap = await db.collection('coaches').get();
-          } else {
-            coachesSnap = await db.collection(`leagues/${leagueId}/coaches`).get();
-          }
-        } catch (err) {
-          if (err?.code === 'permission-denied' && !isLegacyMode) {
-            try {
-              coachesSnap = await db.collection('coaches').get();
-            } catch (legacyErr) {
-              coachesSnap = null;
-            }
+          const coachesCol = getLeagueCollection('coaches', leagueId);
+          if (coachesCol) {
+            coachesSnap = await coachesCol.get();
           } else {
             coachesSnap = null;
           }
+        } catch (err) {
+          console.warn('[classifiche] Impossibile caricare lista allenatori:', err);
+          coachesSnap = null;
         }
-        
-        scheduleSnap = await fetchH2HScheduleSnapshot();
+
+        // Carica calendario H2H per la lega
+        scheduleSnap = await fetchH2HScheduleSnapshot(leagueId);
+        state.hasH2H = Array.isArray(scheduleSnap?.docs) && scheduleSnap.docs.length > 0;
+        const h2hTabBtn = document.querySelector('.tab-btn[data-tab="h2h"]');
+        const h2hTabPane = document.getElementById('tab-h2h');
+
+        if (isRealityLeague) {
+          // reality_show: nascondi completamente tab H2H (UI sola)
+          if (h2hTabBtn) h2hTabBtn.style.display = 'none';
+          if (h2hTabPane) h2hTabPane.style.display = 'none';
+        } else if (!state.hasH2H) {
+          if (h2hTabBtn) h2hTabBtn.style.display = 'none';
+          if (h2hTabPane) h2hTabPane.remove();
+        } else if (h2hTabBtn) {
+          h2hTabBtn.style.display = '';
+        }
 
         state.coaches.clear();
         if (coachesSnap) {
@@ -657,39 +852,49 @@
           }
           keys.forEach(key => state.teamMetaByKey.set(key, team));
         });
+        
+        // Popola select filtro squadre (verrà aggiornato anche con squadre dai risultati)
+        const teamFilterSel = document.getElementById('teamFilterSel');
+        if (teamFilterSel) {
+          const teamOptions = state.teams.map(team => ({ id: team.id, name: team.name }));
+          // Aggiungi anche squadre dai risultati se non sono già presenti
+          state.results.forEach((giornataData, giornataId) => {
+            if (giornataData && giornataData.teams) {
+              Object.entries(giornataData.teams).forEach(([teamId, teamData]) => {
+                if (!teamOptions.find(t => t.id === teamId)) {
+                  teamOptions.push({ id: teamId, name: teamData.teamName || `Squadra ${teamId}` });
+                }
+              });
+            }
+          });
+          // Ordina per nome
+          teamOptions.sort((a, b) => a.name.localeCompare(b.name, 'it'));
+          teamFilterSel.innerHTML = '<option value="">Tutte le squadre</option>' + 
+            teamOptions.map(team => `<option value="${team.id}">${team.name}</option>`).join('');
+        }
 
         state.schedule.clear();
         scheduleSnap.docs.forEach(doc => state.schedule.set(doc.id, doc.data() || {}));
 
-        // NUOVO: Carica risultati da leagues/{leagueId}/results/{giornata}/teams/*
+        // Carica risultati da leagues/{leagueId}/results/{giornata}/teams/*
         state.results.clear();
-        
-        
+
         const giornataIds = Array.from({ length: 24 }, (_, i) => `G${i + 1}`);
 
-        const giornateResults = await Promise.all(
-          giornataIds.map(giornataId => {
-            if (isLegacyMode) {
-              // Legacy: results/G1/teams
-              return db.collection('results').doc(giornataId).collection('teams').get()
-                .then(snap => ({ giornataId, snap }))
-                .catch(error => ({ giornataId, snap: null, error }));
-            } else {
-              // Multi-league: leagues/{leagueId}/results/G1/teams
-              return db.collection(`leagues/${leagueId}/results`).doc(giornataId).collection('teams').get()
-                .then(snap => ({ giornataId, snap }))
-                .catch(error => {
-                  // Se fallisce con multi-league, prova legacy
-                  if (error?.code === 'permission-denied') {
-                    return db.collection('results').doc(giornataId).collection('teams').get()
-                      .then(snap => ({ giornataId, snap }))
-                      .catch(legacyErr => ({ giornataId, snap: null, error: legacyErr }));
-                  }
+        const resultsCol = getLeagueCollection('results', leagueId);
+        const giornateResults = resultsCol
+          ? await Promise.all(
+              giornataIds.map(async giornataId => {
+                try {
+                  const snap = await resultsCol.doc(giornataId).collection('teams').get();
+                  return { giornataId, snap };
+                } catch (error) {
+                  console.warn(`[classifiche] Errore caricamento risultati ${giornataId}:`, error);
                   return { giornataId, snap: null, error };
-                });
-            }
-          })
-        );
+                }
+              })
+            )
+          : [];
 
         giornateResults.forEach(({ giornataId, snap, error }) => {
           const giornataData = state.results.get(giornataId) || { teams: {}, matches: [] };
@@ -715,7 +920,7 @@
         const h2hResults = await Promise.all(
           giornataIds.map(async giornataId => ({
             giornataId,
-            data: await fetchH2HResultData(giornataId)
+            data: await fetchH2HResultData(giornataId, leagueId)
           }))
         );
 
@@ -736,11 +941,12 @@
         renderH2HTable();
         renderGiornataSelect();
       } catch (error) {
-        console.error('Errore caricamento classifiche:', error);
+        console.error('[classifiche] Errore caricamento classifiche:', error);
         const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
         const errorMessage = error?.code === 'permission-denied' 
           ? 'Non hai i permessi per visualizzare le classifiche. Contatta un amministratore per essere aggiunto a una lega.'
-          : 'Errore nel caricamento dei dati.';
+          : 'Errore nel caricamento delle classifiche per questa lega.';
+        showToast(`❌ ${errorMessage}`);
         tables.forEach(sel => {
           const tbody = document.querySelector(sel);
           if (tbody) {
@@ -749,54 +955,12 @@
         });
       }
     }
-
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        // Mostra messaggio invece di redirect immediato
-        const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
-        tables.forEach(sel => {
-          const tbody = document.querySelector(sel);
-          if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Effettua il <a href="auth.html" style="color:var(--primary);text-decoration:underline;">login</a> per visualizzare le classifiche.</td></tr>';
-          }
-        });
-        return;
-      }
-      loadClassificheData();
-    });
-    window.addEventListener('league-changed', () => {
-      loadClassificheData();
-    });
-    
-    // Export standings function
-    async function exportStandings(format) {
-      const leagueId = localStorage.getItem('last_league_id');
-      if (!leagueId) {
-        alert('Seleziona una lega prima!');
-        return;
-      }
-      
-      if (format === 'csv') {
-        const result = await StandingsExport.exportToCSV(leagueId);
-        if (result.success) {
-          alert('✅ Classifica esportata: ' + result.filename);
-        } else {
-          alert('❌ Errore: ' + result.error);
-        }
-      } else if (format === 'excel') {
-        const result = await StandingsExport.exportToExcel(leagueId);
-        if (result.success) {
-          alert('✅ Classifica esportata: ' + result.filename);
-        } else {
-          alert('❌ Errore: ' + result.error);
-        }
-      }
-    }
     
     // Show final podium
     function showFinalPodium() {
-      const leagueId = localStorage.getItem('last_league_id');
+      const leagueId = state.leagueId || getCurrentLeagueIdCached();
       if (!leagueId) {
+        notifyMissingLeague('visualizzare il podio finale');
         alert('Seleziona una lega prima!');
         return;
       }
@@ -820,6 +984,42 @@
       const season = localStorage.getItem('current_season') || '24/25';
       PodiumAnimation.showPodium(top3, `Classifica Finale ${season}`);
     }
+
+    // Applica etichette UI adattive quando la lega è pronta
+    applyClassificheUiStrings();
+    
+    // Bootstrap classifica quando la lega è pronta
+    async function bootstrapClassifiche() {
+      try {
+        await loadClassificheData();
+      } catch (error) {
+        console.error('[classifiche] Errore bootstrap:', error);
+      }
+    }
+    
+    // Aspetta che la lega sia pronta poi carica i dati
+    if (window.ensureLeagueReady) {
+      window.ensureLeagueReady(10000).then(leagueId => {
+        if (leagueId) {
+          bootstrapClassifiche();
+        } else {
+          console.log('[classifiche] Nessuna lega disponibile');
+        }
+      }).catch(err => {
+        console.error('[classifiche] Errore attesa lega:', err);
+      });
+    } else {
+      // Fallback: prova subito
+      setTimeout(bootstrapClassifiche, 1000);
+    }
+    
+    window.addEventListener('league-ready', () => {
+      try { 
+        applyClassificheUiStrings(); 
+        bootstrapClassifiche();
+      } catch (_) {}
+    });
+
   </script>
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/mobile-menu.js?v=2025101803"></script>
@@ -827,9 +1027,9 @@
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/lazy-load.js?v=20251020"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/auth-guard.js?v=2025101901"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>

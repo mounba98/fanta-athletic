@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -14,28 +14,28 @@
   </style>
 </head>
 <body>
-  <h1>🔄 Migrazione Dati Esistenti a Struttura Multi-Lega</h1>
+  <h1>?? Migrazione Dati Esistenti a Struttura Multi-Lega</h1>
   <p>Questo script migra i dati esistenti (squadre, giocatori, admin) nella nuova struttura leagues.</p>
   
   <div>
-    <button class="btn" onclick="checkExistingData()">1️⃣ Check Dati Esistenti</button>
-    <button class="btn" onclick="createFantaAthleticLeague()">2️⃣ Crea Lega "Fanta Athletic"</button>
-    <button class="btn" onclick="migrateAllData()">3️⃣ Migra Tutto</button>
-    <button class="btn" onclick="migrateOnlyResults()" style="background: #f39c12;">4️⃣ Migra Solo Results</button>
-    <button class="btn" onclick="checkResultsStatus()" style="background: #3498db;">🔍 Verifica Stato Results</button>
+    <button class="btn" onclick="checkExistingData()">1?? Check Dati Esistenti</button>
+    <button class="btn" onclick="createFantaAthleticLeague()">2?? Crea Lega "Fanta Athletic"</button>
+    <button class="btn" onclick="migrateAllData()">3?? Migra Tutto</button>
+    <button class="btn" onclick="migrateOnlyResults()" style="background: #f39c12;">4?? Migra Solo Results</button>
+    <button class="btn" onclick="checkResultsStatus()" style="background: #3498db;">?? Verifica Stato Results</button>
   </div>
   
   <div id="log" class="log">Log operazioni...</div>
 
   <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this); document.getElementById('log').innerHTML = '<div class=\"error\">❌ Errore caricamento Firebase SDK. Verifica connessione internet.</div>';"></script>
+  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this); document.getElementById('log').innerHTML = '<div class=\"error\">? Errore caricamento Firebase SDK. Verifica connessione internet.</div>';"></script>
   <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
   <script>
     // Verifica che Firebase sia caricato
     if (typeof firebase === 'undefined') {
-      console.error('❌ Firebase SDK non caricato!');
-      document.getElementById('log').innerHTML = '<div class="error">❌ Firebase SDK non caricato. Verifica connessione internet e riprova.</div>';
+      console.error('? Firebase SDK non caricato!');
+      document.getElementById('log').innerHTML = '<div class="error">? Firebase SDK non caricato. Verifica connessione internet e riprova.</div>';
     }
   </script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
@@ -59,7 +59,7 @@
       // Prova a ottenere il raw DB dal helper
       if (window.LeagueMultiLeague && typeof window.LeagueMultiLeague.getRawDb === 'function') {
         rawDbInstance = window.LeagueMultiLeague.getRawDb();
-        console.log('✅ Raw DB ottenuto da LeagueMultiLeague.getRawDb()');
+        console.log('? Raw DB ottenuto da LeagueMultiLeague.getRawDb()');
         return rawDbInstance;
       }
       
@@ -70,7 +70,7 @@
         window.LeagueMultiLeague.disable();
       }
       rawDbInstance = firebase.firestore();
-      console.log('✅ Raw DB ottenuto (proxy disabilitato)');
+      console.log('? Raw DB ottenuto (proxy disabilitato)');
       return rawDbInstance;
     }
     
@@ -83,15 +83,15 @@
     
     // Verifica che Firebase sia disponibile prima di inizializzare
     if (typeof firebase === 'undefined') {
-      log('❌ Firebase SDK non caricato! Ricarica la pagina.', 'error');
+      log('? Firebase SDK non caricato! Ricarica la pagina.', 'error');
     } else {
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
-        log('❌ Non autenticato. Effettua login.', 'error');
+        log('? Non autenticato. Effettua login.', 'error');
         setTimeout(() => location.href = 'auth.html', 2000);
       } else {
         currentUser = user;
-        log(`✅ Autenticato come: ${user.email}`, 'success');
+        log(`? Autenticato come: ${user.email}`, 'success');
       }
     });
     }
@@ -109,21 +109,21 @@
     }
 
     async function withLegacyDb(task) {
-      // Usa window.__LEGACY_DB__ che è il raw DB senza proxy (definito in firebase-config.js)
+      // Usa window.__LEGACY_DB__ che � il raw DB senza proxy (definito in firebase-config.js)
       // Se non disponibile, prova a disabilitare il proxy e usare firebase.firestore()
       let legacyDb = null;
       let wasEnabled = false;
       
-      log(`🔍 Verifica disponibilità raw DB...`, 'info');
+      log(`?? Verifica disponibilit� raw DB...`, 'info');
       log(`  - window.__LEGACY_DB__: ${window.__LEGACY_DB__ ? 'OK' : 'NULL'}`, 'info');
       log(`  - window.LeagueMultiLeague: ${window.LeagueMultiLeague ? 'OK' : 'NULL'}`, 'info');
       
       // Prova prima con __LEGACY_DB__ (raw DB senza proxy)
       if (window.__LEGACY_DB__) {
         legacyDb = window.__LEGACY_DB__;
-        log('✅ Usando window.__LEGACY_DB__ (raw DB senza proxy)', 'info');
+        log('? Usando window.__LEGACY_DB__ (raw DB senza proxy)', 'info');
       } else {
-        log('⚠️ window.__LEGACY_DB__ non disponibile, uso fallback', 'warning');
+        log('?? window.__LEGACY_DB__ non disponibile, uso fallback', 'warning');
         
         // Fallback: disabilita proxy e usa raw DB
         const helper = window.LeagueMultiLeague || null;
@@ -132,7 +132,7 @@
             wasEnabled = helper.isEnabled();
             if (wasEnabled) {
               helper.disable();
-              log('🔧 Proxy multileghe disabilitato temporaneamente per lettura legacy', 'info');
+              log('?? Proxy multileghe disabilitato temporaneamente per lettura legacy', 'info');
             }
           } catch (err) {
             console.warn('[Migration] impossibile disabilitare multi-league temporaneamente', err);
@@ -142,14 +142,14 @@
         // Prova con getRawDb se disponibile
         if (helper && typeof helper.getRawDb === 'function') {
           legacyDb = helper.getRawDb();
-          log('✅ Usando LeagueMultiLeague.getRawDb()', 'info');
+          log('? Usando LeagueMultiLeague.getRawDb()', 'info');
         } else {
           // Se tutto fallisce, usa firebase.firestore() dopo aver disabilitato il proxy
           if (typeof firebase !== 'undefined' && firebase.firestore) {
             legacyDb = firebase.firestore();
-            log('⚠️ Usando firebase.firestore() (potrebbe essere ancora proxy)', 'warning');
+            log('?? Usando firebase.firestore() (potrebbe essere ancora proxy)', 'warning');
           } else {
-            log('❌ Firebase non disponibile!', 'error');
+            log('? Firebase non disponibile!', 'error');
             throw new Error('Firebase non disponibile');
           }
         }
@@ -161,56 +161,56 @@
         // Riabilita il proxy se era attivo
         if (wasEnabled && window.LeagueMultiLeague && typeof window.LeagueMultiLeague.enable === 'function') {
           window.LeagueMultiLeague.enable();
-          log('🔧 Proxy multileghe riabilitato', 'info');
+          log('?? Proxy multileghe riabilitato', 'info');
         }
       }
     }
     
     async function checkExistingData() {
-      log('🔍 Controllo dati legacy e struttura attuale...', 'warning');
+      log('?? Controllo dati legacy e struttura attuale...', 'warning');
 
       try {
         await withLegacyDb(async legacyDb => {
           const teamsSnap = await legacyDb.collection('teams').get();
-          log(`📊 Teams legacy: ${teamsSnap.size}`);
+          log(`?? Teams legacy: ${teamsSnap.size}`);
 
           const playersSnap = await legacyDb.collection('players').get();
-          log(`👥 Players legacy: ${playersSnap.size}`);
+          log(`?? Players legacy: ${playersSnap.size}`);
 
           try {
             const coachesSnap = await legacyDb.collection('coaches').get();
-            log(`🎓 Coaches legacy: ${coachesSnap.size}`);
+            log(`?? Coaches legacy: ${coachesSnap.size}`);
           } catch (_) {
-            log('ℹ️ Collection legacy "coaches" non trovata (ignorata)', 'warning');
+            log('?? Collection legacy "coaches" non trovata (ignorata)', 'warning');
           }
         });
 
         const adminsSnap = await targetDb.collection('admins').get();
-        log(`👑 Admins attuali: ${adminsSnap.size}`);
+        log(`?? Admins attuali: ${adminsSnap.size}`);
         adminsSnap.forEach(doc => log(`  - Admin: ${doc.id}`));
 
         const leaguesSnap = await targetDb.collection('leagues').get();
-        log(`🏆 Leghe esistenti: ${leaguesSnap.size}`);
+        log(`?? Leghe esistenti: ${leaguesSnap.size}`);
           leaguesSnap.forEach(doc => {
           const league = doc.data() || {};
           log(`  - Lega: ${league.name || 'Senza nome'} (${doc.id})`);
           });
         
-        log('✅ Check completato', 'success');
+        log('? Check completato', 'success');
       } catch (error) {
-        log(`❌ Errore durante il check: ${error.message}`, 'error');
+        log(`? Errore durante il check: ${error.message}`, 'error');
       }
     }
     
     async function createDefaultLeague() {
-      log(`🏗️ Creazione/aggiornamento lega "${DEFAULT_LEAGUE_NAME}"...`, 'warning');
+      log(`??? Creazione/aggiornamento lega "${DEFAULT_LEAGUE_NAME}"...`, 'warning');
       
       if (!currentUser) {
-        log('❌ Non autenticato!', 'error');
+        log('? Non autenticato!', 'error');
         return null;
       }
 
-      // Prima cerca se esiste già una lega con questo nome
+      // Prima cerca se esiste gi� una lega con questo nome
       const existingByName = await targetDb.collection('leagues')
         .where('name', '==', DEFAULT_LEAGUE_NAME)
           .limit(1)
@@ -219,30 +219,30 @@
       if (!existingByName.empty) {
         const existingLeague = existingByName.docs[0];
         const leagueData = existingLeague.data();
-        log(`⚠️ Lega "${DEFAULT_LEAGUE_NAME}" già presente: ${existingLeague.id}`, 'warning');
+        log(`?? Lega "${DEFAULT_LEAGUE_NAME}" gi� presente: ${existingLeague.id}`, 'warning');
         
         // Assicurati che l'utente corrente sia negli admins
         const admins = leagueData.admins || [];
-        log(`👤 Utente corrente: ${currentUser.uid}`, 'info');
-        log(`👑 Admins lega: ${admins.join(', ')}`, 'info');
+        log(`?? Utente corrente: ${currentUser.uid}`, 'info');
+        log(`?? Admins lega: ${admins.join(', ')}`, 'info');
         
         if (!admins.includes(currentUser.uid)) {
-          log(`🔧 Aggiungo utente corrente agli admins della lega...`, 'warning');
+          log(`?? Aggiungo utente corrente agli admins della lega...`, 'warning');
           try {
             await targetDb.collection('leagues').doc(existingLeague.id).update({
               admins: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
               members: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
             });
-            log(`✅ Utente aggiunto agli admins`, 'success');
+            log(`? Utente aggiunto agli admins`, 'success');
             // Aggiorna leagueData per includere l'utente
             leagueData.admins = [...admins, currentUser.uid];
           } catch (updateError) {
-            log(`⚠️ Impossibile aggiungere utente agli admins: ${updateError.message}`, 'warning');
-            log(`⚠️ Continuo comunque (admin globale dovrebbe avere permessi)`, 'warning');
-            log(`⚠️ Verifica che l'UID sia in isAdmin() in firestore.rules`, 'warning');
+            log(`?? Impossibile aggiungere utente agli admins: ${updateError.message}`, 'warning');
+            log(`?? Continuo comunque (admin globale dovrebbe avere permessi)`, 'warning');
+            log(`?? Verifica che l'UID sia in isAdmin() in firestore.rules`, 'warning');
           }
         } else {
-          log(`✅ Utente già negli admins della lega`, 'success');
+          log(`? Utente gi� negli admins della lega`, 'success');
         }
         
           localStorage.setItem('last_league_id', existingLeague.id);
@@ -259,17 +259,17 @@
       const existingLeague = await leagueRef.get();
       if (existingLeague.exists) {
         const leagueData = existingLeague.data();
-        log(`⚠️ Lega con ID "${DEFAULT_LEAGUE_ID}" già presente: ${existingLeague.id}`, 'warning');
+        log(`?? Lega con ID "${DEFAULT_LEAGUE_ID}" gi� presente: ${existingLeague.id}`, 'warning');
         
         // Assicurati che l'utente corrente sia negli admins
         const admins = leagueData.admins || [];
         if (!admins.includes(currentUser.uid)) {
-          log(`🔧 Aggiungo utente corrente agli admins della lega...`, 'warning');
+          log(`?? Aggiungo utente corrente agli admins della lega...`, 'warning');
           await targetDb.collection('leagues').doc(existingLeague.id).update({
             admins: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
             members: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
           });
-          log(`✅ Utente aggiunto agli admins`, 'success');
+          log(`? Utente aggiunto agli admins`, 'success');
         }
         
         localStorage.setItem('last_league_id', existingLeague.id);
@@ -281,7 +281,7 @@
 
       const adminsSnap = await targetDb.collection('admins').get();
         const adminIds = adminsSnap.docs.map(doc => doc.id);
-        log(`👑 Admin trovati: ${adminIds.length}`);
+        log(`?? Admin trovati: ${adminIds.length}`);
         
       const legacyStats = await withLegacyDb(async legacyDb => {
         const [teamsSnap, playersSnap, coachesSnap] = await Promise.all([
@@ -333,8 +333,8 @@
       };
 
       await leagueRef.set(leagueData, { merge: true });
-      log(`✅ Lega "${DEFAULT_LEAGUE_NAME}" creata con ID fisso: ${DEFAULT_LEAGUE_ID}`, 'success');
-      log(`📋 Codice invito: ${inviteCode}`);
+      log(`? Lega "${DEFAULT_LEAGUE_NAME}" creata con ID fisso: ${DEFAULT_LEAGUE_ID}`, 'success');
+      log(`?? Codice invito: ${inviteCode}`);
 
       localStorage.setItem('last_league_id', DEFAULT_LEAGUE_ID);
       window.currentLeague = { id: DEFAULT_LEAGUE_ID, ...leagueData };
@@ -356,7 +356,7 @@
         try {
           const snapshot = await legacyDb.collection('teams').get();
           if (snapshot.empty) {
-            log('ℹ️ Nessuna squadra legacy trovata', 'warning');
+            log('?? Nessuna squadra legacy trovata', 'warning');
             return { count: 0, owners: [] };
           }
 
@@ -376,7 +376,7 @@
                 migratedAt: firebase.firestore.Timestamp.now()
               }, { merge: true });
               count += 1;
-              log(`  ✅ Squadra migrata: ${data.name || doc.id}`);
+              log(`  ? Squadra migrata: ${data.name || doc.id}`);
 
               const savedSnap = await doc.ref.collection('saved').get();
               if (!savedSnap.empty) {
@@ -388,21 +388,21 @@
                       migratedAt: firebase.firestore.Timestamp.now()
                     }, { merge: true });
                   } catch (savedError) {
-                    log(`  ⚠️ Errore migrazione saved per ${doc.id}/${savedDoc.id}: ${savedError.message}`, 'warning');
+                    log(`  ?? Errore migrazione saved per ${doc.id}/${savedDoc.id}: ${savedError.message}`, 'warning');
                   }
                 }
               }
             } catch (teamError) {
-              log(`  ❌ Errore migrazione squadra ${doc.id}: ${teamError.message}`, 'error');
+              log(`  ? Errore migrazione squadra ${doc.id}: ${teamError.message}`, 'error');
               console.error('Team migration error:', teamError);
               // Continua con le altre squadre
             }
           }
 
-          log(`✅ ${count} squadre migrate`, 'success');
+          log(`? ${count} squadre migrate`, 'success');
           return { count, owners: Array.from(owners) };
         } catch (error) {
-          log(`❌ Errore generale migrazione teams: ${error.message}`, 'error');
+          log(`? Errore generale migrazione teams: ${error.message}`, 'error');
           console.error('Teams migration error:', error);
           throw error;
         }
@@ -413,7 +413,7 @@
       return withLegacyDb(async legacyDb => {
         const snapshot = await legacyDb.collection('players').get();
         if (snapshot.empty) {
-          log('ℹ️ Nessun giocatore legacy trovato', 'warning');
+          log('?? Nessun giocatore legacy trovato', 'warning');
           return 0;
         }
 
@@ -442,7 +442,7 @@
           await batch.commit();
         }
 
-        log(`✅ ${count} giocatori migrati`, 'success');
+        log(`? ${count} giocatori migrati`, 'success');
         return count;
       });
     }
@@ -452,7 +452,7 @@
         try {
           const snapshot = await legacyDb.collection('coaches').get();
           if (snapshot.empty) {
-            log('ℹ️ Nessun allenatore legacy trovato', 'warning');
+            log('?? Nessun allenatore legacy trovato', 'warning');
             return 0;
           }
 
@@ -481,10 +481,10 @@
             await batch.commit();
           }
 
-          log(`✅ ${count} allenatori migrati`, 'success');
+          log(`? ${count} allenatori migrati`, 'success');
           return count;
         } catch (error) {
-          log('ℹ️ Collection legacy "coaches" non disponibile, salto.', 'warning');
+          log('?? Collection legacy "coaches" non disponibile, salto.', 'warning');
           return 0;
         }
       });
@@ -495,7 +495,7 @@
         try {
           const snapshot = await legacyDb.collection('rules').get();
           if (snapshot.empty) {
-            log('ℹ️ Nessuna regola legacy trovata', 'warning');
+            log('?? Nessuna regola legacy trovata', 'warning');
             return 0;
           }
 
@@ -524,10 +524,10 @@
             await batch.commit();
           }
 
-          log(`✅ ${count} regole migrate`, 'success');
+          log(`? ${count} regole migrate`, 'success');
           return count;
         } catch (error) {
-          log('ℹ️ Collection legacy "rules" non disponibile, salto.', 'warning');
+          log('?? Collection legacy "rules" non disponibile, salto.', 'warning');
           return 0;
         }
       });
@@ -538,7 +538,7 @@
         try {
           const snapshot = await legacyDb.collection('days').get();
           if (snapshot.empty) {
-            log('ℹ️ Nessun documento "days" legacy trovato', 'warning');
+            log('?? Nessun documento "days" legacy trovato', 'warning');
             return 0;
           }
 
@@ -552,10 +552,10 @@
             count += 1;
           }
 
-          log(`✅ ${count} documenti days migrati`, 'success');
+          log(`? ${count} documenti days migrati`, 'success');
           return count;
         } catch (error) {
-          log('ℹ️ Collection legacy "days" non disponibile, salto.', 'warning');
+          log('?? Collection legacy "days" non disponibile, salto.', 'warning');
           return 0;
         }
       });
@@ -566,7 +566,7 @@
         try {
           const snapshot = await legacyDb.collection('deadlines').get();
           if (snapshot.empty) {
-            log('ℹ️ Nessuna deadline legacy trovata', 'warning');
+            log('?? Nessuna deadline legacy trovata', 'warning');
             return 0;
           }
 
@@ -580,10 +580,10 @@
             count += 1;
           }
 
-          log(`✅ ${count} deadlines migrate`, 'success');
+          log(`? ${count} deadlines migrate`, 'success');
           return count;
         } catch (error) {
-          log('ℹ️ Collection legacy "deadlines" non disponibile, salto.', 'warning');
+          log('?? Collection legacy "deadlines" non disponibile, salto.', 'warning');
           return 0;
         }
       });
@@ -594,7 +594,7 @@
         try {
           const snapshot = await legacyDb.collection('matchday_temp').get();
           if (!snapshot || snapshot.empty) {
-            log('ℹ️ Nessuna bozza matchday_temp trovata', 'warning');
+            log('?? Nessuna bozza matchday_temp trovata', 'warning');
             return 0;
           }
 
@@ -608,10 +608,10 @@
             count += 1;
           }
 
-          log(`✅ ${count} documenti matchday_temp migrati`, 'success');
+          log(`? ${count} documenti matchday_temp migrati`, 'success');
           return count;
         } catch (error) {
-          log('ℹ️ Collection legacy "matchday_temp" non disponibile, salto.', 'warning');
+          log('?? Collection legacy "matchday_temp" non disponibile, salto.', 'warning');
           return 0;
         }
       });
@@ -620,26 +620,26 @@
     async function migrateResults(leagueId) {
       return withLegacyDb(async legacyDb => {
         try {
-          log(`📋 Inizio migrazione results per lega ${leagueId}...`, 'info');
-          log(`🔍 Leggo risultati legacy da: results/`, 'info');
+          log(`?? Inizio migrazione results per lega ${leagueId}...`, 'info');
+          log(`?? Leggo risultati legacy da: results/`, 'info');
           
           // Verifica che legacyDb funzioni
-          log(`🔧 Verifica legacyDb: ${legacyDb ? 'OK' : 'NULL'}`, 'info');
+          log(`?? Verifica legacyDb: ${legacyDb ? 'OK' : 'NULL'}`, 'info');
           if (!legacyDb || !legacyDb.collection) {
-            log('❌ legacyDb non valido!', 'error');
+            log('? legacyDb non valido!', 'error');
             return { giornate: 0, teamEntries: 0 };
           }
           
           // Prova prima a leggere la collezione results
-          log(`📖 Eseguo query: legacyDb.collection('results').get()...`, 'info');
+          log(`?? Eseguo query: legacyDb.collection('results').get()...`, 'info');
           const snapshot = await legacyDb.collection('results').get();
-          log(`📊 Risultato query: ${snapshot.size} documenti trovati`, 'info');
+          log(`?? Risultato query: ${snapshot.size} documenti trovati`, 'info');
           
           let giornateIds = [];
           
           if (snapshot.empty) {
-            log('⚠️ Query collection("results").get() ha restituito 0 documenti', 'warning');
-            log('⚠️ Provo a leggere direttamente G1, G2, G3...', 'warning');
+            log('?? Query collection("results").get() ha restituito 0 documenti', 'warning');
+            log('?? Provo a leggere direttamente G1, G2, G3...', 'warning');
             
             // Prova a leggere direttamente le giornate note (G1, G2, G3)
             const giornateToTry = ['G1', 'G2', 'G3'];
@@ -647,34 +647,34 @@
               try {
                 const testDoc = await legacyDb.collection('results').doc(giornataId).get();
                 if (testDoc.exists) {
-                  log(`✅ ${giornataId} ESISTE (documento)`, 'success');
+                  log(`? ${giornataId} ESISTE (documento)`, 'success');
                   giornateIds.push(giornataId);
                 } else {
                   // Anche se il documento non esiste, prova a vedere se ha subcollezioni
-                  log(`⚠️ ${giornataId} documento non esiste, verifico subcollezione teams/...`, 'warning');
+                  log(`?? ${giornataId} documento non esiste, verifico subcollezione teams/...`, 'warning');
                   const teamsSnap = await legacyDb.collection('results').doc(giornataId).collection('teams').limit(1).get();
                   if (!teamsSnap.empty) {
-                    log(`✅ ${giornataId} ha subcollezione teams/ con dati (${teamsSnap.size} documenti trovati nel test)`, 'success');
+                    log(`? ${giornataId} ha subcollezione teams/ con dati (${teamsSnap.size} documenti trovati nel test)`, 'success');
                     giornateIds.push(giornataId);
                   } else {
-                    log(`❌ ${giornataId} non ha dati`, 'warning');
+                    log(`? ${giornataId} non ha dati`, 'warning');
                   }
                 }
               } catch (testError) {
-                log(`❌ Errore test ${giornataId}: ${testError.message}`, 'error');
+                log(`? Errore test ${giornataId}: ${testError.message}`, 'error');
               }
             }
             
             if (giornateIds.length === 0) {
-              log('❌ Nessuna giornata trovata neanche con lettura diretta', 'error');
+              log('? Nessuna giornata trovata neanche con lettura diretta', 'error');
               return { giornate: 0, teamEntries: 0 };
             }
             
-            log(`✅ Trovate ${giornateIds.length} giornate da migrare: ${giornateIds.join(', ')}`, 'success');
+            log(`? Trovate ${giornateIds.length} giornate da migrare: ${giornateIds.join(', ')}`, 'success');
           } else {
             // Se la query ha funzionato, usa i documenti trovati
             giornateIds = snapshot.docs.map(doc => doc.id);
-            log(`✅ Trovate ${giornateIds.length} giornate dalla query: ${giornateIds.join(', ')}`, 'success');
+            log(`? Trovate ${giornateIds.length} giornate dalla query: ${giornateIds.join(', ')}`, 'success');
           }
 
           let giornataCount = 0;
@@ -682,16 +682,16 @@
 
           for (const giornataId of giornateIds) {
             try {
-              log(`📅 Migrazione ${giornataId}...`, 'info');
+              log(`?? Migrazione ${giornataId}...`, 'info');
               
               // Leggi il documento giornata (se esiste)
               const giornataDoc = await legacyDb.collection('results').doc(giornataId).get();
               let giornataData = {};
               if (giornataDoc.exists) {
                 giornataData = giornataDoc.data() || {};
-                log(`  📄 Letti dati giornata: ${Object.keys(giornataData).length} campi`, 'info');
+                log(`  ?? Letti dati giornata: ${Object.keys(giornataData).length} campi`, 'info');
               } else {
-                log(`  ⚠️ Documento ${giornataId} non esiste, creo solo con metadati`, 'warning');
+                log(`  ?? Documento ${giornataId} non esiste, creo solo con metadati`, 'warning');
                 giornataData = {
                   giornata: giornataId,
                   label: giornataId
@@ -700,7 +700,7 @@
               
               // Scrivi documento giornata
               const resultRef = targetDb.collection(`leagues/${leagueId}/results`).doc(giornataId);
-              log(`  📝 Scrivo in: leagues/${leagueId}/results/${giornataId}`, 'info');
+              log(`  ?? Scrivo in: leagues/${leagueId}/results/${giornataId}`, 'info');
               
               await resultRef.set({
                 ...giornataData,
@@ -708,52 +708,52 @@
                 migratedAt: firebase.firestore.Timestamp.now()
               }, { merge: true });
               giornataCount += 1;
-              log(`  ✅ Giornata ${giornataId} migrata`, 'success');
+              log(`  ? Giornata ${giornataId} migrata`, 'success');
 
               // Leggi risultati squadre dalla struttura legacy
-              log(`  🔍 Leggo risultati squadre da: results/${giornataId}/teams/`, 'info');
+              log(`  ?? Leggo risultati squadre da: results/${giornataId}/teams/`, 'info');
               let teamsSnap;
               try {
                 teamsSnap = await legacyDb.collection('results').doc(giornataId).collection('teams').get();
-                log(`  📊 Trovati ${teamsSnap.size} risultati squadre per ${giornataId}`, 'info');
+                log(`  ?? Trovati ${teamsSnap.size} risultati squadre per ${giornataId}`, 'info');
               } catch (readError) {
-                log(`  ⚠️ Errore lettura risultati squadre: ${readError.message}`, 'warning');
-                log(`  ⚠️ Continuo senza risultati squadre per questa giornata`, 'warning');
+                log(`  ?? Errore lettura risultati squadre: ${readError.message}`, 'warning');
+                log(`  ?? Continuo senza risultati squadre per questa giornata`, 'warning');
                 teamsSnap = { empty: true, docs: [] };
               }
               
               if (!teamsSnap.empty) {
                 for (const teamDoc of teamsSnap.docs) {
                   try {
-                    log(`    📝 Scrivo team ${teamDoc.id} in: leagues/${leagueId}/results/${giornataId}/teams/${teamDoc.id}`, 'info');
+                    log(`    ?? Scrivo team ${teamDoc.id} in: leagues/${leagueId}/results/${giornataId}/teams/${teamDoc.id}`, 'info');
                     await resultRef.collection('teams').doc(teamDoc.id).set({
                       ...(teamDoc.data() || {}),
                       leagueId,
                       migratedAt: firebase.firestore.Timestamp.now()
                     }, { merge: true });
                     teamEntries += 1;
-                    log(`    ✅ Team ${teamDoc.id} migrato`, 'success');
+                    log(`    ? Team ${teamDoc.id} migrato`, 'success');
                   } catch (teamError) {
-                    log(`    ❌ Errore migrazione team ${teamDoc.id} in ${giornataId}: ${teamError.message}`, 'error');
+                    log(`    ? Errore migrazione team ${teamDoc.id} in ${giornataId}: ${teamError.message}`, 'error');
                     console.error('Team result migration error:', teamError);
                     console.error('Team doc data:', teamDoc.data());
                   }
                 }
               } else {
-                log(`  ⚠️ Nessun risultato squadra trovato per ${giornataId}`, 'warning');
+                log(`  ?? Nessun risultato squadra trovato per ${giornataId}`, 'warning');
               }
             } catch (giornataError) {
-              log(`  ❌ Errore migrazione giornata ${giornataId}: ${giornataError.message}`, 'error');
+              log(`  ? Errore migrazione giornata ${giornataId}: ${giornataError.message}`, 'error');
               console.error('Giornata migration error:', giornataError);
               // Continua con le altre giornate
             }
           }
 
-          log(`✅ ${giornataCount} giornate di risultati migrate (${teamEntries} record squadra)`, 'success');
+          log(`? ${giornataCount} giornate di risultati migrate (${teamEntries} record squadra)`, 'success');
           return { giornate: giornataCount, teamEntries };
         } catch (error) {
-          log(`❌ ERRORE migrazione results: ${error.message}`, 'error');
-          log(`❌ Stack trace: ${error.stack}`, 'error');
+          log(`? ERRORE migrazione results: ${error.message}`, 'error');
+          log(`? Stack trace: ${error.stack}`, 'error');
           console.error('Results migration error:', error);
           return { giornate: 0, teamEntries: 0 };
         }
@@ -761,50 +761,50 @@
     }
 
     async function migrateOnlyResults() {
-      log('🚀 Migrazione SOLO Results...', 'warning');
+      log('?? Migrazione SOLO Results...', 'warning');
       
       if (!currentUser) {
-        log('❌ Non autenticato!', 'error');
+        log('? Non autenticato!', 'error');
         return;
       }
 
       try {
         const leagueId = await createDefaultLeague();
         if (!leagueId) {
-          log('❌ ID lega non disponibile. Interrompo.', 'error');
+          log('? ID lega non disponibile. Interrompo.', 'error');
           return;
         }
 
         const resultsResult = await migrateResults(leagueId);
         
-        log('🎊 Migrazione Results completata!', 'success');
-        log(`📊 Risultati: ${resultsResult.giornate} giornate, ${resultsResult.teamEntries} record squadra`, 'info');
+        log('?? Migrazione Results completata!', 'success');
+        log(`?? Risultati: ${resultsResult.giornate} giornate, ${resultsResult.teamEntries} record squadra`, 'info');
         
       } catch (error) {
-        log(`❌ ERRORE: ${error.message}`, 'error');
+        log(`? ERRORE: ${error.message}`, 'error');
         console.error('Migration error:', error);
       }
     }
 
     async function checkResultsStatus() {
-      log('🔍 Verifica Stato Results...', 'info');
+      log('?? Verifica Stato Results...', 'info');
       
       if (!currentUser) {
-        log('❌ Devi essere autenticato per verificare lo stato', 'error');
+        log('? Devi essere autenticato per verificare lo stato', 'error');
         return;
       }
 
       try {
         const leagueId = await createDefaultLeague();
         if (!leagueId) {
-          log('❌ ID lega non disponibile', 'error');
+          log('? ID lega non disponibile', 'error');
           return;
         }
 
         const rawDb = getRawDb();
         
         // 1. Verifica legacy results (top-level)
-        log('📋 1. Verifica legacy results/ (top-level)...', 'info');
+        log('?? 1. Verifica legacy results/ (top-level)...', 'info');
         await withLegacyDb(async legacyDb => {
           try {
             const legacyResults = await legacyDb.collection('results').get();
@@ -815,21 +815,21 @@
                 // Verifica subcollezione teams
                 try {
                   const teamsSnap = await legacyDb.collection('results').doc(doc.id).collection('teams').get();
-                  log(`     → teams/: ${teamsSnap.size} documenti`, teamsSnap.size > 0 ? 'success' : 'warning');
+                  log(`     ? teams/: ${teamsSnap.size} documenti`, teamsSnap.size > 0 ? 'success' : 'warning');
                 } catch (teamsError) {
-                  log(`     → teams/: ERRORE - ${teamsError.message}`, 'error');
+                  log(`     ? teams/: ERRORE - ${teamsError.message}`, 'error');
                 }
               }
             } else {
-              log('   ⚠️ Nessun risultato legacy trovato', 'warning');
+              log('   ?? Nessun risultato legacy trovato', 'warning');
             }
           } catch (legacyError) {
-            log(`   ❌ Errore lettura legacy results: ${legacyError.message}`, 'error');
+            log(`   ? Errore lettura legacy results: ${legacyError.message}`, 'error');
           }
         });
         
         // 2. Verifica multileague results
-        log(`📋 2. Verifica multileague leagues/${leagueId}/results/...`, 'info');
+        log(`?? 2. Verifica multileague leagues/${leagueId}/results/...`, 'info');
         try {
           const multiResults = await rawDb.collection(`leagues/${leagueId}/results`).get();
           log(`   Multileague results: ${multiResults.size} documenti trovati`, multiResults.size > 0 ? 'success' : 'warning');
@@ -839,36 +839,36 @@
               // Verifica subcollezione teams
               try {
                 const teamsSnap = await doc.ref.collection('teams').get();
-                log(`     → teams/: ${teamsSnap.size} documenti`, teamsSnap.size > 0 ? 'success' : 'warning');
+                log(`     ? teams/: ${teamsSnap.size} documenti`, teamsSnap.size > 0 ? 'success' : 'warning');
               } catch (teamsError) {
-                log(`     → teams/: ERRORE - ${teamsError.message}`, 'error');
+                log(`     ? teams/: ERRORE - ${teamsError.message}`, 'error');
               }
             }
           } else {
-            log('   ⚠️ Nessun risultato multileague trovato', 'warning');
+            log('   ?? Nessun risultato multileague trovato', 'warning');
           }
         } catch (multiError) {
-          log(`   ❌ Errore lettura multileague results: ${multiError.message}`, 'error');
+          log(`   ? Errore lettura multileague results: ${multiError.message}`, 'error');
         }
         
         // 3. Verifica days multileague
-        log(`📋 3. Verifica days leagues/${leagueId}/days/...`, 'info');
+        log(`?? 3. Verifica days leagues/${leagueId}/days/...`, 'info');
         try {
           const daysSnap = await rawDb.collection(`leagues/${leagueId}/days`).get();
           log(`   Days: ${daysSnap.size} documenti trovati`, daysSnap.size > 0 ? 'success' : 'warning');
           if (daysSnap.size > 0) {
             for (const doc of daysSnap.docs) {
               const data = doc.data();
-              const computed = data.computed ? '✅ computed:true' : '❌ computed:false/missing';
+              const computed = data.computed ? '? computed:true' : '? computed:false/missing';
               log(`   - ${doc.id}: ${computed}`, 'info');
             }
           }
         } catch (daysError) {
-          log(`   ❌ Errore lettura days: ${daysError.message}`, 'error');
+          log(`   ? Errore lettura days: ${daysError.message}`, 'error');
         }
         
         // 4. Verifica legacy days (top-level)
-        log('📋 4. Verifica legacy days/ (top-level)...', 'info');
+        log('?? 4. Verifica legacy days/ (top-level)...', 'info');
         await withLegacyDb(async legacyDb => {
           try {
             const legacyDays = await legacyDb.collection('days').get();
@@ -879,13 +879,13 @@
               }
             }
           } catch (legacyDaysError) {
-            log(`   ❌ Errore lettura legacy days: ${legacyDaysError.message}`, 'error');
+            log(`   ? Errore lettura legacy days: ${legacyDaysError.message}`, 'error');
           }
         });
         
-        log('✅ Verifica completata', 'success');
+        log('? Verifica completata', 'success');
       } catch (error) {
-        log(`❌ ERRORE verifica: ${error.message}`, 'error');
+        log(`? ERRORE verifica: ${error.message}`, 'error');
         console.error('Check results error:', error);
       }
     }
@@ -898,9 +898,9 @@
             lastMigrationAt: firebase.firestore.Timestamp.now()
           }
         }, { merge: true });
-        log('✅ Statistiche lega aggiornate', 'success');
+        log('? Statistiche lega aggiornate', 'success');
       } catch (error) {
-        log(`⚠️ Errore aggiornando le statistiche lega: ${error.message}`, 'warning');
+        log(`?? Errore aggiornando le statistiche lega: ${error.message}`, 'warning');
       }
     }
 
@@ -915,19 +915,19 @@
           members: firebase.firestore.FieldValue.arrayUnion(...cleanIds),
           'stats.activeMembers': firebase.firestore.FieldValue.increment(cleanIds.length)
         });
-        log(`✅ Aggiunti ${cleanIds.length} membri derivati dalle squadre`, 'success');
+        log(`? Aggiunti ${cleanIds.length} membri derivati dalle squadre`, 'success');
       } catch (error) {
-        log(`⚠️ Impossibile aggiornare i membri della lega: ${error.message}`, 'warning');
+        log(`?? Impossibile aggiornare i membri della lega: ${error.message}`, 'warning');
       }
     }
 
     async function migrateAllData() {
-      log('🚀 INIZIO MIGRAZIONE COMPLETA...', 'warning');
+      log('?? INIZIO MIGRAZIONE COMPLETA...', 'warning');
 
       try {
         const leagueId = await createDefaultLeague();
         if (!leagueId) {
-          log('❌ ID lega non disponibile. Interrompo.', 'error');
+          log('? ID lega non disponibile. Interrompo.', 'error');
           return;
         }
 
@@ -954,15 +954,15 @@
 
         await addTeamOwnersAsMembers(leagueId, teamsResult.owners);
         
-        log('🎊 MIGRAZIONE COMPLETATA CON SUCCESSO!', 'success');
-        log('✅ Puoi ora ricaricare l\'app.', 'success');
+        log('?? MIGRAZIONE COMPLETATA CON SUCCESSO!', 'success');
+        log('? Puoi ora ricaricare l\'app.', 'success');
         
         setTimeout(() => {
-          log('🔄 Ricarico pagina...', 'warning');
+          log('?? Ricarico pagina...', 'warning');
           setTimeout(() => location.href = 'index.html', 1000);
         }, 3000);
       } catch (error) {
-        log(`❌ ERRORE MIGRAZIONE: ${error.message}`, 'error');
+        log(`? ERRORE MIGRAZIONE: ${error.message}`, 'error');
         console.error('Migration error:', error);
       }
     }

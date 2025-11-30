@@ -616,8 +616,10 @@
     }
 
     function clearInlineDetail() {
-      if (inlineDetail && inlineDetail.parentNode) {
-        inlineDetail.parentNode.remove();
+      if (inlineDetail && typeof inlineDetail.remove === 'function') {
+        inlineDetail.remove();
+      } else if (inlineDetail && inlineDetail.parentNode) {
+        inlineDetail.parentNode.removeChild(inlineDetail);
       }
       inlineDetail = null;
     }
@@ -718,6 +720,14 @@
     async function statsBoot() {
       setStatsLoading();
       try {
+        // Attendi che la lega sia disponibile con timeout uniforme di 10 secondi
+        const leagueId = await ensureLeagueReady(10000);
+        if (!leagueId) {
+          notifyMissingLeague('visualizzare le statistiche');
+          return;
+        }
+        const isLegacyMode = !leagueId || window.__LEAGUE_PERMISSION_DENIED__;
+
         const rulesSource = window.loadRulesJSON
           ? await window.loadRulesJSON()
           : await (await fetch('resources/rules.json')).json();
@@ -731,10 +741,27 @@
         statsState.players = (await playersRes.json()).players || [];
         const baseCoaches = (await baseCoachesRes.json()).coaches || [];
 
+        // Carica dati esclusivamente dalla lega corrente (senza fallback legacy)
+        const teamsCol = isLegacyMode 
+          ? window.db.collection('teams')
+          : window.db.collection(`leagues/${leagueId}/teams`);
+        const coachesCol = isLegacyMode
+          ? window.db.collection('coaches')
+          : window.db.collection(`leagues/${leagueId}/coaches`);
+        const daysCol = isLegacyMode
+          ? window.db.collection('days')
+          : window.db.collection(`leagues/${leagueId}/days`);
+
         const [teamsSnap, firestoreCoachesSnap, daysSnap] = await Promise.all([
-          window.db.collection('teams').get(),
-          window.db.collection('coaches').get().catch(() => null),
-          window.db.collection('days').get()
+          teamsCol.get().catch(err => {
+            console.warn('[statistiche] Errore caricamento teams:', err);
+            return { docs: [], empty: true };
+          }),
+          coachesCol.get().catch(() => ({ docs: [], empty: true })),
+          daysCol.get().catch(err => {
+            console.warn('[statistiche] Errore caricamento days:', err);
+            return { docs: [], empty: true };
+          })
         ]);
 
         statsState.playerRules = normalizeStatRules(rules, 'Giocatore', STAT_REPEATABLE_PLAYERS);
@@ -772,9 +799,17 @@
         statsState.curvaCounts.clear();
         statsState.teamStats.clear();
 
-        const dayDocs = daysSnap.docs;
+        const dayDocs = daysSnap.docs || [];
+        if (dayDocs.length === 0) {
+          playersGrid.innerHTML = '<div class="muted">⚠️ Nessuna giornata trovata per questa lega. Verifica che la lega sia stata popolata.</div>';
+          coachesGrid.innerHTML = '';
+          curvaGrid.innerHTML = '';
+          teamsGrid.innerHTML = '';
+          return;
+        }
+
         await Promise.all(dayDocs.map(doc => aggregateDayStats(doc)));
-        await Promise.all(dayDocs.map(doc => aggregateTeamStats(doc.id)));
+        await Promise.all(dayDocs.map(doc => aggregateTeamStats(doc.id, leagueId, isLegacyMode)));
 
         renderPlayers();
         renderCoaches();
@@ -782,8 +817,11 @@
         renderTeams();
         bindStatsFilters();
       } catch (error) {
-        console.error('Errore caricamento statistiche:', error);
-        playersGrid.innerHTML = `<div class="muted">Errore caricamento: ${escapeHtml(error.message)}</div>`;
+        console.error('[statistiche] Errore caricamento statistiche:', error);
+        const errorMsg = error?.code === 'permission-denied'
+          ? '⚠️ Accesso negato: verifica i permessi della lega.'
+          : `⚠️ Errore caricamento: ${escapeHtml(error.message || String(error))}`;
+        playersGrid.innerHTML = `<div class="muted">${errorMsg}</div>`;
         coachesGrid.innerHTML = '';
         curvaGrid.innerHTML = '';
         teamsGrid.innerHTML = '';
@@ -861,9 +899,18 @@
       });
     }
 
-    async function aggregateTeamStats(giornataId) {
+    async function aggregateTeamStats(giornataId, leagueId, isLegacyMode) {
       try {
-        const snap = await window.db.collection('results').doc(giornataId).collection('teams').get();
+        const resultsCol = isLegacyMode
+          ? window.db.collection('results').doc(giornataId).collection('teams')
+          : window.db.collection(`leagues/${leagueId}/results`).doc(giornataId).collection('teams');
+        
+        const snap = await resultsCol.get();
+        if (snap.empty) {
+          console.warn('[statistiche] Nessun risultato per giornata', giornataId);
+          return;
+        }
+
         snap.forEach(doc => {
           const data = doc.data() || {};
           const breakdown = data.breakdown || {};
@@ -894,7 +941,7 @@
           statsState.teamStats.set(teamId, entry);
         });
       } catch (error) {
-        console.warn('aggregateTeamStats', giornataId, error);
+        console.warn('[statistiche] aggregateTeamStats', giornataId, error);
       }
     }
 
@@ -1258,9 +1305,9 @@
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/lazy-load.js?v=20251020"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>
 </body>

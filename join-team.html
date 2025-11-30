@@ -57,7 +57,7 @@
     <div id="result" style="margin-top: 20px;"></div>
   </div>
 
-  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -77,6 +77,7 @@
     // Check URL params
     const urlParams = new URLSearchParams(window.location.search);
     const codeFromURL = urlParams.get('code');
+    const leagueIdFromURL = urlParams.get('leagueId');
     
     if (codeFromURL) {
       document.getElementById('codeInput').value = codeFromURL;
@@ -96,13 +97,18 @@
       if (!user) {
         // Redirect to auth with return URL
         localStorage.setItem('join_team_code', code);
+        if (leagueIdFromURL) {
+          localStorage.setItem('join_team_league', leagueIdFromURL);
+        }
         location.href = 'auth.html?return=join-team';
         return;
       }
       
       resultDiv.innerHTML = '<div>⏳ Verifica in corso...</div>';
       
-      const result = await TeamInviteSystem.useTeamInvite(code, user.uid);
+      const storedLeagueHint = localStorage.getItem('join_team_league');
+      const leagueHint = leagueIdFromURL || storedLeagueHint || null;
+      const result = await TeamInviteSystem.useTeamInvite(code, user.uid, leagueHint);
       
       if (result.success) {
         resultDiv.innerHTML = `
@@ -115,6 +121,8 @@
         
         // Save league ID and redirect
         localStorage.setItem('last_league_id', result.leagueId);
+        localStorage.removeItem('join_team_code');
+        localStorage.removeItem('join_team_league');
         setTimeout(() => {
           location.href = 'index.html';
         }, 3000);
@@ -131,8 +139,13 @@
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         const savedCode = localStorage.getItem('join_team_code');
+        const savedLeague = localStorage.getItem('join_team_league');
         if (savedCode) {
           localStorage.removeItem('join_team_code');
+          if (savedLeague && !leagueIdFromURL) {
+            // Mantieni league salvata finché non completiamo il join
+            localStorage.setItem('join_team_league', savedLeague);
+          }
           document.getElementById('codeInput').value = savedCode;
           joinTeam();
         }

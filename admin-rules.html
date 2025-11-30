@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=2025110701"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin • Regole Bonus/Malus</title>
@@ -66,20 +66,32 @@
     :root.dark .status-badge { opacity: 0.9; }
   </style>
 </head>
-<body data-disable-auto-header="true">
+<body>
+
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>📋 Regole Bonus/Malus</h1>
+  </header>
 
   <main class="container">
-    <h1 style="margin: 0 0 20px; font-size: 26px; font-weight: 800; display:flex; align-items:center; gap:10px;">
-      <span>📋</span> Gestione Regole Bonus/Malus
-    </h1>
     <section class="card">
       <h2>Aggiungi Regola</h2>
       <p style="color:var(--muted);font-size:14px;">Il codice verrà generato automaticamente (R001, R002, ...)</p>
       <div class="row">
         <input id="ruleDesc" class="input" placeholder="Testo (es. Gol segnato)" style="flex:1;" />
         <input id="ruleValue" class="input" type="number" step="0.5" placeholder="Valore" style="width:120px;" />
+        <select id="ruleInputType" class="input" style="width:200px;">
+          <option value="auto">🔄 Tipo automatico</option>
+          <option value="toggle">✓ Toggle (on/off)</option>
+          <option value="counter">🔢 Moltiplicatore</option>
+        </select>
         <button class="btn" id="addRuleBtn" style="white-space:nowrap;">➕ Aggiungi</button>
       </div>
+      <p style="margin-top:10px;font-size:13px;color:var(--muted);">
+        💡 <strong>Toggle</strong> applica la regola una sola volta. <strong>Moltiplicatore</strong> consente di conteggiare quante volte la regola si verifica (es. cori ripetuti).
+      </p>
     </section>
 
     <section class="card">
@@ -109,6 +121,7 @@
             <th>Descrizione Regola</th>
             <th style="width:100px;">Valore</th>
             <th style="width:140px;">Soggetto</th>
+            <th style="width:150px;">Tipo Input</th>
             <th style="width:120px;">Stato</th>
             <th style="width:140px;">Visibilità</th>
             <th style="width:160px;">Azioni</th>
@@ -120,16 +133,28 @@
   </main>
 
   <!-- EDIT MODAL -->
-  <div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;">
+  <div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10000;align-items:center;justify-content:center;">
     <div style="background:var(--card);border-radius:16px;padding:30px;max-width:500px;width:90%;">
       <h3 style="margin-bottom:20px;">✏️ Modifica Regola</h3>
       <div style="margin-bottom:15px;">
         <label style="display:block;margin-bottom:5px;font-weight:600;">Descrizione</label>
         <input id="editDesc" class="input" style="width:100%;" />
       </div>
-      <div style="margin-bottom:20px;">
+      <div style="margin-bottom:15px;">
         <label style="display:block;margin-bottom:5px;font-weight:600;">Valore</label>
         <input id="editVal" class="input" type="number" step="0.5" style="width:100%;" />
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;margin-bottom:5px;font-weight:600;">Tipo Input</label>
+        <select id="editInputType" class="input" style="width:100%;">
+          <option value="auto">Auto (inferito automaticamente)</option>
+          <option value="toggle">Toggle (on/off)</option>
+          <option value="counter">Moltiplicatore (contatore)</option>
+        </select>
+        <p style="font-size:12px;color:var(--muted);margin-top:5px;">
+          💡 <strong>Toggle</strong>: attiva/disattiva (es. "Gol segnato").<br>
+          <strong>Moltiplicatore</strong>: conta quante volte applicare (es. "Marchino cori").
+        </p>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn" onclick="closeEditModal()" style="background:#6c757d;">❌ Annulla</button>
@@ -138,19 +163,33 @@
     </div>
   </div>
 
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
+  <script src="resources/firebase-cdn-loader.js?v=2025110701"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script>
+    if (!window.firebase) {
+      document.write('<script src="resources/firebase-app-compat.js?v=2025110701"><\\/script>');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script>
+    if (!(window.firebase && firebase.auth)) {
+      document.write('<script src="resources/firebase-auth-compat.js?v=2025110701"><\\/script>');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+    if (!(window.firebase && firebase.firestore)) {
+      document.write('<script src="resources/firebase-firestore-compat.js?v=2025110701"><\\/script>');
+    }
+  </script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script>
-    // Init Firebase SUBITO
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
     const db = firebase.firestore();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=2025110701"></script>
   <script>
 
     firebase.auth().onAuthStateChanged(async (user)=>{
@@ -163,6 +202,7 @@
     let rulesData = [];
     let pendingSyncReason = null;
     let syncTimer = null;
+    let initialSyncPerformed = false;
     const SYNC_DELAY = 800;
     const REPEATABLE_PLAYERS = new Set(['R040','R041','R042','R072','R075','R089','R097','R044','R045','R056','R057','R058','R061','R070','R063','R073','R092']);
     const REPEATABLE_COACH = new Set(['R020','R036']);
@@ -172,6 +212,7 @@
       document.getElementById('addRuleBtn').onclick = async ()=>{
         const descrizione = document.getElementById('ruleDesc').value.trim();
         const valore = parseFloat(document.getElementById('ruleValue').value||0);
+        const inputType = (document.getElementById('ruleInputType')?.value || 'auto');
         if (!descrizione) return showToast('Descrizione obbligatoria!', 'error');
         
         try {
@@ -186,7 +227,7 @@
         const rule_id = `R${String(nextNum).padStart(3, '0')}`;
         
         const maxOrder = rulesData.length ? Math.max(...rulesData.map(r=>r.ordine||0)) : 0;
-        await db.collection('rules').add({ 
+        const payload = {
           rule_id, 
           nome_bonus: descrizione,
           descrizione, 
@@ -195,9 +236,19 @@
           visible: true,
           ordine: maxOrder+1, 
           createdAt: Date.now() 
-        });
+        };
+
+        if (inputType && inputType !== 'auto') {
+          payload.input_type = inputType;
+          payload.input = inputType;
+        }
+
+        await db.collection('rules').add(payload);
         document.getElementById('ruleDesc').value='';
         document.getElementById('ruleValue').value='';
+        if (document.getElementById('ruleInputType')) {
+          document.getElementById('ruleInputType').value = 'auto';
+        }
         showToast('Regola aggiunta!', 'success');
           requestRulesSync('create');
         } catch (error) {
@@ -213,6 +264,10 @@
         if (pendingSyncReason) {
           scheduleRulesSync(pendingSyncReason);
           pendingSyncReason = null;
+        }
+        if (!initialSyncPerformed && rulesData.length) {
+          scheduleRulesSync('initial');
+          initialSyncPerformed = true;
         }
       });
       
@@ -235,7 +290,7 @@
       const tb = document.querySelector('#rulesTable tbody');
       
       if (filtered.length === 0) {
-        tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted);">
+        tb.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted);">
           📋 Nessuna regola in database. Aggiungine una sopra! Il codice verrà generato automaticamente.
         </td></tr>`;
         return;
@@ -245,6 +300,8 @@
         const visible = r.visible !== false;
         const active = r.attivo !== false;
         const soggetto = r.soggetto || 'Giocatore';
+        const inputType = r.input_type || r.input || 'auto';
+        const inputTypeLabel = inputType === 'counter' ? '🔢 Moltiplicatore' : inputType === 'toggle' ? '✓ Toggle' : '🔄 Auto';
         return `<tr style="${!visible ? 'opacity:0.6;' : ''}">
           <td style="font-family:monospace;font-size:14px;font-weight:600;color:var(--primary);">${r.rule_id || '—'}</td>
           <td style="color:var(--text);min-width:200px;">${r.nome_bonus || r.descrizione || '—'}</td>
@@ -255,6 +312,14 @@
               <option value="Allenatore" ${soggetto==='Allenatore'?'selected':''}>👔 Allenatore</option>
               <option value="Curva" ${soggetto==='Curva'?'selected':''}>📣 Curva</option>
             </select>
+          </td>
+          <td style="text-align:center;">
+            <select onchange="updateRule('${r.id}','input_type',this.value)" style="padding:8px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;">
+              <option value="auto" ${inputType==='auto'?'selected':''}>🔄 Auto</option>
+              <option value="toggle" ${inputType==='toggle'?'selected':''}>✓ Toggle</option>
+              <option value="counter" ${inputType==='counter'?'selected':''}>🔢 Moltiplicatore</option>
+            </select>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">${inputTypeLabel}</div>
           </td>
           <td style="text-align:center;">
             <span class="status-badge ${active ? 'status-active' : 'status-inactive'}">
@@ -286,7 +351,23 @@
     }
 
     async function updateRule(id, field, val){ 
-      await db.collection('rules').doc(id).update({[field]: val});
+      const updateData = {};
+      
+      if (field === 'input_type') {
+        if (val === 'auto') {
+          // Rimuovi i campi manuali per permettere inferenza automatica
+          updateData.input_type = firebase.firestore.FieldValue.delete();
+          updateData.input = firebase.firestore.FieldValue.delete();
+        } else {
+          // Salva il tipo manuale
+          updateData.input_type = val;
+          updateData.input = val; // Mantieni anche 'input' per retrocompatibilità
+        }
+      } else {
+        updateData[field] = val;
+      }
+      
+      await db.collection('rules').doc(id).update(updateData);
       showToast('Regola aggiornata!', 'success');
       requestRulesSync('update');
     }
@@ -319,6 +400,8 @@
       editingRuleId = id;
       document.getElementById('editDesc').value = rule.nome_bonus || rule.descrizione || '';
       document.getElementById('editVal').value = rule.valore || 0;
+      const inputType = rule.input_type || rule.input || 'auto';
+      document.getElementById('editInputType').value = inputType;
       document.getElementById('editModal').style.display = 'flex';
     }
     
@@ -332,17 +415,30 @@
       
       const desc = document.getElementById('editDesc').value.trim();
       const val = parseFloat(document.getElementById('editVal').value || 0);
+      const inputType = document.getElementById('editInputType').value;
       
       if (!desc) {
         showToast('Descrizione obbligatoria!', 'error');
         return;
       }
       
-      await db.collection('rules').doc(editingRuleId).update({
+      const updateData = {
         nome_bonus: desc,
         descrizione: desc,
         valore: val
-      });
+      };
+      
+      // Salva input_type solo se diverso da 'auto' (per retrocompatibilità)
+      if (inputType !== 'auto') {
+        updateData.input_type = inputType;
+        updateData.input = inputType; // Mantieni anche 'input' per retrocompatibilità
+      } else {
+        // Se 'auto', rimuovi i campi manuali per permettere inferenza
+        updateData.input_type = firebase.firestore.FieldValue.delete();
+        updateData.input = firebase.firestore.FieldValue.delete();
+      }
+      
+      await db.collection('rules').doc(editingRuleId).update(updateData);
       
       showToast('Regola aggiornata!', 'success');
       closeEditModal();
@@ -363,7 +459,11 @@
     }
 
     function inferInput(rule) {
-      if (rule.input) return rule.input;
+      // Se è stato impostato manualmente, usa quello
+      if (rule.input_type && rule.input_type !== 'auto') return rule.input_type;
+      if (rule.input && rule.input !== 'auto') return rule.input;
+      
+      // Altrimenti inferisci automaticamente
       const id = rule.rule_id || '';
       const soggetto = rule.soggetto || 'Giocatore';
       const note = String(rule.note || '').toLowerCase();
@@ -380,7 +480,8 @@
         return;
       }
       try {
-        const payload = rulesData.map(rule => ({
+        const source = dedupeRulesForCache(rulesData);
+        const payload = source.map(rule => ({
           rule_id: rule.rule_id,
           nome_bonus: rule.nome_bonus || rule.descrizione || '',
           descrizione: rule.descrizione || rule.nome_bonus || '',
@@ -390,6 +491,7 @@
           visible: rule.visible !== false,
           ordine: rule.ordine || 0,
           input: inferInput(rule),
+          input_type: rule.input_type || (rule.input && rule.input !== 'auto' ? rule.input : null),
           note: rule.note || ''
         })).sort((a, b) => (a.ordine || 0) - (b.ordine || 0) || (a.rule_id || '').localeCompare(b.rule_id || ''));
 
@@ -409,6 +511,29 @@
 
     async function manualSyncRules() {
       await syncRulesCache('manual');
+    }
+    
+    function dedupeRulesForCache(list){
+      const map = new Map();
+      const extras = [];
+      (list||[]).forEach(rule => {
+        const key = ((rule?.rule_id || rule?.id || '') + '').trim();
+        if (!key) {
+          extras.push(rule);
+          return;
+        }
+        if (!map.has(key)) {
+          map.set(key, rule);
+          return;
+        }
+        const current = map.get(key);
+        const nextUpdated = typeof rule?.updatedAt === 'number' ? rule.updatedAt : (rule?.updatedAt?.toMillis?.() ?? 0);
+        const currentUpdated = typeof current?.updatedAt === 'number' ? current.updatedAt : (current?.updatedAt?.toMillis?.() ?? 0);
+        if (nextUpdated > currentUpdated) {
+          map.set(key, rule);
+        }
+      });
+      return [...map.values(), ...extras];
     }
     
     function showToast(message, type = 'success') {
@@ -445,13 +570,12 @@
       showToast('Export completato!', 'success');
     }
   </script>
-    <script src="resources/mobile-detect.js?v=2025101801"></script>
+  <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
+  <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
-  <script src="resources/admin-navbar.js?v=2025102001"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
 </body>
 </html>

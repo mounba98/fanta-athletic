@@ -1,0 +1,281 @@
+{
+  "competitionId": "argentina-primera-2025",
+  "sportType": "football",
+  "season": "2025",
+  "label": "Argentina Primera División 2025",
+  "metadata": {
+    "region": "Argentina",
+    "organizer": "AFA",
+    "format": "league",
+    "notes": "Dataset dimostrativo per pipeline multi-sport"
+  },
+  "teams": [
+    {
+      "teamId": "arg_bo_boca",
+      "name": "Boca Juniors",
+      "shortName": "BOC",
+      "city": "Buenos Aires",
+      "stadium": "La Bombonera",
+      "primaryColor": "#0C1A38",
+      "secondaryColor": "#F5C518",
+      "coach": "Martín Palermo",
+      "logo": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='120' height='120' rx='18' fill='%230C1A38'/%3E%3Ctext x='50%25' y='55%25' font-size='46' fill='%23F5C518' font-family='Arial' font-weight='700' text-anchor='middle'%3EBOC%3C/text%3E%3C/svg%3E"
+    },
+    {
+      "teamId": "arg_ri_river",
+      "name": "River Plate",
+      "shortName": "RIV",
+      "city": "Buenos Aires",
+      "stadium": "Monumental",
+      "primaryColor": "#C8102E",
+      "secondaryColor": "#FFFFFF",
+      "coach": "Enzo Gallardo",
+      "logo": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='120' height='120' rx='18' fill='%23FFFFFF' stroke='%23C8102E' stroke-width='6'/%3E%3Ctext x='50%25' y='55%25' font-size='46' fill='%23C8102E' font-family='Arial' font-weight='700' text-anchor='middle'%3ERIV%3C/text%3E%3C/svg%3E"
+    },
+    {
+      "teamId": "arg_ra_racing",
+      "name": "Racing Club",
+      "shortName": "RAC",
+      "city": "Avellaneda",
+      "stadium": "Cilindro de Avellaneda",
+      "primaryColor": "#00ADEF",
+      "secondaryColor": "#FFFFFF",
+      "coach": "Fernando Gago",
+      "logo": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='120' height='120' rx='18' fill='%2300ADEF'/%3E%3Ctext x='50%25' y='55%25' font-size='44' fill='%23FFFFFF' font-family='Arial' font-weight='700' text-anchor='middle'%3ERAC%3C/text%3E%3C/svg%3E"
+    },
+    {
+      "teamId": "arg_in_independiente",
+      "name": "Independiente",
+      "shortName": "IND",
+      "city": "Avellaneda",
+      "stadium": "Libertadores de América",
+      "primaryColor": "#D50032",
+      "secondaryColor": "#FFFFFF",
+      "coach": "Carlos Tévez",
+      "logo": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='120' height='120' rx='18' fill='%23D50032'/%3E%3Ctext x='50%25' y='55%25' font-size='44' fill='%23FFFFFF' font-family='Arial' font-weight='700' text-anchor='middle'%3EIND%3C/text%3E%3C/svg%3E"
+    }
+  ],
+  "players": [
+    {
+      "player_id": "ARG_BO_P01",
+      "role": "Portiere",
+      "roleCode": "P",
+      "nome_completo": "Santiago Torres",
+      "teamId": "arg_bo_boca",
+      "teamName": "Boca Juniors",
+      "shirtNumber": 1,
+      "marketValue": 18,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_BO_D02",
+      "role": "Difensore",
+      "roleCode": "D",
+      "nome_completo": "Agustín Barrios",
+      "teamId": "arg_bo_boca",
+      "teamName": "Boca Juniors",
+      "shirtNumber": 4,
+      "marketValue": 20,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_BO_C03",
+      "role": "Centrocampista",
+      "roleCode": "C",
+      "nome_completo": "Lucas Benavídez",
+      "teamId": "arg_bo_boca",
+      "teamName": "Boca Juniors",
+      "shirtNumber": 8,
+      "marketValue": 24,
+      "nationality": "Uruguay"
+    },
+    {
+      "player_id": "ARG_BO_A04",
+      "role": "Attaccante",
+      "roleCode": "A",
+      "nome_completo": "Matías Corvalán",
+      "teamId": "arg_bo_boca",
+      "teamName": "Boca Juniors",
+      "shirtNumber": 9,
+      "marketValue": 28,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_BO_A05",
+      "role": "Attaccante",
+      "roleCode": "A",
+      "nome_completo": "Julián Herrera",
+      "teamId": "arg_bo_boca",
+      "teamName": "Boca Juniors",
+      "shirtNumber": 11,
+      "marketValue": 22,
+      "nationality": "Chile"
+    },
+    {
+      "player_id": "ARG_RI_P01",
+      "role": "Portiere",
+      "roleCode": "P",
+      "nome_completo": "Franco Martínez",
+      "teamId": "arg_ri_river",
+      "teamName": "River Plate",
+      "shirtNumber": 1,
+      "marketValue": 19,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_RI_D02",
+      "role": "Difensore",
+      "roleCode": "D",
+      "nome_completo": "Tomás Villagra",
+      "teamId": "arg_ri_river",
+      "teamName": "River Plate",
+      "shirtNumber": 3,
+      "marketValue": 23,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_RI_C03",
+      "role": "Centrocampista",
+      "roleCode": "C",
+      "nome_completo": "Ignacio Luján",
+      "teamId": "arg_ri_river",
+      "teamName": "River Plate",
+      "shirtNumber": 5,
+      "marketValue": 27,
+      "nationality": "Paraguay"
+    },
+    {
+      "player_id": "ARG_RI_C04",
+      "role": "Centrocampista",
+      "roleCode": "C",
+      "nome_completo": "Facundo Pereyra",
+      "teamId": "arg_ri_river",
+      "teamName": "River Plate",
+      "shirtNumber": 10,
+      "marketValue": 32,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_RI_A05",
+      "role": "Attaccante",
+      "roleCode": "A",
+      "nome_completo": "Emanuel Ríos",
+      "teamId": "arg_ri_river",
+      "teamName": "River Plate",
+      "shirtNumber": 9,
+      "marketValue": 30,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_RA_P01",
+      "role": "Portiere",
+      "roleCode": "P",
+      "nome_completo": "Gastón Medina",
+      "teamId": "arg_ra_racing",
+      "teamName": "Racing Club",
+      "shirtNumber": 1,
+      "marketValue": 16,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_RA_D02",
+      "role": "Difensore",
+      "roleCode": "D",
+      "nome_completo": "Jonathan Galván",
+      "teamId": "arg_ra_racing",
+      "teamName": "Racing Club",
+      "shirtNumber": 2,
+      "marketValue": 18,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_RA_C03",
+      "role": "Centrocampista",
+      "roleCode": "C",
+      "nome_completo": "Rodrigo Maltese",
+      "teamId": "arg_ra_racing",
+      "teamName": "Racing Club",
+      "shirtNumber": 6,
+      "marketValue": 21,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_RA_C04",
+      "role": "Centrocampista",
+      "roleCode": "C",
+      "nome_completo": "Mateo Fuentes",
+      "teamId": "arg_ra_racing",
+      "teamName": "Racing Club",
+      "shirtNumber": 8,
+      "marketValue": 24,
+      "nationality": "Uruguay"
+    },
+    {
+      "player_id": "ARG_RA_A05",
+      "role": "Attaccante",
+      "roleCode": "A",
+      "nome_completo": "Bruno Salvatierra",
+      "teamId": "arg_ra_racing",
+      "teamName": "Racing Club",
+      "shirtNumber": 11,
+      "marketValue": 26,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_IN_P01",
+      "role": "Portiere",
+      "roleCode": "P",
+      "nome_completo": "Martín Aguado",
+      "teamId": "arg_in_independiente",
+      "teamName": "Independiente",
+      "shirtNumber": 12,
+      "marketValue": 15,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_IN_D02",
+      "role": "Difensore",
+      "roleCode": "D",
+      "nome_completo": "Nicolás Paredes",
+      "teamId": "arg_in_independiente",
+      "teamName": "Independiente",
+      "shirtNumber": 4,
+      "marketValue": 19,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_IN_C03",
+      "role": "Centrocampista",
+      "roleCode": "C",
+      "nome_completo": "Emiliano Cabrera",
+      "teamId": "arg_in_independiente",
+      "teamName": "Independiente",
+      "shirtNumber": 7,
+      "marketValue": 22,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_IN_C04",
+      "role": "Centrocampista",
+      "roleCode": "C",
+      "nome_completo": "Diego Antilef",
+      "teamId": "arg_in_independiente",
+      "teamName": "Independiente",
+      "shirtNumber": 10,
+      "marketValue": 25,
+      "nationality": "Argentina"
+    },
+    {
+      "player_id": "ARG_IN_A05",
+      "role": "Attaccante",
+      "roleCode": "A",
+      "nome_completo": "Ramiro Ferreyra",
+      "teamId": "arg_in_independiente",
+      "teamName": "Independiente",
+      "shirtNumber": 9,
+      "marketValue": 27,
+      "nationality": "Argentina"
+    }
+  ]
+}
+

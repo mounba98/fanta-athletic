@@ -59,23 +59,41 @@
    */
   async function createNotification(userId, notification) {
     const db = firebase.firestore();
-    
-    await db.collection('notifications').add({
+    const leagueId = (() => {
+      try {
+        return localStorage.getItem('last_league_id');
+      } catch (_) {
+        return null;
+      }
+    })();
+
+    const doc = {
       userId: userId,
-      type: notification.type,
-      title: notification.title,
-      message: notification.message,
+      leagueId: notification.leagueId ?? leagueId ?? null,
+      type: notification.type || 'generic',
+      title: notification.title || notification.message || 'Notifica',
+      body: notification.body || notification.message || '',
       link: notification.link || null,
-      data: notification.data || {},
+      postId: notification.postId || (notification.data && notification.data.postId) || null,
+      commentId: notification.commentId || null,
+      actorUid: notification.actorUid || null,
+      actorName: notification.actorName || null,
+      reactionType: notification.reactionType || null,
       read: false,
       createdAt: firebase.firestore.Timestamp.now()
-    });
+    };
+
+    if (notification.data && Object.keys(notification.data).length) {
+      doc.extra = notification.data;
+    }
+
+    await db.collection('notifications').add(doc);
     
     // Show browser notification if permission granted
     if (Notification.permission === 'granted') {
       showNotification(notification.title, {
-        body: notification.message,
-        data: { url: notification.link }
+        body: doc.body,
+        data: { url: doc.link }
       });
     }
   }
@@ -84,12 +102,30 @@
    * Send notification for tag on post
    */
   async function notifyTag(taggedUserId, post, taggerName) {
+    if (!taggedUserId) return;
+
+    const postId = post && (post.id || post.postId) ? (post.id || post.postId) : null;
+    const postContent = post && typeof post.content === 'string' ? post.content : '';
+    const currentUser = firebase.auth().currentUser;
+    const actorUid = (post && post.authorUid) || (currentUser && currentUser.uid) || null;
+
+    if (typeof window.notifyPostTag === 'function') {
+      try {
+        await window.notifyPostTag(postId, taggedUserId, actorUid, taggerName, postContent);
+        return;
+      } catch (error) {
+        console.warn('notifyPostTag fallback error:', error);
+      }
+    }
+
     await createNotification(taggedUserId, {
-      type: 'tag',
+      type: 'post_tag',
       title: `${taggerName} ti ha taggato`,
-      message: post.content.substring(0, 100) + '...',
-      link: `/bacheca.html#post-${post.id}`,
-      data: { postId: post.id }
+      body: postContent ? postContent.substring(0, 120) : 'Apri la bacheca per vedere il post.',
+      link: postId ? `/bacheca.html?post=${postId}` : '/bacheca.html',
+      postId: postId,
+      actorName: taggerName,
+      actorUid: actorUid
     });
   }
   

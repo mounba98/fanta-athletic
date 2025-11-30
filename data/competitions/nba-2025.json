@@ -1,0 +1,43 @@
+{
+  "competitionId": "nba-2025",
+  "sportType": "basketball",
+  "season": "2024/2025",
+  "label": "NBA 2024/2025",
+  "metadata": {
+    "region": "USA",
+    "organizer": "NBA"
+  },
+  "participants": [
+    {
+      "participantId": "nba_gsw_curry",
+      "name": "Stephen Curry",
+      "team": "Golden State Warriors",
+      "role": "PG"
+    },
+    {
+      "participantId": "nba_den_jokic",
+      "name": "Nikola Jokic",
+      "team": "Denver Nuggets",
+      "role": "C"
+    },
+    {
+      "participantId": "nba_mil_giannis",
+      "name": "Giannis Antetokounmpo",
+      "team": "Milwaukee Bucks",
+      "role": "PF"
+    },
+    {
+      "participantId": "nba_bos_tatum",
+      "name": "Jayson Tatum",
+      "team": "Boston Celtics",
+      "role": "SF"
+    },
+    {
+      "participantId": "nba_lal_lebron",
+      "name": "LeBron James",
+      "team": "Los Angeles Lakers",
+      "role": "SF"
+    }
+  ]
+}
+

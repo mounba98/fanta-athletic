@@ -18,6 +18,7 @@
     // Calcolo (ex Giornate) solo per admin
     if (isAdmin) {
       allPages.splice(4, 0, { href: 'matchday.html', label: 'Calcolo', icon: '🧮', desktop: true, mobile: false, isAdminOnly: true });
+      allPages.push({ href: 'admin-setup.html', label: 'Setup', icon: '⚙️', desktop: true, mobile: false, isAdmin: true });
       allPages.push({ href: 'admin.html', label: 'Admin', icon: '🛠️', desktop: true, mobile: false, isAdmin: true });
     }
 
@@ -53,6 +54,76 @@
     navHTML += `<div id="navbarAuthBtn" style="margin-left: 12px;"></div>`;
     
     return navHTML;
+  }
+
+  const BADGE_ID = 'currentLeagueBadge';
+
+  async function fetchLeagueDoc(leagueId) {
+    if (!leagueId || !window.firebase || !firebase.firestore) return null;
+    try {
+      const snap = await firebase.firestore().collection('leagues').doc(leagueId).get();
+      if (!snap.exists) return null;
+      return { id: snap.id, ...(snap.data() || {}) };
+    } catch (err) {
+      console.warn('[navbar] impossibile leggere lega', err);
+      return null;
+    }
+  }
+
+  function ensureLeagueBadge(hostElement) {
+    if (!hostElement) return null;
+    let badge = document.getElementById(BADGE_ID);
+    if (badge) return badge;
+    badge = document.createElement('span');
+    badge.id = BADGE_ID;
+    badge.style.cssText = `
+      display:none;
+      margin-left:12px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:rgba(31,41,55,0.85);
+      color:#fff;
+      font-size:11px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.04em;
+    `;
+    hostElement.appendChild(badge);
+    return badge;
+  }
+
+  async function updateLeagueBadge(leagueHint) {
+    const header = document.querySelector('header');
+    if (!header) return;
+    const h1 = header.querySelector('h1');
+    if (!h1) return;
+    const badge = ensureLeagueBadge(h1);
+    if (!badge) return;
+
+    const helper = window.LeagueHelper;
+    const currentId = leagueHint?.id || helper?.getCurrentLeagueId?.() || window.LeagueContext?.getCurrentLeagueId?.();
+    if (!currentId) {
+      badge.style.display = 'none';
+      badge.textContent = '';
+      return;
+    }
+
+    let leagueData = leagueHint;
+    if (!leagueData || !leagueData.name) {
+      leagueData = await fetchLeagueDoc(currentId);
+    }
+    if (!leagueData) {
+      badge.style.display = 'none';
+      badge.textContent = '';
+      return;
+    }
+
+    const config = window.getSportConfig?.(leagueData.sportType) || null;
+    const extras = [];
+    if (config?.label) extras.push(config.label);
+    if (leagueData.season) extras.push(leagueData.season);
+    badge.textContent = `${leagueData.name || 'Lega'}${extras.length ? ' · ' + extras.join(' · ') : ''}`;
+    badge.style.display = 'inline-flex';
   }
 
   async function initNavbar() {
@@ -117,6 +188,7 @@
     if (h1) {
       h1.insertAdjacentHTML('afterend', navbarHTML);
     }
+    updateLeagueBadge();
     
     // Aggiorna pulsante auth
     updateAuthButton(currentUser);
@@ -193,6 +265,24 @@
       authBtnContainer.innerHTML = '';
     }
   }
+
+  window.addEventListener('league-ready', (event) => {
+    const league = event.detail?.league;
+    if (league) {
+      updateLeagueBadge(league);
+    } else {
+      updateLeagueBadge();
+    }
+  });
+
+  window.addEventListener('league-changed', (event) => {
+    const leagueId = event.detail?.leagueId;
+    if (leagueId) {
+      updateLeagueBadge({ id: leagueId });
+    } else {
+      updateLeagueBadge();
+    }
+  });
 
   // Inizializza
   if (document.readyState === 'loading') {

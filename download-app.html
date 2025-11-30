@@ -403,7 +403,7 @@
       apiKey: "AIzaSyDnQMuPvx_Gr8VjBJf_Hrx39O8w2dm67co",
       authDomain: "fanta-athletic.firebaseapp.com",
       projectId: "fanta-athletic",
-      storageBucket: "fanta-athletic.appspot.com",
+      storageBucket: "fanta-athletic.firebasestorage.app",
       messagingSenderId: "845950461193",
       appId: "1:845950461193:web:04475bb0eaa2dc459a9fd8",
       measurementId: "G-289T0N4D8L"
@@ -514,12 +514,26 @@
     // Generate QR Code on page load
     document.addEventListener('DOMContentLoaded', generateQRCode);
 
-    // Service Worker Registration
-    if ('serviceWorker' in navigator) {
+    // Service Worker Registration (solo fuori da localhost)
+    (function manageServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+      const unregisterAll = async () => {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          regs.forEach(reg => reg.unregister());
+        } catch (err) {
+          console.warn('Errore deregistrazione Service Worker:', err);
+        }
+      };
+      if (isLocalhost) {
+        unregisterAll();
+        return;
+      }
       navigator.serviceWorker.register('/sw.js')
         .then(reg => console.log('Service Worker registrato'))
         .catch(err => console.log('Errore Service Worker:', err));
-    }
+    })();
   </script>
 
   <!-- Include only essential scripts -->

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>🛠️ Set Admin</h1>
+  <h1>??? Set Admin</h1>
   <p>Imposta un utente come amministratore</p>
   
   <div>
@@ -35,7 +35,7 @@
       apiKey: "AIzaSyDnQMuPvx_Gr8VjBJf_Hrx39O8w2dm67co",
       authDomain: "fanta-athletic.firebaseapp.com",
       projectId: "fanta-athletic",
-      storageBucket: "fanta-athletic.appspot.com",
+        storageBucket: "fanta-athletic.firebasestorage.app",
       messagingSenderId: "845950461193",
       appId: "1:845950461193:web:04475bb0eaa2dc459a9fd8",
       measurementId: "G-289T0N4D8L"
@@ -54,18 +54,18 @@
       const result = document.getElementById('result');
       
       if (!email) {
-        result.innerHTML = '<p class="error">❌ Inserisci un\'email</p>';
+        result.innerHTML = '<p class="error">? Inserisci un\'email</p>';
         return;
       }
       
-      result.innerHTML = '<p>⏳ Ricerca utente...</p>';
+      result.innerHTML = '<p>? Ricerca utente...</p>';
       
       try {
         // Find user by email
         const usersSnap = await db.collection('users').where('email', '==', email).get();
         
         if (usersSnap.empty) {
-          result.innerHTML = `<p class="error">❌ Utente con email ${email} non trovato</p>`;
+          result.innerHTML = `<p class="error">? Utente con email ${email} non trovato</p>`;
           return;
         }
         
@@ -73,7 +73,7 @@
         const uid = userDoc.id;
         const userData = userDoc.data();
         
-        result.innerHTML = `<p>✅ Utente trovato: ${userData.display_name || email}<br>UID: ${uid}</p><p>⏳ Impostazione admin...</p>`;
+        result.innerHTML = `<p>? Utente trovato: ${userData.display_name || email}<br>UID: ${uid}</p><p>? Impostazione admin...</p>`;
         
         // Set as admin
         await db.collection('admins').doc(uid).set({
@@ -83,11 +83,11 @@
           addedBy: 'system'
         });
         
-        result.innerHTML = `<p class="success">✅ Utente ${email} impostato come admin!<br>UID: ${uid}<br><br>Fai logout e login per vedere le sezioni admin.</p>`;
+        result.innerHTML = `<p class="success">? Utente ${email} impostato come admin!<br>UID: ${uid}<br><br>Fai logout e login per vedere le sezioni admin.</p>`;
         
       } catch (error) {
         console.error('Errore:', error);
-        result.innerHTML = `<p class="error">❌ Errore: ${error.message}</p>`;
+        result.innerHTML = `<p class="error">? Errore: ${error.message}</p>`;
       }
     }
   </script>

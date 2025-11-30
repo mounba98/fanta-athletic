@@ -14,6 +14,24 @@
       const db = global.db || global.firebase.firestore();
       if (!db || !db.collection) return null;
 
+      const leagueId = await resolveLeagueId();
+
+      if (leagueId) {
+        const leagueDoc = await db.collection(`leagues/${leagueId}/config`).doc('rules_cache').get();
+        if (leagueDoc.exists) {
+          const leagueData = leagueDoc.data() || {};
+          if (Array.isArray(leagueData.rules)) {
+            return { rules: normalizeRules(leagueData.rules), source: `league:${leagueId}` };
+          }
+          if (leagueData.rules && typeof leagueData.rules === 'object') {
+            const arr = Object.values(leagueData.rules);
+            if (Array.isArray(arr) && arr.length) {
+              return { rules: normalizeRules(arr), source: `league:${leagueId}` };
+            }
+          }
+        }
+      }
+
       const docRef = db.collection(FIRESTORE_PATH.collection).doc(FIRESTORE_PATH.doc);
       const snap = await docRef.get();
       if (!snap.exists) return null;
@@ -92,5 +110,23 @@
   global.loadRulesJSON = async function () {
     return loadRules();
   };
+
+  async function resolveLeagueId() {
+    try {
+      if (global.LeagueHelper) {
+        if (typeof global.LeagueHelper.getCurrentLeagueId === 'function') {
+          const current = global.LeagueHelper.getCurrentLeagueId();
+          if (current) return current;
+        }
+        if (typeof global.LeagueHelper.waitForLeague === 'function') {
+          const info = await global.LeagueHelper.waitForLeague(1500);
+          return info?.id || null;
+        }
+      }
+    } catch (err) {
+      console.warn('[rules-loader] impossibile determinare leagueId:', err?.message || err);
+    }
+    return null;
+  }
 })(window);
 

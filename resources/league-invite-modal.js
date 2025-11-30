@@ -64,7 +64,7 @@
       animation: fadeIn 0.2s ease;
     `;
     
-    const inviteUrl = `${window.location.origin}/join-league.html?code=${inviteCode}`;
+    const inviteUrl = `${window.location.origin}/join-league.html?leagueId=${leagueId}&code=${inviteCode}`;
     const userName = firebase.auth().currentUser?.displayName || 'Un utente';
     const whatsappMessage = encodeURIComponent(
       `🏆 ${userName} ti ha invitato a unirti alla lega "${league.name}" su Fanta Athletic!\n\n` +

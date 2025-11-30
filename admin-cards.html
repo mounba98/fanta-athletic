@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
@@ -57,7 +57,7 @@
     <a class="logo-home" href="index.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>🛠️ Admin - Gestione Card Home</h1>
+    <h1>??? Admin - Gestione Card Home</h1>
   </header>
 
   <main class="admin-container">
@@ -66,7 +66,7 @@
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
         <input id="newCardTitle" class="input" placeholder="Nome card (es. Squadre)" style="flex:1;min-width:200px;" />
         <input id="newCardDesc" class="input" placeholder="Descrizione (opzionale)" style="flex:2;min-width:300px;" />
-        <button class="btn" onclick="addNewCard()" style="white-space:nowrap;">➕ Aggiungi</button>
+        <button class="btn" onclick="addNewCard()" style="white-space:nowrap;">? Aggiungi</button>
       </div>
     </div>
 
@@ -108,16 +108,16 @@
 
     // Card predefinite
     const defaultCards = [
-      { id: 'squadre', title: '🏆 Squadre', description: 'Visualizza info e statistiche delle squadre.', link: 'squadre.html', image: '' },
-      { id: 'formazioni', title: '⚽ Formazioni', description: 'Gestisci la formazione della tua squadra.', link: 'formazioni.html', image: '' },
-      { id: 'classifica', title: '📊 Classifica', description: 'Consulta la classifica aggiornata.', link: 'standings.html', image: '' },
-      { id: 'giornate', title: '🎮 Giornate', description: 'Gestisci le giornate e i punteggi.', link: 'matchday.html', image: '' },
-      { id: 'statistiche', title: '📈 Statistiche', description: 'Analizza le statistiche dettagliate.', link: 'statistiche.html', image: '' },
-      { id: 'giocatori', title: '⚽ Giocatori', description: 'Database completo dei giocatori.', link: 'giocatori.html', image: '' },
-      { id: 'allenatori', title: '👔 Allenatori', description: 'Info sugli allenatori e la curva.', link: 'allenatori.html', image: '' },
-      { id: 'curva', title: '📣 Curva', description: 'La voce dei tifosi.', link: 'curva.html', image: '' },
-      { id: 'asta', title: '🔨 Asta', description: 'Partecipa all\'asta dei giocatori.', link: 'asta.html', image: '' },
-      { id: 'bacheca', title: '💬 Bacheca', description: 'Bacheca goliardica e trash talk.', link: 'bacheca.html', image: '' }
+      { id: 'squadre', title: '?? Squadre', description: 'Visualizza info e statistiche delle squadre.', link: 'squadre.html', image: '' },
+      { id: 'formazioni', title: '? Formazioni', description: 'Gestisci la formazione della tua squadra.', link: 'formazioni.html', image: '' },
+      { id: 'classifica', title: '?? Classifica', description: 'Consulta la classifica aggiornata.', link: 'standings.html', image: '' },
+      { id: 'giornate', title: '?? Giornate', description: 'Gestisci le giornate e i punteggi.', link: 'matchday.html', image: '' },
+      { id: 'statistiche', title: '?? Statistiche', description: 'Analizza le statistiche dettagliate.', link: 'statistiche.html', image: '' },
+      { id: 'giocatori', title: '? Giocatori', description: 'Database completo dei giocatori.', link: 'giocatori.html', image: '' },
+      { id: 'allenatori', title: '?? Allenatori', description: 'Info sugli allenatori e la curva.', link: 'allenatori.html', image: '' },
+      { id: 'curva', title: '?? Curva', description: 'La voce dei tifosi.', link: 'curva.html', image: '' },
+      { id: 'asta', title: '?? Asta', description: 'Partecipa all\'asta dei giocatori.', link: 'asta.html', image: '' },
+      { id: 'bacheca', title: '?? Bacheca', description: 'Bacheca goliardica e trash talk.', link: 'bacheca.html', image: '' }
     ];
 
     firebase.auth().onAuthStateChanged(async (user) => {
@@ -161,23 +161,23 @@
       const grid = document.getElementById('cardsGrid');
       
       if (cardsData.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;padding:40px;color:var(--muted);">📋 Nessuna card. Aggiungine una sopra!</p>';
+        grid.innerHTML = '<p style="text-align:center;padding:40px;color:var(--muted);">?? Nessuna card. Aggiungine una sopra!</p>';
         return;
       }
       
       grid.innerHTML = cardsData.map((card, idx) => `
         <div class="home-card">
           <div class="card-actions">
-            <button class="btn btn-sm" onclick="editCard(${idx})" style="padding:4px 8px;background:#3498db;color:white;">✏️</button>
-            <button class="btn btn-sm btn-secondary" onclick="deleteCard(${idx})" style="padding:4px 8px;">🗑️</button>
+            <button class="btn btn-sm" onclick="editCard(${idx})" style="padding:4px 8px;background:#3498db;color:white;">??</button>
+            <button class="btn btn-sm btn-secondary" onclick="deleteCard(${idx})" style="padding:4px 8px;">???</button>
           </div>
           ${card.image ? `<img src="${card.image}" class="card-image-preview" alt="${card.title}" />` : '<div class="card-image-preview" style="display:flex;align-items:center;justify-content:center;color:#999;">Nessuna immagine</div>'}
           <h3>${card.title || 'Card ' + (idx + 1)}</h3>
           <p>${card.description || 'Nessuna descrizione'}</p>
-          ${card.link ? `<small style="opacity:0.7;">→ ${card.link}</small>` : ''}
+          ${card.link ? `<small style="opacity:0.7;">? ${card.link}</small>` : ''}
           <div style="margin-top:12px;display:flex;gap:8px;">
             <input type="file" id="file-${idx}" accept="image/*" style="display:none;" onchange="uploadImage(${idx})" />
-            <button class="btn btn-sm" onclick="document.getElementById('file-${idx}').click()" style="flex:1;background:#28a745;color:white;">📷 Carica Immagine</button>
+            <button class="btn btn-sm" onclick="document.getElementById('file-${idx}').click()" style="flex:1;background:#28a745;color:white;">?? Carica Immagine</button>
           </div>
         </div>
       `).join('');
@@ -208,10 +208,10 @@
         cardsData[idx].image = url;
         await saveAllCards();
         renderCards();
-        alert('✅ Immagine caricata e salvata!');
+        alert('? Immagine caricata e salvata!');
       } catch (error) {
         console.error('Errore upload:', error);
-        alert('❌ Errore nel caricamento dell\'immagine');
+        alert('? Errore nel caricamento dell\'immagine');
       }
     }
 
@@ -262,7 +262,7 @@
 
     async function saveCard(cardId) {
       await saveAllCards();
-      alert('✅ Card salvata!');
+      alert('? Card salvata!');
     }
 
     async function saveAllCards(){
@@ -271,7 +271,7 @@
         console.log('Cards saved:', cardsData.length);
       } catch (error) {
         console.error('Errore salvataggio:', error);
-        alert('❌ Errore nel salvataggio');
+        alert('? Errore nel salvataggio');
       }
     }
 
@@ -329,8 +329,8 @@
   <script src="resources/bottom-nav.js?v=2025101802"></script>
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
 </body>
 </html>

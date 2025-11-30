@@ -5,7 +5,12 @@
 
   let lastScrollTop = 0;
   let isHidden = false;
-  const isMobile = window.innerWidth <= 768;
+  const MOBILE_BREAKPOINT = 768;
+  const SHOW_THRESHOLD = 6;
+
+  function isMobileViewport() {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
 
   function handleScroll() {
     const header = document.querySelector('header');
@@ -15,7 +20,7 @@
     const scrollDelta = Math.abs(scrollTop - lastScrollTop);
     
     // Solo su mobile e con scroll significativo (>10px)
-    if (!isMobile || scrollDelta < 10) {
+    if (!isMobileViewport() || scrollDelta < 4) {
       lastScrollTop = scrollTop;
       return;
     }
@@ -25,14 +30,12 @@
       header.style.transform = 'translateY(-100%)';
       header.style.transition = 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
       isHidden = true;
-      console.log('📱 Navbar hidden (scroll down)');
     }
     // Scroll up - show navbar
-    else if (scrollTop < lastScrollTop && isHidden) {
+    else if (scrollTop < lastScrollTop && isHidden && ((lastScrollTop - scrollTop) > SHOW_THRESHOLD || scrollTop < 40)) {
       header.style.transform = 'translateY(0)';
       header.style.transition = 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
       isHidden = false;
-      console.log('📱 Navbar shown (scroll up)');
     }
     
     lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
@@ -52,7 +55,7 @@
 
   // Ensure header is positioned correctly - SOLO su desktop, non su mobile
   const header = document.querySelector('header');
-  if (header && !isMobile) {
+  if (header && !isMobileViewport()) {
     header.style.position = 'fixed';
     header.style.top = '0';
     header.style.left = '0';
@@ -64,7 +67,7 @@
   }
   
   // Su mobile, rimuovi qualsiasi stile inline che potrebbe interferire
-  if (header && isMobile) {
+  if (header && isMobileViewport()) {
     // Rimuovi tutti gli stili inline che potrebbero interferire
     header.style.position = '';
     header.style.top = '';
@@ -91,8 +94,8 @@
       header.style.transform = '';
       header.style.transition = '';
       document.body.style.paddingTop = '';
-    }
+  }
   });
   
-  console.log('✅ Navbar auto-hide initialized (mobile:', isMobile + ')');
+  console.log('✅ Navbar auto-hide initialized (mobile:', isMobileViewport() + ')');
 })();

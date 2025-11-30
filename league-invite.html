@@ -222,9 +222,9 @@
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/league-context.js?v=2025101901"></script>
 
@@ -260,7 +260,7 @@
         document.getElementById('inviteCode').textContent = currentLeague.inviteCode || 'N/A';
         
         const baseUrl = window.location.origin;
-        const inviteLink = `${baseUrl}/join-league.html?code=${currentLeague.inviteCode}`;
+        const inviteLink = `${baseUrl}/join-league.html?leagueId=${currentLeague.id}&code=${currentLeague.inviteCode}`;
         document.getElementById('inviteLink').textContent = inviteLink;
 
         document.getElementById('membersCount').textContent = (currentLeague.members || []).length;

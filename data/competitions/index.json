@@ -1,0 +1,15 @@
+{
+  "competitions": [
+    {
+      "competitionId": "nba-2025",
+      "sportType": "basketball",
+      "label": "NBA 2024/2025"
+    },
+    {
+      "competitionId": "argentina-primera-2025",
+      "sportType": "football",
+      "label": "Argentina Primera División 2025"
+    }
+  ]
+}
+

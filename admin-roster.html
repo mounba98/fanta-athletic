@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Roster Giocatori</title>
+  <title>Admin � Roster Giocatori</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
@@ -27,7 +27,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Admin • Roster Giocatori</h1>
+    <h1>Admin � Roster Giocatori</h1>
   </header>
 
   <main class="container">
@@ -45,7 +45,7 @@
           <option>Attaccante</option>
         </select>
         <input id="pSoprannome" class="input" placeholder="Soprannome (opzionale)" style="flex:1;" />
-        <button class="btn" onclick="addPlayer()" style="white-space:nowrap;">➕ Aggiungi</button>
+        <button class="btn" onclick="addPlayer()" style="white-space:nowrap;">? Aggiungi</button>
       </div>
     </section>
 
@@ -53,7 +53,7 @@
     <section class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="margin:0;">Giocatori (<span id="playerCount">0</span>)</h2>
-        <input id="searchInput" class="input" placeholder="🔍 Cerca..." style="max-width:300px;" oninput="filterPlayers()" />
+        <input id="searchInput" class="input" placeholder="?? Cerca..." style="max-width:300px;" oninput="filterPlayers()" />
       </div>
       <table class="table" id="playersTable">
         <thead>
@@ -87,7 +87,7 @@
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn btn-secondary" onclick="closeEditModal()">Annulla</button>
-        <button class="btn" onclick="saveEdit()">💾 Salva</button>
+        <button class="btn" onclick="saveEdit()">?? Salva</button>
       </div>
     </div>
   </div>
@@ -179,7 +179,7 @@
       
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);">
-          ${playersData.length === 0 ? '📋 Nessun giocatore in database. Aggiungine uno sopra!' : '🔍 Nessun risultato per la ricerca'}
+          ${playersData.length === 0 ? '?? Nessun giocatore in database. Aggiungine uno sopra!' : '?? Nessun risultato per la ricerca'}
         </td></tr>`;
         return;
       }
@@ -189,10 +189,10 @@
           <td>${p.nome || ''}</td>
           <td>${p.cognome || ''}</td>
           <td>${p.role || ''}</td>
-          <td>${p.soprannome || '—'}</td>
+          <td>${p.soprannome || '�'}</td>
           <td>
-            <button class="btn btn-sm btn-edit" onclick="openEditModal('${p.id}')">✏️ Modifica</button>
-            <button class="btn btn-sm btn-delete" onclick="deletePlayer('${p.id}')">🗑️ Elimina</button>
+            <button class="btn btn-sm btn-edit" onclick="openEditModal('${p.id}')">?? Modifica</button>
+            <button class="btn btn-sm btn-delete" onclick="deletePlayer('${p.id}')">??? Elimina</button>
           </td>
         </tr>
       `).join('');
@@ -251,7 +251,7 @@
   <script src="resources/bottom-nav.js?v=2025101802"></script>
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
   <script src="resources/notifications-dropdown.js?v=2025102002"></script>
 </body>

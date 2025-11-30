@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h1>🔧 Imposta Primo Admin</h1>
+  <h1>?? Imposta Primo Admin</h1>
   <div class="info">
     <p><strong>Questa pagina serve per impostare il primo amministratore.</strong></p>
     <p>1. Fai login con l'account che vuoi rendere admin</p>
@@ -24,7 +24,7 @@
 
   <div id="userInfo"></div>
   
-  <button class="btn" onclick="makeAdmin()" id="adminBtn" style="display:none;">🛠️ Rendimi Admin</button>
+  <button class="btn" onclick="makeAdmin()" id="adminBtn" style="display:none;">??? Rendimi Admin</button>
   
   <div id="result"></div>
 
@@ -50,7 +50,7 @@
       const adminBtn = document.getElementById('adminBtn');
       
       if (!user) {
-        userInfo.innerHTML = '<div class="info error">❌ Non sei loggato. <a href="auth.html">Vai al login</a></div>';
+        userInfo.innerHTML = '<div class="info error">? Non sei loggato. <a href="auth.html">Vai al login</a></div>';
         return;
       }
 
@@ -62,10 +62,10 @@
         </div>
       `;
 
-      // Controlla se già admin
+      // Controlla se gi� admin
       const adminDoc = await db.collection('admins').doc(user.uid).get();
       if (adminDoc.exists) {
-        userInfo.innerHTML += '<div class="info success">✅ Sei già admin!</div>';
+        userInfo.innerHTML += '<div class="info success">? Sei gi� admin!</div>';
       } else {
         adminBtn.style.display = 'block';
       }
@@ -79,7 +79,7 @@
       }
 
       const result = document.getElementById('result');
-      result.innerHTML = '<div class="info">⏳ Impostazione admin in corso...</div>';
+      result.innerHTML = '<div class="info">? Impostazione admin in corso...</div>';
 
       try {
         await db.collection('admins').doc(user.uid).set({
@@ -91,7 +91,7 @@
 
         result.innerHTML = `
           <div class="info success">
-            <p>✅ <strong>Successo!</strong> Sei ora un amministratore.</p>
+            <p>? <strong>Successo!</strong> Sei ora un amministratore.</p>
             <p>Puoi ora:</p>
             <ul>
               <li><a href="populate-data.html">Popolare il database</a></li>
@@ -101,7 +101,7 @@
         `;
         document.getElementById('adminBtn').style.display = 'none';
       } catch (error) {
-        result.innerHTML = `<div class="info error">❌ Errore: ${error.message}</div>`;
+        result.innerHTML = `<div class="info error">? Errore: ${error.message}</div>`;
       }
     }
   </script>

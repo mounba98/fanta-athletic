@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Gestione Squadre</title>
+  <title>Admin � Gestione Squadre</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
@@ -25,7 +25,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Admin • Gestione Squadre</h1>
+    <h1>Admin � Gestione Squadre</h1>
   </header>
 
   <main class="container">
@@ -33,13 +33,13 @@
       <h2>Aggiungi Squadra</h2>
       <div class="row">
         <input id="teamName" class="input" placeholder="Nome squadra" style="flex:1;" />
-        <button class="btn" id="addTeamBtn" style="white-space:nowrap;">➕ Aggiungi</button>
+        <button class="btn" id="addTeamBtn" style="white-space:nowrap;">? Aggiungi</button>
       </div>
     </section>
 
     <section class="card">
       <h2>Squadre Esistenti (<span id="teamCount">0</span>)</h2>
-      <p style="color:var(--muted);font-size:14px;">⚠️ Click su squadra per espandere e gestire allenatori</p>
+      <p style="color:var(--muted);font-size:14px;">?? Click su squadra per espandere e gestire allenatori</p>
       <div id="teamsList"></div>
     </section>
   </main>
@@ -128,7 +128,7 @@
                 <span style="font-weight:700;font-size:16px;color:var(--text);">${t.name}</span>
                 <span style="font-size:12px;color:var(--muted);">(${teamUsers.length} utenti)</span>
               </div>
-              <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();deleteTeam('${t.id}')" style="padding:4px 8px;">🗑️</button>
+              <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();deleteTeam('${t.id}')" style="padding:4px 8px;">???</button>
             </div>
             <div id="team${idx}" style="display:none;padding:16px;background:var(--card);">
               <h4 style="margin:0 0 10px;color:var(--text);">Utenti Assegnati</h4>
@@ -138,7 +138,7 @@
                   return `
                   <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--border);">
                     <span style="color:var(--text);">${displayName}</span>
-                    <button class="btn btn-sm btn-secondary" onclick="removeUser('${t.id}','${u.id}')" style="padding:4px 8px;">🗑️</button>
+                    <button class="btn btn-sm btn-secondary" onclick="removeUser('${t.id}','${u.id}')" style="padding:4px 8px;">???</button>
                   </div>
                   `;
                 }).join('') || '<p style="color:var(--muted);font-size:14px;">Nessun utente assegnato</p>'}
@@ -151,7 +151,7 @@
                     return `<option value="${u.id}">${displayName}</option>`;
                   }).join('')}
                 </select>
-                <button class="btn" onclick="addUser('${t.id}',${idx})" style="padding:8px 16px;">➕ Aggiungi</button>
+                <button class="btn" onclick="addUser('${t.id}',${idx})" style="padding:8px 16px;">? Aggiungi</button>
               </div>
             </div>
           </div>
@@ -187,7 +187,7 @@
     }
 
     async function deleteTeam(id){
-      if (!confirm(`Eliminare la squadra ${id}? Questa azione è irreversibile.`)) return;
+      if (!confirm(`Eliminare la squadra ${id}? Questa azione � irreversibile.`)) return;
       await db.collection('teams').doc(id).delete();
     }
   </script>
@@ -195,7 +195,7 @@
   <script src="resources/bottom-nav.js?v=2025101802"></script>
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
   <script src="resources/notifications-dropdown.js?v=2025102002"></script>
 </body>

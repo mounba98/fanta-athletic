@@ -27,7 +27,22 @@ class NotificationManager {
       return false;
     }
 
+    const isLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
+    const unregisterAll = async () => {
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        regs.forEach(reg => reg.unregister());
+      } catch (err) {
+        console.warn('Errore deregistrazione SW (notifications):', err);
+      }
+    };
+
     try {
+      if (isLocalhost) {
+        await unregisterAll();
+        console.log('Service Worker disattivato in ambiente locale (notifications).');
+        return false;
+      }
       // Verifica che siamo in un contesto sicuro prima di registrare
       if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
         console.warn('Service Worker non registrato: richiesto HTTPS o localhost');
@@ -40,9 +55,7 @@ class NotificationManager {
         return false;
       }
       
-      this.registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
-      });
+      this.registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       console.log('Service Worker registrato');
       return true;
     } catch (error) {

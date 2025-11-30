@@ -4,6 +4,9 @@
  * v2025101905
  */
 
+window.LEAGUE_SELECTOR_VERSION = 'debug-2025-11-19-01';
+console.log('[league-selector] build debug-2025-11-19-01 caricata');
+
 (function() {
   'use strict';
   
@@ -14,6 +17,8 @@
   let initialized = false;
   let bootstrapScheduled = false;
   const MAX_ATTACH_RETRIES = 15;
+  const INVITE_SCRIPT_SRC = window.LEAGUE_INVITE_SCRIPT_SRC || 'resources/league-invite-modal.js?v=2025102403';
+  let inviteModalPromise = null;
   
   // Esponi globalmente
   window.currentLeague = null;
@@ -53,10 +58,10 @@
       await loadUserLeagues();
       await loadCurrentLeague();
 
-      // Render anche se non ci sono leghe ma c'è permission denied (non-admin)
+      // Se l'utente non ha ancora leghe, mostriamo comunque il selettore
+      // vuoto con le azioni Crea/Unisciti, invece di saltare il render.
       if (userLeagues.length === 0 && !window.__LEAGUE_PERMISSION_DENIED__) {
-        console.warn('[LEAGUE-SELECTOR] No leagues found, skipping render');
-        return;
+        console.log('[LEAGUE-SELECTOR] No leagues found for user, rendering empty selector with join/create actions');
       }
 
       renderLeagueSelector();
@@ -90,31 +95,60 @@
       let permissionDenied = false;
 
       // PRIMA: Prova a leggere la lega dal documento utente (più efficiente e funziona per non-admin)
+      const leagueIdsFromUserDoc = new Set();
+      const pushLeagueId = (id) => {
+        if (typeof id === 'string' && id.trim()) {
+          leagueIdsFromUserDoc.add(id.trim());
+        }
+      };
+
+      const isUserInLeague = (leagueData = {}) => {
+        if (leagueData.owner === user.uid) return true;
+        if (Array.isArray(leagueData.members) && leagueData.members.includes(user.uid)) return true;
+        if (leagueData.members && typeof leagueData.members === 'object' && leagueData.members[user.uid]) return true;
+        if (Array.isArray(leagueData.admins) && leagueData.admins.includes(user.uid)) return true;
+        if (leagueData.admins && typeof leagueData.admins === 'object' && leagueData.admins[user.uid]) return true;
+        return false;
+      };
+
+      let userDocData = null;
       try {
         const userDoc = await db.collection('users').doc(user.uid).get();
         if (userDoc.exists) {
-          const userData = userDoc.data();
-          const currentLeagueId = userData.currentLeague || (userData.leagues && userData.leagues[0]);
-          
-          if (currentLeagueId) {
-            console.log('📋 [LEAGUE-SELECTOR] Found league in user doc:', currentLeagueId);
-            try {
-              const leagueDoc = await db.collection('leagues').doc(currentLeagueId).get();
-              if (leagueDoc.exists) {
-                const leagueData = leagueDoc.data();
-                // Verifica che l'utente sia effettivamente membro
-                if (leagueData.members && leagueData.members.includes(user.uid)) {
-                  leagueMap.set(leagueDoc.id, { id: leagueDoc.id, ...leagueData });
-                  console.log('✅ [LEAGUE-SELECTOR] Loaded league from user doc:', leagueDoc.id);
-                }
-              }
-            } catch (err) {
-              console.warn('[LEAGUE-SELECTOR] Error loading league from user doc:', err);
-            }
+          userDocData = userDoc.data() || {};
+          pushLeagueId(userDocData.currentLeague);
+          if (Array.isArray(userDocData.leagues)) {
+            userDocData.leagues.forEach(pushLeagueId);
+          } else if (userDocData.leagues && typeof userDocData.leagues === 'object') {
+            Object.keys(userDocData.leagues).forEach(pushLeagueId);
+          }
+          if (Array.isArray(userDocData.joinedLeagues)) {
+            userDocData.joinedLeagues.forEach(pushLeagueId);
           }
         }
       } catch (err) {
         console.warn('[LEAGUE-SELECTOR] Error reading user doc:', err);
+      }
+
+      if (leagueIdsFromUserDoc.size > 0) {
+        console.log('📋 [LEAGUE-SELECTOR] fetching leagues from user doc map', leagueIdsFromUserDoc.size);
+        const fetches = Array.from(leagueIdsFromUserDoc).map(async (leagueId) => {
+          try {
+            const doc = await db.collection('leagues').doc(leagueId).get();
+            if (doc.exists) {
+              const leagueData = doc.data() || {};
+              if (isUserInLeague(leagueData)) {
+                leagueMap.set(doc.id, { id: doc.id, ...leagueData });
+                console.log('✅ [LEAGUE-SELECTOR] added league from user doc:', doc.id);
+              } else {
+                console.warn(`[LEAGUE-SELECTOR] user ${user.uid} non presente in members/admins di ${doc.id}, skip`);
+              }
+            }
+          } catch (err) {
+            console.warn('[LEAGUE-SELECTOR] Error loading league from user doc list:', err);
+          }
+        });
+        await Promise.all(fetches);
       }
 
       // SECONDA: Prova query (funziona solo per admin, ma proviamo comunque)
@@ -217,42 +251,116 @@
   }
   
   /**
-   * Carica lega corrente
+   * Carica lega corrente con ordine di priorità robusto
    */
   async function loadCurrentLeague() {
+    console.log('[league-selector] Inizio loadCurrentLeague');
+    
     if (window.__LEAGUE_PERMISSION_DENIED__) {
+      console.log('[league-selector] Permission denied detected, nessuna lega');
       currentLeague = null;
       window.currentLeague = null;
       try { localStorage.removeItem('last_league_id'); } catch (_) {}
       window.dispatchEvent(new CustomEvent('league-ready', { detail: { league: null } }));
       return;
     }
-    const leagueId = localStorage.getItem('last_league_id');
     
-    if (!leagueId) {
-      if (userLeagues.length > 0) {
-        currentLeague = userLeagues[0];
-        window.currentLeague = currentLeague;
-        localStorage.setItem('last_league_id', currentLeague.id);
-        console.log('✅ currentLeague defaulted to', currentLeague.id);
-      } else {
-        currentLeague = null;
-        window.currentLeague = null;
+    let targetLeagueId = null;
+    const user = firebase.auth().currentUser;
+    
+    // 1) PRIORITÀ MASSIMA: users/{uid}.currentLeague
+    if (user) {
+      try {
+        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data() || {};
+          if (userData.currentLeague) {
+            targetLeagueId = userData.currentLeague;
+            console.log('[league-selector] currentLeague trovato da users doc:', targetLeagueId);
+          }
+        }
+      } catch (err) {
+        console.warn('[league-selector] Errore lettura users/{uid}.currentLeague:', err);
       }
+    }
+    
+    // 2) SECONDARIO: localStorage.last_league_id
+    if (!targetLeagueId) {
+      targetLeagueId = localStorage.getItem('last_league_id');
+      if (targetLeagueId) {
+        console.log('[league-selector] currentLeague trovato da localStorage:', targetLeagueId);
+      }
+    }
+    
+    // 3) FALLBACK: prima lega disponibile
+    if (!targetLeagueId && userLeagues.length > 0) {
+      targetLeagueId = userLeagues[0].id;
+      console.log('[league-selector] currentLeague defaulted to prima lega disponibile:', targetLeagueId);
+    }
+    
+    if (!targetLeagueId) {
+      console.log('[league-selector] Nessuna lega disponibile');
+      currentLeague = null;
+      window.currentLeague = null;
+      window.dispatchEvent(new CustomEvent('league-ready', { detail: { league: null } }));
       return;
     }
     
-    const league = userLeagues.find(l => l.id === leagueId);
+    // Carica i dati della lega target
+    let league = userLeagues.find(l => l.id === targetLeagueId);
+    if (!league) {
+      try {
+        const doc = await firebase.firestore().collection('leagues').doc(targetLeagueId).get();
+        if (doc.exists) {
+          const data = doc.data() || {};
+          league = { id: doc.id, ...data };
+          const existingIndex = userLeagues.findIndex(l => l.id === doc.id);
+          if (existingIndex >= 0) {
+            userLeagues[existingIndex] = league;
+          } else {
+            userLeagues.unshift(league);
+          }
+          console.log('[league-selector] lega caricata on-demand:', doc.id);
+        } else {
+          console.warn('[league-selector] lega target non trovata su Firestore:', targetLeagueId);
+        }
+      } catch (err) {
+        console.warn('[league-selector] Errore caricamento lega target:', err);
+      }
+    }
+    
+    // Imposta la lega corrente
     if (league) {
       currentLeague = league;
-      window.currentLeague = league;
-      console.log('✅ currentLeague loaded:', league.id);
+      window.currentLeague = currentLeague;
+      localStorage.setItem('last_league_id', currentLeague.id);
+      console.log('[league-selector] currentLeague impostato:', currentLeague.name, '(ID:', currentLeague.id, ')');
+
+      // Log meta leagueType/sportType per debug UI (reality_show vs sport_league)
+      if (currentLeague) {
+        if (typeof window.getLeagueType === 'function') {
+          console.log('[league-selector] currentLeague meta:', {
+            id: currentLeague.id,
+            name: currentLeague.name,
+            sportType: currentLeague.sportType || 'football',
+            leagueType: window.getLeagueType(currentLeague)
+          });
+        } else {
+          console.log('[league-selector] currentLeague meta:', {
+            id: currentLeague.id,
+            name: currentLeague.name,
+            sportType: currentLeague.sportType || 'football',
+            leagueType: currentLeague.leagueType || 'sport_league'
+          });
+        }
+      }
     } else {
+      // Fallback alla prima lega disponibile se la target non esiste
       if (userLeagues.length > 0) {
         currentLeague = userLeagues[0];
         window.currentLeague = currentLeague;
         localStorage.setItem('last_league_id', currentLeague.id);
-        console.log('✅ currentLeague set from fallback:', currentLeague.id);
+        console.log('[league-selector] fallback to prima lega disponibile:', currentLeague.id);
       } else {
         currentLeague = null;
         window.currentLeague = null;
@@ -374,7 +482,7 @@
   }
   
   /**
-   * Render contenuto dropdown
+   * Render contenuto dropdown con raggruppamento per sport
    */
   function renderDropdownContent() {
     if (userLeagues.length === 0) {
@@ -388,23 +496,64 @@
       `;
     }
     
-    const leaguesHTML = userLeagues.map(league => {
-      const isActive = currentLeague && league.id === currentLeague.id;
-      const teamCount = league.stats?.teamCount || league.teamCount || 0;
-      const isMulti = teamCount > 1;
-      const typeLabel = isMulti ? '🏆 Campionato' : '👤 Squadra unica';
+    // Raggruppa leghe per sportType
+    const leaguesBySport = {};
+    userLeagues.forEach(league => {
+      const sportType = league.sportType || 'football';
+      if (!leaguesBySport[sportType]) {
+        leaguesBySport[sportType] = [];
+      }
+      leaguesBySport[sportType].push(league);
+    });
+    
+    // Funzione helper per ottenere configurazione sport
+    const getSportConfig = (sportType) => {
+      const configs = {
+        'football': { label: '⚽ Calcio', icon: '⚽' },
+        'basketball': { label: '🏀 Basket', icon: '🏀' },
+        'volleyball': { label: '🏐 Volley', icon: '🏐' },
+        'sanremo': { label: '🎤 Sanremo', icon: '🎤' },
+        'reality_tv': { label: '📺 Reality TV', icon: '📺' },
+        'default': { label: '📋 Altro', icon: '📋' }
+      };
+      return configs[sportType] || configs.default;
+    };
+    
+    // Genera HTML per ogni gruppo sport
+    let leaguesHTML = '';
+    Object.keys(leaguesBySport).forEach(sportType => {
+      const sportConfig = getSportConfig(sportType);
+      const sportLeagues = leaguesBySport[sportType];
       
-      return `
-        <div class="league-dropdown-item ${isActive ? 'active' : ''}" data-league-id="${league.id}">
-          <span class="league-item-icon">${getLeagueIcon(league)}</span>
-          <div class="league-item-info">
-            <div class="league-item-name">${league.name}</div>
-            <div class="league-item-meta">${typeLabel}${league.season ? ` • ${league.season}` : ''}</div>
+      leaguesHTML += `
+        <div class="league-sport-group">
+          <div class="league-sport-header">${sportConfig.label}</div>
+          <div class="league-sport-list">
+      `;
+      
+      sportLeagues.forEach(league => {
+        const isActive = currentLeague && league.id === currentLeague.id;
+        const teamCount = league.stats?.teamCount || league.teamCount || 0;
+        const isMulti = teamCount > 1;
+        const typeLabel = isMulti ? '🏆 Campionato' : '👤 Squadra unica';
+        
+        leaguesHTML += `
+          <div class="league-dropdown-item ${isActive ? 'active' : ''}" data-league-id="${league.id}">
+            <span class="league-item-icon">${getLeagueIcon(league)}</span>
+            <div class="league-item-info">
+              <div class="league-item-name">${league.name}</div>
+              <div class="league-item-meta">${typeLabel}${league.season ? ` • ${league.season}` : ''}</div>
+            </div>
+            ${isActive ? '<span class="league-item-check">✓</span>' : ''}
           </div>
-          ${isActive ? '<span class="league-item-check">✓</span>' : ''}
+        `;
+      });
+      
+      leaguesHTML += `
+          </div>
         </div>
       `;
-    }).join('');
+    });
     
     return `
       <div class="league-dropdown-list">
@@ -414,10 +563,10 @@
         <a href="admin-leghe.html" class="league-dropdown-action">
           <span>➕</span> Crea Nuova
         </a>
-        <button class="league-dropdown-action" onclick="window.showJoinModal()">
+        <button class="league-dropdown-action league-join-action" type="button">
           <span>🔍</span> Unisciti
         </button>
-        <button class="league-dropdown-action" onclick="window.showInviteModal()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <button class="league-dropdown-action league-invite-action" type="button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
           <span>📤</span> Invita Amici
         </button>
       </div>
@@ -568,6 +717,38 @@
         switchLeague(leagueId);
       });
     });
+
+    const joinAction = dropdown.querySelector('.league-join-action');
+    if (joinAction) {
+      joinAction.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeDropdown();
+        if (typeof window.showJoinModal === 'function') {
+          window.showJoinModal();
+        } else {
+          alert('Funzione join non disponibile');
+        }
+      });
+    }
+
+    const inviteAction = dropdown.querySelector('.league-invite-action');
+    if (inviteAction) {
+      inviteAction.addEventListener('click', async (event) => {
+        event.preventDefault();
+        closeDropdown();
+        try {
+          await ensureInviteModalLoaded();
+          if (typeof window.showInviteModal === 'function') {
+            window.showInviteModal();
+          } else {
+            throw new Error('showInviteModal non è disponibile');
+          }
+        } catch (error) {
+          console.error('[LEAGUE-SELECTOR] Impossibile aprire la finestra inviti', error);
+          alert('Errore nell\'apertura della finestra inviti. Riprova più tardi.');
+        }
+      });
+    }
   }
   
   /**
@@ -598,9 +779,12 @@
   /**
    * Switch a un'altra lega
    */
-  function switchLeague(leagueId) {
+  async function switchLeague(leagueId) {
+    console.log('[league-selector] Inizio switchLeague a:', leagueId);
+    
     const dropdown = document.getElementById('leagueDropdown');
     if (currentLeague && leagueId === currentLeague.id) {
+      console.log('[league-selector] Stessa lega selezionata, nessun cambio');
       // Stessa lega, chiudi dropdown
       if (dropdown) {
         dropdown.classList.remove('show');
@@ -609,11 +793,117 @@
       return;
     }
     
+    // Reset cache locale quando cambia lega (evita mix di dati)
+    clearLeagueLocalCache();
+    
+    // Aggiorna localStorage e globali
     localStorage.setItem('last_league_id', leagueId);
-    window.dispatchEvent(new CustomEvent('league-changed', { detail: { leagueId } }));
+    window.currentLeagueId = leagueId;
+    
+    // Trova i dati della lega selezionata
+    const selectedLeague = userLeagues.find(l => l.id === leagueId);
+    if (selectedLeague) {
+      window.currentLeague = selectedLeague;
+      console.log('[league-selector] window.currentLeague aggiornato:', selectedLeague.name);
+    }
+    
+    // Aggiorna users/{uid}.currentLeague su Firestore (async, non bloccante)
+    try {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        await firebase.firestore().collection('users').doc(user.uid).update({
+          currentLeague: leagueId
+        });
+        console.log('[league-selector] currentLeague aggiornato su Firestore per utente:', user.uid);
+      }
+    } catch (err) {
+      console.warn('[league-selector] Errore aggiornamento currentLeague su Firestore:', err);
+      // Non bloccare l'esperienza utente se fallisce la scrittura
+    }
+    
+    // Dispatch evento per le pagine che ascoltano
+    window.dispatchEvent(new CustomEvent('league-changed', { detail: { leagueId, league: selectedLeague } }));
+    console.log('[league-selector] Evento league-changed dispatchato');
     
     // Reload pagina per aggiornare dati
+    console.log('[league-selector] Reload pagina per applicare cambiamenti');
     window.location.reload();
+  }
+
+  /**
+   * Pulisce la cache localStorage per evitare dati mischiati tra leghe
+   */
+  function clearLeagueLocalCache() {
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (
+          key.startsWith('teams_') || 
+          key.startsWith('teams_data') ||
+          key.startsWith('team_logo_') ||
+          key.startsWith('teams_saved_') ||
+          key.startsWith('players_G') ||
+          key.startsWith('coaches_G') ||
+          key.startsWith('curva_G') ||
+          key.startsWith('results_') ||
+          key.startsWith('days_') ||
+          key.startsWith('matchday_') ||
+          key.startsWith('lineup_') ||
+          key.startsWith('classifica_') ||
+          key.startsWith('convocati_') ||
+          key.startsWith('saved_') ||
+          key.startsWith('standings_') ||
+          key.startsWith('schedule_') ||
+          key.startsWith('h2h_')
+        )) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      console.log(`🧹 [league-selector] Cache pulita (${keysToRemove.length} chiavi) per cambio lega`);
+    } catch (err) {
+      console.warn('[league-selector] Errore pulizia cache:', err);
+    }
+  }
+
+  async function ensureInviteModalLoaded() {
+    if (typeof window.showInviteModal === 'function') {
+      return;
+    }
+
+    if (!inviteModalPromise) {
+      const existingScript = document.querySelector('script[src*="league-invite-modal.js"]');
+      inviteModalPromise = new Promise((resolve, reject) => {
+        if (existingScript) {
+          const state = existingScript.readyState;
+          if (typeof window.showInviteModal === 'function' || state === 'complete' || state === 'loaded') {
+            resolve();
+            return;
+          }
+          existingScript.addEventListener('load', resolve, { once: true });
+          existingScript.addEventListener('error', reject, { once: true });
+        } else {
+          const script = document.createElement('script');
+          script.src = INVITE_SCRIPT_SRC;
+          script.async = true;
+          script.dataset.leagueInvite = 'true';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        }
+      }).then(() => {
+        if (typeof window.showInviteModal !== 'function') {
+          throw new Error('Script degli inviti caricato ma showInviteModal non definita');
+        }
+      }).catch((error) => {
+        throw error;
+      }).finally(() => {
+        inviteModalPromise = null;
+      });
+    }
+
+    await inviteModalPromise;
   }
   
   /**
@@ -748,6 +1038,27 @@
         color: var(--primary);
         font-weight: bold;
         font-size: 18px;
+      }
+      
+      /* Sport grouping */
+      .league-sport-group {
+        margin-bottom: 12px;
+      }
+      
+      .league-sport-header {
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        background: #f8f9fa;
+        border-radius: 6px;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .league-sport-list {
+        padding: 0 4px;
       }
       
       .league-dropdown-empty {

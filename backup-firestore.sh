@@ -9,7 +9,7 @@ echo ""
 
 # Configurazione
 PROJECT_ID="fanta-athletic"
-BACKUP_BUCKET="gs://fanta-athletic.appspot.com/backups"
+BACKUP_BUCKET="gs://fanta-athletic.firebasestorage.app/backups"
 BACKUP_NAME="backup-pre-multilega-$(date +%Y%m%d-%H%M%S)"
 
 echo "📅 Data backup: $(date)"

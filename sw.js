@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fanta-athletic-v2025110701';
+const CACHE_NAME = 'fanta-athletic-v2025102720';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -57,19 +57,12 @@ self.addEventListener('fetch', event => {
     return; // Don't intercept Firebase requests at all
   }
   
-  // Skip cache for HTML, JS, CSS - always fetch fresh
+  // Skip cache for HTML, JS, CSS - always fetch fresh (network-first con fallback)
   if (url.pathname.endsWith('.html') || 
       url.pathname.endsWith('.js') || 
       url.pathname.endsWith('.css') ||
       url.pathname === '/') {
-    event.respondWith(
-      fetch(event.request)
-        .catch(() => caches.match(event.request))
-        .catch(() => {
-          console.warn('Fetch failed, returning offline response');
-          return new Response('Offline', { status: 503 });
-        })
-    );
+    event.respondWith(networkFirst(event.request));
     return;
   }
   
@@ -93,6 +86,22 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
+function networkFirst(request) {
+  return fetch(request).catch(() => {
+    return caches.match(request).then(match => {
+      if (match) return match;
+      return offlineResponse();
+    });
+  });
+}
+
+function offlineResponse() {
+  return new Response('Offline', {
+    status: 503,
+    statusText: 'Offline'
+  });
+}
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {

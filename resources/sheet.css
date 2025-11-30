@@ -9,6 +9,23 @@
   --primary-hover: #b01030;
   --ring: rgba(220,20,60,0.35);
   --shadow: 0 2px 5px rgba(0,0,0,0.1);
+  --layout-max: 1200px;
+  --layout-max-wide: 1320px;
+  --layout-padding: clamp(18px, 3vw, 42px);
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --layout-max: 1320px;
+    --layout-max-wide: 1440px;
+  }
+}
+
+@media (min-width: 1680px) {
+  :root {
+    --layout-max: 1440px;
+    --layout-max-wide: 1560px;
+  }
 }
 
 /* Dark Theme */
@@ -55,18 +72,49 @@ html, body { height: 100%; overflow-x: hidden; max-width: 100vw; }
 
 body {
   margin: 0;
-  padding: 20px;
+  padding: var(--layout-padding);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: var(--bg);
   color: var(--text);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: clamp(18px, 2.2vw, 28px);
   max-width: 100%;
   overflow-x: hidden;
   position: relative;
   min-height: 100vh;
   transition: background 0.3s, color 0.3s;
+  align-items: stretch;
+}
+
+body > main,
+body > footer,
+body > .layout,
+body > .panel,
+main,
+.layout,
+.panel,
+.card,
+.home-main,
+.section,
+.page-section,
+.page-wrapper,
+.content-wrapper,
+.match-summary-card,
+.recent-results-card {
+  width: min(100%, var(--layout-max));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+header {
+  width: 100%;
+  margin: 0;
+  padding: 0 20px;
+  border-radius: 0;
+  box-sizing: border-box;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 /* Desktop ad banners */
@@ -197,12 +245,16 @@ body {
     top: 0;
     left: 0;
     right: 0;
+    transform: none;
     z-index: 9999;
     margin: 0 !important;
-    max-height: 80px; /* Altezza normale come in foto */
+    width: 100%;
+    max-height: 80px;
     overflow: hidden;
     padding: 10px 28px;
     align-items: center;
+    gap: 16px;
+    box-shadow: none;
   }
 
   header > .nav {
@@ -219,10 +271,9 @@ body {
   header > #navbarProfileIcon {
     margin-left: 0;
   }
-  }
   
   body {
-    padding-top: 130px; /* Adeguato alla nuova navbar */
+    padding-top: 132px; /* Adeguato alla nuova navbar */
   }
 }
 
@@ -260,7 +311,7 @@ body.page-home {
     position: relative !important;
     top: auto !important;
   }
-  
+
   body.page-squadre,
   body:not(.page-home):not(.page-squadre) {
     padding: 18px 16px 80px !important;
@@ -570,19 +621,16 @@ header p {
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
 }
 
-/* Tablet: nascondi link non essenziali, mostra icone */
-@media (max-width: 1200px) {
-  .nav {
-    gap: 4px;
-  }
-  
+/* Desktop grande (>1400px) - Layout completo */
+@media (min-width: 1401px) {
   .nav-link {
-    padding: 7px 12px;
-    font-size: 13px;
+    padding: 8px 14px;
+    font-size: 14px;
+    gap: 7px;
   }
   
   .nav-icon {
-    font-size: 16px;
+    font-size: 18px;
   }
   
   .nav-label {
@@ -590,11 +638,20 @@ header p {
   }
 }
 
-/* Desktop piccolo: riduci padding */
-@media (max-width: 1024px) {
+/* Desktop medio (1200-1400px) - Layout standard */
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .nav {
+    gap: 6px;
+  }
+  
   .nav-link {
-    padding: 6px 10px;
-    gap: 4px;
+    padding: 7px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+  
+  .nav-icon {
+    font-size: 17px;
   }
   
   .nav-label {
@@ -602,27 +659,103 @@ header p {
   }
 }
 
-/* Desktop molto piccolo: nascondi label non essenziali */
-@media (max-width: 1200px) and (min-width: 1025px) {
-  .nav-link.nav-desktop:not(.nav-admin) .nav-label {
+/* Desktop piccolo / Laptop (1024-1200px) - Solo icone per link non essenziali */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  header {
+    padding: 8px 20px;
+  }
+  
+  header h1 {
+    font-size: 18px;
+  }
+  
+  .logo-home img {
+    height: 42px;
+    width: 42px;
+  }
+  
+  .nav {
+    gap: 4px;
+    padding: 4px 12px;
+  }
+  
+  /* Nascondi label per link non essenziali, mantieni per Admin e link importanti */
+  .nav-link.nav-desktop:not(.nav-admin):not([href="index.html"]):not([href="formazioni.html"]):not([href="bacheca.html"]) .nav-label {
     display: none;
   }
   
-  .nav-link.nav-desktop:not(.nav-admin) {
-    padding: 8px;
+  .nav-link {
+    padding: 8px 10px;
     min-width: 40px;
     justify-content: center;
   }
+  
+  .nav-link.nav-admin .nav-label,
+  .nav-link[href="index.html"] .nav-label,
+  .nav-link[href="formazioni.html"] .nav-label,
+  .nav-link[href="bacheca.html"] .nav-label {
+    display: inline;
+    font-size: 11px;
+  }
+  
+  .nav-icon {
+    font-size: 16px;
+  }
 }
 
-/* Tablet: nascondi label, mostra solo icone per link desktop */
-@media (max-width: 900px) {
+/* Tablet grande / Laptop piccolo (900-1024px) - Solo icone */
+@media (min-width: 900px) and (max-width: 1023px) {
+  header {
+    padding: 8px 16px;
+  }
+  
+  header h1 {
+    font-size: 16px;
+  }
+  
+  .logo-home img {
+    height: 40px;
+    width: 40px;
+  }
+  
+  .nav {
+    gap: 3px;
+    padding: 4px 10px;
+  }
+  
   .nav-link.nav-desktop .nav-label {
     display: none;
   }
   
-  .nav-link.nav-desktop {
+  .nav-link {
     padding: 8px;
+    min-width: 38px;
+    justify-content: center;
+  }
+  
+  .nav-icon {
+    font-size: 16px;
+  }
+}
+
+/* Tablet (768-900px) - Solo icone, padding ridotto */
+@media (min-width: 768px) and (max-width: 899px) {
+  .nav {
+    gap: 2px;
+  }
+  
+  .nav-link.nav-desktop .nav-label {
+    display: none;
+  }
+  
+  .nav-link {
+    padding: 6px 8px;
+    min-width: 36px;
+    justify-content: center;
+  }
+  
+  .nav-icon {
+    font-size: 15px;
   }
 }
 

@@ -9,6 +9,51 @@
   let retryCount = 0;
   const MAX_RETRIES = 50; // 5 secondi max
 
+  const NO_TEAM_BADGE_ID = 'noTeamBadge';
+
+  function getNoTeamBadgeHost() {
+    const header = document.querySelector('header');
+    if (!header) return null;
+    const h1 = header.querySelector('h1');
+    return h1 || header;
+  }
+
+  function updateNoTeamBadge(show) {
+    const host = getNoTeamBadgeHost();
+    if (!host) return;
+
+    let badge = document.getElementById(NO_TEAM_BADGE_ID);
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = NO_TEAM_BADGE_ID;
+      badge.textContent = 'Nessuna squadra';
+      badge.title = 'Clicca per scegliere la tua squadra';
+      badge.style.cssText = [
+        'display:inline-flex',
+        'align-items:center',
+        'justify-content:center',
+        'margin-left:8px',
+        'padding:3px 8px',
+        'border-radius:999px',
+        'background:#b91c1c',
+        'color:#fff',
+        'font-size:11px',
+        'font-weight:600',
+        'letter-spacing:0.06em',
+        'text-transform:uppercase',
+        'cursor:pointer'
+      ].join(';');
+      badge.addEventListener('click', () => {
+        try {
+          window.location.href = 'scegli-squadra.html';
+        } catch (_) {}
+      });
+      host.appendChild(badge);
+    }
+
+    badge.style.display = show ? 'inline-flex' : 'none';
+  }
+
   /**
    * Renderizza icona profilo con foto o placeholder
    */
@@ -31,6 +76,7 @@
     firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
         container.innerHTML = '';
+        updateNoTeamBadge(false);
         return;
       }
 
@@ -56,6 +102,18 @@
               👤
             </a>
           `;
+        }
+
+        // Badge "Nessuna squadra" per utenti senza team_index
+        try {
+          const hasTeam = typeof userData.team_index === 'number';
+          console.log('[navbar] userData:', userData);
+          console.log('[navbar] team_index:', userData.team_index, 'type:', typeof userData.team_index);
+          console.log('[navbar] hasTeam:', hasTeam);
+          updateNoTeamBadge(user && !hasTeam);
+        } catch (_) {
+          console.error('[navbar] Errore check team:', _);
+          updateNoTeamBadge(false);
         }
 
         // Hover effect

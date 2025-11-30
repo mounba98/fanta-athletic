@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Gestione Leghe</title>
+  <title>Admin - Gestione Leghe</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
@@ -20,11 +20,51 @@
     .input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(52, 144, 220, 0.1); }
     .btn { padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--stroke); }
+    .btn-secondary:hover { background: rgba(52, 152, 219, 0.1); }
+    .formation-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border: 1px solid var(--stroke);
+      border-radius: 10px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .formation-chip:hover {
+      border-color: var(--primary);
+      background: rgba(52, 152, 219, 0.08);
+    }
+    .mono-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(52, 152, 219, 0.15);
+      color: var(--text);
+      font-weight: 600;
+    }
+    .mono-chip button {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    .mono-chip button:hover {
+      opacity: 0.7;
+    }
     
     /* Toast */
     .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
     .toast { background: #2ecc71; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
     .toast.error { background: #e74c3c; }
+    .toast.info { background: var(--surface); color: var(--text); border:1px solid var(--stroke); }
     @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
   </style>
 </head>
@@ -33,16 +73,16 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Admin • Gestione Leghe</h1>
+    <h1>Admin - Gestione Leghe</h1>
   </header>
 
   <main class="container">
     <section class="card">
       <h2>Lega Attiva</h2>
-      <p style="color:var(--muted);font-size:14px;">La lega selezionata sarà usata in tutti gli altri pannelli</p>
+      <p style="color:var(--muted);font-size:14px;">La lega selezionata sar� usata in tutti gli altri pannelli</p>
       <div style="background: rgba(52, 152, 219, 0.1); padding: 16px; border-radius: 12px; border-left: 4px solid var(--primary);">
         <div style="font-size: 20px; font-weight: 700; color: var(--primary);" id="currentLeagueName">Nessuna lega selezionata</div>
-        <div style="font-size: 13px; color: var(--muted); margin-top: 4px;" id="currentLeagueId">—</div>
+        <div style="font-size: 13px; color: var(--muted); margin-top: 4px;" id="currentLeagueId">�</div>
       </div>
     </section>
 
@@ -63,13 +103,13 @@
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <label style="border:2px solid #ddd; padding:16px; border-radius:12px; cursor:pointer; transition:all 0.3s;" onclick="selectType('mono')" id="type-mono">
               <input type="radio" name="leagueType" value="mono" style="margin-right:8px;" />
-              <strong>👤 Mono-Squadra (Giocatori Non Unici)</strong>
-              <div style="font-size:12px; color:var(--muted); margin-top:6px;">Gestisci la tua squadra. I giocatori possono essere scelti da più utenti. Ideale per competizione personale o piccoli gruppi.</div>
+              <strong>Mono-Squadra (giocatori non unici)</strong>
+              <div style="font-size:12px; color:var(--muted); margin-top:6px;">Gestisci una rosa personale. Gli stessi calciatori possono essere selezionati da pi&ugrave; allenatori.</div>
             </label>
             <label style="border:2px solid #ddd; padding:16px; border-radius:12px; cursor:pointer; transition:all 0.3s;" onclick="selectType('multi')" id="type-multi">
               <input type="radio" name="leagueType" value="multi" style="margin-right:8px;" />
-              <strong>🏆 Multi-Squadra (Giocatori Unici)</strong>
-              <div style="font-size:12px; color:var(--muted); margin-top:6px;">Lega classica con amici. Ogni giocatore appartiene a una sola squadra. Asta, budget, trasferimenti.</div>
+              <strong>Multi-Squadra (giocatori unici)</strong>
+              <div style="font-size:12px; color:var(--muted); margin-top:6px;">Lega classica tra amici: ogni giocatore appartiene a una sola squadra. Supporta asta, budget e mercato.</div>
             </label>
           </div>
         </div>
@@ -78,6 +118,21 @@
         <div>
           <label style="font-weight:600; margin-bottom:6px; display:block;">Stagione</label>
           <input id="seasonInput" class="input" placeholder="es. 2024/2025" value="2024/2025" />
+        </div>
+
+        <!-- Sport -->
+        <div>
+          <label style="font-weight:600; margin-bottom:6px; display:block;">Sport *</label>
+          <select id="sportTypeSelect" class="input"></select>
+          <p style="font-size:12px; color:var(--muted); margin-top:4px;">Lo sport determina ruoli, punteggi e configurazioni predefinite.</p>
+        </div>
+
+        <!-- Competition -->
+        <div>
+          <label style="font-weight:600; margin-bottom:6px; display:block;">Competition / Catalog ID</label>
+          <input id="competitionIdInput" class="input" placeholder="es. serie-a-2025, nba-2025, f1-2026" list="competitionIdList" />
+          <datalist id="competitionIdList"></datalist>
+          <p style="font-size:12px; color:var(--muted); margin-top:4px;">Facoltativo. Consigliato per collegare la lega al catalogo ufficiale.</p>
         </div>
         
         <!-- Settings Multi-Squadra (condizionale) -->
@@ -96,66 +151,101 @@
         </div>
         
         <!-- Moduli Disponibili -->
-        <div>
-          <label style="font-weight:600; margin-bottom:6px; display:block;">Moduli Disponibili (Formato: Difensori-Centrocampisti-Attaccanti)</label>
-          <div id="formationCheckboxes" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(100px, 1fr)); gap:8px;">
-            <label style="display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+        <div id="multiFormationSection">
+          <label style="font-weight:600; margin-bottom:6px; display:block;">Moduli Disponibili (Difensori-Centrocampisti-Attaccanti)</label>
+          <div id="formationCheckboxes" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:8px;">
+            <label class="formation-chip">
               <input type="checkbox" value="3-4-3" checked /> 3-4-3
             </label>
-            <label style="display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+            <label class="formation-chip">
               <input type="checkbox" value="3-5-2" checked /> 3-5-2
             </label>
-            <label style="display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+            <label class="formation-chip">
               <input type="checkbox" value="4-3-3" checked /> 4-3-3
             </label>
-            <label style="display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+            <label class="formation-chip">
               <input type="checkbox" value="4-4-2" checked /> 4-4-2
             </label>
-            <label style="display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+            <label class="formation-chip">
               <input type="checkbox" value="4-5-1" /> 4-5-1
             </label>
-            <label style="display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+            <label class="formation-chip">
               <input type="checkbox" value="5-3-2" /> 5-3-2
             </label>
-            <label style="display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+            <label class="formation-chip">
               <input type="checkbox" value="5-4-1" /> 5-4-1
             </label>
           </div>
-          <p style="font-size:12px; color:var(--muted); margin-top:8px;">⚠️ Portiere è sempre obbligatorio (non incluso nel modulo)</p>
+          <p style="font-size:12px; color:var(--muted); margin-top:8px;">Il portiere &egrave; sempre incluso automaticamente.</p>
+        </div>
+
+        <div id="monoFormationSection" style="display:none;">
+          <label style="font-weight:600; margin-bottom:6px; display:block;">Moduli Disponibili (difensori-centrocampisti-attaccanti)</label>
+          <div style="display:grid; gap:12px; background:var(--surface); border:1px solid var(--stroke); padding:16px; border-radius:12px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px;">
+              <div>
+                <label for="monoRosterSize" style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Numero giocatori titolari</label>
+                <input id="monoRosterSize" class="input" type="number" min="3" max="11" value="5" />
+              </div>
+              <div>
+                <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Totali disponibili</label>
+                <div id="monoFormationSummary" style="font-size:13px; color:var(--muted);">Moduli caricati: 0</div>
+              </div>
+            </div>
+
+            <div id="monoFormationList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px; align-items:end;">
+              <div>
+                <label for="monoDefInput" style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Difensori</label>
+                <input id="monoDefInput" class="input" type="number" min="0" max="5" value="2" />
+              </div>
+              <div>
+                <label for="monoMidInput" style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Centrocampisti</label>
+                <input id="monoMidInput" class="input" type="number" min="0" max="5" value="2" />
+              </div>
+              <div>
+                <label for="monoAttInput" style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Attaccanti</label>
+                <input id="monoAttInput" class="input" type="number" min="0" max="5" value="1" />
+              </div>
+              <button type="button" class="btn btn-secondary" id="addMonoFormationBtn" style="margin-top:24px;">Aggiungi modulo</button>
+            </div>
+            <p style="font-size:12px; color:var(--muted); margin:0;">Ogni modulo deve sommare al totale dei titolari selezionati. Il portiere resta fisso.</p>
+          </div>
         </div>
         
         <!-- Regole Predefinite -->
         <div>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#f8f9fa; padding:12px; border-radius:8px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); padding:12px; border-radius:8px; border:1px solid var(--stroke);">
             <input type="checkbox" id="useDefaultRules" checked style="width:18px; height:18px;" />
             <div>
-              <strong>✅ Importa Regole Fantacalcio Classiche</strong>
-              <div style="font-size:12px; color:var(--muted);">11 regole standard (Gol +3, Assist +1, Ammonizione -0.5, etc.). Potrai modificarle, nasconderle o eliminarne in Admin → Regole dopo la creazione.</div>
+              <strong>Importa regole fantacalcio classiche</strong>
+              <div style="font-size:12px; color:var(--muted);">Carica 11 regole standard (gol +3, assist +1, ammonizione -0.5, ecc.). Potrai modificarle o eliminarle in Admin &rarr; Regole dopo la creazione.</div>
             </div>
           </label>
         </div>
         
         <!-- Sistema Voti Opzionale -->
         <div>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#e3f2fd; padding:12px; border-radius:8px;" onclick="togglePlayerRatings()">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); padding:12px; border-radius:8px; border:1px solid var(--stroke);" onclick="togglePlayerRatings()">
             <input type="checkbox" id="usePlayerRatings" checked style="width:18px; height:18px;" />
             <div>
-              <strong>📊 Usa Voti Giocatori</strong>
-              <div style="font-size:12px; color:var(--muted);">Abilita inserimento voti manuale per calcolo punteggi. ⚠️ Richiede qualcuno che si segna i dati in partita.</div>
+              <strong>Usa voti giocatori</strong>
+              <div style="font-size:12px; color:var(--muted);">Abilita l'inserimento manuale dei voti per il calcolo dei punteggi. Serve qualcuno che aggiorni i dati dopo le partite.</div>
             </div>
           </label>
           
-          <div id="ratingsWarning" style="display:none; margin-top:8px; padding:10px; background:#fff3cd; border-radius:6px; font-size:12px;">
-            💡 <strong>Nota</strong>: Senza voti, Modificatore Difesa e Attacco saranno disabilitati. Il calcolo si baserà solo su bonus/malus (gol, assist, ammonizioni, etc.)
+          <div id="ratingsWarning" style="display:none; margin-top:8px; padding:10px; background:#fff3cd; border-radius:6px; font-size:12px; color:#5c3a00;">
+            <strong>Nota:</strong> senza voti i modificatori di difesa e attacco restano disattivati. Il calcolo user&agrave; solo bonus e malus (gol, assist, ammonizioni, ecc.).
           </div>
         </div>
         
         <!-- Modificatore Difesa -->
         <div>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#e8f5e9; padding:12px; border-radius:8px;" onclick="toggleDefenseModifier()">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); padding:12px; border-radius:8px; border:1px solid var(--stroke);" onclick="toggleDefenseModifier()">
             <input type="checkbox" id="useDefenseModifier" style="width:18px; height:18px;" />
             <div>
-              <strong>🛡️ Modificatore Difesa Avanzato</strong>
+              <strong>Modificatore difesa avanzato</strong>
               <div style="font-size:12px; color:var(--muted);">Bonus/malus basato sulla media voto dei 4 migliori difensori (Portiere + 3 difensori). Solo per difese a 4 o 5.</div>
             </div>
           </label>
@@ -186,21 +276,21 @@
                 <input type="number" id="defMod5" class="input" value="2" step="0.5" style="padding:6px;" />
               </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:center;">
-                <span style="font-size:13px;">Media ≥ 7.00</span>
+                <span style="font-size:13px;">Media = 7.00</span>
                 <input type="number" id="defMod6" class="input" value="3" step="0.5" style="padding:6px;" />
               </div>
             </div>
-            <p style="font-size:11px; color:var(--muted); margin-top:10px;">💡 Valori negativi per malus (es. -1 per media < 6)</p>
+            <p style="font-size:11px; color:var(--muted); margin-top:10px;">Usa valori negativi per indicare i malus (es. -1 per media inferiore a 6).</p>
           </div>
         </div>
         
         <!-- Sistema Coppa -->
         <div id="cupSystemSection" style="display:none;">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#fff3cd; padding:12px; border-radius:8px;" onclick="toggleCupSystem()">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); padding:12px; border-radius:8px; border:1px solid var(--stroke);" onclick="toggleCupSystem()">
             <input type="checkbox" id="useCupSystem" style="width:18px; height:18px;" />
             <div>
-              <strong>🏆 Sistema Coppa/Playoff</strong>
-              <div style="font-size:12px; color:var(--muted);">Aggiungi coppa parallela con gironi e/o scontri diretti eliminatori</div>
+              <strong>Sistema coppa/playoff</strong>
+              <div style="font-size:12px; color:var(--muted);">Aggiungi una coppa parallela con gironi e/o scontri diretti eliminatori.</div>
             </div>
           </label>
           
@@ -248,11 +338,11 @@
         
         <!-- Sistema Wildcard/Capitano -->
         <div>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#fff9e6; padding:12px; border-radius:8px;" onclick="toggleWildcard()">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); padding:12px; border-radius:8px; border:1px solid var(--stroke);" onclick="toggleWildcard()">
             <input type="checkbox" id="useWildcard" style="width:18px; height:18px;" />
             <div>
-              <strong>⭐ Sistema Capitano/Wildcard</strong>
-              <div style="font-size:12px; color:var(--muted);">Permetti di scegliere un giocatore con moltiplicatore punteggio</div>
+              <strong>Sistema capitano/wildcard</strong>
+              <div style="font-size:12px; color:var(--muted);">Permetti di scegliere un giocatore con moltiplicatore di punteggio.</div>
             </div>
           </label>
           
@@ -268,7 +358,7 @@
                   <option value="2.5">2.5x</option>
                   <option value="3">3x</option>
                 </select>
-                <p style="font-size:11px; color:var(--muted); margin-top:4px;">Il punteggio del giocatore selezionato sarà moltiplicato</p>
+                <p style="font-size:11px; color:var(--muted); margin-top:4px;">Il punteggio del giocatore selezionato sara' moltiplicato.</p>
               </div>
               
               <div>
@@ -276,7 +366,7 @@
                 <input type="number" id="wildcardUsesPerSeason" class="input" value="0" min="0" max="38" style="width:100px;" />
                 <p style="font-size:11px; color:var(--muted); margin-top:4px;">
                   0 = illimitato (ogni giornata)<br/>
-                  Esempio: 5 = può usare capitano solo 5 volte in tutta la stagione
+                  Esempio: 5 = puo' usare il capitano solo 5 volte in tutta la stagione
                 </p>
               </div>
               
@@ -286,13 +376,13 @@
                   <span style="font-size:13px; font-weight:600;">Massimo 1 giocatore per giornata</span>
                 </label>
                 <p style="font-size:11px; color:var(--muted); margin-top:4px;">
-                  Se disabilitato, può selezionare più giocatori con moltiplicatore nella stessa giornata
+                  Se disabilitato puoi selezionare piu' giocatori con moltiplicatore nella stessa giornata.
                 </p>
               </div>
             </div>
             
-            <div style="margin-top:16px; padding:12px; background:#e8f5e9; border-radius:8px; font-size:12px;">
-              <strong>💡 Esempi Configurazione:</strong>
+            <div style="margin-top:16px; padding:12px; background:var(--surface); border-radius:8px; border:1px solid var(--stroke); font-size:12px;">
+              <strong>Esempi di configurazione:</strong>
               <ul style="margin:8px 0; padding-left:20px;">
                 <li><strong>Capitano Classico</strong>: 2x, 0 utilizzi, 1 per giornata</li>
                 <li><strong>Wildcard Limited</strong>: 3x, 5 utilizzi stagione, 1 per giornata</li>
@@ -302,7 +392,7 @@
           </div>
         </div>
         
-        <button class="btn" onclick="createLeague()" style="width:100%; padding:14px;">➡️ Crea Competizione</button>
+        <button class="btn" onclick="createLeague()" style="width:100%; padding:14px;">Crea competizione</button>
       </div>
     </section>
 
@@ -311,7 +401,7 @@
       <p style="color:var(--muted);font-size:14px;">Hai ricevuto un codice invito? Inseriscilo qui</p>
       <div style="display:flex; gap:12px; flex-wrap:wrap;">
         <input id="joinCode" class="input" placeholder="Inserisci codice (es. ABC123)" style="flex:1; min-width:200px; text-transform:uppercase;" maxlength="6" />
-        <button class="btn" onclick="joinLeague()">➡️ Unisciti</button>
+        <button class="btn" onclick="joinLeague()">Unisciti</button>
       </div>
     </section>
 
@@ -327,6 +417,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/sport-config.js?v=20251115"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -343,7 +434,105 @@
   <script>
     let currentUser = null;
     let leagues = [];
-    const currentLeagueId = localStorage.getItem('current_league_id') || null;
+    let currentLeagueId = localStorage.getItem('current_league_id') || localStorage.getItem('last_league_id') || null;
+    let monoFormations = [];
+    let monoRosterSize = 5;
+    const DEFAULT_SPORT_TYPE = 'football';
+    let leagueReloadScheduled = false;
+    const COMPETITION_INDEX_URL = 'data/competitions/index.json';
+    let availableCompetitions = [];
+
+    function getSportConfigSafe(type) {
+      if (typeof window.getSportConfig === 'function') {
+        return window.getSportConfig(type);
+      }
+      if (window.SPORT_CONFIG && window.SPORT_CONFIG[type]) {
+        return window.SPORT_CONFIG[type];
+      }
+      return window.SPORT_CONFIG?.football || null;
+    }
+
+    function computeDefaultLineupSize(config) {
+      if (!config) return 11;
+      if (Array.isArray(config.defaultFormation) && config.defaultFormation.length) {
+        return config.defaultFormation.reduce((sum, value) => sum + Number(value || 0), 0);
+      }
+      if (config.lineupSlots && typeof config.lineupSlots === 'object') {
+        return Object.values(config.lineupSlots).reduce((sum, value) => sum + Number(value || 0), 0);
+      }
+      return 11;
+    }
+
+    // leagueType wiring: mappa sportType -> leagueType (sport_league, sport_series, reality_show, ...)
+    function computeLeagueTypeFromSportType(sportType) {
+      if (typeof window.computeLeagueTypeFromSportType === 'function') {
+        // Usa la versione condivisa se disponibile (sport-config.js)
+        return window.computeLeagueTypeFromSportType(sportType);
+      }
+      switch (sportType) {
+        case 'football':
+        case 'basketball':
+        case 'volleyball':
+          return 'sport_league';
+        case 'f1':
+        case 'sanremo':
+          return 'sport_series';
+        case 'reality_tv':
+          return 'reality_show';
+        default:
+          return 'sport_league';
+      }
+    }
+
+    function populateSportSelect() {
+      const select = document.getElementById('sportTypeSelect');
+      if (!select) return;
+      const config = window.SPORT_CONFIG || { football: { label: 'Calcio' } };
+      select.innerHTML = Object.entries(config).map(([key, value]) => `
+        <option value="${key}">${value.label || key}</option>
+      `).join('');
+      select.value = DEFAULT_SPORT_TYPE;
+    }
+
+    function handleSportChange() {
+      const select = document.getElementById('sportTypeSelect');
+      const competitionInput = document.getElementById('competitionIdInput');
+      if (!select) return;
+      const cfg = getSportConfigSafe(select.value);
+      if (competitionInput && cfg?.defaultCompetitionId) {
+        competitionInput.placeholder = cfg.defaultCompetitionId;
+      }
+      refreshCompetitionSuggestions(select?.value || DEFAULT_SPORT_TYPE);
+    }
+
+    function refreshCompetitionSuggestions(targetSport) {
+      const list = document.getElementById('competitionIdList');
+      if (!list) return;
+      const sport = targetSport || document.getElementById('sportTypeSelect')?.value || DEFAULT_SPORT_TYPE;
+      const filtered = availableCompetitions.filter(item => !sport || item.sportType === sport);
+      list.innerHTML = filtered.map(item => `
+        <option value="${item.competitionId}">${item.label || item.competitionId}</option>
+      `).join('');
+      const input = document.getElementById('competitionIdInput');
+      if (input && !input.value) {
+        const placeholder = filtered[0]?.competitionId || '';
+        if (placeholder) {
+          input.placeholder = placeholder;
+        }
+      }
+    }
+
+    async function loadCompetitionHints() {
+      try {
+        const response = await fetch(COMPETITION_INDEX_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`status ${response.status}`);
+        const json = await response.json();
+        availableCompetitions = Array.isArray(json?.competitions) ? json.competitions : [];
+        refreshCompetitionSuggestions();
+      } catch (err) {
+        console.warn('[admin-leghe] impossibile caricare competition index', err);
+      }
+    }
 
     firebase.auth().onAuthStateChanged(async (user)=>{
       if (!user) return location.href='auth.html';
@@ -351,6 +540,28 @@
       if (!a.exists) return location.href='index.html';
       currentUser = user;
       boot();
+    });
+
+    window.addEventListener('league-changed', (event) => {
+      const newLeagueId = event.detail?.leagueId;
+      if (newLeagueId && newLeagueId !== currentLeagueId) {
+        setCurrentLeagueId(newLeagueId, { reload: !document.hidden });
+      }
+    });
+
+    window.addEventListener('league-ready', (event) => {
+      const league = event.detail?.league;
+      if (league?.id && league.id !== currentLeagueId) {
+        currentLeagueId = league.id;
+        syncLeagueUI();
+      }
+    });
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'last_league_id' && event.newValue && event.newValue !== currentLeagueId) {
+        setCurrentLeagueId(event.newValue, { reload: false });
+        syncLeagueUI();
+      }
     });
 
     function boot() {
@@ -367,23 +578,160 @@
       const multi = document.getElementById('type-multi');
       const multiSettings = document.getElementById('multiSettings');
       const cupSystemSection = document.getElementById('cupSystemSection');
-      
+      const multiFormationSection = document.getElementById('multiFormationSection');
+      const monoFormationSection = document.getElementById('monoFormationSection');
+      if (!mono || !multi) return;
       if (type === 'mono') {
         mono.style.borderColor = 'var(--primary)';
-        mono.style.background = 'rgba(52, 152, 219, 0.05)';
-        multi.style.borderColor = '#ddd';
-        multi.style.background = 'white';
-        multiSettings.style.display = 'none';
-        cupSystemSection.style.display = 'none';
-        document.querySelector('input[value="mono"]').checked = true;
+        mono.style.background = 'rgba(52, 152, 219, 0.08)';
+        multi.style.borderColor = 'var(--stroke)';
+        multi.style.background = 'var(--card)';
+        if (multiSettings) multiSettings.style.display = 'none';
+        if (cupSystemSection) cupSystemSection.style.display = 'none';
+        if (multiFormationSection) multiFormationSection.style.display = 'none';
+        if (monoFormationSection) {
+          monoFormationSection.style.display = 'block';
+          ensureMonoFormationDefaults();
+        }
+        const monoRadio = document.querySelector('input[value="mono"]');
+        if (monoRadio) monoRadio.checked = true;
       } else {
         multi.style.borderColor = 'var(--primary)';
-        multi.style.background = 'rgba(52, 152, 219, 0.05)';
-        mono.style.borderColor = '#ddd';
-        mono.style.background = 'white';
-        multiSettings.style.display = 'block';
-        cupSystemSection.style.display = 'block';
-        document.querySelector('input[value="multi"]').checked = true;
+        multi.style.background = 'rgba(52, 152, 219, 0.08)';
+        mono.style.borderColor = 'var(--stroke)';
+        mono.style.background = 'var(--card)';
+        if (multiSettings) multiSettings.style.display = 'block';
+        if (cupSystemSection) cupSystemSection.style.display = 'block';
+        if (multiFormationSection) multiFormationSection.style.display = 'block';
+        if (monoFormationSection) monoFormationSection.style.display = 'none';
+        const multiRadio = document.querySelector('input[value="multi"]');
+        if (multiRadio) multiRadio.checked = true;
+      }
+    }
+
+    function ensureMonoFormationDefaults() {
+      const rosterInput = document.getElementById('monoRosterSize');
+      if (rosterInput) {
+        const parsed = parseInt(rosterInput.value, 10);
+        monoRosterSize = normalizeRosterSize(isNaN(parsed) ? monoRosterSize : parsed);
+        rosterInput.value = monoRosterSize;
+      }
+      if (!monoFormations.length) {
+        monoFormations = buildDefaultMonoFormations(monoRosterSize);
+      }
+      renderMonoFormations();
+    }
+
+    function normalizeRosterSize(value) {
+      if (isNaN(value)) return monoRosterSize;
+      return Math.min(11, Math.max(3, value));
+    }
+
+    function formationTotal(formation) {
+      return formation
+        .split('-')
+        .map(part => parseInt(part, 10) || 0)
+        .reduce((sum, current) => sum + current, 0);
+    }
+
+    function buildDefaultMonoFormations(size) {
+      const combos = [];
+      for (let def = 1; def <= Math.min(size - 2, 4); def += 1) {
+        for (let mid = 1; mid <= Math.min(size - def - 1, 4); mid += 1) {
+          const att = size - def - mid;
+          if (att < 1 || att > 4) continue;
+          combos.push(`${def}-${mid}-${att}`);
+        }
+      }
+      if (!combos.length) {
+        const safeMid = Math.max(1, size - 2);
+        combos.push(`1-${safeMid}-${size - 1 - safeMid}`);
+      }
+      return Array.from(new Set(combos));
+    }
+
+    function renderMonoFormations() {
+      const listEl = document.getElementById('monoFormationList');
+      const summaryEl = document.getElementById('monoFormationSummary');
+      if (!listEl || !summaryEl) return;
+      summaryEl.textContent = `Moduli caricati: ${monoFormations.length} · Titolari: ${monoRosterSize}`;
+      listEl.innerHTML = '';
+      if (!monoFormations.length) {
+        const empty = document.createElement('span');
+        empty.style.fontSize = '12px';
+        empty.style.color = 'var(--muted)';
+        empty.textContent = 'Nessun modulo configurato.';
+        listEl.appendChild(empty);
+        return;
+      }
+      monoFormations.forEach((formation, index) => {
+        const chip = document.createElement('span');
+        chip.className = 'mono-chip';
+        chip.appendChild(document.createTextNode(formation));
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.setAttribute('aria-label', `Rimuovi modulo ${formation}`);
+        removeBtn.textContent = 'x';
+        removeBtn.addEventListener('click', () => {
+          monoFormations.splice(index, 1);
+          renderMonoFormations();
+        });
+        chip.appendChild(removeBtn);
+        listEl.appendChild(chip);
+      });
+    }
+
+    function addMonoFormationFromInputs() {
+      const defInput = document.getElementById('monoDefInput');
+      const midInput = document.getElementById('monoMidInput');
+      const attInput = document.getElementById('monoAttInput');
+      if (!defInput || !midInput || !attInput) return;
+      const def = Math.max(0, parseInt(defInput.value, 10) || 0);
+      const mid = Math.max(0, parseInt(midInput.value, 10) || 0);
+      const att = Math.max(0, parseInt(attInput.value, 10) || 0);
+      if (att === 0) {
+        showToast('Inserisci almeno un attaccante.', 'error');
+        return;
+      }
+      const total = def + mid + att;
+      if (total !== monoRosterSize) {
+        showToast(`Il modulo deve sommare ${monoRosterSize} giocatori.`, 'error');
+        return;
+      }
+      const formation = `${def}-${mid}-${att}`;
+      if (monoFormations.includes(formation)) {
+        showToast('Modulo gia\' presente.', 'info');
+        return;
+      }
+      monoFormations.push(formation);
+      monoFormations.sort();
+      renderMonoFormations();
+    }
+
+    function setupMonoFormationControls() {
+      const rosterInput = document.getElementById('monoRosterSize');
+      if (rosterInput) {
+        const parsed = parseInt(rosterInput.value, 10);
+        monoRosterSize = normalizeRosterSize(isNaN(parsed) ? monoRosterSize : parsed);
+        rosterInput.value = monoRosterSize;
+        if (!monoFormations.length) {
+          monoFormations = buildDefaultMonoFormations(monoRosterSize);
+        }
+        renderMonoFormations();
+        rosterInput.addEventListener('change', () => {
+          const next = normalizeRosterSize(parseInt(rosterInput.value, 10));
+          monoRosterSize = next;
+          rosterInput.value = next;
+          monoFormations = monoFormations.filter(f => formationTotal(f) === monoRosterSize);
+          if (!monoFormations.length) {
+            monoFormations = buildDefaultMonoFormations(monoRosterSize);
+          }
+          renderMonoFormations();
+        });
+      }
+      const addBtn = document.getElementById('addMonoFormationBtn');
+      if (addBtn) {
+        addBtn.addEventListener('click', addMonoFormationFromInputs);
       }
     }
     
@@ -430,12 +778,28 @@
     
     // Listen for cup format changes
     document.addEventListener('DOMContentLoaded', () => {
+      populateSportSelect();
+      handleSportChange();
+      loadCompetitionHints();
+      const sportSelect = document.getElementById('sportTypeSelect');
+      if (sportSelect) {
+        sportSelect.addEventListener('change', handleSportChange);
+      }
       document.querySelectorAll('input[name="cupFormat"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
           const groupSettings = document.getElementById('groupSettings');
-          groupSettings.style.display = e.target.value === 'groups' ? 'block' : 'none';
+          if (groupSettings) {
+            groupSettings.style.display = e.target.value === 'groups' ? 'block' : 'none';
+          }
         });
       });
+      setupMonoFormationControls();
+      const selectedType = document.querySelector('input[name="leagueType"]:checked');
+      if (selectedType) {
+        selectType(selectedType.value);
+      } else {
+        selectType('multi');
+      }
     });
 
     function renderLeagues() {
@@ -443,7 +807,7 @@
       const grid = document.getElementById('leaguesGrid');
 
       if (leagues.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--muted);">📋 Nessuna lega creata. Creane una sopra!</div>';
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--muted);">Nessuna lega creata. Usa il pannello sopra per crearne una nuova.</div>';
         return;
       }
 
@@ -452,6 +816,8 @@
         const teamCount = league.teamCount || 0;
         const playerCount = league.playerCount || 0;
         
+        const sportCfg = getSportConfigSafe(league.sportType || DEFAULT_SPORT_TYPE);
+        const sportLabel = sportCfg?.label || 'Calcio';
         return `
           <div class="league-card ${isActive ? 'active' : ''}" onclick="selectLeague('${league.id}')">
             ${isActive ? '<div class="league-badge">ATTIVA</div>' : ''}
@@ -460,9 +826,10 @@
             <div style="display: flex; gap: 16px; font-size: 13px;">
               <div><strong>${teamCount}</strong> squadre</div>
               <div><strong>${playerCount}</strong> giocatori</div>
+              <div><strong>${sportLabel}</strong></div>
             </div>
             <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef;">
-              <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); deleteLeague('${league.id}')" style="padding: 6px 12px; font-size: 12px;">🗑️ Elimina</button>
+              <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); deleteLeague('${league.id}')" style="padding: 6px 12px; font-size: 12px;">Elimina</button>
             </div>
           </div>
         `;
@@ -504,11 +871,25 @@
       
       const type = typeRadio.value;
       const season = document.getElementById('seasonInput').value.trim() || '2024/2025';
+      const sportTypeSelect = document.getElementById('sportTypeSelect');
+      const sportType = sportTypeSelect?.value || DEFAULT_SPORT_TYPE;
+      const competitionInput = document.getElementById('competitionIdInput');
+      const competitionId = competitionInput?.value.trim() || null;
+      const sportConfig = getSportConfigSafe(sportType);
       
-      // Get selected formations
-      const formationCheckboxes = document.querySelectorAll('#formationCheckboxes input:checked');
-      const formations = Array.from(formationCheckboxes).map(cb => cb.value);
-      if (formations.length === 0) return showToast('Seleziona almeno una formazione!', 'error');
+      let formations = [];
+      if (type === 'multi') {
+        const formationCheckboxes = document.querySelectorAll('#formationCheckboxes input:checked');
+        formations = Array.from(formationCheckboxes).map(cb => cb.value);
+        if (formations.length === 0) return showToast('Seleziona almeno una formazione!', 'error');
+      } else {
+        monoFormations = monoFormations.filter(f => formationTotal(f) === monoRosterSize);
+        if (!monoFormations.length) {
+          monoFormations = buildDefaultMonoFormations(monoRosterSize);
+        }
+        formations = monoFormations.slice();
+        if (!formations.length) return showToast('Configura almeno un modulo per la lega mono-squadra.', 'error');
+      }
 
       try {
         // Defense Modifier settings
@@ -545,28 +926,49 @@
         } : { enabled: false };
       
         // Create league doc
+        const maxTeams = type === 'multi' ? parseInt(document.getElementById('maxTeams').value, 10) || 10 : 1;
+        const budgetPerTeam = type === 'multi' ? parseInt(document.getElementById('budget').value, 10) || 500 : 0;
+        const defaultLineupSize = computeDefaultLineupSize(sportConfig);
+        const lineupSize = type === 'mono' ? monoRosterSize : defaultLineupSize;
+
+        const settings = {
+          sport: sportType,
+          formations: formations,
+          maxTeams: maxTeams,
+          budgetPerTeam: budgetPerTeam,
+          enableTransfers: type === 'multi',
+          scoringSystem: 'default',
+          usePlayerRatings: usePlayerRatings,
+          defenseModifier: defenseModifier,
+          cupSystem: cupSystem,
+          wildcard: wildcard,
+          lineupSize: lineupSize,
+          competitionId: competitionId,
+          sportConfigVersion: '2025-11',
+          scoringProfileId: sportConfig?.scoringProfileId || 'default',
+          roles: sportConfig?.roles || []
+        };
+
+        if (type === 'mono') {
+          settings.monoRosterSize = monoRosterSize;
+        }
+
+        const leagueType = computeLeagueTypeFromSportType(sportType);
+
         const leagueData = {
           name: name,
           type: type, // 'mono' or 'multi'
           season: season,
+          sportType: sportType,
+          leagueType: leagueType,
+          competitionId: competitionId,
           createdBy: currentUser.uid,
           createdAt: firebase.firestore.Timestamp.now(),
           admins: [currentUser.uid],
           members: [currentUser.uid],
           inviteCode: generateInviteCode(),
           status: 'active',
-          settings: {
-            sport: 'calcio',
-            formations: formations,
-            maxTeams: type === 'multi' ? parseInt(document.getElementById('maxTeams').value) : 1,
-            budgetPerTeam: type === 'multi' ? parseInt(document.getElementById('budget').value) : 500,
-            enableTransfers: type === 'multi',
-            scoringSystem: 'default',
-            usePlayerRatings: usePlayerRatings,
-            defenseModifier: defenseModifier,
-            cupSystem: cupSystem,
-            wildcard: wildcard
-          },
+          settings: settings,
           stats: {
             teamCount: 0,
             playerCount: 0,
@@ -597,6 +999,15 @@
         document.getElementById('newLeagueName').value = '';
         document.getElementById('seasonInput').value = '2024/2025';
         document.querySelectorAll('input[name="leagueType"]').forEach(r => r.checked = false);
+        const sportSelect = document.getElementById('sportTypeSelect');
+        if (sportSelect) {
+          sportSelect.value = DEFAULT_SPORT_TYPE;
+          handleSportChange();
+        }
+        const competitionField = document.getElementById('competitionIdInput');
+        if (competitionField) {
+          competitionField.value = '';
+        }
         
         // Auto-select new league
         selectLeague(docRef.id);
@@ -615,13 +1026,41 @@
       return code;
     }
 
+    function setCurrentLeagueId(leagueId, options = {}) {
+      if (!leagueId) return;
+      currentLeagueId = leagueId;
+      try {
+        localStorage.setItem('current_league_id', leagueId);
+        localStorage.setItem('last_league_id', leagueId);
+      } catch (err) {
+        console.warn('[admin-leghe] impossibile salvare lega corrente', err);
+      }
+      syncLeagueUI();
+      if (options.reload === false) {
+        return;
+      }
+      if (options.silentRefresh) {
+        return;
+      }
+      if (!leagueReloadScheduled) {
+        leagueReloadScheduled = true;
+        setTimeout(() => {
+          location.reload();
+        }, 50);
+      }
+    }
+
     function selectLeague(leagueId) {
-      localStorage.setItem('current_league_id', leagueId);
-      location.reload(); // Reload to update display
+      setCurrentLeagueId(leagueId);
+    }
+
+    function syncLeagueUI() {
+      updateCurrentLeague();
+      renderLeagues();
     }
 
     async function deleteLeague(leagueId) {
-      if (!confirm('Eliminare questa lega?\n\nATTENZIONE: Questa azione è irreversibile!')) return;
+      if (!confirm('Eliminare questa lega?\n\nATTENZIONE: Questa azione � irreversibile!')) return;
 
       try {
         await db.collection('leagues').doc(leagueId).delete();
@@ -629,6 +1068,8 @@
         // If deleted league was active, clear selection
         if (leagueId === currentLeagueId) {
           localStorage.removeItem('current_league_id');
+          localStorage.removeItem('last_league_id');
+          currentLeagueId = null;
         }
         
         showToast('Lega eliminata', 'success');
@@ -661,7 +1102,7 @@
 
         // Check if already member
         if (leagueData.members && leagueData.members.includes(currentUser.uid)) {
-          showToast('Sei già membro di questa competizione!', 'info');
+          showToast('Sei gi� membro di questa competizione!', 'info');
           selectLeague(leagueId);
           return;
         }
@@ -685,8 +1126,14 @@
       const container = document.getElementById('toastContainer') || createToastContainer();
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
-      const icon = type === 'success' ? '✓' : '✕';
-      toast.innerHTML = `<span style="font-size:20px;">${icon}</span><span>${message}</span>`;
+      const labelMap = { success: 'OK', error: 'ERR', info: 'INFO' };
+      const label = labelMap[type] || 'MSG';
+      const labelEl = document.createElement('strong');
+      labelEl.textContent = label;
+      const messageEl = document.createElement('span');
+      messageEl.textContent = message;
+      toast.appendChild(labelEl);
+      toast.appendChild(messageEl);
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
@@ -707,8 +1154,8 @@
   <script src="resources/bottom-nav.js?v=2025101802"></script>
   <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
 </body>
 </html>

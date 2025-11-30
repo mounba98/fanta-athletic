@@ -399,6 +399,23 @@
       margin-bottom: 4px;
       color: var(--text);
     }
+
+    .mention-highlight {
+      display: inline-block;
+      padding: 0 6px;
+      margin: 0 1px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #0f172a;
+      background: linear-gradient(135deg, rgba(253, 224, 71, 0.92) 0%, rgba(249, 115, 22, 0.95) 100%);
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.18);
+    }
+
+    :root.dark .mention-highlight {
+      color: #0f172a;
+      background: linear-gradient(135deg, rgba(253, 224, 71, 0.95) 0%, rgba(249, 115, 22, 1) 100%);
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.25);
+    }
     .comment-time {
       font-size: 12px;
       color: var(--muted);
@@ -575,11 +592,10 @@
     <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
 
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js" onerror="console.error('Errore caricamento firebase-storage-compat.js')"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js?v=20251021-6"></script>
   <script src="resources/firebase.js"></script>
 
@@ -595,10 +611,245 @@
     let isAdmin = false;
     let currentFilter = 'all';
     let postsUnsubscribe = null;
+    let postsCache = [];
     let selectedImage = null;
     let selectedVideoBlob = null; // compressed webm
     const MAX_VIDEO_SIZE_MB = 25;
     const MAX_VIDEO_DURATION_SEC = 60;
+    const mentionHandleDirectory = new Map();
+
+    function slugifyForHandle(value = '') {
+      if (!value) return '';
+      return value
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase();
+    }
+
+    function getUserDisplayName(user = {}) {
+      return (
+        user.display_name ||
+        user.displayName ||
+        user.nickname ||
+        [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+        user.team_name ||
+        user.email ||
+        'Utente'
+      );
+    }
+
+    function buildMentionHandle(user = {}) {
+      if (!user) return '';
+      if (user.uid && mentionHandleDirectory.has(user.uid)) {
+        const cached = mentionHandleDirectory.get(user.uid);
+        if (cached && cached.handle) return cached.handle;
+      }
+
+      const username = user.username && user.username !== 'Utente'
+        ? slugifyForHandle(user.username)
+        : '';
+
+      let handle = username;
+      if (!handle) {
+        const realName = [user.firstName, user.lastName].filter(Boolean).join(' ');
+        const display = user.display_name || user.displayName || user.nickname || '';
+        const emailPart = (user.email || '').split('@')[0];
+        const candidates = [realName, display, emailPart].filter(Boolean);
+        for (const candidate of candidates) {
+          const slug = slugifyForHandle(candidate);
+          if (slug) {
+            handle = slug;
+            break;
+          }
+        }
+      }
+
+      if (!handle) {
+        handle = 'utente';
+      }
+
+      if (!username) {
+        const suffix = (user.uid || '').slice(-4).toLowerCase();
+        if (suffix && !handle.endsWith(`-${suffix}`)) {
+          handle = `${handle}-${suffix}`;
+        }
+      }
+
+      handle = handle.toLowerCase();
+
+      const entry = {
+        uid: user.uid || null,
+        handle,
+        displayName: getUserDisplayName(user),
+        raw: user
+      };
+
+      if (user.uid) {
+        mentionHandleDirectory.set(user.uid, entry);
+      }
+      mentionHandleDirectory.set(handle, entry);
+
+      return handle;
+    }
+
+    function extractMentionHandles(text = '') {
+      if (!text) return [];
+      const matches = text.match(/@([a-z0-9._-]+)/gi);
+      if (!matches) return [];
+      return [...new Set(matches.map(m => m.slice(1).toLowerCase()))];
+    }
+
+    async function resolveCurrentLeagueId() {
+      try {
+        if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
+          const id = leagueHelper.getCurrentLeagueId();
+          if (id) return id;
+        }
+      } catch (err) {
+        console.warn('[bacheca] Impossibile ottenere leagueId da LeagueHelper:', err);
+      }
+
+      if (!currentUser) return null;
+
+      try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const userData = userDoc.data() || {};
+        return userData.currentLeague || (Array.isArray(userData.leagues) ? userData.leagues[0] : null);
+      } catch (err) {
+        console.warn('[bacheca] Impossibile determinare la lega corrente:', err);
+        return null;
+      }
+    }
+
+    let cachedMemberDocs = null;
+    async function fetchLeagueMemberDocs(force = false) {
+      if (!force && cachedMemberDocs && Array.isArray(cachedMemberDocs.memberDocs) && cachedMemberDocs.memberDocs.length) {
+        return cachedMemberDocs;
+      }
+
+      let leagueId = null;
+      const memberDocs = [];
+
+      try {
+        leagueId = await resolveCurrentLeagueId();
+      } catch (err) {
+        console.warn('[bacheca] resolveCurrentLeagueId error:', err);
+      }
+
+      if (leagueId) {
+        try {
+          const leagueDoc = await db.collection('leagues').doc(leagueId).get();
+          if (leagueDoc.exists) {
+            const members = leagueDoc.data().members || [];
+            if (members.length) {
+              const docs = await Promise.all(members.map(uid => db.collection('users').doc(uid).get()));
+              docs.forEach(doc => { if (doc) memberDocs.push(doc); });
+            }
+          }
+        } catch (error) {
+          console.error('[bacheca] Errore caricamento membri lega:', error);
+        }
+      }
+
+      if (!memberDocs.length) {
+        try {
+          const usersSnap = await db.collection('users').get();
+          usersSnap.forEach(doc => memberDocs.push(doc));
+          if (!leagueId) {
+            console.warn('[bacheca] Nessuna lega attiva, fallback a elenco utenti completo per mentions');
+          }
+        } catch (err) {
+          console.error('[bacheca] Errore fallback users per mentions:', err);
+        }
+      }
+
+      cachedMemberDocs = { leagueId: leagueId || null, memberDocs };
+      return cachedMemberDocs;
+    }
+
+    async function processMentions(postId, content, authorData = {}) {
+      const handles = extractMentionHandles(content);
+      if (!handles.length) return;
+
+      const handleSet = new Set(handles);
+      const matches = [];
+
+      // Usa cache già popolata
+      for (const handle of handleSet) {
+        const cached = mentionHandleDirectory.get(handle);
+        if (cached) {
+          matches.push({
+            uid: cached.uid,
+            handle: cached.handle,
+            displayName: cached.displayName || getUserDisplayName(cached.raw || {})
+          });
+        }
+      }
+
+      const missingHandles = handles.filter(h => !mentionHandleDirectory.has(h));
+      if (missingHandles.length) {
+        const { memberDocs } = await fetchLeagueMemberDocs();
+        for (const doc of memberDocs) {
+          if (!doc.exists) continue;
+          const data = { uid: doc.id, ...doc.data() };
+          const handle = buildMentionHandle(data);
+          mentionHandleDirectory.set(handle, {
+            uid: data.uid,
+            handle,
+            displayName: getUserDisplayName(data),
+            raw: data
+          });
+        }
+
+        for (const handle of missingHandles) {
+          const cached = mentionHandleDirectory.get(handle);
+          if (cached) {
+            matches.push({
+              uid: cached.uid,
+              handle: cached.handle,
+              displayName: cached.displayName || getUserDisplayName(cached.raw || {})
+            });
+          }
+        }
+      }
+
+      const uniqueMatches = [];
+      const seen = new Set();
+      for (const entry of matches) {
+        if (!entry.uid || seen.has(entry.uid)) continue;
+        seen.add(entry.uid);
+        uniqueMatches.push(entry);
+      }
+
+      if (!uniqueMatches.length) return;
+
+      try {
+        await db.collection('posts').doc(postId).update({
+          mentions: uniqueMatches.map(item => ({
+            uid: item.uid,
+            handle: item.handle,
+            displayName: item.displayName
+          })),
+          mentionHandles: Array.from(handleSet)
+        });
+      } catch (error) {
+        console.error('[bacheca] Errore salvataggio mentions:', error);
+      }
+
+      if (typeof window.notifyPostTag === 'function') {
+        const actorUid = authorData.uid || (currentUser && currentUser.uid) || null;
+        const actorName = getUserDisplayName(authorData);
+        for (const entry of uniqueMatches) {
+          if (entry.uid === actorUid) continue;
+          try {
+            await window.notifyPostTag(postId, entry.uid, actorUid, actorName, content);
+          } catch (error) {
+            console.error('[bacheca] Errore notifica tag:', error);
+          }
+        }
+      }
+    }
 
     async function ensureLeagueReady(timeoutMs = 7000) {
       if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
@@ -756,9 +1007,11 @@
         return;
       }
       
+      const searchLower = (searchText || '').toLowerCase();
       items.forEach(item => {
-        const userName = item.textContent.toLowerCase();
-        if (userName.includes(searchText.toLowerCase()) || !searchText) {
+        const datasetSearch = item.dataset.search || item.textContent.toLowerCase();
+        const handle = (item.dataset.handle || '').toLowerCase();
+        if (!searchLower || datasetSearch.includes(searchLower) || handle.includes(searchLower)) {
           item.style.display = 'block';
         } else {
           item.style.display = 'none';
@@ -796,100 +1049,97 @@
     async function loadUsers(searchText = '') {
       try {
         await ensureLeagueReady();
-        
+
         const userList = document.getElementById('userList');
         if (!userList) {
           console.warn('[bacheca] userList element not found');
           return;
         }
-        
-        // Mostra loading
+
         userList.innerHTML = '<div class="user-item" style="opacity:0.6;">Caricamento...</div>';
-        
-        // Ottieni leagueId corrente
-        let leagueId = null;
-        if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
-          leagueId = leagueHelper.getCurrentLeagueId();
-        } else {
-          const userDoc = await db.collection('users').doc(currentUser.uid).get();
-          const userData = userDoc.data() || {};
-          leagueId = userData.currentLeague || (userData.leagues && userData.leagues[0]);
-        }
-        
+
+        const { leagueId, memberDocs } = await fetchLeagueMemberDocs();
         if (!leagueId) {
           console.warn('[bacheca] Nessuna lega trovata per filtrare utenti');
           userList.innerHTML = '<div class="user-item" style="opacity:0.6;">Nessuna lega selezionata</div>';
           return;
         }
-        
-        console.log('[bacheca] Loading users for league:', leagueId);
-        
-        // Carica membri della lega
-        const leagueDoc = await db.collection('leagues').doc(leagueId).get();
-        const leagueData = leagueDoc.data() || {};
-        const members = leagueData.members || [];
-        
-        if (members.length === 0) {
-          document.getElementById('userList').innerHTML = '<div class="user-item" style="opacity:0.6;">Nessun utente nella lega</div>';
+
+        const members = memberDocs
+          .filter(doc => doc.exists)
+          .map(doc => ({ uid: doc.id, ...doc.data() }))
+          .filter(user => currentUser ? user.uid !== currentUser.uid : true);
+
+        if (!members.length) {
+          userList.innerHTML = '<div class="user-item" style="opacity:0.6;">Nessun utente nella lega</div>';
           return;
         }
-        
-        // Carica dati utenti (solo membri della lega)
-        const userPromises = members.map(uid => db.collection('users').doc(uid).get());
-        const userDocs = await Promise.all(userPromises);
-        
+
+        const searchLower = (searchText || '').trim().toLowerCase();
+
+        const filteredUsers = members.filter(user => {
+          if (!searchLower) return true;
+          const displayName = getUserDisplayName(user).toLowerCase();
+          const username = (user.username || '').toLowerCase();
+          const email = (user.email || '').toLowerCase();
+          const realName = ([user.firstName, user.lastName].filter(Boolean).join(' ')).toLowerCase();
+          const handle = buildMentionHandle(user).toLowerCase();
+          return (
+            displayName.includes(searchLower) ||
+            username.includes(searchLower) ||
+            email.includes(searchLower) ||
+            realName.includes(searchLower) ||
+            handle.includes(searchLower)
+          );
+        });
+
         userList.innerHTML = '';
-        
-        let filteredUsers = userDocs
-          .filter(doc => doc.exists)
-          .map(doc => ({
-            uid: doc.id,
-            ...doc.data()
-          }))
-          .filter(user => {
-            // Escludi l'utente corrente
-            if (user.uid === currentUser.uid) return false;
-            // Se c'è searchText, filtra, altrimenti mostra tutti
-            if (!searchText || searchText.trim() === '') return true;
-            const searchLower = searchText.toLowerCase().trim();
-            const displayName = (user.displayName || user.display_name || user.nickname || user.email || '').toLowerCase();
-            return displayName.includes(searchLower);
-          });
-        
-        console.log('[bacheca] Found', filteredUsers.length, 'users (filtered from', userDocs.length, 'members)');
-        
-        if (filteredUsers.length === 0) {
-          userList.innerHTML = searchText && searchText.trim() 
-            ? '<div class="user-item" style="opacity:0.6;">Nessun utente trovato per "' + escapeHtml(searchText) + '"</div>'
+
+        if (!filteredUsers.length) {
+          userList.innerHTML = searchLower
+            ? `<div class="user-item" style="opacity:0.6;">Nessun utente trovato per "${escapeHtml(searchText)}"</div>`
             : '<div class="user-item" style="opacity:0.6;">Nessun utente nella lega</div>';
           return;
         }
-        
+
         filteredUsers.forEach(user => {
-          const displayName = user.displayName || user.nickname || user.email || 'Utente';
-          
+          const displayName = getUserDisplayName(user);
+          const username = user.username && user.username !== 'Utente' && !user.username.includes('@')
+            ? user.username
+            : null;
+          const displayText = username && displayName.toLowerCase() !== username.toLowerCase()
+            ? `${displayName} • ${username}`
+            : displayName;
+          const mentionHandle = buildMentionHandle(user);
+
           const userItem = document.createElement('div');
           userItem.className = 'user-item';
-          userItem.textContent = displayName;
+          userItem.dataset.handle = mentionHandle;
+          userItem.dataset.search = `${displayText} ${mentionHandle} ${(user.email || '')}`.toLowerCase();
+          userItem.innerHTML = `
+            <div style="display:flex;flex-direction:column;">
+              <span>${escapeHtml(displayText)}</span>
+              <span style="font-size:12px;color:var(--muted);">@${escapeHtml(mentionHandle)}</span>
+            </div>
+          `;
           userItem.onclick = () => {
             const textarea = document.getElementById('postContent');
+            if (!textarea) return;
+
+            const handle = userItem.dataset.handle;
             const currentText = textarea.value;
             const cursorPos = textarea.selectionStart;
-            
-            // Trova l'ultima @ prima del cursore
             const textBeforeCursor = currentText.substring(0, cursorPos);
             const lastAtIndex = textBeforeCursor.lastIndexOf('@');
-            
+
             if (lastAtIndex !== -1) {
-              // Sostituisci da @ fino al cursore con @displayName
               const textAfterCursor = currentText.substring(cursorPos);
-              textarea.value = currentText.substring(0, lastAtIndex) + `@${displayName} ` + textAfterCursor;
-              textarea.selectionStart = textarea.selectionEnd = lastAtIndex + displayName.length + 2;
+              textarea.value = currentText.substring(0, lastAtIndex) + `@${handle} ` + textAfterCursor;
+              textarea.selectionStart = textarea.selectionEnd = lastAtIndex + handle.length + 2;
             } else {
-              // Aggiungi semplicemente @displayName
-              textarea.value += `@${displayName} `;
+              textarea.value += `@${handle} `;
             }
-            
+
             textarea.focus();
             toggleUserPicker();
           };
@@ -897,7 +1147,10 @@
         });
       } catch (error) {
         console.error('Errore caricamento utenti:', error);
-        document.getElementById('userList').innerHTML = '<div class="user-item" style="opacity:0.6; color:red;">Errore caricamento utenti</div>';
+        const userList = document.getElementById('userList');
+        if (userList) {
+          userList.innerHTML = '<div class="user-item" style="opacity:0.6; color:red;">Errore caricamento utenti</div>';
+        }
       }
     }
     
@@ -1091,6 +1344,12 @@
           await docRef.update(updates);
         }
 
+        try {
+          await processMentions(docRef.id, content, { uid: currentUser.uid, ...userData });
+        } catch (mentionError) {
+          console.error('[bacheca] Errore durante la gestione dei tag:', mentionError);
+        }
+
         document.getElementById('postContent').value = '';
         removeImagePreview();
         selectedVideoBlob = null; document.getElementById('videoInput').value='';
@@ -1120,7 +1379,18 @@
     async function buildPostsList(docs) {
       const posts = [];
       for (const doc of docs) {
-        const postData = { id: doc.id, ...doc.data() };
+        const postData = { id: doc.id, refPath: doc.ref.path, ...doc.data() };
+        if (postData.timestamp) {
+          if (typeof postData.timestamp.toDate !== 'function') {
+            if (postData.timestamp instanceof Date) {
+              postData.timestamp = firebase.firestore.Timestamp.fromDate(postData.timestamp);
+            } else if (typeof postData.timestamp === 'number') {
+              postData.timestamp = firebase.firestore.Timestamp.fromMillis(postData.timestamp);
+            } else if (postData.timestamp.seconds !== undefined) {
+              postData.timestamp = new firebase.firestore.Timestamp(postData.timestamp.seconds, postData.timestamp.nanoseconds || 0);
+            }
+          }
+        }
         if (postData.authorName && postData.authorName.includes('@')) {
           try {
             const userDoc = await db.collection('users').doc(postData.authorUid).get();
@@ -1148,22 +1418,26 @@
       }
 
       postsUnsubscribe = query.onSnapshot(async (snapshot) => {
-        let posts = await buildPostsList(snapshot.docs);
+        const primaryPosts = await buildPostsList(snapshot.docs);
+        const postsMap = new Map();
+        primaryPosts.forEach(post => postsMap.set(post.id, post));
 
-        if (!posts.length && rawDb) {
+        if (rawDb) {
           try {
             const legacySnap = await rawDb.collection('posts').orderBy('timestamp', 'desc').limit(50).get();
             const legacyPosts = await buildPostsList(legacySnap.docs);
-            if (legacyPosts.length) {
-              renderPosts(legacyPosts);
-              return;
-            }
+            legacyPosts.forEach(post => {
+              if (!postsMap.has(post.id)) {
+                postsMap.set(post.id, post);
+              }
+            });
           } catch (err) {
             console.warn('Fallback legacy posts failed:', err);
           }
         }
 
-        renderPosts(posts);
+        const merged = Array.from(postsMap.values()).sort((a, b) => getPostTimestamp(b) - getPostTimestamp(a)).slice(0, 50);
+        renderPosts(merged);
       }, async (error) => {
         console.error('Errore ascolto posts:', error);
         if (error?.code === 'permission-denied' && rawDb) {
@@ -1188,10 +1462,13 @@
         return;
       }
 
+      postsCache = Array.isArray(posts) ? [...posts] : [];
       feed.innerHTML = posts.map(post => {
-        const time = post.timestamp ? formatTime(post.timestamp.toDate()) : 'Ora';
+        const timeSource = post.timestamp ? (typeof post.timestamp.toDate === 'function' ? post.timestamp.toDate() : new Date(post.timestamp)) : null;
+        const time = timeSource ? formatTime(timeSource) : 'Ora';
         const badge = post.type === 'trash' ? '<span class="badge-trash">ðŸ”¥ TRASH</span>' :
                       post.type === 'epic' ? '<span class="badge-epic">ðŸ‘‘ EPIC</span>' : '';
+        const contentHtml = highlightMentions(fixEmoji(escapeHtml(post.content || '')));
         
         return `
           <div class="post">
@@ -1210,7 +1487,7 @@
                   </div>
                 </div>` : ''}
             </div>
-            <div class="post-content">${fixEmoji(escapeHtml(post.content))}</div>
+            <div class="post-content">${contentHtml}</div>
             ${post.imageUrl ? `<img class="post-image" src="${post.imageUrl}" alt="Post image" />` : ''}
             ${post.videoUrl ? `<video controls style="width:100%;max-height:480px;border-radius:10px;background:#000;" src="${post.videoUrl}"></video>` : ''}
             <div class="post-reactions">
@@ -1252,12 +1529,13 @@
       
       return comments.map((comment, index) => {
         const canDelete = isAdmin || (currentUser && comment.authorUid === currentUser.uid);
+        const commentHtml = highlightMentions(fixEmoji(escapeHtml(comment.text || '')));
         return `
         <div class="comment">
           <img class="comment-avatar" src="${comment.authorPhoto || 'resources/logo.png'}" alt="Avatar" />
           <div class="comment-content">
             <div class="comment-author">${comment.authorName}</div>
-            <div class="comment-text">${escapeHtml(comment.text)}</div>
+            <div class="comment-text">${commentHtml}</div>
             <div class="comment-time">${formatTime(new Date(comment.timestamp))}</div>
           </div>
           ${canDelete ? `<button class="comment-delete" onclick="deleteComment('${postId}', ${index})" title="Elimina commento">×</button>` : ''}
@@ -1292,13 +1570,34 @@
         
         // NOTIFICA proprietario post
         if (typeof window.notifyPostComment === 'function' && post.userId !== currentUser.uid) {
-          await window.notifyPostComment(postId, post.userId, currentUser.uid, userData.display_name || 'Utente');
+          await window.notifyPostComment(
+            postId,
+            post.userId,
+            currentUser.uid,
+            userData.display_name || userData.displayName || userData.nickname || currentUser.displayName || currentUser.email || 'Utente',
+            text
+          );
         }
         
         // NOTIFICA altri commentatori
         if (typeof window.notifyOtherCommenters === 'function') {
           const existingCommenters = (post.comments || []).map(c => c.authorUid).filter(uid => uid !== currentUser.uid);
           await window.notifyOtherCommenters(postId, post.userId, currentUser.uid, userData.display_name || 'Utente', existingCommenters);
+        }
+
+        // TAG mentions nel commento
+        try {
+          await processMentions(postId, text, {
+            uid: currentUser.uid,
+            display_name: userData.display_name,
+            displayName: userData.displayName,
+            nickname: userData.nickname,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: currentUser.email
+          });
+        } catch (mentionError) {
+          console.error('[bacheca] Errore durante la gestione dei tag nel commento:', mentionError);
         }
       } catch (error) {
         console.error('Errore commento:', error);
@@ -1327,9 +1626,14 @@
 
     async function toggleReaction(postId, reactionType) {
       try {
-        const postRef = db.collection('posts').doc(postId);
+        const cached = postsCache.find(p => p.id === postId);
+        const postRef = cached?.refPath ? db.doc(cached.refPath) : db.collection('posts').doc(postId);
         const postDoc = await postRef.get();
-        const post = postDoc.data();
+        if (!postDoc.exists) {
+          console.warn('[bacheca] toggleReaction: post non trovato', postId);
+          return;
+        }
+        const post = postDoc.data() || {};
         
         const reactionKey = `reactions.${reactionType}`;
         const userReactionsKey = `userReactions.${currentUser.uid}`;
@@ -1357,7 +1661,8 @@
           
           // NOTIFICA proprietario post
           if (typeof window.notifyPostReaction === 'function' && post.userId !== currentUser.uid) {
-            await window.notifyPostReaction(postId, post.userId, currentUser.uid, currentUser.displayName, reactionType);
+            const actorName = currentUser.displayName || currentUser.email || 'Utente';
+            await window.notifyPostReaction(postId, post.userId, currentUser.uid, actorName, reactionType);
           }
         }
       } catch (error) {
@@ -1392,6 +1697,23 @@
       return date.toLocaleDateString('it-IT');
     }
 
+    function getPostTimestamp(post) {
+      if (!post || !post.timestamp) return 0;
+      const ts = post.timestamp;
+      if (typeof ts.toMillis === 'function') return ts.toMillis();
+      if (ts instanceof Date) return ts.getTime();
+      if (typeof ts === 'number') return ts;
+      if (typeof ts.seconds === 'number') {
+        return ts.seconds * 1000 + ((ts.nanoseconds || 0) / 1e6);
+      }
+      try {
+        const parsed = new Date(ts);
+        return parsed.getTime() || 0;
+      } catch {
+        return 0;
+      }
+    }
+
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
@@ -1412,6 +1734,11 @@
           }
         });
     }
+
+    function highlightMentions(html = '') {
+      if (!html) return '';
+      return html.replace(/(@[a-z0-9._-]+)/gi, '<span class="mention-highlight">$1</span>');
+    }
   </script>
       <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/mobile-menu.js?v=2025101803"></script>
@@ -1419,13 +1746,15 @@
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/lazy-load.js?v=20251020"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/league-invite-modal.js?v=2025102403"></script>
   <script src="resources/social-notifications.js?v=2025102404"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>
+  <script src="resources/footer.js?v=20251027"></script>
+  <script src="resources/cookie-consent.js?v=20251027"></script>
   
   <!-- Toast Container -->
   <div id="toastContainer" class="toast-container"></div>

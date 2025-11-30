@@ -2,11 +2,14 @@ window.firebaseConfig = {
   apiKey: "AIzaSyDnQMuPvx_Gr8VjBJf_Hrx39O8w2dm67co",
   authDomain: "fanta-athletic.firebaseapp.com",
   projectId: "fanta-athletic",
-  storageBucket: "fanta-athletic.appspot.com",
+  storageBucket: "fanta-athletic.firebasestorage.app",
   messagingSenderId: "845950461193",
   appId: "1:845950461193:web:04475bb0eaa2dc459a9fd8",
   measurementId: "G-289T0N4D8L"
 };
+
+window.FIREBASE_CONFIG_VERSION = 'debug-2025-11-19-01';
+console.log('[firebase-config] build debug-2025-11-19-01 caricata');
 
 (function initializeFirebase() {
   if (typeof firebase === 'undefined') {
@@ -16,6 +19,27 @@ window.firebaseConfig = {
 
   if (!firebase.apps.length) {
     firebase.initializeApp(window.firebaseConfig);
+  }
+
+  // Rileva automaticamente se gli emulatori sono attivi (localhost)
+  // Nota: Se gli emulatori non sono disponibili, l'app userà Firestore/Auth di produzione
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (isLocalhost) {
+    // Prova a connettere agli emulatori (opzionale - se non disponibili usa produzione)
+    try {
+      // Connetti Firestore all'emulatore (solo se disponibile)
+      // Se l'emulatore non è attivo, Firestore userà automaticamente produzione
+      if (window.location.search.includes('useEmulators=true')) {
+        firebase.firestore().useEmulator('localhost', 8080);
+        firebase.auth().useEmulator('http://localhost:9099');
+        console.log('🔧 [Firebase] Connesso agli emulatori locali (Firestore:8080, Auth:9099)');
+      } else {
+        console.log('ℹ️ [Firebase] Su localhost ma emulatori non forzati. Usa ?useEmulators=true nell\'URL per attivarli.');
+        console.log('ℹ️ [Firebase] Connessione a Firestore/Auth di produzione.');
+      }
+    } catch (err) {
+      console.warn('⚠️ [Firebase] Impossibile connettere agli emulatori, uso produzione:', err);
+    }
   }
 
   const DEFAULT_LEAGUE_ID = 'fanta-athletic-legacy';
@@ -34,7 +58,18 @@ window.firebaseConfig = {
     'matchday_temp',
     'h2h_schedule',
     'h2h_results',
-    'posts'
+    'posts',
+    'matchdays',
+    'matchday_summaries',
+    'notifications',
+    'teamInvites',
+    'cups',
+    'achievements',
+    'trades',
+    'lineups',
+    'standings',
+    'standings_cache',
+    'rules_cache'
   ]);
 
   let multiLeagueModeFlag = true;
@@ -291,6 +326,31 @@ window.firebaseConfig = {
       return multiLeagueEnabled;
     }
 
+    function getCurrentLeagueType() {
+      const league = getCurrentLeague();
+      try {
+        if (typeof window.getLeagueType === 'function') {
+          return window.getLeagueType(league);
+        }
+      } catch (err) {
+        console.warn('[LeagueHelper] getLeagueType globale ha generato un errore:', err);
+      }
+      return (league && league.leagueType) || 'sport_league';
+    }
+
+    function isRealityLeagueHelper() {
+      const league = getCurrentLeague();
+      try {
+        if (typeof window.isRealityLeague === 'function') {
+          return window.isRealityLeague(league);
+        }
+      } catch (err) {
+        console.warn('[LeagueHelper] isRealityLeague globale ha generato un errore:', err);
+      }
+      const lt = (league && league.leagueType) || 'sport_league';
+      return lt === 'reality_show';
+    }
+
     function enableMultiLeague(persist = false) {
       multiLeagueEnabled = true;
       multiLeagueModeFlag = true;
@@ -398,6 +458,8 @@ window.firebaseConfig = {
     window.LeagueHelper = {
       getCurrentLeagueId,
       getCurrentLeague,
+      getCurrentLeagueType,
+      isRealityLeague: isRealityLeagueHelper,
       getLeaguePath,
       getLeagueCollection,
       getLeagueDoc,

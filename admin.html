@@ -1,52 +1,12 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <script src="resources/theme-preload.js?v=2025110701"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🔧 Admin Hub</title>
   <link rel="icon" href="resources/favicon.ico">
   <link rel="stylesheet" href="resources/sheet.css?v=2025101906">
-  <style>
-    /* Navbar - mobile responsive */
-    .admin-navbar {
-      background: linear-gradient(135deg, #dc2626, #2d6cdf);
-      padding: 15px 0;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-    .admin-navbar .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-    .admin-navbar-brand {
-      color: white;
-      font-size: 24px;
-      font-weight: 900;
-      text-decoration: none;
-    }
-    .admin-navbar-links {
-      display: flex;
-      gap: 20px;
-    }
-    .admin-navbar-links a {
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      transition: opacity 0.2s;
-    }
-    .admin-navbar-links a:hover {
-      opacity: 0.8;
-    }
-    /* Mobile: nascondi admin-navbar custom, usa navbar standard */
-    @media (max-width: 768px) {
-      .admin-navbar { display: none !important; }
-      body { padding: 10px; padding-top: 70px; }
-    }
-  </style>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -380,11 +340,26 @@
   </div>
   
   <!-- Firebase -->
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js"></script>
+  <script src="resources/firebase-cdn-loader.js?v=2025110701"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script>
+    if (!window.firebase) {
+      document.write('<script src="resources/firebase-app-compat.js?v=2025110701"><\\/script>');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script>
+    if (!(window.firebase && firebase.auth)) {
+      document.write('<script src="resources/firebase-auth-compat.js?v=2025110701"><\\/script>');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+    if (!(window.firebase && firebase.firestore)) {
+      document.write('<script src="resources/firebase-firestore-compat.js?v=2025110701"><\\/script>');
+    }
+  </script>
+  <script src="resources/firebase-config.js?v=20251021-2"></script>
   <script>
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
@@ -393,12 +368,13 @@
     window.auth = firebase.auth();
   </script>
   
-  <!-- Navbar mobile scripts -->
+  <!-- Navbar & UI scripts -->
+  <script src="resources/app-init.js?v=2025110701"></script>
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025101901"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/mobile-menu.js?v=2025101803"></script>
   <script src="resources/bottom-nav.js?v=2025101802"></script>
 </body>

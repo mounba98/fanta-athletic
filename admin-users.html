@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin â€¢ Gestione Utenti</title>
+  <title>Admin • Gestione Utenti</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
@@ -24,14 +24,14 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Admin â€¢ Gestione Utenti</h1>
+    <h1>Admin • Gestione Utenti</h1>
   </header>
 
   <main class="container">
     <section class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="margin:0;">Utenti Registrati (<span id="userCount">0</span>)</h2>
-        <input id="searchInput" class="input" placeholder="ğŸ” Cerca..." style="max-width:300px;" oninput="filterUsers()" />
+        <input id="searchInput" class="input" placeholder="?? Cerca..." style="max-width:300px;" oninput="filterUsers()" />
       </div>
       <div style="max-height:70vh;overflow-y:auto;">
         <table class="table" id="usersTable">
@@ -74,7 +74,7 @@
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn btn-secondary" onclick="closeEditModal()">Annulla</button>
-        <button class="btn" onclick="saveEdit()">ğŸ’¾ Salva</button>
+        <button class="btn" onclick="saveEdit()">?? Salva</button>
       </div>
     </div>
   </div>
@@ -140,8 +140,8 @@
       
       const tbody = document.querySelector('#usersTable tbody');
       tbody.innerHTML = filtered.map(u=>{
-        const teamName = teamsData.find(t=> t.id === String(u.team_index))?.name || 'â€”';
-        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('it-IT') : 'â€”';
+        const teamName = teamsData.find(t=> t.id === String(u.team_index))?.name || '—';
+        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('it-IT') : '—';
         const shortId = u.id.substring(0, 8);
         const firstName = capitalize(u.firstName || '');
         const lastName = capitalize(u.lastName || '');
@@ -149,14 +149,14 @@
         return `
           <tr>
             <td class="uid" title="${u.id}">${shortId}</td>
-            <td>${firstName || 'â€”'}</td>
-            <td>${lastName || 'â€”'}</td>
-            <td>${u.email || 'â€”'}</td>
+            <td>${firstName || '—'}</td>
+            <td>${lastName || '—'}</td>
+            <td>${u.email || '—'}</td>
             <td>${teamName}</td>
             <td>${date}</td>
             <td>
-              <button class="btn btn-sm btn-edit" onclick="openEditModal('${u.id}')">âœï¸</button>
-              <button class="btn btn-sm btn-delete" onclick="deleteUser('${u.id}')">ğŸ—‘ï¸</button>
+              <button class="btn btn-sm btn-edit" onclick="openEditModal('${u.id}')">??</button>
+              <button class="btn btn-sm btn-delete" onclick="deleteUser('${u.id}')">???</button>
             </td>
           </tr>
         `;
@@ -213,14 +213,14 @@
 
     async function deleteUser(id){
       const user = usersData.find(u=> u.id === id);
-      if (!confirm(`Eliminare utente ${user.email || user.id}?\n\nQuesta azione Ã¨ irreversibile.`)) return;
+      if (!confirm(`Eliminare utente ${user.email || user.id}?\n\nQuesta azione è irreversibile.`)) return;
       await db.collection('users').doc(id).delete();
     }
   </script>
     <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/bottom-nav.js?v=2025101802"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
   <script src="resources/notifications-dropdown.js?v=2025102002"></script>
 </body>

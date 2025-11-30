@@ -85,12 +85,126 @@
     }
 
     /* Pitch and DnD */
-    .pitch { background: linear-gradient(180deg,#1f8f52 0%, #1c7b47 100%); border-radius: 18px; padding: 32px 24px 24px; color:#e8f6ee; box-shadow: var(--shadow); position: relative; overflow: hidden; max-width: 1100px; margin: 0 auto; }
-    .pitch-grid { display:grid; gap: 18px; margin-top: 12px; }
-    .pitch-grid .line { display:grid; gap: 18px; justify-content:center; align-items:center; }
+    .pitch {
+      position: relative;
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 24px 16px 20px;
+      box-sizing: border-box;
+      border-radius: 20px;
+      background: radial-gradient(circle at 50% 0%, #16a34a 0%, #15803d 40%, #14532d 75%, #052e16 100%);
+      border: 2px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+      color:#e8f6ee;
+      overflow: hidden;
+    }
+
+    .pitch-grid { display:grid; gap: 14px; margin-top: 10px; position: relative; z-index: 1; }
+    .pitch-grid .line { display:grid; gap: 14px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
-    .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 50%; margin: 0 auto; }
-    .slot { min-height: 110px; width: 100%; max-width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.1); border:2px dashed rgba(255,255,255,0.45); border-radius:16px; display:flex; align-items:stretch; justify-content:center; padding:12px; text-align:left; transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease, border-color 0.2s ease; }
+    .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 52%; margin: 0 auto; }
+
+    .pitch-lines {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      height: 90%;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+      border-radius: 0;
+    }
+
+    .pitch-lines::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .pitch-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-radius: 50%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .penalty-area-top,
+    .penalty-area-bottom {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 45%;
+      height: 13.5%;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    .penalty-area-top {
+      top: 5%;
+      border-top: none;
+    }
+
+    .penalty-area-bottom {
+      bottom: 5%;
+      border-bottom: none;
+    }
+
+    .small-area-top,
+    .small-area-bottom {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24%;
+      height: 7%;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    .small-area-top {
+      top: 5%;
+      border-top: none;
+    }
+
+    .small-area-bottom {
+      bottom: 5%;
+      border-bottom: none;
+    }
+
+    .penalty-arc-top,
+    .penalty-arc-bottom {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28%;
+      height: 9%;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .penalty-arc-top {
+      top: 17.5%;
+      border-top: none;
+    }
+
+    .penalty-arc-bottom {
+      bottom: 17.5%;
+      border-bottom: none;
+    }
+
+    .slot { min-height: 88px; width: 100%; max-width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.06); border:2px dashed rgba(255,255,255,0.45); border-radius:16px; display:flex; align-items:stretch; justify-content:center; padding:8px; text-align:left; transition: box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease, border-color 0.2s ease; }
     .slot-card.draggable { width: 100%; height: 100%; min-height: 0; }
     .slot.filled { background: rgba(255,255,255,0.16); border-style: solid; }
     .slot.captain-slot { background: rgba(253, 224, 71, 0.16); border-color: rgba(253, 224, 71, 0.55); }
@@ -98,13 +212,14 @@
     .slot.touch-drop-target { background:rgba(34,197,94,0.3); border-color:#22c55e; border-style:solid; box-shadow: 0 8px 20px rgba(34,197,94,0.25); }
 
     .slot-card.draggable {
-      background: rgba(15,23,42,0.28);
-      border: 1px solid rgba(255,255,255,0.18);
+      position: relative;
+      background: rgba(15,23,42,0.45);
+      border: 1px solid rgba(255,255,255,0.22);
       border-radius: 14px;
-      padding: 14px;
+      padding: 10px 10px 8px;
       display:flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       cursor: grab;
       user-select: none;
       -webkit-user-select: none;
@@ -114,19 +229,21 @@
       height: 100%;
       min-height: 0;
       box-sizing: border-box;
+      max-width: 92%;
+      margin: 0 auto;
     }
 
     .slot-card-main {
       display:flex;
       align-items:center;
-      gap: 12px;
+      gap: 8px;
       min-width: 0;
     }
 
     .slot-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 18px;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
       overflow: hidden;
       border: 2px solid rgba(255,255,255,0.32);
       flex-shrink: 0;
@@ -150,7 +267,7 @@
     }
 
     .slot-name {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       text-shadow: 0 1px 3px rgba(15,23,42,0.45);
       white-space: nowrap;
@@ -217,10 +334,47 @@
       box-shadow:0 16px 32px rgba(15,23,42,0.35);
     }
 
+    .slot-icon {
+      position: absolute;
+      top: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      line-height: 1;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.4);
+    }
+
+    .slot-cap-toggle {
+      left: 6px;
+      background: rgba(251,191,36,0.98);
+      color: #1f2937;
+    }
+
+    .slot-cap-toggle:not(.is-active) {
+      background: rgba(15,23,42,0.7);
+      color: #facc15;
+      border: 1px solid rgba(248,250,252,0.5);
+      box-shadow: none;
+    }
+
+    .slot-remove-btn {
+      right: 6px;
+      background: rgba(248,113,113,0.9);
+      color: #fef2f2;
+      font-weight: 700;
+    }
+
     .coach-badge {
       position: absolute;
       top: 12px;
-      right: 12px;
+      right: 18px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -256,8 +410,8 @@
     }
 
     .coach-slot-mini {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       border-radius: 14px;
       background: rgba(255,255,255,0.15);
       border: 2px dashed rgba(255,255,255,0.4);
@@ -266,14 +420,14 @@
       justify-content: center;
       overflow: hidden;
       flex-shrink: 0;
-      margin-left: 60px;
+      margin-left: 16px;
     }
     
     @media (max-width: 768px) {
       .coach-slot-mini {
-        width: 80px;
-        height: 80px;
-        margin-left: 4px !important; /* Ridotto da 8px a 4px per fix scomparsa foto */
+        width: 64px;
+        height: 64px;
+        margin-left: 10px !important;
         border-width: 3px;
         border-style: solid;
         border-color: rgba(255,255,255,0.6);
@@ -347,10 +501,14 @@
       gap: 8px;
       padding: 6px 10px;
       border-radius: 12px;
-      background: rgba(15,23,42,0.12);
-      border:1px solid rgba(148,163,184,0.22);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      background: #ffffff;
+      border:1px solid rgba(209,213,219,0.9);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
       cursor: grab;
+      color: var(--text, #1f2937);
+      font-size: 0.8rem;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .bench-chip.captain-chip {
@@ -375,16 +533,45 @@
       flex: 1;
       min-width: 0;
       font-weight: 600;
-      color: #f8fafc;
+      color: inherit;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    :root.dark .bench-chip {
+      background: rgba(15,23,42,0.45);
+      border-color: rgba(148,163,184,0.35);
+      color: #f8fafc;
     }
 
     .slot-badge--bench {
       background: rgba(255,255,255,0.12);
       border-color: rgba(255,255,255,0.18);
       color: #f8fafc;
+    }
+
+    /* Panca desktop: elenco verticale */
+    #benchStripDesktop {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-wrap: nowrap;
+      align-items: stretch;
+    }
+
+    /* Panca mobile: griglia di tile */
+    #benchStrip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+
+    #benchStrip .bench-chip {
+      flex: 0 0 calc(33.333% - 6px);
+      max-width: calc(33.333% - 6px);
     }
 
     .roster { display:grid; gap:8px; border:1px solid #e7edf3; border-radius:10px; padding:8px; }
@@ -441,6 +628,18 @@
 
     .btn-sm { padding:10px 14px; font-size: 15px; }
     #saveTeam { padding: 12px 16px; font-size: 15px; }
+    #saveFormation,
+    #saveFormationMobile {
+      background: #16a34a;
+      border-color: #15803d;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    #saveFormation:hover,
+    #saveFormationMobile:hover {
+      background: #15803d;
+      border-color: #166534;
+    }
     #kickoffTime { padding: 10px 12px; font-size: 16px; }
     #teamName { font-weight: 400; font-size: 20px; padding: 14px 16px; }
     /* Enlarge team list font */
@@ -467,7 +666,6 @@
       .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 50%; }
        .slot { min-height: 110px; }
        .slot-card.draggable { padding: 12px; }
-      #teamSelectMobile { width: 100%; }
       #benchStrip { max-width: 550px; margin: 0 auto; justify-content: center; }
       .sectionh { max-width: 550px; margin: 0 auto; }
       /* Larger touch targets for tablet */
@@ -512,25 +710,33 @@
       body.page-formazioni { padding-bottom: 140px; }
        .pitch { max-width: 320px; margin: 0 auto; padding: 24px 18px 22px; }
       .sectionh { max-width: 300px; margin-left: auto; margin-right: auto; }
-      #benchStrip { max-width: 300px; margin-left: auto; margin-right: auto; justify-content: center; }
+      #benchStrip { max-width: 320px; margin-left: auto; margin-right: auto; justify-content: center; }
       #colRight > .row { max-width: 300px; margin-left: auto; margin-right: auto; }
       /* Mobile: slot più grandi, layout verticale foto+nome */
       .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
       .pitch-grid .line.one { grid-template-columns: 1fr; max-width: 50%; }
-       .slot { min-height: 130px; }
-       .slot-card.draggable { padding: 12px; gap: 10px; }
-       .slot-card-main { flex-direction: column; align-items: center; text-align: center; }
+       .slot {
+        min-height: 96px;
+      }
+      .slot-card.draggable {
+        padding: 10px;
+        gap: 8px;
+      }
+ .slot-card-main { flex-direction: column; align-items: center; text-align: center; }
        .slot-info { align-items: center; }
        .slot-name { white-space: normal; }
        .slot-meta { justify-content: center; }
        .slot-actions { justify-content: center; }
        .coach-badge { position: static; margin: -6px 0 12px auto; }
-      #teamSelectMobile { width: 100%; }
       /* Larger touch targets for mobile */
       .btn { min-height: 48px; font-size: 16px; }
       /* Layout verticale: foto SOPRA nome */
-       .slot-card-main .slot-avatar { width: 80px; height: 80px; border-radius: 20px; }
-       .slot-card-main .slot-badge { font-size: 10px; }
+       .slot-card-main .slot-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+      }
+ .slot-card-main .slot-badge { font-size: 10px; }
       .btn-sm { padding: 4px 6px; font-size: 12px; min-height: 32px; }
       /* Roster mobile: mantieni orizzontale */
       .roster .draggable { flex-direction: row; background: #fff; border: 1px solid #dbe1e8; padding: 6px 8px; }
@@ -542,6 +748,112 @@
     @supports (-webkit-touch-callout: none) {
       .draggable { -webkit-user-select: none; user-select: none; }
       .slot { -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
+    }
+    
+    /* Team Meta Layout - evita FOUC */
+    .team-meta-layout {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    
+    .team-logo-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+    }
+    
+    .team-logo-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .team-logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background: rgba(148,163,184,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .team-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .team-name-input {
+      flex: 1;
+    }
+    
+    .team-coach-invite-section {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .team-coach-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+    
+    .team-coach-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    
+    .team-coach-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .team-coach-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: rgba(148,163,184,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--primary);
+    }
+    
+    .team-coach-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .team-coach-initials {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .team-coach-name {
+      font-size: 16px;
+      color: var(--text);
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    .team-invite-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     
     /* JS removed from style block (moved to <script>) */
@@ -739,20 +1051,6 @@
         </div>
       </div>
       
-      <!-- Mobile: solo selettori essenziali -->
-      <div class="mobile-only" style="background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: var(--shadow);">
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <label>
-            <div class="muted" style="margin-bottom: 4px; font-size: 12px;">Giornata:</div>
-            <select id="giornataSelMobile" class="input" style="width: 100%;"></select>
-          </label>
-          <label>
-            <div class="muted" style="margin-bottom: 4px; font-size: 12px;">Squadra:</div>
-            <select id="teamSelectMobile" class="input" style="width: 100%;"></select>
-          </label>
-        </div>
-      </div>
-      
       <!-- Info squadra -->
       <div class="desktop-only" id="teamMeta" style="background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);"></div>
       <div style="max-width: 1400px; margin: 0 auto;">
@@ -761,6 +1059,14 @@
           <div>
             <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
             <div class="pitch">
+              <div class="pitch-lines"></div>
+              <div class="pitch-circle"></div>
+              <div class="penalty-area-top"></div>
+              <div class="penalty-area-bottom"></div>
+              <div class="small-area-top"></div>
+              <div class="small-area-bottom"></div>
+              <div class="penalty-arc-top"></div>
+              <div class="penalty-arc-bottom"></div>
               <div class="pitch-grid" id="pitchGrid">
                 <div class="line two">
                   <div class="slot" data-slot="0"></div>
@@ -775,10 +1081,10 @@
                    <div class="coach-slot-mini" id="coachSlotMini" style="margin-left: auto; margin-right: 0;"></div>
                 </div>
               </div>
-              <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
             </div>
+            <div class="hint" style="margin-top:6px; max-width:520px;">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
             <div class="actions-grid" style="margin:8px 0;">
-              <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
+              <button class="btn desktop-only" id="saveFormation">Salva</button>
               <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
             </div>
           </div>
@@ -808,6 +1114,14 @@
         <div class="mobile-only" style="margin-top: 16px;">
           <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
           <div class="pitch">
+            <div class="pitch-lines"></div>
+            <div class="pitch-circle"></div>
+            <div class="penalty-area-top"></div>
+            <div class="penalty-area-bottom"></div>
+            <div class="small-area-top"></div>
+            <div class="small-area-bottom"></div>
+            <div class="penalty-arc-top"></div>
+            <div class="penalty-arc-bottom"></div>
             <div class="pitch-grid" id="pitchGridMobile">
               <div class="line two">
                 <div class="slot" data-slot="0"></div>
@@ -822,8 +1136,8 @@
                 <div class="coach-slot-mini" id="coachSlotMiniMobile" style="margin-left: auto; margin-right: 0;"></div>
               </div>
             </div>
-            <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
           </div>
+          <div class="hint" style="margin-top:6px; max-width:300px; margin-left:auto; margin-right:auto;">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
         </div>
         
         <div class="mobile-only" style="margin-top: 16px;">
@@ -1197,13 +1511,19 @@
     };
 
   const leagueHelper = window.LeagueHelper || null;
+  let missingLeagueToastShown = false;
 
   function firestore() {
     return window.db || firebase.firestore();
   }
 
-  function legacyFirestore() {
-    return window.__LEGACY_DB__ || firebase.firestore();
+  function notifyMissingLeague(context = 'questa operazione') {
+    console.warn(`[formazioni] League ID mancante (${context})`);
+    if (!missingLeagueToastShown) {
+      missingLeagueToastShown = true;
+      toast('❌ Seleziona una lega valida per continuare.');
+      setTimeout(() => { missingLeagueToastShown = false; }, 4000);
+    }
   }
 
   function getCurrentLeagueIdCached() {
@@ -1214,10 +1534,6 @@
     if (window.currentLeague && window.currentLeague.id) {
       return window.currentLeague.id;
     }
-    try {
-      const stored = localStorage.getItem('last_league_id');
-      if (stored) return stored;
-    } catch (_) {}
     return null;
   }
 
@@ -1226,7 +1542,6 @@
       try {
         const info = await leagueHelper.waitForLeague(timeoutMs);
         if (info && info.id) {
-          try { localStorage.setItem('last_league_id', info.id); } catch (_) {}
           return info.id;
         }
       } catch (err) {
@@ -1247,10 +1562,11 @@
       }
     }
     const targetLeague = leagueId || getCurrentLeagueIdCached();
-    if (targetLeague) {
-      return db.collection(`leagues/${targetLeague}/${collection}`).doc(docId);
+    if (!targetLeague) {
+      notifyMissingLeague(`getLeagueDoc(${collection}/${docId})`);
+      return null;
     }
-    return db.collection(collection).doc(docId);
+    return db.collection(`leagues/${targetLeague}/${collection}`).doc(docId);
   }
 
   function getLeagueCollection(collection, leagueId = null) {
@@ -1258,20 +1574,23 @@
     if (leagueHelper && typeof leagueHelper.getLeagueCollection === 'function') {
       try {
         const ref = leagueHelper.getLeagueCollection(collection, leagueId || undefined);
-        if (ref) return ref;
+        if (ref) {
+          console.log(`[formazioni] getLeagueCollection via LeagueHelper: ${collection}, league: ${leagueId || 'current'}`);
+          return ref;
+        }
       } catch (err) {
         console.warn('[formazioni] LeagueHelper.getLeagueCollection failed', err);
       }
     }
     const targetLeague = leagueId || getCurrentLeagueIdCached();
-    if (targetLeague) {
-      // ✅ USA MULTILEGA: leagues/{leagueId}/collection
-      console.log('[formazioni] Using multilega path: leagues/' + targetLeague + '/' + collection);
-      return db.collection(`leagues/${targetLeague}/${collection}`);
+    if (!targetLeague) {
+      notifyMissingLeague(`getLeagueCollection(${collection})`);
+      return null;
     }
-    // ⚠️ FALLBACK LEGACY: collection diretta
-    console.warn('[formazioni] No leagueId found, using legacy path: ' + collection);
-    return db.collection(collection);
+    // ✅ USA MULTILEGA: leagues/{leagueId}/collection
+    const path = `leagues/${targetLeague}/${collection}`;
+    console.log(`[formazioni] getLeagueCollection diretto: ${path}`);
+    return db.collection(path);
   }
 
   function getTeamDocRef(index, leagueId = null) {
@@ -1292,23 +1611,17 @@
   }
 
   async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
-    const results = [];
     const leagueRef = getSavedDocRef(teamIdx, giornata, leagueId);
-    if (leagueRef) {
-      results.push({ source: 'league', ref: leagueRef });
+    if (!leagueRef) {
+      return null;
     }
-    const legacyRef = legacyFirestore().collection('teams').doc(String(teamIdx)).collection('saved').doc(giornata);
-    results.push({ source: 'legacy', ref: legacyRef });
-
-    for (const entry of results) {
-      try {
-        const snap = await entry.ref.get();
-        if (snap && snap.exists) {
-          return { snap, source: entry.source };
-        }
-      } catch (err) {
-        console.warn('[formazioni] fetchSavedSnapshot error', entry.source, teamIdx, giornata, err);
+    try {
+      const snap = await leagueRef.get();
+      if (snap && snap.exists) {
+        return { snap, source: 'league' };
       }
+    } catch (err) {
+      console.warn('[formazioni] fetchSavedSnapshot error', teamIdx, giornata, err);
     }
     return null;
   }
@@ -1393,155 +1706,138 @@
     return null;
   }
 
-    function toast(msg){
-      const el = document.createElement('div');
-      el.textContent = msg;
-      el.style.position='fixed'; el.style.bottom='16px'; el.style.right='16px'; el.style.background='#2d6cdf'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.boxShadow='var(--shadow)'; el.style.zIndex='9999';
-      document.body.appendChild(el); setTimeout(()=> el.remove(), 2000);
-    }
+  function toast(msg){
+    const el = document.createElement('div');
+    el.textContent = msg;
+    el.style.position='fixed'; el.style.bottom='16px'; el.style.right='16px'; el.style.background='#2d6cdf'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.boxShadow='var(--shadow)'; el.style.zIndex='9999';
+    document.body.appendChild(el); setTimeout(()=> el.remove(), 2000);
+  }
 
-    async function loadAuth(){
-      if (!window.auth || !window.db) return;
-      window.auth.onAuthStateChanged(async (user)=>{
-        state.user = user || null; state.isAdmin = false; state.userTeamIdx = null;
-        if (user){
-          try{
-            const ad = await window.db.collection('admins').doc(user.uid).get();
-            state.isAdmin = !!ad.exists;
-            const ud = await window.db.collection('users').doc(user.uid).get();
-            if (ud.exists) {
-              const userData = ud.data();
-              state.userTeamIdx = userData.team_index;
-              if (typeof state.userTeamIdx !== 'number' && !state.isAdmin) {
-                console.warn('⚠️ User senza team_index assegnato!');
-                toast('⚠️ Non hai una squadra assegnata. Vai su "Scegli Squadra" o contatta un admin.');
-              }
-              if (!state.isAdmin && typeof state.userTeamIdx === 'number') {
-                state.selectedTeamIdx = state.userTeamIdx;
-              }
-            } else {
-              console.warn('⚠️ Documento user non trovato in Firestore');
-            }
-          } catch { /* noop */ }
-        }
-        updateAuthBtn();
-        renderTeamsList(); renderEditor();
-        // scroll alla squadra dell'utente, se presente
+  function renderNoTeamAssigned(){
+    const main = document.querySelector('main') || document.body;
+    if (!main) return;
+    main.innerHTML = `
+      <section class="section" style="max-width: 800px; margin: 40px auto; text-align: center;">
+        <h2>Nessuna squadra assegnata</h2>
+        <p style="color: var(--muted); margin-bottom: 20px;">
+          Per gestire le formazioni devi prima scegliere una squadra disponibile nella tua lega.
+        </p>
+        <a href="scegli-squadra.html" class="btn">Scegli la tua Squadra</a>
+      </section>
+    `;
+  }
+  
+  async function loadAuth(){
+    if (!window.auth || !window.db) return;
+    window.auth.onAuthStateChanged(async (user)=>{
+      state.user = user || null;
+      state.isAdmin = false;
+      state.userTeamIdx = null;
+
+      if (user){
         try{
-          const el = document.querySelector(`#teams .item[data-idx="${state.selectedTeamIdx}"]`);
-          if (el) el.scrollIntoView({ block:'nearest' });
-        } catch {}
-      });
+          const ad = await window.db.collection('admins').doc(user.uid).get();
+          state.isAdmin = !!ad.exists;
+        } catch(e) {
+          console.warn('[formazioni] errore lettura admin:', e);
+        }
+
+        try{
+          const ud = await window.db.collection('users').doc(user.uid).get();
+          if (ud.exists) {
+            const userData = ud.data() || {};
+            state.userTeamIdx = userData.team_index;
+
+            if (typeof state.userTeamIdx !== 'number' && !state.isAdmin) {
+              console.warn('⚠️ User senza team_index assegnato!');
+              toast('⚠️ Non hai una squadra assegnata. Vai su "Scegli Squadra" o contatta un admin.');
+              renderNoTeamAssigned();
+              if (typeof updateAuthBtn === 'function') {
+                updateAuthBtn();
+              }
+              return;
+            }
+
+            if (!state.isAdmin && typeof state.userTeamIdx === 'number') {
+              state.selectedTeamIdx = state.userTeamIdx;
+            }
+          } else {
+            console.warn('[formazioni] Documento utente non trovato');
+          }
+        } catch(e) {
+          console.warn('[formazioni] errore lettura utente:', e);
+        }
+      }
+
+      if (typeof updateAuthBtn === 'function') {
+        updateAuthBtn();
+      }
+
+      renderTeamsList();
+      renderEditor();
+    });
+  }
+
+  function isLockedAuto(){
+    // PRIORITÀ 1: Se giornata calcolata → BLOCCATA (anche G1/G2!) per non-admin
+    if (state.daysComputed && !state.isAdmin) {
+      return true;
     }
 
-    function updateAuthBtn(){
-      const btn = document.getElementById('userAuthBtn'); if (!btn) return;
-      btn.textContent = state.user ? 'Esci' : 'Accedi';
-    }
-
-    function canEdit(idx){
-      return state.isAdmin || (state.user && state.userTeamIdx===idx);
-    }
-
-    function mondayWindow(now){
-      // returns [startLock, endLock) for current week: Mon 20:30 .. Wed 00:30
-      const d = new Date(now);
-      const day = d.getDay(); // 0 Sun .. 6 Sat
-      // get current week Monday 20:30
-      const curMon = new Date(d);
-      const diffToMon = (day + 6) % 7; // days since Monday
-      curMon.setDate(d.getDate() - diffToMon);
-      curMon.setHours(20,30,0,0);
-      // End: Wednesday 00:30 of the same week (Mon + 2 days at 00:30)
-      const wed0030 = new Date(curMon);
-      wed0030.setDate(curMon.getDate()+2);
-      wed0030.setHours(0,30,0,0);
-      return [curMon, wed0030];
-    }
-    // getKickoff rimosso: calcio d'inizio gestito in Calcolo
-    function isLockedAuto(){
-      // PRIORITÀ 1: Se giornata calcolata → BLOCCATA (anche G1/G2!)
-      if (state.daysComputed && !state.isAdmin) {
-        // console.log('📊 Giornata', state.giornata, '- BLOCCATA (già calcolata)');
+    // PRIORITÀ 2: Check deadline da Firestore
+    if (state.deadlineTime) {
+      const now = new Date();
+      if (now >= state.deadlineTime) {
         return true;
       }
-      
-      // PRIORITÀ 2: Check deadline da Firestore
-      if (state.deadlineTime) {
-        const now = new Date();
-        if (now >= state.deadlineTime) {
-          // console.log('⏰ Giornata', state.giornata, '- BLOCCATA (deadline scaduta)');
-          return true;
-        }
+    }
+
+    // Altrimenti aperta
+    return false;
+  }
+
+  async function updateDaysComputed(){
+    try{
+      const docRef = getLeagueDoc('days', state.giornata);
+      if (!docRef){
+        state.daysComputed = false;
+        return;
       }
-      
-      // Altrimenti aperta
-      // console.log('🔓 Giornata', state.giornata, '- APERTA');
-      return false;
+      const doc = await docRef.get();
+      if (doc.exists){
+        const data = doc.data() || {};
+        state.daysComputed = !!(data.computed === true);
+        return;
+      }
+    }catch(e){
+      console.warn('[formazioni] updateDaysComputed error:', e);
     }
-    async function updateDaysComputed(){
-      // Reads days/{giornata}.computed from Firestore; fallback false
-      try{
-        const docRef = getLeagueDoc('days', state.giornata);
-        if (docRef){
-          const doc = await docRef.get();
-          if (doc.exists){
-            state.daysComputed = !!(doc.data()?.computed===true);
-            return;
-          }
-        }
-        const legacyDoc = await legacyFirestore().collection('days').doc(state.giornata).get();
-        if (legacyDoc.exists){
-          state.daysComputed = !!(legacyDoc.data()?.computed === true);
-          return;
-        }
-      }catch(e){ /* noop */ }
-      state.daysComputed = false;
-    }
-    async function loadDeadline(){
-      // Carica deadline da Firestore per giornata corrente
+    state.daysComputed = false;
+  }
+
+  async function loadDeadline(){
+      // Carica deadline da Firestore per giornata corrente (per-lega)
       state.deadlineTime = null;
       try{
-        if (!window.db) {
-          console.warn('⚠️ Firestore non disponibile');
+        const leagueId = await ensureLeagueReady(10000);
+        if (!leagueId) {
+          notifyMissingLeague('caricare la deadline');
           return;
         }
-        // Fallback per fanta principale senza leghe
         const giornataNum = parseInt(state.giornata.replace('G',''));
-        let deadlinePath;
-        
-        if (window.currentLeague && window.currentLeague.id) {
-          deadlinePath = `leagues/${window.currentLeague.id}/deadlines/giornata_${giornataNum}`;
-        } else {
-          // Fallback: deadlines globali
-          deadlinePath = `deadlines/G${giornataNum}`;
+        const docRef = getLeagueDoc('deadlines', `giornata_${giornataNum}`, leagueId);
+        if (!docRef) {
+          // notifyMissingLeague è già stato chiamato da getLeagueDoc
+          return;
         }
-        
-        // console.log('📡 Loading deadline from:', deadlinePath);
-        
-        let doc;
-        if (window.currentLeague && window.currentLeague.id) {
-          try {
-            doc = await window.db.collection('leagues').doc(window.currentLeague.id)
-              .collection('deadlines').doc(`giornata_${giornataNum}`).get();
-          } catch(err) {
-            console.warn('⚠️ Error loading league deadline, trying global:', err);
-            doc = await window.db.collection('deadlines').doc(`G${giornataNum}`).get();
-          }
-        } else {
-          // Fallback: deadline globale
-          doc = await window.db.collection('deadlines').doc(`G${giornataNum}`).get();
-        }
-        
+        const doc = await docRef.get();
         if (doc.exists && doc.data().deadline){
           state.deadlineTime = doc.data().deadline.toDate();
-          // console.log('✅ Deadline loaded:', state.deadlineTime);
-        } else {
-          // Deadline non trovata - normale per giornate future o non configurate
-          // console.log('ℹ️ Deadline non trovata per giornata', giornataNum, '- Formazioni APERTE');
         }
+        // Se non esiste deadline, le formazioni restano aperte
       }catch(e){ 
         console.error('❌ Deadline load error:', e); 
+        toast('❌ Errore nel caricamento della deadline per questa lega. Formazioni considerate aperte.');
       }
     }
     async function initLockUI(){
@@ -1627,10 +1923,14 @@
     function loadSaved(g){ return {}; }
     function saveSaved(g, data){ /* noop */ }
     async function saveCurrentTeamFormation(){
-      const t = state.teams[state.selectedTeamIdx]; if (!t) return;
-      if (!t.captain){ toast('Seleziona il capitano prima di salvare'); return; }
-      await ensureLeagueReady();
-      const leagueId = getCurrentLeagueIdCached();
+      const t = state.teams[state.selectedTeamIdx]; if (!t) return false;
+      if (!t.captain){ toast('Seleziona il capitano prima di salvare'); return false; }
+      const leagueId = await ensureLeagueReady();
+      if (!leagueId) {
+        notifyMissingLeague('salvare la formazione');
+        toast('❌ Impossibile salvare la formazione senza una lega selezionata.');
+        return false;
+      }
       const sanitizedLineup = (t.lineup||[]).slice(0,5).concat(Array(5).fill(null)).slice(0,5);
       const payload = {
         lineup: sanitizedLineup,
@@ -1646,8 +1946,8 @@
         if (leagueRef){
           await leagueRef.set(payload, { merge:true });
         }
-        await legacyFirestore().collection('teams').doc(String(state.selectedTeamIdx)).collection('saved').doc(g).set(payload, { merge:true });
-        toast(`✅ Formazione salvata • Squadra ${state.selectedTeamIdx+1} • ${g}`); 
+        toast(`✅ Formazione salvata · Squadra ${state.selectedTeamIdx+1} · ${g}`);
+        return true;
       }catch(e){ 
         console.error('❌ Firestore save ERROR:', e);
         console.error('Error details:', {
@@ -1678,6 +1978,7 @@
             }
           }, 1000);
         }
+        return false;
       }
     }
 
@@ -1757,33 +2058,10 @@
       }
       
       // Verifica che la lega sia pronta
-      const leagueId = await ensureLeagueReady(5000);
+      const leagueId = await ensureLeagueReady(10000);
       if (!leagueId) {
-        console.warn('[formazioni] syncTeamsFromFirestore: Nessuna lega disponibile, uso fallback legacy');
-        // Fallback: prova a caricare da collection legacy
-        try {
-          const legacyDb = legacyFirestore();
-          const legacyTasks = Array.from({length:19}, (_,i)=>{
-            return legacyDb.collection('teams').doc(String(i)).get();
-          });
-          const legacyDocs = await Promise.all(legacyTasks);
-          legacyDocs.forEach((doc, i)=>{
-            if (doc && doc.exists){
-              const d = doc.data();
-              const t = state.teams[i];
-              if (!t) return;
-              if (d.name) t.name = d.name;
-              if (Array.isArray(d.coach_ids)) t.coach_ids = d.coach_ids;
-              if (Array.isArray(d.roster)) t.roster = d.roster;
-              if (d.logo) setTeamLogo(i, d.logo);
-            }
-          });
-          console.log('[formazioni] Squadre caricate da legacy Firebase');
-          renderTeamsList();
-          return;
-        } catch (legacyErr) {
-          console.error('[formazioni] Errore caricamento legacy:', legacyErr);
-        }
+        notifyMissingLeague('caricare le squadre');
+        return;
       }
       
       try{
@@ -1814,43 +2092,24 @@
         });
         console.log('[formazioni] ✅ Squadre caricate da multilega (' + loadedCount + '/19)');
         if (loadedCount === 0) {
-          console.warn('[formazioni] ⚠️ Nessuna squadra trovata in multilega, provo legacy...');
-          throw new Error('No teams found in multilega');
+          console.warn('[formazioni] ⚠️ Nessuna squadra trovata in multilega');
         }
         renderTeamsList();
       }catch(e){ 
         console.error('[formazioni] FS load teams error:', e);
-        // Fallback a legacy se multilega fallisce
-        try {
-          const legacyDb = legacyFirestore();
-          const legacyTasks = Array.from({length:19}, (_,i)=>{
-            return legacyDb.collection('teams').doc(String(i)).get();
-          });
-          const legacyDocs = await Promise.all(legacyTasks);
-          legacyDocs.forEach((doc, i)=>{
-            if (doc && doc.exists){
-              const d = doc.data();
-              const t = state.teams[i];
-              if (!t) return;
-              if (d.name) t.name = d.name;
-              if (Array.isArray(d.coach_ids)) t.coach_ids = d.coach_ids;
-              if (Array.isArray(d.roster)) t.roster = d.roster;
-              if (d.logo) setTeamLogo(i, d.logo);
-            }
-          });
-          console.log('[formazioni] Squadre caricate da legacy (fallback)');
-          renderTeamsList();
-        } catch (legacyErr) {
-          console.error('[formazioni] Errore anche nel fallback legacy:', legacyErr);
-        }
+        toast('❌ Impossibile caricare le squadre dalla lega selezionata. Riprova tra poco.');
       }
     }
 
     async function applySavedFromFirestore(g){
-      await ensureLeagueReady();
+      const leagueId = await ensureLeagueReady(10000);
       if (!window.db) return;
+      if (!leagueId) {
+        notifyMissingLeague('caricare le formazioni salvate');
+        return;
+      }
       try{
-        const snapshots = await Promise.all(Array.from({length:19}, (_,i)=> fetchSavedSnapshot(i, g)));
+        const snapshots = await Promise.all(Array.from({length:19}, (_,i)=> fetchSavedSnapshot(i, g, leagueId)));
         for (let i = 0; i < snapshots.length; i++) {
           const result = snapshots[i];
           const t = state.teams[i]; if (!t) continue;
@@ -1859,27 +2118,27 @@
             if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
             if (d.captain!==undefined) t.captain = d.captain;
             if (d.name && !t.name) t.name = d.name;
-            if (result.source === 'legacy') {
-              const leagueRef = getSavedDocRef(i, g);
-              if (leagueRef) {
-                try { await leagueRef.set(d, { merge:true }); } catch (err) { console.warn('[formazioni] sync legacy saved -> league', i, g, err); }
-              }
-            }
           }
         }
         renderEditor();
-      }catch(e){ console.warn('FS load saved error', e); }
+      }catch(e){ 
+        console.warn('[formazioni] FS load saved error', e);
+        toast('❌ Errore nel caricamento delle formazioni salvate per questa lega.');
+      }
     }
 
     // Realtime subscription to saved formations for current giornata
     let savedUnsubs = [];
     function unsubscribeSaved(){ try{ savedUnsubs.forEach(u=>u&&u()); }catch{} savedUnsubs=[]; }
-    function subscribeSavedForGiornata(g){
+    async function subscribeSavedForGiornata(g){
       unsubscribeSaved();
-      ensureLeagueReady();
-      if (!window.db) return;
+      const leagueId = await ensureLeagueReady(10000);
+      if (!leagueId) {
+        notifyMissingLeague('sottoscrivere le formazioni salvate');
+        return;
+      }
       for (let i=0;i<19;i++){
-        const ref = getSavedDocRef(i, g);
+        const ref = getSavedDocRef(i, g, leagueId);
         if (!ref) continue;
         const unsub = ref.onSnapshot(doc=>{
           const t = state.teams[i]; if (!t) return;
@@ -1891,6 +2150,9 @@
           }
           renderTeamsList();
           if (state.selectedTeamIdx===i) renderEditor();
+        }, (error) => {
+          console.error('[formazioni] Realtime saved formations error', error);
+          toast('❌ Errore nel caricamento in tempo reale delle formazioni per questa lega.');
         });
         savedUnsubs.push(unsub);
       }
@@ -1929,20 +2191,42 @@
     }
 
     async function fetchOwnersForTeam(idx){
+      // Solo gli admin possono vedere i proprietari delle squadre.
+      // Per gli utenti normali saltiamo la query per evitare errori di permesso.
+      if (!state.isAdmin) {
+        return [];
+      }
+
       try{
         if (!window.db) return [];
-        // Per non-admin, questa query potrebbe non essere permessa - gestisci silenziosamente
+        
+        // Forza uso collection root users; richiede permessi adeguati nelle rules
         const snap = await window.db.collection('users').where('team_index','==', idx).get();
         const list = [];
-        snap.forEach(doc=>{ const d=doc.data()||{}; list.push(d.display_name||d.email||doc.id); });
+        snap.forEach(doc=>{ 
+          const d=doc.data()||{}; 
+          const name = d.display_name||d.email||doc.id;
+          list.push(name); 
+        });
         return list;
+        
       }catch(e){ 
-        // Non loggare errori permission-denied per non-admin (sono attesi)
-        if (e?.code !== 'permission-denied') {
-          console.warn('fetchOwnersForTeam', e);
-        }
+        console.warn('fetchOwnersForTeam ERROR (admin only):', e);
         return []; 
       }
+    }
+
+    function canEdit(teamIdx) {
+      // Admin può modificare tutte le squadre
+      if (state.isAdmin) return true;
+      
+      // Utente loggato può modificare solo la sua squadra
+      if (state.user && typeof state.userTeamIdx === 'number' && state.userTeamIdx === teamIdx) {
+        return true;
+      }
+      
+      // Altrimenti non può modificare
+      return false;
     }
 
     function renderEditor(){
@@ -1955,6 +2239,10 @@
         console.warn('⚠️ renderEditor: team non trovato, selectedTeamIdx:', state.selectedTeamIdx, 'teams length:', state.teams?.length);
         return;
       }
+      // Se il capitano non è più in campo, azzera automaticamente
+      if (t.captain && !(Array.isArray(t.lineup) && t.lineup.includes(t.captain))) {
+        t.captain = null;
+      }
       const locked = isLockedAuto();
       const computedReadOnly = state.daysComputed && !state.isAdmin; // Giornate calcolate read-only per non-admin
       const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computedReadOnly;
@@ -1965,6 +2253,7 @@
       }
       const logo = getTeamLogo(state.selectedTeamIdx);
       const role = state.isAdmin? 'Admin' : (state.user ? (state.userTeamIdx===state.selectedTeamIdx? 'Proprietario' : 'Utente') : 'Ospite');
+      const canManageInvites = state.isAdmin || (state.user && typeof state.userTeamIdx === 'number' && state.userTeamIdx === state.selectedTeamIdx);
       const display = state.userDisplayName || (state.user?.email||'');
       const ownerInfo = `<strong>${role}</strong>${display? ' • <strong>'+display+'</strong>' : ''}`;
       const primaryCoachId = Array.isArray(t.coach_ids) && t.coach_ids.length ? t.coach_ids[0] : null;
@@ -2021,36 +2310,45 @@
         </div>
       ` : '<div class="muted" style="margin-top:8px;">Nessun coach assegnato</div>';
       $('#teamMeta').innerHTML = `
-        <div class="grid2">
-          <div>
-            <div class="muted" style="font-size:16px; font-weight:800;">Logo squadra</div>
-            <div class="row" style="gap:10px; align-items:center;">
-              <div id="logoBox">${logo? `<img src="${logo}" alt="logo"/>` : '<strong class="muted">Carica logo</strong>'}</div>
-              <div style="flex:1;">
+        <div class="team-meta-layout">
+          <!-- Logo squadra + Nome squadra -->
+          <div class="team-logo-section">
+            <div class="muted">Logo squadra</div>
+            <div class="team-logo-row">
+              <div id="logoBox" class="team-logo-container">${logo? `<img src="${logo}" alt="logo" class="team-logo-img"/>` : '<strong class="muted">Logo</strong>'}</div>
+              <div class="team-name-input">
                 <div class="muted">Nome squadra</div>
                 <input id="teamName" class="input" value="${t.name}" ${!canWrite?'disabled':''} />
               </div>
             </div>
             <input type="file" id="teamLogoInput" accept="image/*" style="display:none;" ${!canWrite?'disabled':''} />
           </div>
-          <div>
-            <div class="muted" style="margin:0 0 8px;">Allenatore</div>
-            ${selectedCoach ? (() => {
-              const coachName = selectedCoach.nome || selectedCoach.name || 'Coach';
-              const coachInitials = getInitials(coachName);
-              return `
-                <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
-                  <div style="width:80px; height:80px; border-radius:50%; overflow:hidden; background:rgba(148,163,184,0.2); display:flex; align-items:center; justify-content:center; border:3px solid var(--primary);">
-                    ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=\\'font-size:28px; font-weight:700;\\'>${coachInitials}</span>'"/>` : `<span style="font-size:28px; font-weight:700;">${coachInitials}</span>`}
+          
+          <!-- Allenatore + Inviti -->
+          <div class="team-coach-invite-section">
+            <!-- Allenatore -->
+            <div class="team-coach-section">
+              <div class="muted team-coach-title">Allenatore</div>
+              ${selectedCoach ? (() => {
+                const coachName = selectedCoach.nome || selectedCoach.name || 'Coach';
+                const coachInitials = getInitials(coachName);
+                return `
+                  <div class="team-coach-preview">
+                    <div class="team-coach-avatar">
+                      ${coachPhoto ? `<img src="${coachPhoto}" alt="${coachName}" class="team-coach-img" onerror="this.parentElement.innerHTML='<span class=\\'team-coach-initials\\'>${coachInitials}</span>'"/>` : `<span class="team-coach-initials">${coachInitials}</span>`}
+                    </div>
+                    <span class="team-coach-name">${escapeHtml(coachName)}</span>
                   </div>
-                  <span style="font-size:14px; color:var(--text); font-weight:600;">${escapeHtml(coachName)}</span>
-                </div>
-              `;
-            })() : '<div class="muted" style="margin-top:8px;">Nessun allenatore assegnato</div>'}
-            <div style="margin-top:16px;">
-              <div class="muted">Accesso</div>
-              <div>${ownerInfo}</div>
-              <div class="muted" id="ownersList" style="margin-top:6px;">Allenatori: …</div>
+                `;
+              })() : '<div class="muted">Nessun allenatore assegnato</div>'}
+            </div>
+            
+            <!-- Inviti -->
+            <div class="team-invite-section">
+              <div class="team-invite-content">
+                <div class="muted" id="ownersList">Allenatori: …</div>
+                <div id="teamInviteBox"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -2059,6 +2357,24 @@
       fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
         const el = document.getElementById('ownersList'); if (!el) return;
         el.textContent = arr.length? `Allenatori: ${arr.join(', ')}` : 'Allenatori: —';
+        const inviteBox = document.getElementById('teamInviteBox');
+        if (inviteBox) {
+          if (canManageInvites && window.TeamInviteSystem && typeof window.TeamInviteSystem.renderInviteUI === 'function') {
+            const leagueId = getCurrentLeagueIdCached();
+            if (leagueId) {
+              window.TeamInviteSystem.renderInviteUI(
+                inviteBox,
+                leagueId,
+                String(state.selectedTeamIdx),
+                t.name || ('Squadra '+(state.selectedTeamIdx+1))
+              );
+            } else {
+              inviteBox.innerHTML = '';
+            }
+          } else {
+            inviteBox.innerHTML = '';
+          }
+        }
       });
 
       // Player pool with checkbox selection (desktop)
@@ -2189,22 +2505,23 @@
             slot.classList.add('captain-active');
           }
           const showCapBtn = (!t.captain) || isCaptain;
+          const capIconHtml = showCapBtn
+            ? `<button class="slot-icon slot-cap-toggle${isCaptain ? ' is-active' : ''}" data-act="cap" title="Imposta capitano" aria-label="Imposta capitano">★</button>`
+            : '';
           slot.innerHTML = `
             <div class="slot-card draggable${isCaptain ? ' captain-card' : ''}" draggable="true" data-pid="${pid}">
+              ${capIconHtml}
+              <button class="slot-icon slot-remove-btn" data-act="remove" title="Rimuovi" aria-label="Rimuovi giocatore">×</button>
               <div class="slot-card-main">
                 <div class="slot-avatar">
                   <img src="${photoURL}" alt="${safeName}" onerror="this.src='resources/logo.png'" />
-              </div>
+                </div>
                 <div class="slot-info">
                   <span class="slot-name">${safeName}</span>
                   <div class="slot-meta">
                     ${badges.join('')}
                   </div>
                 </div>
-              </div>
-              <div class="slot-actions">
-                ${showCapBtn ? '<button class="btn btn-secondary btn-sm" data-act="cap" title="Imposta capitano" aria-label="Imposta capitano">⭐</button>' : ''}
-                <button class="btn btn-secondary btn-sm" data-act="remove" title="Rimuovi" aria-label="Rimuovi giocatore">×</button>
               </div>
             </div>
           `;
@@ -2222,6 +2539,9 @@
           // Doppio click per rimuovere dal campo
           dragEl.addEventListener('dblclick', ()=>{
             if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+            if (t.captain === pid) {
+              t.captain = null;
+            }
             t.lineup[i] = null;
             saveTeams();
             renderEditor();
@@ -2245,6 +2565,9 @@
             removeBtn.addEventListener('click', (e)=>{
               e.stopPropagation();
               if (!canWrite) { toast('Formazione bloccata o non hai permessi.'); return; }
+              if (t.captain === pid) {
+                t.captain = null;
+              }
               t.lineup[i] = null;
               saveTeams();
               renderEditor();
@@ -2334,18 +2657,28 @@
         
         // Mobile già gestito da click handler sopra (handleMobileClickPlayer)
       });
-      // allow dropping from pitch back to bench to remove from that slot
-      bench.addEventListener('dragover', ev=> ev.preventDefault());
-      bench.addEventListener('drop', ev=>{
-        ev.preventDefault();
-        if (!canWrite) { return; }
-        const dragged = ev.dataTransfer.getData('text/plain');
-        // If dragged is currently placed in lineup, remove it (send to bench)
-        if (t.lineup.includes(dragged)){
-          t.lineup = t.lineup.map(x=> x===dragged ? null : x);
-          saveTeams(); renderEditor();
-        }
-      });
+      // allow dropping from pitch back to bench (mobile + desktop) per rimuovere dal campo
+      function setupBenchDrop(target){
+        if (!target) return;
+        target.addEventListener('dragover', ev=> ev.preventDefault());
+        target.addEventListener('drop', ev=>{
+          ev.preventDefault();
+          if (!canWrite) { return; }
+          const dragged = ev.dataTransfer.getData('text/plain');
+          if (!dragged) return;
+          // Se il giocatore era in campo, rimuovilo e, se capitano, azzera il capitano
+          if (Array.isArray(t.lineup) && t.lineup.includes(dragged)){
+            t.lineup = t.lineup.map(x=> x===dragged ? null : x);
+            if (t.captain === dragged) {
+              t.captain = null;
+            }
+            saveTeams();
+            renderEditor();
+          }
+        });
+      }
+      setupBenchDrop(bench);
+      setupBenchDrop(benchDesktop);
 
       $('#teamName').oninput = ()=>{ if (!canWrite) return; t.name = $('#teamName').value; saveTeams(); renderTeamsList(); };
       
@@ -2444,8 +2777,10 @@
             }
             return;
           }  
-          await saveCurrentTeamFormation();
-          renderTeamsList();
+          const ok = await saveCurrentTeamFormation();
+          if (ok) {
+            renderTeamsList();
+          }
         }
         saveFormation();
       } }
@@ -2464,9 +2799,10 @@
             toast('❌ Permesso negato');
             return;
           }
-          await saveCurrentTeamFormation();
-          renderTeamsList();
-          toast('✅ Formazione salvata');
+          const ok = await saveCurrentTeamFormation();
+          if (ok) {
+            renderTeamsList();
+          }
         };
       }
       if (btnClearMobile) {
@@ -2543,12 +2879,46 @@
       return hasD && hasC && hasA;
     }
 
+    const LEAGUES_WITH_CUSTOM_PLAYER_FILES = new Set(['y3GQ05GhHsMSZLZj1Oew']);
+
+    async function safeLoadJson(url){
+      try{
+        const resp = await fetch(url);
+        if (!resp.ok) return null;
+        return await resp.json();
+      }catch{
+        return null;
+      }
+    }
+
     async function loadPlayersAndCoaches(){
-      await ensureLeagueReady();
+      const leagueId = await ensureLeagueReady();
 
       let basePlayers=[], baseCoaches=[];
-      try{ const resp = await fetch('resources/players.json'); const js=await resp.json(); basePlayers = js.players||[]; }catch{}
-      try{ const resp = await fetch('resources/coaches.json'); const js=await resp.json(); baseCoaches = js.coaches||[]; }catch{}
+      if (leagueId && LEAGUES_WITH_CUSTOM_PLAYER_FILES.has(leagueId)){
+        const leaguePlayers = await safeLoadJson(`resources/players_${leagueId}.json`);
+        if (leaguePlayers && Array.isArray(leaguePlayers.players)){
+          basePlayers = leaguePlayers.players;
+        }
+        const leagueCoaches = await safeLoadJson(`resources/coaches_${leagueId}.json`);
+        if (leagueCoaches && Array.isArray(leagueCoaches.coaches)){
+          baseCoaches = leagueCoaches.coaches;
+        }
+      }
+
+      if (!basePlayers.length){
+        const globalPlayers = await safeLoadJson('resources/players.json');
+        if (globalPlayers && Array.isArray(globalPlayers.players)){
+          basePlayers = globalPlayers.players;
+        }
+      }
+
+      if (!baseCoaches.length){
+        const globalCoaches = await safeLoadJson('resources/coaches.json');
+        if (globalCoaches && Array.isArray(globalCoaches.coaches)){
+          baseCoaches = globalCoaches.coaches;
+        }
+      }
 
       const uniqueKey = () => (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
@@ -2576,8 +2946,17 @@
       };
 
       try {
-        const playersRef = getLeagueCollection('players');
-        const coachesRef = getLeagueCollection('coaches');
+        const leagueId = await ensureLeagueReady(10000);
+        if (!leagueId) {
+          notifyMissingLeague('caricare giocatori e allenatori');
+          throw new Error('Missing leagueId for catalog load');
+        }
+        const playersRef = getLeagueCollection('players', leagueId);
+        const coachesRef = getLeagueCollection('coaches', leagueId);
+        if (!playersRef || !coachesRef) {
+          notifyMissingLeague('caricare giocatori e allenatori');
+          throw new Error('Missing leagueId for catalog load');
+        }
         const [ps, cs] = await Promise.all([
           playersRef.get(),
           coachesRef.get()
@@ -2586,17 +2965,7 @@
         mergeCoachesDocs(cs.docs.map(d => ({ coach_id: d.id, ...(d.data() || {}) })));
       } catch (err) {
         console.warn('[formazioni] Caricamento dati multi-lega fallito', err);
-        try {
-          const legacyDb = legacyFirestore();
-          const [ps, cs] = await Promise.all([
-            legacyDb.collection('players').get(),
-            legacyDb.collection('coaches').get()
-          ]);
-          mergePlayersDocs(ps.docs.map(d => ({ player_id: d.id, ...(d.data() || {}) })));
-          mergeCoachesDocs(cs.docs.map(d => ({ coach_id: d.id, ...(d.data() || {}) })));
-        } catch (legacyErr) {
-          console.warn('[formazioni] Caricamento dati legacy fallito', legacyErr);
-        }
+        toast('❌ Impossibile caricare catalogo giocatori/allenatori per la lega selezionata.');
       }
 
       state.players = Array.from(pmap.values());
@@ -2604,15 +2973,34 @@
 
       if (window.firebase && window.firebase.storage) {
         const storage = window.firebase.storage();
-        const leagueId = getCurrentLeagueIdCached() || 'default';
-        for (const player of state.players) {
-          if (!player.photoURL) {
-            try {
-              const photoRef = storage.ref(`players/${leagueId}/${player.player_id}.jpg`);
-              const photoURL = await photoRef.getDownloadURL();
-              player.photoURL = photoURL;
-            } catch (_) {
-              // ignore missing photo
+        const leagueId = getCurrentLeagueIdCached();
+        if (!leagueId) {
+          console.warn('[formazioni] League ID mancante per il caricamento delle foto giocatori, skip Firebase Storage');
+        } else {
+          // Carica foto giocatori
+          for (const player of state.players) {
+            if (!player.photoURL) {
+              try {
+                const photoRef = storage.ref(`players/${leagueId}/${player.player_id}.jpg`);
+                const photoURL = await photoRef.getDownloadURL();
+                player.photoURL = photoURL;
+              } catch (_) {
+                // ignore missing photo
+              }
+            }
+          }
+          
+          // Carica foto coach
+          for (const coach of state.coaches) {
+            if (!coach.photoURL && !coach.photo_url && !coach.photo) {
+              try {
+                const photoRef = storage.ref(`coaches/${leagueId}/${coach.coach_id}.jpg`);
+                const photoURL = await photoRef.getDownloadURL();
+                coach.photoURL = photoURL;
+                coach.photo_url = photoURL;
+              } catch (_) {
+                // ignore missing photo
+              }
             }
           }
         }
@@ -2665,18 +3053,14 @@
       }
       
       if (isMobile()) {
-        // console.log('📱 Mobile mode active');
+        // Mobile mode active
       }
       
-      // ✅ VERIFICA MULTILEGA
-      console.log('[formazioni] LeagueHelper disponibile:', !!leagueHelper);
-      if (leagueHelper && typeof leagueHelper.isMultiLeagueEnabled === 'function') {
-        const isMulti = leagueHelper.isMultiLeagueEnabled();
-        console.log('[formazioni] Multi-league enabled:', isMulti);
+      const leagueId = await ensureLeagueReady(10000);
+      if (!leagueId) {
+        notifyMissingLeague('gestire le formazioni');
+        return;
       }
-      
-      const leagueId = await ensureLeagueReady(10000); // Aumentato timeout a 10s
-      console.log('[formazioni] League ID dopo ensureLeagueReady:', leagueId);
       
       await loadPlayersAndCoaches();
       initTeams();
@@ -2717,10 +3101,13 @@
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/lazy-load.js?v=20251020"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/team-invite-system.js?v=2025101907"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>
+  <script src="resources/footer.js?v=20251027"></script>
+  <script src="resources/cookie-consent.js?v=20251027"></script>
 </body>
 </html>

@@ -7,6 +7,14 @@
 (function() {
   'use strict';
   
+  const USERNAME_REGEX = /^[a-z0-9._-]{3,20}$/;
+  const RESERVED_USERNAMES = new Set(['utente', 'admin', 'administrator', 'root', 'supporto', 'support', 'moderator', 'mod']);
+  let ensureUsernamePromise = null;
+  let usernameMappingDisabled = false;
+  try {
+    usernameMappingDisabled = localStorage.getItem('username_mapping_disabled') === '1';
+  } catch (_) {}
+  
   // Check se auth guard è disabilitato globalmente
   if (window.__DISABLE_AUTH_GUARD__) {
     console.log('🔓 Auth guard disabilitato per questa pagina');
@@ -14,7 +22,7 @@
   }
   
   // Pages che NON richiedono login
-  const PUBLIC_PAGES = ['auth.html', 'login.html', 'register.html', 'index.html', 'store.html', 'adsense-verification.html', 'adsense-preview.html', 'privacy.html', 'terms.html'];
+  const PUBLIC_PAGES = ['auth.html', 'login.html', 'register.html', 'index.html', 'store.html', 'adsense-verification.html', 'adsense-preview.html', 'privacy.html', 'terms.html', 'join-league.html', 'scegli-squadra.html', 'join-team.html'];
   const currentPage = window.location.pathname.split('/').pop();
   
   // Se è pagina pubblica, esci
@@ -62,6 +70,12 @@
     
     // Utente autenticato
     window.currentUser = user;
+    
+    try {
+      await ensureUsernameForUser(user);
+    } catch (err) {
+      console.error('[auth-guard] Impossibile verificare username utente:', err);
+    }
     
     // Auto-load ultima lega vista
     await loadLastLeague();
@@ -460,5 +474,303 @@
       alert(`❌ Errore: ${error.message || 'Riprova'}`);
     }
   };
+  
+  function normalizeUsername(value) {
+    if (!value) return '';
+    return value.trim().toLowerCase();
+  }
+  
+  function isStoredUsernameValid(value) {
+    if (!value || typeof value !== 'string') return false;
+    const normalized = normalizeUsername(value);
+    if (!normalized) return false;
+    if (RESERVED_USERNAMES.has(normalized)) return false;
+    return USERNAME_REGEX.test(normalized);
+  }
+  
+  function buildUsernameVariants(base) {
+    const variants = new Set();
+    if (!base) return variants;
+    variants.add(base);
+    const noDots = base.replace(/\./g, '');
+    variants.add(noDots);
+    const noUnderscore = base.replace(/_/g, '');
+    variants.add(noUnderscore);
+    const noHyphen = base.replace(/-/g, '');
+    variants.add(noHyphen);
+    const alnumOnly = base.replace(/[^a-z0-9]/g, '');
+    variants.add(alnumOnly);
+    return new Set(Array.from(variants).filter(Boolean));
+  }
+  
+function detectExistingUsername(data = {}, user = null) {
+  const candidates = [
+    data.username,
+    data.usernameLower,
+    data.profile?.username,
+    data.profile?.nickname,
+    data.nickname,
+    data.display_name,
+    data.displayName,
+    user?.displayName
+  ];
+  for (const raw of candidates) {
+    if (isStoredUsernameValid(raw)) return raw;
+  }
+  return '';
+}
+
+  function disableUsernameMapping() {
+    if (usernameMappingDisabled) return;
+    usernameMappingDisabled = true;
+    try { localStorage.setItem('username_mapping_disabled', '1'); } catch (_) {}
+  }
+
+  async function ensureUsernameMapping(db, userId, username, existingVariants = []) {
+    if (!db || !userId || !username) return;
+    const normalized = normalizeUsername(username);
+    const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+    const userRef = db.collection('users').doc(userId);
+
+    if (usernameMappingDisabled) {
+      await userRef.set({
+        username: normalized,
+        usernameLower: normalized,
+        usernameUpdatedAt: timestamp
+      }, { merge: true });
+      window.currentUsername = normalized;
+      return;
+    }
+
+    const variants = buildUsernameVariants(normalized);
+    const staleVariants = Array.isArray(existingVariants)
+      ? existingVariants.filter(v => v && !variants.has(v))
+      : [];
+    
+    const staleToDelete = [];
+    for (const variant of staleVariants) {
+      try {
+        const snap = await db.collection('usernames').doc(variant).get();
+        if (snap.exists && snap.data()?.uid === userId) {
+          staleToDelete.push(variant);
+        }
+      } catch (err) {
+        console.warn('[auth-guard] impossibile verificare variant username da rimuovere', variant, err);
+      }
+    }
+    
+    const batch = db.batch();
+    
+    variants.forEach(variant => {
+      const ref = db.collection('usernames').doc(variant);
+      batch.set(ref, {
+        uid: userId,
+        username: normalized,
+        updatedAt: timestamp
+      }, { merge: true });
+    });
+    
+    staleToDelete.forEach(variant => {
+      batch.delete(db.collection('usernames').doc(variant));
+    });
+    
+  batch.set(userRef, {
+      username: normalized,
+      usernameLower: normalized,
+      usernameVariants: Array.from(variants),
+      usernameUpdatedAt: timestamp
+    }, { merge: true });
+    
+  try {
+    await batch.commit();
+    window.currentUsername = normalized;
+  } catch (err) {
+    if (err?.code === 'permission-denied') {
+      console.warn('[auth-guard] impossibile aggiornare mapping username (permessi). Salvo solo nel profilo utente.', err);
+      disableUsernameMapping();
+      await userRef.set({
+        username: normalized,
+        usernameLower: normalized,
+        usernameUpdatedAt: timestamp
+      }, { merge: true });
+      window.currentUsername = normalized;
+      return;
+    }
+    throw err;
+  }
+    window.currentUsername = normalized;
+  }
+  
+  async function ensureUsernameForUser(user) {
+    if (!user || !firebase.firestore) return null;
+    if (ensureUsernamePromise) return ensureUsernamePromise;
+    
+    ensureUsernamePromise = (async () => {
+      const db = firebase.firestore();
+      const docRef = db.collection('users').doc(user.uid);
+      let userData = {};
+      try {
+        const snap = await docRef.get();
+        if (snap.exists) {
+          userData = snap.data() || {};
+        } else {
+          userData = {};
+        }
+      } catch (err) {
+        console.warn('[auth-guard] impossibile leggere documento utente per username', err);
+      }
+      
+      const storedUsername = detectExistingUsername(userData, user);
+      if (isStoredUsernameValid(storedUsername)) {
+        if (usernameMappingDisabled) {
+          const normalized = normalizeUsername(storedUsername);
+          try {
+            await db.collection('users').doc(user.uid).set({
+              username: normalized,
+              usernameLower: normalized,
+              usernameUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+          } catch (err) {
+            console.warn('[auth-guard] impossibile aggiornare username profilo (mapping disabilitato)', err);
+          }
+          window.currentUsername = normalized;
+          return normalized;
+        }
+        try {
+          await ensureUsernameMapping(db, user.uid, storedUsername, userData.usernameVariants);
+        } catch (err) {
+          console.warn('[auth-guard] impossibile sincronizzare mapping username esistente', err);
+        }
+        return storedUsername;
+      }
+      
+      const modalResult = await showUsernameRequiredModal({
+        defaultValue: normalizeUsername(storedUsername),
+        displayName: userData.displayName || user.displayName || '',
+        email: userData.email || user.email || '',
+        onSubmit: async (rawValue) => {
+          const candidate = normalizeUsername(rawValue);
+          if (!candidate) {
+            return { ok: false, error: 'Inserisci un nome utente.' };
+          }
+          if (candidate.length < 3) {
+            return { ok: false, error: 'Il nome utente deve avere almeno 3 caratteri.' };
+          }
+          if (candidate.length > 20) {
+            return { ok: false, error: 'Massimo 20 caratteri consentiti.' };
+          }
+          if (!USERNAME_REGEX.test(candidate)) {
+            return { ok: false, error: 'Sono ammessi solo lettere, numeri, punto, trattino e underscore.' };
+          }
+          if (RESERVED_USERNAMES.has(candidate)) {
+            return { ok: false, error: 'Questo nome utente non è disponibile.' };
+          }
+          
+          if (!usernameMappingDisabled) {
+            try {
+              const existingDoc = await db.collection('usernames').doc(candidate).get();
+              if (existingDoc.exists && existingDoc.data()?.uid && existingDoc.data().uid !== user.uid) {
+                return { ok: false, error: 'Nome utente già utilizzato. Scegline un altro.' };
+              }
+            } catch (err) {
+              if (err?.code === 'permission-denied') {
+                console.warn('[auth-guard] impossibile verificare disponibilità username (permessi). Procedo comunque.', err);
+              } else {
+                console.error('[auth-guard] errore verifica disponibilità username', err);
+                return { ok: false, error: 'Errore di rete. Riprova.' };
+              }
+            }
+          }
+          
+          try {
+            await ensureUsernameMapping(db, user.uid, candidate, userData.usernameVariants);
+            userData.username = candidate;
+            return { ok: true, username: candidate };
+          } catch (err) {
+            console.error('[auth-guard] errore salvataggio username', err);
+            return { ok: false, error: 'Impossibile salvare. Riprova.' };
+          }
+        }
+      });
+      
+      return modalResult;
+    })();
+    
+    return ensureUsernamePromise;
+  }
+  
+  function showUsernameRequiredModal(options = {}) {
+    return new Promise((resolve) => {
+      const { defaultValue = '', displayName = '', email = '', onSubmit } = options;
+      const existingModal = document.getElementById('usernameRequiredModal');
+      if (existingModal) existingModal.remove();
+      
+      const overlay = document.createElement('div');
+      overlay.id = 'usernameRequiredModal';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.88);display:flex;align-items:center;justify-content:center;z-index:20000;padding:16px;';
+      overlay.innerHTML = `
+        <div style="background:var(--card, #0f172a);color:var(--text, #e2e8f0);padding:24px 28px;border-radius:16px;max-width:420px;width:100%;box-shadow:0 24px 48px rgba(0,0,0,0.35);border:1px solid rgba(148,163,184,0.35);display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <h2 style="margin:0;font-size:20px;font-weight:700;">Scegli il tuo nome utente</h2>
+            <p style="margin:0;font-size:14px;line-height:1.5;color:var(--muted,#94a3b8);">
+              Per partecipare alla lega devi impostare un nome utente unico. Sarà visibile agli altri membri.
+            </p>
+            ${(displayName || email) ? `<div style="font-size:13px;background:rgba(59,130,246,0.08);padding:10px 12px;border-radius:10px;border:1px solid rgba(59,130,246,0.18);">
+              <strong>Profilo:</strong> ${displayName || email}
+            </div>` : ''}
+          </div>
+          <form id="usernameRequiredForm" style="display:flex;flex-direction:column;gap:12px;">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;">
+              <span>Nome utente</span>
+              <input id="usernameRequiredInput" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="${defaultValue || ''}" style="padding:12px 14px;border-radius:10px;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.68);color:#e2e8f0;font-size:15px;" placeholder="es. mounba" />
+            </label>
+            <div style="font-size:12px;color:var(--muted,#94a3b8);line-height:1.5;">
+              • Minimo 3, massimo 20 caratteri<br>
+              • Lettere, numeri, punto, trattino e underscore consentiti<br>
+              • Non sono ammessi spazi
+            </div>
+            <div id="usernameRequiredError" style="font-size:13px;color:#f97316;min-height:18px;"></div>
+            <button type="submit" class="btn" style="padding:12px 16px;font-weight:600;">Salva nome utente</button>
+          </form>
+        </div>
+      `;
+      
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      document.body.appendChild(overlay);
+      
+      const form = overlay.querySelector('#usernameRequiredForm');
+      const input = overlay.querySelector('#usernameRequiredInput');
+      const errorEl = overlay.querySelector('#usernameRequiredError');
+      if (input) {
+        setTimeout(() => {
+          input.focus();
+          input.select();
+        }, 60);
+      }
+      
+      const submitHandler = async (event) => {
+        event.preventDefault();
+        if (!onSubmit || typeof onSubmit !== 'function') {
+          resolve(null);
+          overlay.remove();
+          document.body.style.overflow = prevOverflow;
+          return;
+        }
+        const rawValue = input.value;
+        const result = await onSubmit(rawValue);
+        if (result && result.ok) {
+          overlay.remove();
+          document.body.style.overflow = prevOverflow;
+          resolve(result.username);
+        } else {
+          errorEl.textContent = (result && result.error) ? result.error : 'Impossibile salvare. Riprova.';
+        }
+      };
+      
+      form.addEventListener('submit', submitHandler);
+    });
+  }
   
 })();

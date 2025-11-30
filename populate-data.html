@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -13,13 +13,13 @@
   </style>
 </head>
 <body>
-  <h1>🔧 Popola Database Firestore</h1>
+  <h1>?? Popola Database Firestore</h1>
   <p>Questo script carica giocatori e regole da JSON nel database Firestore.</p>
   
-  <button class="btn" onclick="populatePlayers()">📥 Carica Giocatori</button>
-  <button class="btn" onclick="populateRules()">📥 Carica Regole</button>
-  <button class="btn" onclick="populateAll()">📥 Carica Tutto</button>
-  <button class="btn" onclick="clearLog()" style="background:#666;">🗑️ Pulisci Log</button>
+  <button class="btn" onclick="populatePlayers()">?? Carica Giocatori</button>
+  <button class="btn" onclick="populateRules()">?? Carica Regole</button>
+  <button class="btn" onclick="populateAll()">?? Carica Tutto</button>
+  <button class="btn" onclick="clearLog()" style="background:#666;">??? Pulisci Log</button>
   
   <div id="log" class="log"></div>
 
@@ -53,7 +53,7 @@
     }
 
     async function populatePlayers() {
-      log('📥 Caricamento giocatori...');
+      log('?? Caricamento giocatori...');
       try {
         const response = await fetch('resources/players.json');
         const data = await response.json();
@@ -79,17 +79,17 @@
             createdAt: Date.now()
           });
           
-          log(`✅ ${player.nome_completo} (${player.role})`, 'success');
+          log(`? ${player.nome_completo} (${player.role})`, 'success');
         }
         
-        log(`🎉 ${data.players.length} giocatori caricati con successo!`, 'success');
+        log(`?? ${data.players.length} giocatori caricati con successo!`, 'success');
       } catch (error) {
-        log(`❌ Errore: ${error.message}`, 'error');
+        log(`? Errore: ${error.message}`, 'error');
       }
     }
 
     async function populateRules() {
-      log('📥 Caricamento regole...');
+      log('?? Caricamento regole...');
       try {
         const data = await (window.loadRulesJSON ? window.loadRulesJSON() : Promise.resolve({ rules: [] }));
         
@@ -112,19 +112,19 @@
             createdAt: Date.now()
           });
           
-          log(`✅ ${rule.rule_id}: ${rule.nome_bonus} (${rule.valore})`, 'success');
+          log(`? ${rule.rule_id}: ${rule.nome_bonus} (${rule.valore})`, 'success');
         }
         
-        log(`🎉 ${data.rules.length} regole caricate con successo!`, 'success');
+        log(`?? ${data.rules.length} regole caricate con successo!`, 'success');
       } catch (error) {
-        log(`❌ Errore: ${error.message}`, 'error');
+        log(`? Errore: ${error.message}`, 'error');
       }
     }
 
     async function populateAll() {
       await populatePlayers();
       await populateRules();
-      log('✅ COMPLETATO! Database popolato.', 'success');
+      log('? COMPLETATO! Database popolato.', 'success');
     }
   </script>
 </body>

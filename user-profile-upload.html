@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
@@ -106,7 +106,7 @@
     <a class="logo-home" href="index.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>📸 Foto Profilo</h1>
+    <h1>?? Foto Profilo</h1>
   </header>
 
   <main class="upload-container">
@@ -123,7 +123,7 @@
       </div>
 
       <div class="drop-zone" id="dropZone">
-        <div style="font-size: 48px; margin-bottom: 16px;">📷</div>
+        <div style="font-size: 48px; margin-bottom: 16px;">??</div>
         <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
           Trascina un'immagine qui
         </div>
@@ -131,52 +131,52 @@
           oppure clicca per selezionare
         </div>
         <div style="font-size: 12px; color: var(--muted);">
-          Formati: JPG, PNG (max 2MB)
+          Formati: JPG, PNG (max 20MB, compressione automatica)
         </div>
       </div>
       
       <input type="file" id="fileInput" accept="image/*" style="display: none;" />
 
       <div class="crop-container" id="cropContainer">
-        <h4 style="margin-bottom: 12px;">✂️ Ritaglia e Regola</h4>
+        <h4 style="margin-bottom: 12px;">?? Ritaglia e Regola</h4>
         <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">Trascina il box di selezione sull'area desiderata</p>
         <div style="background: #000; border-radius: 8px; overflow: hidden;">
           <img id="cropImage" />
         </div>
         
         <div class="crop-preview">
-          <h4>👁️ Anteprima Circolare</h4>
+          <h4>??? Anteprima Circolare</h4>
           <div class="crop-preview-circle">
             <img id="previewImage" src="" alt="Preview" />
           </div>
         </div>
         
         <div class="crop-controls">
-          <button class="btn btn-secondary" onclick="cropper.zoom(0.1)">🔍 Zoom +</button>
-          <button class="btn btn-secondary" onclick="cropper.zoom(-0.1)">🔍 Zoom -</button>
-          <button class="btn btn-secondary" onclick="cropper.rotate(90)">🔄 Ruota</button>
-          <button class="btn btn-secondary" onclick="cropper.reset()">↺ Reset</button>
-          <button class="btn btn-success" onclick="saveCroppedImage()">✅ Salva Foto</button>
-          <button class="btn btn-secondary" onclick="cancelCrop()">✖ Annulla</button>
+          <button class="btn btn-secondary" onclick="cropper.zoom(0.1)">?? Zoom +</button>
+          <button class="btn btn-secondary" onclick="cropper.zoom(-0.1)">?? Zoom -</button>
+          <button class="btn btn-secondary" onclick="cropper.rotate(90)">?? Ruota</button>
+          <button class="btn btn-secondary" onclick="cropper.reset()">? Reset</button>
+          <button class="btn btn-success" onclick="saveCroppedImage()">? Salva Foto</button>
+          <button class="btn btn-secondary" onclick="cancelCrop()">? Annulla</button>
         </div>
       </div>
 
       <div class="btn-group">
         <button class="btn btn-secondary" onclick="deletePhoto()" style="flex: 1;">
-          🗑️ Rimuovi Foto
+          ??? Rimuovi Foto
         </button>
         <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="flex: 1;">
-          📤 Carica Nuova
+          ?? Carica Nuova
         </button>
       </div>
     </div>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js?v=20251021-3"></script>
   <script src="resources/app-check-config.js?v=20251021-3"></script>
   <script>
@@ -193,9 +193,9 @@
   <script src="resources/mobile-detect.js?v=2025101801"></script>
   <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
 
   <script>
@@ -268,8 +268,9 @@
         return;
       }
 
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File troppo grande! Max 2MB');
+      const MAX_SOURCE_SIZE = 20 * 1024 * 1024;
+      if (file.size > MAX_SOURCE_SIZE) {
+        alert('File troppo grande! Max 20MB prima della compressione automatica');
         return;
       }
 
@@ -344,36 +345,32 @@
           imageSmoothingQuality: 'high'
         });
 
-        canvas.toBlob(async (blob) => {
-          try {
-            const storage = firebase.storage();
-            const storageRef = storage.ref();
-            const fileRef = storageRef.child(`avatars/${currentUser.uid}/profile.jpg`);
-            
-            await fileRef.put(blob, {
-              contentType: 'image/jpeg'
-            });
+        const blob = await createOptimizedBlobFromCanvas(canvas);
 
-            const photoURL = await fileRef.getDownloadURL();
+        const storage = firebase.storage();
+        const storageRef = storage.ref();
+        const fileRef = storageRef.child(`avatars/${currentUser.uid}/profile.jpg`);
+        
+        await fileRef.put(blob, {
+          contentType: 'image/jpeg',
+          cacheControl: 'public, max-age=31536000'
+        });
 
-            const db = firebase.firestore();
-            await db.collection('users').doc(currentUser.uid).set({
-              photoURL,
-              photoUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
+        const photoURL = await fileRef.getDownloadURL();
 
-            alert('✅ Foto salvata con successo!');
+        const db = firebase.firestore();
+        await db.collection('users').doc(currentUser.uid).set({
+          photoURL,
+          photoUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
 
-            cancelCrop();
-            await loadCurrentPhoto();
-          } catch (error) {
-            console.error('Error saving photo:', error);
-            alert('❌ Errore durante il salvataggio: ' + error.message);
-          }
-        }, 'image/jpeg', 0.9);
+        alert('? Foto salvata con successo!');
+
+        cancelCrop();
+        await loadCurrentPhoto();
       } catch (error) {
         console.error('Error cropping image:', error);
-        alert('❌ Errore durante il crop: ' + error.message);
+        alert('? Errore durante il crop: ' + error.message);
       }
     }
 
@@ -384,6 +381,41 @@
       }
       document.getElementById('cropContainer').classList.remove('active');
       document.getElementById('fileInput').value = '';
+    }
+
+    async function createOptimizedBlobFromCanvas(canvas) {
+      const MAX_BYTES = 600 * 1024;
+      const MIN_QUALITY = 0.5;
+      const MIN_SIZE = 320;
+
+      const toBlob = (sourceCanvas, quality) => new Promise((resolve, reject) => {
+        sourceCanvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Impossibile generare l\'immagine')), 'image/jpeg', quality);
+      });
+
+      let quality = 0.9;
+      let blob = await toBlob(canvas, quality);
+
+      while (blob && blob.size > MAX_BYTES && quality > MIN_QUALITY) {
+        quality = Math.max(MIN_QUALITY, quality - 0.1);
+        blob = await toBlob(canvas, quality);
+      }
+
+      if (blob && blob.size > MAX_BYTES) {
+        let size = canvas.width;
+        while (blob && blob.size > MAX_BYTES && size > MIN_SIZE) {
+          size = Math.max(MIN_SIZE, Math.round(size * 0.85));
+          const downCanvas = document.createElement('canvas');
+          downCanvas.width = size;
+          downCanvas.height = size;
+          const downCtx = downCanvas.getContext('2d');
+          downCtx.imageSmoothingEnabled = true;
+          downCtx.imageSmoothingQuality = 'high';
+          downCtx.drawImage(canvas, 0, 0, size, size);
+          blob = await toBlob(downCanvas, Math.max(MIN_QUALITY, quality));
+        }
+      }
+
+      return blob;
     }
 
     async function deletePhoto() {
@@ -409,11 +441,11 @@
           photoURL: firebase.firestore.FieldValue.delete()
         });
 
-        alert('✅ Foto eliminata!');
+        alert('? Foto eliminata!');
         await loadCurrentPhoto();
       } catch (error) {
         console.error('Error deleting photo:', error);
-        alert('❌ Errore durante l\'eliminazione: ' + error.message);
+        alert('? Errore durante l\'eliminazione: ' + error.message);
       }
     }
   </script>

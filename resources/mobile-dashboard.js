@@ -107,6 +107,18 @@
 
       try {
         const db = firebase.firestore();
+        if (!window.LeagueHelper || typeof window.LeagueHelper.waitForLeague !== 'function') {
+          console.warn('[mobile-dashboard] LeagueHelper non disponibile, esco');
+          return;
+        }
+
+        const leagueInfo = await window.LeagueHelper.waitForLeague().catch(() => null);
+        if (!leagueInfo || !leagueInfo.id) {
+          console.warn('[mobile-dashboard] Nessuna lega selezionata, widget disabilitato');
+          return;
+        }
+        const leagueId = leagueInfo.id;
+        const getLeagueCollection = (name) => window.LeagueHelper.getLeagueCollection(name, leagueId);
         
         let myTeam = null;
         let teamId = null;
@@ -118,7 +130,7 @@
             const data = userDoc.data() || {};
             if (data.team_index !== undefined && data.team_index !== null) {
               teamId = String(data.team_index);
-              const teamDoc = await db.collection('teams').doc(teamId).get();
+              const teamDoc = await getLeagueCollection('teams').doc(teamId).get();
               if (teamDoc.exists) {
                 myTeam = { id: teamDoc.id, ...teamDoc.data() };
               }
@@ -130,7 +142,7 @@
 
         // fallback: cerca tra squadre
         if (!myTeam) {
-          const teamsSnap = await db.collection('teams').get();
+          const teamsSnap = await getLeagueCollection('teams').get();
           teamsSnap.forEach(doc => {
             const team = doc.data() || {};
             if (team.owner === user.uid || (Array.isArray(team.members) && team.members.includes(user.uid))) {
@@ -147,7 +159,7 @@
 
           document.getElementById('myTeamName').textContent = myTeam.name || 'La Mia Squadra';
           
-        const daysSnap = await db.collection('days').where('computed', '==', true).get();
+        const daysSnap = await getLeagueCollection('days').where('computed', '==', true).get();
         const giornate = daysSnap.docs
           .map(doc => ({
             id: doc.id,
@@ -159,7 +171,7 @@
         const allResults = [];
         for (const entry of giornate) {
           try {
-            const resultDoc = await db.collection('results').doc(entry.id).collection('teams').doc(myTeam.id).get();
+            const resultDoc = await getLeagueCollection('results').doc(entry.id).collection('teams').doc(myTeam.id).get();
             if (resultDoc.exists) {
               allResults.push({ giornataId: entry.id, num: entry.num, data: resultDoc.data() || {} });
             }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <script src="resources/theme-preload.js"></script>
@@ -104,6 +104,156 @@
     .forfeit { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
     .forfeit-penalty { background: rgba(231, 76, 60, 0.3); border-radius: 8px; padding: 10px; margin: -2px 0; }
     .admin-controls { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow); }
+    .view-switcher {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    .view-btn {
+      flex: 1 1 160px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .view-btn:hover:not(.disabled):not(:disabled) {
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+    }
+    .view-btn.active {
+      background: linear-gradient(135deg, rgba(102,126,234,0.18) 0%, rgba(118,75,162,0.20) 100%);
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 4px 14px rgba(102,126,234,0.18);
+    }
+    .view-btn.disabled,
+    .view-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      background: var(--surface);
+      border-style: dashed;
+      color: var(--muted);
+      box-shadow: none;
+    }
+    .calendar-status {
+      margin-bottom: 16px;
+    }
+    .calendar-status .info-banner {
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .calendar-status .warning-banner {
+      background: rgba(244, 114, 182, 0.12);
+      border: 1px solid rgba(244, 114, 182, 0.25);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .calendar-status .empty-state {
+      background: rgba(148,163,184,0.12);
+      border: 1px dashed rgba(148,163,184,0.4);
+      color: var(--muted);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .cup-round-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .cup-round-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      border-bottom: 2px solid rgba(102,126,234,0.35);
+      padding-bottom: 10px;
+    }
+    .cup-round-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .cup-round-meta {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: right;
+    }
+    .cup-match {
+      background: linear-gradient(135deg, rgba(102,126,234,0.95) 0%, rgba(118,75,162,0.95) 100%);
+      border-radius: 10px;
+      padding: 14px;
+      color: #fff;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cup-match::before {
+      content: attr(data-label);
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      opacity: 0.65;
+      text-transform: uppercase;
+    }
+    .cup-match .team {
+      padding: 6px 0;
+    }
+    .cup-match .aggregate {
+      margin-top: 10px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cup-match .notes {
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    @media (max-width: 640px) {
+      .view-switcher {
+        flex-direction: column;
+      }
+      .view-btn {
+        width: 100%;
+      }
+      .cup-round-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .cup-round-meta {
+        text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
@@ -122,11 +272,16 @@
           <label style="white-space:nowrap;">Numero Giornate:</label>
           <input type="number" id="numRounds" value="34" min="1" max="100" style="width:80px;padding:8px;border-radius:8px;border:1px solid #ddd;" />
         </div>
-        <button class="btn" onclick="generateSchedule()">🔄 Genera Calendario</button>
-        <button class="btn btn-secondary" onclick="clearResults()">🗑️ Cancella Risultati</button>
-        <button class="btn" onclick="deleteCalendar()" style="background:#e74c3c;color:white;">❌ Elimina Calendario</button>
+        <button class="btn" onclick="generateSchedule()">⚙️ Genera Calendario</button>
+        <button class="btn btn-secondary" onclick="clearResults()">🧹 Cancella Risultati</button>
+        <button class="btn" onclick="deleteCalendar()" style="background:#e74c3c;color:white;">🗑️ Elimina Calendario</button>
       </div>
     </div>
+    <section class="view-switcher" id="viewSwitcher">
+      <button type="button" class="view-btn active" data-view="h2h">⚽ Campionato H2H</button>
+      <button type="button" class="view-btn" data-view="cup">🏆 Coppa / Playoff</button>
+    </section>
+    <div id="calendarStatus" class="calendar-status"></div>
     <div id="calendario"></div>
   </main>
 
@@ -140,6 +295,11 @@
       firebase.initializeApp(window.firebaseConfig);
     }
   </script>
+  <script>
+    window.addEventListener('league-ready', () => {
+      try { applyCalendarioUiStrings(); } catch (_) {}
+    });
+  </script>
   
   <script>
     if (!firebase.apps.length) {
@@ -151,84 +311,404 @@
   <script src="resources/app-init.js"></script>
   <script>
     const SEASON = '2024-25';
-    let teamNames = [];
+    const leagueHelper = window.LeagueHelper || null;
+    let calendarioUi = {
+      dayLabelSingular: 'Giornata',
+      dayLabelPlural: 'Giornate',
+      teamLabelSingular: 'Squadra',
+      teamLabelPlural: 'Squadre',
+      participantSingular: 'giocatore',
+      participantPlural: 'giocatori'
+    };
+    let isRealityLeagueCalendario = false;
+    const state = {
+      leagueId: null,
+      teams: [],
+      teamNames: [],
+      teamMetaByKey: new Map(),
+      teamMetaByIndex: new Map(),
+      schedule: [],
+      cupRounds: [],
+      cupSettings: null,
+      hasH2H: false,
+      hasCupSchedule: false,
+      selectedView: 'h2h',
+      loading: true
+    };
     let isAdmin = false;
+
+    const calendarioContainer = document.getElementById('calendario');
+    const statusContainer = document.getElementById('calendarStatus');
+    const viewButtons = Array.from(document.querySelectorAll('#viewSwitcher .view-btn'));
+
+    function applyCalendarioUiStrings() {
+      const league = leagueHelper?.getCurrentLeague?.() || window.currentLeague || null;
+      const isReality = leagueHelper?.isRealityLeague?.() ||
+        (typeof window.isRealityLeague === 'function' ? window.isRealityLeague(league) : false);
+      const ui = (typeof window.getLeagueUiStrings === 'function')
+        ? window.getLeagueUiStrings(league)
+        : {
+            dayLabelSingular: 'Giornata',
+            dayLabelPlural: 'Giornate',
+            teamLabelSingular: 'Squadra',
+            teamLabelPlural: 'Squadre',
+            participantSingular: 'giocatore',
+            participantPlural: 'giocatori'
+          };
+
+      calendarioUi = ui;
+      isRealityLeagueCalendario = !!isReality;
+
+      if (typeof window.getLeagueType === 'function') {
+        console.log('[calendario] leagueType:', window.getLeagueType(league), 'isReality:', isRealityLeagueCalendario);
+      } else {
+        console.log('[calendario] leagueType: (fallback sport_league)', 'isReality:', isRealityLeagueCalendario);
+      }
+
+      // reality_show: solo cambio testi nelle card (Giornata -> Puntata), dati invariati.
+      try {
+        const dayLabelPlural = ui.dayLabelPlural || 'Giornate';
+        // Non tocchiamo header principale "Calendario Scontri" per mantenere coerenza di navigazione.
+      } catch (err) {
+        console.warn('[calendario] applyCalendarioUiStrings error:', err);
+      }
+    }
 
     auth.onAuthStateChanged(async (user)=>{
       if (!user) return location.href='auth.html';
-      const a = await db.collection('admins').doc(user.uid).get();
-      isAdmin = a.exists;
-      if (isAdmin) document.getElementById('adminControls').style.display='block';
-      boot();
+      try {
+        const adminDoc = await db.collection('admins').doc(user.uid).get();
+        isAdmin = adminDoc.exists;
+      } catch (err) {
+        console.warn('[calendario] impossibile verificare admin', err);
+        isAdmin = false;
+      }
+      document.getElementById('adminControls').style.display = isAdmin ? 'block' : 'none';
+      await boot();
     });
 
-    async function boot(){
-      // Load team names
-      const teamsSnap = await db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
-      teamNames = teamsSnap.docs.map((d,i)=> d.data().name || `Squadra ${i+1}`);
+    viewButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        if (!view) return;
+        if (btn.disabled || btn.classList.contains('disabled')) return;
+        if (state.selectedView === view) return;
+        state.selectedView = view;
+        renderCurrentView();
+      });
+    });
 
-      // Load schedule
-      const schedSnap = await db.collection('h2h_schedule').doc(SEASON).collection('giornate').orderBy('giornata').get();
-      if (schedSnap.empty && isAdmin){
-        alert('Calendario vuoto. Clicca "Genera Calendario" per crearlo.');
+    async function ensureLeagueReady(timeoutMs = 7000) {
+      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
+        try {
+          const info = await leagueHelper.waitForLeague(timeoutMs);
+          if (info?.id) {
+            state.leagueId = info.id;
+          }
+        } catch (err) {
+          console.warn('[calendario] Timeout attesa lega:', err?.message || err);
+        }
+      }
+      if (!state.leagueId) {
+        try {
+          const stored = localStorage.getItem('last_league_id');
+          if (stored) {
+            state.leagueId = stored;
+          } else if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
+            state.leagueId = leagueHelper.getCurrentLeagueId();
+          }
+        } catch (err) {
+          console.warn('[calendario] impossibile leggere last_league_id', err);
+        }
+      }
+    }
+
+    async function boot(){
+      await ensureLeagueReady();
+      applyCalendarioUiStrings();
+      await loadLeagueSettings();
+      await loadTeams();
+      await Promise.all([
+        loadH2HSchedule(),
+        loadCupSchedule()
+      ]);
+      state.loading = false;
+      normaliseSelectedView();
+      renderCurrentView();
+    }
+
+    function normaliseSelectedView() {
+      if (state.selectedView === 'cup' && !isCupAvailable()) {
+        state.selectedView = 'h2h';
+      }
+    }
+
+    function getScopedCollection(path) {
+      if (leagueHelper && typeof leagueHelper.getLeagueCollection === 'function') {
+        const ref = leagueHelper.getLeagueCollection(path);
+        if (ref) return ref;
+      }
+      // ✅ USA SEMPRE MULTILEGA: leagues/{leagueId}/collection
+      if (state.leagueId) {
+        return db.collection(`leagues/${state.leagueId}/${path}`);
+      }
+      console.warn('[calendario] Nessun leagueId disponibile per getScopedCollection');
+      return null;
+    }
+
+    async function loadLeagueSettings() {
+      if (!state.leagueId) return;
+      try {
+        const doc = await db.collection('leagues').doc(state.leagueId).get();
+        if (doc.exists) {
+          const data = doc.data() || {};
+          state.cupSettings = data.settings?.cupSystem || null;
+          console.log('[calendario] Impostazioni cup caricate da leagues/' + state.leagueId);
+          return;
+        }
+      } catch (err) {
+        console.warn('[calendario] impossibile leggere impostazioni lega', err);
+      }
+      // ✅ NESSUN FALLBACK LEGACY - solo multilega
+    }
+
+    async function loadTeams() {
+      state.teams = [];
+      state.teamNames = [];
+      state.teamMetaByKey = new Map();
+      state.teamMetaByIndex = new Map();
+      let snapshot = null;
+      try {
+        snapshot = await getScopedCollection('teams').orderBy('name').get();
+      } catch (err) {
+        console.warn('[calendario] errore caricamento teams (orderBy name)', err);
+        try {
+          snapshot = await getScopedCollection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
+        } catch (err2) {
+          console.error('[calendario] impossibile caricare teams', err2);
+          // ✅ NESSUN FALLBACK LEGACY - solo multilega
+          snapshot = null;
+        }
+      }
+      if (!snapshot) return;
+
+      snapshot.docs.forEach((doc, index) => {
+        const data = doc.data() || {};
+        const name = data.name || `Squadra ${index + 1}`;
+        const numericId = data.numericId ?? index;
+        const meta = {
+          id: doc.id,
+          name,
+          numericId,
+          index
+        };
+        state.teams.push(meta);
+        state.teamNames[index] = name;
+        state.teamMetaByKey.set(doc.id, meta);
+        state.teamMetaByKey.set(String(doc.id), meta);
+        if (numericId !== undefined && numericId !== null) {
+          state.teamMetaByKey.set(String(numericId), meta);
+        }
+        state.teamMetaByKey.set(String(index), meta);
+        state.teamMetaByIndex.set(index, meta);
+      });
+    }
+
+    async function loadH2HSchedule() {
+      state.schedule = [];
+      state.hasH2H = false;
+
+      let schedSnap = null;
+      try {
+        schedSnap = await getScopedCollection('h2h_schedule').doc(SEASON).collection('giornate').orderBy('giornata').get();
+      } catch (err) {
+        console.warn('[calendario] errore h2h_schedule', err);
+        // ✅ NESSUN FALLBACK LEGACY - solo multilega
+        schedSnap = null;
+      }
+
+      let resSnap = null;
+      try {
+        resSnap = await getScopedCollection('h2h_results').doc(SEASON).collection('giornate').get();
+      } catch (err) {
+        console.warn('[calendario] errore h2h_results', err);
+        // ✅ NESSUN FALLBACK LEGACY - solo multilega
+        resSnap = null;
+      }
+
+      const resultsMap = new Map();
+      if (resSnap) {
+        resSnap.docs.forEach(doc => resultsMap.set(doc.id, doc.data() || {}));
+      }
+
+      if (schedSnap && !schedSnap.empty) {
+        state.schedule = schedSnap.docs.map(doc => {
+          const data = doc.data() || {};
+          const res = resultsMap.get(doc.id) || {};
+          return {
+            id: doc.id,
+            giornata: data.giornata ?? doc.id,
+            matches: Array.isArray(data.matches) ? data.matches : [],
+            bye: data.bye ?? null,
+            results: Array.isArray(res.matches) ? res.matches : []
+          };
+        });
+        state.hasH2H = state.schedule.length > 0;
+      } else {
+        state.schedule = [];
+        state.hasH2H = false;
+      }
+    }
+
+    async function loadCupSchedule() {
+      state.cupRounds = [];
+      state.hasCupSchedule = false;
+
+      const candidatePaths = [
+        { collection: 'cup_schedule', sub: 'rounds', orderBy: 'order' },
+        { collection: 'cup_schedule', sub: 'fasi', orderBy: 'order' },
+        { collection: 'cup_schedule', sub: 'giornate', orderBy: 'giornata' },
+        { collection: 'cup_rounds', sub: null, orderBy: 'order' }
+      ];
+
+      for (const candidate of candidatePaths) {
+        try {
+          let ref = getScopedCollection(candidate.collection);
+          if (candidate.sub) {
+            ref = ref.doc(SEASON).collection(candidate.sub);
+          }
+          let queryRef = ref;
+          if (candidate.orderBy) {
+            queryRef = ref.orderBy(candidate.orderBy);
+          }
+          const snap = await queryRef.get();
+          if (snap && !snap.empty) {
+            state.cupRounds = snap.docs.map(doc => {
+              const data = doc.data() || {};
+              const matches = Array.isArray(data.matches) ? data.matches : [];
+              return {
+                id: doc.id,
+                title: data.label || data.round || data.name || doc.id,
+                matches,
+                order: data.order ?? data.roundIndex ?? 0,
+                meta: data
+              };
+            });
+            state.cupRounds.sort((a, b) => a.order - b.order);
+            state.hasCupSchedule = state.cupRounds.length > 0;
+            break;
+          }
+        } catch (err) {
+          console.warn('[calendario] Impossibile caricare dati cup da lega:', candidate.collection, err);
+        }
+      }
+    }
+
+    function isCupAvailable() {
+      return !!(state.hasCupSchedule || (state.cupSettings && state.cupSettings.enabled));
+    }
+
+    function updateViewButtons() {
+      viewButtons.forEach(btn => {
+        const view = btn.dataset.view;
+        const isActive = state.selectedView === view;
+        btn.classList.toggle('active', isActive);
+        if (view === 'cup') {
+          const available = isCupAvailable();
+          if (!available) {
+            btn.classList.add('disabled');
+            btn.setAttribute('disabled', 'disabled');
+          } else {
+            btn.classList.remove('disabled');
+            btn.removeAttribute('disabled');
+          }
+        }
+      });
+    }
+
+    function renderCurrentView() {
+      updateViewButtons();
+      if (!statusContainer || !calendarioContainer) return;
+
+      if (state.selectedView === 'cup') {
+        renderCupView();
         return;
       }
 
-      // Load results
-      const resSnap = await db.collection('h2h_results').doc(SEASON).collection('giornate').get();
-      const resMap = new Map();
-      resSnap.docs.forEach(d=> resMap.set(d.id, d.data()));
-
-      const giornate = schedSnap.docs.map(d=>{
-        const sched = d.data();
-        const res = resMap.get(d.id) || {};
-        return { giornata: sched.giornata, matches: sched.matches||[], bye: sched.bye, results: res.matches||[] };
-      });
-
-      renderCalendario(giornate);
+      renderH2HView();
     }
 
-    function renderCalendario(giornate) {
-      const container = document.getElementById('calendario');
-      
-      container.innerHTML = giornate.map(g => {
-        const matchesHtml = g.matches.map((m,idx)=>{
-          const homeName = teamNames[m.home] || `Squadra ${m.home+1}`;
-          const awayName = teamNames[m.away] || `Squadra ${m.away+1}`;
-          const res = g.results.find(r=> r.home===m.home && r.away===m.away) || {};
-          const sh = res.scoreHome!=null ? res.scoreHome : null;
-          const sa = res.scoreAway!=null ? res.scoreAway : null;
-          const winner = sh!=null && sa!=null ? (sh>sa?'casa':sh<sa?'trasferta':'pareggio') : null;
-          const status = sh!=null && sa!=null ? 'played' : 'upcoming';
-          
-          // Check for forfeit penalties
-          const homeForfeit = res.forfeitHome === true;
-          const awayForfeit = res.forfeitAway === true;
+    function renderH2HView() {
+      if (!state.hasH2H) {
+        const message = isAdmin
+          ? 'Nessun calendario H2H disponibile per questa lega. Genera il calendario dagli strumenti admin.'
+          : 'Il calendario degli scontri diretti non è ancora disponibile per questa lega.';
+        statusContainer.innerHTML = `<div class="empty-state">${message}</div>`;
+        calendarioContainer.innerHTML = '';
+        return;
+      }
+      statusContainer.innerHTML = '';
+      calendarioContainer.innerHTML = buildH2HHtml(state.schedule);
+    }
 
+    function renderCupView() {
+      const cupEnabled = state.cupSettings && state.cupSettings.enabled;
+      if (!state.hasCupSchedule) {
+        const message = cupEnabled
+          ? 'Il sistema coppa è attivo ma non è stato ancora generato un tabellone. Puoi configurarlo da Admin → Leghe.'
+          : 'Attiva il sistema coppa/playoff da Admin → Leghe per creare un calendario dedicato.';
+        statusContainer.innerHTML = `<div class="${cupEnabled ? 'info-banner' : 'warning-banner'}">${message}</div>`;
+        calendarioContainer.innerHTML = '';
+        return;
+      }
+      statusContainer.innerHTML = '';
+      calendarioContainer.innerHTML = buildCupHtml(state.cupRounds);
+    }
+
+    function buildH2HHtml(giornate = []) {
+      if (!giornate.length) return '';
+      const dayLabelSingular = calendarioUi.dayLabelSingular || 'Giornata';
+      return giornate.map(g => {
+        const matchesHtml = (g.matches || []).map((m) => {
+          const homeName = resolveTeamName(m.home);
+          const awayName = resolveTeamName(m.away);
+          const res = (g.results || []).find(r => matchSamePair(r, m)) || {};
+          const sh = res.scoreHome != null ? Number(res.scoreHome) : null;
+          const sa = res.scoreAway != null ? Number(res.scoreAway) : null;
+          const winner = (sh != null && sa != null)
+            ? (sh > sa ? 'casa' : sh < sa ? 'trasferta' : 'pareggio')
+            : null;
+          const status = sh != null && sa != null ? 'played' : 'upcoming';
+          const homeForfeit = !!res.forfeitHome;
+          const awayForfeit = !!res.forfeitAway;
           return `
             <div class="scontro ${homeForfeit || awayForfeit ? 'forfeit' : ''}">
               <div class="team ${winner==='casa'?'winner':''} ${homeForfeit ? 'forfeit-penalty' : ''}">
                 <span class="team-name">${homeName}${homeForfeit ? ' ⚠️' : ''}</span>
-                <span class="team-score">${sh!=null ? sh.toFixed(1) : '-'}</span>
+                <span class="team-score">${formatScore(sh)}</span>
               </div>
               <div class="divider"></div>
               <div class="team ${winner==='trasferta'?'winner':''} ${awayForfeit ? 'forfeit-penalty' : ''}">
                 <span class="team-name">${awayName}${awayForfeit ? ' ⚠️' : ''}</span>
-                <span class="team-score">${sa!=null ? sa.toFixed(1) : '-'}</span>
+                <span class="team-score">${formatScore(sa)}</span>
               </div>
               <div class="status ${status}">
-                ${status==='played' ? (homeForfeit || awayForfeit ? '⚠️ Penalità Formazione' : '✅ Giocata') : '⏳ Da giocare'}
+                ${status==='played'
+                  ? (homeForfeit || awayForfeit ? '⚠️ Penalità formazione' : '✅ Giocata')
+                  : '⏳ Da giocare'}
               </div>
             </div>
           `;
         }).join('');
 
-        const byeHtml = g.bye!=null ? `<div class="scontro riposo"><div class="team"><span class="team-name">${teamNames[g.bye]||`Squadra ${g.bye+1}`}</span></div><div class="status">🏖️ Riposo</div></div>` : '';
+        const byeHtml = g.bye!=null
+          ? `<div class="scontro riposo"><div class="team"><span class="team-name">${resolveTeamName(g.bye)}</span></div><div class="status">🛏️ Riposo</div></div>`
+          : '';
 
         return `
           <div class="giornata-card">
             <div class="giornata-header">
-              <div class="giornata-title">Giornata ${g.giornata}</div>
+              <div class="giornata-title">${dayLabelSingular} ${g.giornata}</div>
             </div>
             <div class="scontri-grid">
               ${matchesHtml}
@@ -239,20 +719,109 @@
       }).join('');
     }
 
+    function buildCupHtml(rounds = []) {
+      if (!rounds.length) return '';
+      return rounds.map((round) => {
+        const matches = (round.matches || []).map((match, index) => {
+          const homeName = resolveTeamName(match.home);
+          const awayName = resolveTeamName(match.away);
+          const scoreHome = match.scoreHome != null ? Number(match.scoreHome) : null;
+          const scoreAway = match.scoreAway != null ? Number(match.scoreAway) : null;
+          const aggHome = match.aggregateHome != null ? Number(match.aggregateHome) : null;
+          const aggAway = match.aggregateAway != null ? Number(match.aggregateAway) : null;
+          const label = match.legLabel || match.label || `Match ${index + 1}`;
+          const notes = match.notes || match.commento || '';
+          const showAggregate = aggHome != null && aggAway != null;
+          const status = match.status || (scoreHome != null && scoreAway != null ? 'Giocata' : 'Da giocare');
+          return `
+            <div class="cup-match" data-label="${escapeHtml(label)}">
+              <div class="team">
+                <span class="team-name">${homeName}</span>
+                <span class="team-score">${formatScore(scoreHome)}</span>
+              </div>
+              <div class="divider" style="background: rgba(255,255,255,0.35);"></div>
+              <div class="team">
+                <span class="team-name">${awayName}</span>
+                <span class="team-score">${formatScore(scoreAway)}</span>
+              </div>
+              <div class="status played" style="background: rgba(255,255,255,0.18); margin-top: 12px;">
+                ${status}
+              </div>
+              ${showAggregate ? `<div class="aggregate">Totale: ${formatScore(aggHome)} - ${formatScore(aggAway)}</div>` : ''}
+              ${notes ? `<div class="notes">${escapeHtml(notes)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+        const metaLines = [];
+        if (round.meta?.date) metaLines.push(`Data: ${escapeHtml(round.meta.date)}`);
+        if (round.meta?.location) metaLines.push(`Sede: ${escapeHtml(round.meta.location)}`);
+        return `
+          <div class="cup-round-card">
+            <div class="cup-round-header">
+              <div class="cup-round-title">${escapeHtml(round.title)}</div>
+              ${metaLines.length ? `<div class="cup-round-meta">${metaLines.join('<br />')}</div>` : ''}
+            </div>
+            <div class="scontri-grid">
+              ${matches || '<div style="color:var(--muted);">Nessun incontro disponibile.</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function resolveTeamName(ref) {
+      if (ref === undefined || ref === null) return 'TBD';
+      if (typeof ref === 'object') {
+        if (ref.name) return ref.name;
+        if (ref.teamId) {
+          const meta = state.teamMetaByKey.get(String(ref.teamId));
+          if (meta) return meta.name;
+        }
+      }
+      if (typeof ref === 'number') {
+        const meta = state.teamMetaByIndex.get(ref) || state.teamMetaByKey.get(String(ref));
+        return meta ? meta.name : `Squadra ${ref + 1}`;
+      }
+      const key = String(ref).trim();
+      if (!key) return 'TBD';
+      const meta = state.teamMetaByKey.get(key);
+      return meta ? meta.name : key;
+    }
+
+    function matchSamePair(result, match) {
+      if (!result || !match) return false;
+      const homeMatches = String(result.home) === String(match.home);
+      const awayMatches = String(result.away) === String(match.away);
+      return homeMatches && awayMatches;
+    }
+
+    function formatScore(value) {
+      if (value === null || value === undefined || Number.isNaN(value)) return '-';
+      return Number(value).toFixed(1);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
     async function generateSchedule(){
       const numRounds = parseInt(document.getElementById('numRounds').value) || 34;
-      const numTeams = teamNames.length;
+      const numTeams = state.teamNames.length || state.teams.length;
       if (numTeams < 2) return alert('Serve almeno 2 squadre');
       if (!confirm(`Generare calendario per ${numTeams} squadre (${numRounds} giornate)?`)) return;
       const schedule = roundRobinN(numTeams, numRounds);
       const batch = db.batch();
       schedule.forEach((g,i)=>{
-        const ref = db.collection('h2h_schedule').doc(SEASON).collection('giornate').doc(`G${i+1}`);
+        const ref = getScopedCollection('h2h_schedule').doc(SEASON).collection('giornate').doc(`G${i+1}`);
         batch.set(ref, { giornata: i+1, matches: g.matches, bye: g.bye });
       });
       await batch.commit();
       alert('✅ Calendario generato!');
-      boot();
+      await loadH2HSchedule();
+      renderCurrentView();
     }
 
     function roundRobinN(n, totalRounds){
@@ -294,12 +863,13 @@
 
     async function clearResults(){
       if (!confirm('Cancellare tutti i risultati?')) return;
-      const snap = await db.collection('h2h_results').doc(SEASON).collection('giornate').get();
+      const snap = await getScopedCollection('h2h_results').doc(SEASON).collection('giornate').get();
       const batch = db.batch();
       snap.docs.forEach(d=> batch.delete(d.ref));
       await batch.commit();
-      alert('✅ Risultati cancellati!');
-      boot();
+      alert('🧹 Risultati cancellati!');
+      await loadH2HSchedule();
+      renderCurrentView();
     }
 
     async function deleteCalendar(){
@@ -307,19 +877,20 @@
       if (!confirm('Sei davvero sicuro? Verranno eliminati calendario E risultati!')) return;
       
       // Elimina calendario
-      const schedSnap = await db.collection('h2h_schedule').doc(SEASON).collection('giornate').get();
+      const schedSnap = await getScopedCollection('h2h_schedule').doc(SEASON).collection('giornate').get();
       const batch1 = db.batch();
       schedSnap.docs.forEach(d=> batch1.delete(d.ref));
       await batch1.commit();
       
       // Elimina risultati
-      const resSnap = await db.collection('h2h_results').doc(SEASON).collection('giornate').get();
+      const resSnap = await getScopedCollection('h2h_results').doc(SEASON).collection('giornate').get();
       const batch2 = db.batch();
       resSnap.docs.forEach(d=> batch2.delete(d.ref));
       await batch2.commit();
       
-      alert('✅ Calendario e risultati eliminati!');
-      location.reload();
+      alert('🗑️ Calendario e risultati eliminati!');
+      await loadH2HSchedule();
+      renderCurrentView();
     }
   </script>
   
@@ -328,9 +899,9 @@
   <script src="resources/bottom-nav.js?v=2025101802"></script>
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>
 </body>

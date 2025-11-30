@@ -89,31 +89,102 @@
       firebase.initializeApp(window.firebaseConfig);
     }
     const db = firebase.firestore();
+    console.log('[verifica-squadre] script loaded');
     
     let currentLeagueId = null;
     let teams = [];
     let users = [];
 
     firebase.auth().onAuthStateChanged(async (user) => {
+      console.log('[verifica-squadre] auth state changed, user present:', !!user);
       if (!user) {
         window.location.href = 'auth.html';
         return;
       }
 
-      const adminDoc = await db.collection('admins').doc(user.uid).get();
-      if (!adminDoc.exists) {
+      let isAdmin = false;
+      try {
+        const adminDoc = await db.collection('admins').doc(user.uid).get();
+        isAdmin = adminDoc.exists;
+        console.log('[verifica-squadre] admin doc exists:', isAdmin, 'uid:', user.uid);
+      } catch (err) {
+        console.error('[verifica-squadre] errore lettura admins doc:', err);
+      }
+
+      if (!isAdmin) {
         alert('⚠️ Solo admin!');
         window.location.href = 'index.html';
         return;
       }
 
-      const checkLeague = setInterval(() => {
-        if (window.currentLeague && window.currentLeague.id) {
-          clearInterval(checkLeague);
-          currentLeagueId = window.currentLeague.id;
-          loadData();
+      // Risolvi leagueId senza dipendere da window.currentLeague / navbar
+      let targetLeagueId = null;
+
+      // 1) URL param (override esplicito)
+      try {
+        const params = new URLSearchParams(window.location.search || '');
+        targetLeagueId = params.get('leagueId') || params.get('league') || null;
+        if (targetLeagueId) {
+          console.log('[verifica-squadre] leagueId from URL params:', targetLeagueId);
         }
-      }, 500);
+      } catch (err) {
+        console.warn('[verifica-squadre] impossibile leggere URL params:', err);
+      }
+
+      // 2) LeagueHelper, se disponibile
+      if (!targetLeagueId && window.LeagueHelper && typeof window.LeagueHelper.getCurrentLeagueId === 'function') {
+        try {
+          const helperId = window.LeagueHelper.getCurrentLeagueId();
+          if (helperId) {
+            targetLeagueId = helperId;
+            console.log('[verifica-squadre] leagueId from LeagueHelper:', targetLeagueId);
+          }
+        } catch (err) {
+          console.warn('[verifica-squadre] errore usando LeagueHelper.getCurrentLeagueId:', err);
+        }
+      }
+
+      // 3) localStorage.last_league_id
+      if (!targetLeagueId) {
+        try {
+          const stored = localStorage.getItem('last_league_id');
+          if (stored) {
+            targetLeagueId = stored;
+            console.log('[verifica-squadre] leagueId from localStorage.last_league_id:', targetLeagueId);
+          }
+        } catch (err) {
+          console.warn('[verifica-squadre] impossibile leggere last_league_id:', err);
+        }
+      }
+
+      // 4) Documento utente (currentLeague o prima lega in elenco)
+      if (!targetLeagueId) {
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            const data = userDoc.data() || {};
+            if (data.currentLeague) {
+              targetLeagueId = data.currentLeague;
+              console.log('[verifica-squadre] leagueId from users.currentLeague:', targetLeagueId);
+            } else if (Array.isArray(data.leagues) && data.leagues.length > 0) {
+              targetLeagueId = data.leagues[0];
+              console.log('[verifica-squadre] leagueId from users.leagues[0]:', targetLeagueId);
+            }
+          }
+        } catch (err) {
+          console.warn('[verifica-squadre] errore lettura users doc per leagueId:', err);
+        }
+      }
+
+      if (!targetLeagueId) {
+        alert('⚠️ Nessuna lega selezionata. Apri prima una lega oppure aggiungi ?leagueId=ID nella URL.');
+        console.warn('[verifica-squadre] impossibile determinare leagueId');
+        return;
+      }
+
+      currentLeagueId = targetLeagueId;
+      console.log('[verifica-squadre] using leagueId:', currentLeagueId);
+      loadData();
     });
 
     async function loadData() {

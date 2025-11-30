@@ -31,7 +31,7 @@
     
     try {
       const code = generateTeamInviteCode();
-      const link = `${window.location.origin}/join-team.html?code=${code}`;
+      const link = `${window.location.origin}/join-team.html?leagueId=${leagueId}&code=${code}`;
       
       const inviteData = {
         leagueId: leagueId,
@@ -48,7 +48,7 @@
         status: 'active'
       };
       
-      await db.collection('teamInvites').doc(code).set(inviteData);
+      await db.collection(`leagues/${leagueId}/teamInvites`).doc(code).set(inviteData);
       
       return { success: true, code, link };
       
@@ -61,17 +61,17 @@
   /**
    * Verifica e usa codice invito squadra
    */
-  async function useTeamInvite(code, userId) {
+  async function useTeamInvite(code, userId, leagueIdHint = null) {
     const db = firebase.firestore();
     
     try {
-      const inviteDoc = await db.collection('teamInvites').doc(code).get();
-      
-      if (!inviteDoc.exists) {
+      const inviteFetch = await fetchInviteDocument(db, code, leagueIdHint);
+      if (!inviteFetch) {
         return { success: false, error: 'Codice non valido' };
       }
       
-      const invite = inviteDoc.data();
+      const { snapshot, leagueId } = inviteFetch;
+      const invite = snapshot.data();
       
       // Validazioni
       if (invite.status !== 'active') {
@@ -79,12 +79,31 @@
       }
       
       if (invite.expiresAt.toDate() < new Date()) {
-        await db.collection('teamInvites').doc(code).update({ status: 'expired' });
+        await snapshot.ref.update({ status: 'expired' });
         return { success: false, error: 'Invito scaduto' };
       }
       
-      // Aggiungi utente alla squadra
-      await db.collection(`leagues/${invite.leagueId}/teams`).doc(invite.teamId).update({
+      const numericTeamIndex = parseInt(invite.teamId, 10);
+      if (!Number.isFinite(numericTeamIndex)) {
+        return { success: false, error: 'Invito non valido (team non riconosciuta)' };
+      }
+
+      const userRef = db.collection('users').doc(userId);
+      const userSnap = await userRef.get();
+      const userData = userSnap.exists ? (userSnap.data() || {}) : {};
+
+      const existingMembersSnap = await db.collection('users')
+        .where('currentLeague', '==', leagueId)
+        .where('team_index', '==', numericTeamIndex)
+        .get();
+
+      const alreadyOnTeam = userData.currentLeague === leagueId && userData.team_index === numericTeamIndex;
+      if (!alreadyOnTeam && existingMembersSnap.size >= 3) {
+        return { success: false, error: 'Questa squadra ha già il numero massimo di allenatori (3).' };
+      }
+
+      // Aggiungi utente alla squadra (lista coaches per tracking ruoli)
+      await db.collection(`leagues/${leagueId}/teams`).doc(invite.teamId).update({
         coaches: firebase.firestore.FieldValue.arrayUnion({
           userId: userId,
           role: invite.role,
@@ -93,12 +112,31 @@
       });
       
       // Aggiungi utente alla lega se non presente
-      await db.collection('leagues').doc(invite.leagueId).update({
+      await db.collection('leagues').doc(leagueId).update({
         members: firebase.firestore.FieldValue.arrayUnion(userId)
       });
+
+      // Aggiorna profilo utente con lega e squadra corrente
+      const authUser = firebase.auth().currentUser;
+      const userPayload = {
+        currentLeague: leagueId,
+        leagues: firebase.firestore.FieldValue.arrayUnion(leagueId),
+        team_index: numericTeamIndex,
+        updatedAt: firebase.firestore.Timestamp.now()
+      };
+      if (authUser && authUser.uid === userId) {
+        if (authUser.email) {
+          userPayload.email = authUser.email;
+        }
+        if (authUser.displayName) {
+          userPayload.displayName = authUser.displayName;
+        }
+        userPayload.uid = userId;
+      }
+      await userRef.set(userPayload, { merge: true });
       
       // Mark invite as used
-      await db.collection('teamInvites').doc(code).update({
+      await snapshot.ref.update({
         status: 'used',
         usedBy: userId,
         usedAt: firebase.firestore.Timestamp.now()
@@ -106,7 +144,7 @@
       
       return { 
         success: true, 
-        leagueId: invite.leagueId,
+        leagueId: leagueId,
         teamId: invite.teamId,
         role: invite.role
       };
@@ -120,8 +158,8 @@
   /**
    * Invia invito via email
    */
-  async function sendInviteEmail(code, recipientEmail, senderName, teamName) {
-    const link = `${window.location.origin}/join-team.html?code=${code}`;
+  async function sendInviteEmail(code, recipientEmail, senderName, teamName, leagueId) {
+    const link = `${window.location.origin}/join-team.html?code=${code}${leagueId ? `&leagueId=${leagueId}` : ''}`;
     
     // TODO: Integrare con servizio email (SendGrid, Firebase Email Extension, etc.)
     // Per ora, mostriamo il link da copiare
@@ -182,6 +220,32 @@
         `;
       }
     });
+  }
+
+  async function fetchInviteDocument(db, code, leagueIdHint) {
+    if (leagueIdHint) {
+      const docRef = db.collection(`leagues/${leagueIdHint}/teamInvites`).doc(code);
+      const snapshot = await docRef.get();
+      if (snapshot.exists) {
+        return { snapshot, leagueId: leagueIdHint };
+      }
+    }
+
+    const cgSnapshot = await db.collectionGroup('teamInvites')
+      .where('code', '==', code)
+      .limit(1)
+      .get();
+
+    if (cgSnapshot.empty) {
+      return null;
+    }
+
+    const snapshot = cgSnapshot.docs[0];
+    const pathSegments = snapshot.ref.path.split('/');
+    const leaguesIndex = pathSegments.indexOf('leagues');
+    const derivedLeagueId = leaguesIndex >= 0 ? pathSegments[leaguesIndex + 1] : snapshot.data().leagueId;
+
+    return { snapshot, leagueId: derivedLeagueId };
   }
   
   // Expose API

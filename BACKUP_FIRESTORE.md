@@ -25,7 +25,7 @@ Prima di iniziare la migrazione multileghe, è **fondamentale** fare un backup c
 1. Clicca su **"..."** (menu) in alto a destra
 2. Seleziona **"Export"** o **"Esporta"**
 3. Scegli destinazione:
-   - **Cloud Storage bucket:** `gs://fanta-athletic.appspot.com/backups`
+   - **Cloud Storage bucket:** `gs://fanta-athletic.firebasestorage.app/backups`
    - Oppure crea nuovo bucket dedicato
 
 ### Passo 3: Configura Esportazione
@@ -152,7 +152,7 @@ chmod +x backup-firestore.sh
 gcloud auth login
 
 # Scarica backup
-gsutil -m cp -r gs://fanta-athletic.appspot.com/backups/backup-YYYYMMDD-HHMMSS ./local-backup/
+gsutil -m cp -r gs://fanta-athletic.firebasestorage.app/backups/backup-YYYYMMDD-HHMMSS ./local-backup/
 ```
 
 ---
@@ -169,7 +169,7 @@ gsutil -m cp -r gs://fanta-athletic.appspot.com/backups/backup-YYYYMMDD-HHMMSS .
 ### Metodo 2: Firebase CLI
 ```bash
 # Importa backup da Cloud Storage
-firebase firestore:import gs://fanta-athletic.appspot.com/backups/backup-YYYYMMDD-HHMMSS --project=fanta-athletic
+firebase firestore:import gs://fanta-athletic.firebasestorage.app/backups/backup-YYYYMMDD-HHMMSS --project=fanta-athletic
 ```
 
 **⚠️ ATTENZIONE:** Questo sovrascrive i dati esistenti!
@@ -182,7 +182,7 @@ firebase firestore:import gs://fanta-athletic.appspot.com/backups/backup-YYYYMMD
 
 1. **Backup Completo:**
    ```bash
-   firebase firestore:export gs://fanta-athletic.appspot.com/backups/backup-pre-migration-$(date +%Y%m%d-%H%M%S)
+firebase firestore:export gs://fanta-athletic.firebasestorage.app/backups/backup-pre-migration-$(date +%Y%m%d-%H%M%S)
    ```
 
 2. **Verifica Backup:**
@@ -249,13 +249,13 @@ backup-YYYYMMDD-HHMMSS/
 
 1. **Backup Completo:**
    ```bash
-   firebase firestore:export gs://fanta-athletic.appspot.com/backups/backup-pre-multilega-$(date +%Y%m%d-%H%M%S)
+   firebase firestore:export gs://fanta-athletic.firebasestorage.app/backups/backup-pre-multilega-$(date +%Y%m%d-%H%M%S)
    ```
 
 2. **Backup Storage (immagini):**
    ```bash
-   gsutil -m cp -r gs://fanta-athletic.appspot.com/player-photos ./backups/player-photos/
-   gsutil -m cp -r gs://fanta-athletic.appspot.com/coach-photos ./backups/coach-photos/
+   gsutil -m cp -r gs://fanta-athletic.firebasestorage.app/player-photos ./backups/player-photos/
+   gsutil -m cp -r gs://fanta-athletic.firebasestorage.app/coach-photos ./backups/coach-photos/
    ```
 
 3. **Verifica:**

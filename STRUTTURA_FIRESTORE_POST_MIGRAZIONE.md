@@ -75,6 +75,31 @@ leagues/
       └── matchday_temp/            ← ✅ Subcollezione (se presenti)
 ```
 
+### 3. **Estensione Multi-Sport (Nuova)**
+
+Per supportare campionati diversi (calcio, volley, basket, F1, Sanremo, reality, …) ogni documento lega deve includere:
+
+- `sportType`: stringa (`football`, `volleyball`, `basketball`, `f1`, `sanremo`, `reality_tv`, ...).
+- `competitionId`: riferimento logico alla competition/catalog (es. `serie-a-2025`, `nba-2025`, `f1-2026`).
+- `settings.scoringProfileId`: eventuale override del profilo punteggi rispetto allo sport di default.
+
+Schema proposto per le competition condivise:
+
+```
+competitions/
+  └── serie-a-2025
+      ├── sportType: "football"
+      ├── season: "2024/2025"
+      ├── metadata: {...}
+      └── participants/ (giocatori/concorrenti reali)
+
+  └── nba-2025
+      ├── sportType: "basketball"
+      └── participants/...
+```
+
+Ogni lega punta a una competition (anche condivisa) e salva localmente solo i dati fantasy (teams, risultati, notifiche, ecc.). I ruoli/formazioni/punteggi base sono guidati da `SPORT_CONFIG` (`public/resources/sport-config.js`).
+
 ---
 
 ## 🔍 COME VERIFICARE IN FIRESTORE CONSOLE

@@ -241,6 +241,12 @@
     <div class="profile-section" style="border: 2px solid #e74c3c;">
       <h3 style="color: #e74c3c;">⚠️ Zona Pericolosa</h3>
       <p style="color: #666;">Queste azioni sono irreversibili. Procedi con cautela.</p>
+      <div class="form-group" style="margin: 12px 0;">
+        <label for="deleteConfirmInput" style="display:block; font-size:14px; color:#e74c3c; margin-bottom:4px;">
+          Per eliminare definitivamente l'account, scrivi <strong>DELETE</strong> in maiuscolo:
+        </label>
+        <input type="text" id="deleteConfirmInput" placeholder="Digita DELETE per abilitare il pulsante" style="max-width:260px;">
+      </div>
       <div class="btn-group">
         <button class="btn btn-danger" id="deleteAccountBtn">🗑️ Elimina Account</button>
         <button class="btn btn-secondary" id="logoutBtn">🚪 Logout</button>
@@ -252,11 +258,10 @@
     <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
 
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js?v=20251021-fix"></script>
   <script>
     // Init Firebase IMMEDIATAMENTE
@@ -375,18 +380,40 @@
       cropImg = img; pan={x:0,y:0}; cropModal.querySelector('#cropZoom').value='1';
       stage.appendChild(img);
       cropModal.style.display='flex';
-      img.onload = ()=> { updateAvatarPreview(); };
+      img.onload = ()=> { applyTransform(true); };
+      applyTransform(true);
     }
-    function applyTransform(){
+    function applyTransform(forcePreview = false){
+      if (!cropImg) return;
       const z = parseFloat(cropModal.querySelector('#cropZoom').value);
-      cropImg.style.transform = `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px)) scale(${z})`;
-      updateAvatarPreview();
+      cropImg.style.transform = `translate(-50%, -50%) translate(${pan.x}px, ${pan.y}px) scale(${z})`;
+      if (forcePreview) {
+        updateAvatarPreview();
+      } else {
+        requestAnimationFrame(updateAvatarPreview);
+      }
     }
     cropModal.querySelector('#cropZoom').addEventListener('input', applyTransform);
     cropModal.querySelector('#cropCancel').addEventListener('click', ()=>{ cropModal.style.display='none'; });
-    cropModal.querySelector('#cropStage').addEventListener('mousedown', (e)=>{ dragging=true; start={x:e.clientX,y:e.clientY}; cropImg.style.cursor='grabbing'; });
-    window.addEventListener('mousemove', (e)=>{ if(!dragging) return; pan.x += (e.clientX-start.x); pan.y += (e.clientY-start.y); start={x:e.clientX,y:e.clientY}; applyTransform(); });
-    window.addEventListener('mouseup', ()=>{ dragging=false; if(cropImg) cropImg.style.cursor='grab'; });
+    cropModal.querySelector('#cropStage').addEventListener('mousedown', (e)=>{
+      if (!cropImg) return;
+      dragging=true;
+      start={x:e.clientX,y:e.clientY};
+      cropImg.style.cursor='grabbing';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', (e)=>{
+      if(!dragging || !cropImg) return;
+      pan.x += (e.clientX-start.x);
+      pan.y += (e.clientY-start.y);
+      start={x:e.clientX,y:e.clientY};
+      applyTransform();
+    });
+    window.addEventListener('mouseup', ()=>{
+      if(!dragging) return;
+      dragging=false;
+      if(cropImg) cropImg.style.cursor='grab';
+    });
     cropModal.querySelector('#cropStage').addEventListener('touchstart', (e)=>{
       if (!e.touches || !e.touches.length) return;
       dragging = true;
@@ -403,14 +430,58 @@
     }, { passive: false });
     window.addEventListener('touchend', ()=>{ dragging=false; if(cropImg) cropImg.style.cursor='grab'; });
     async function renderCroppedAvatar(){
-      const canvas = document.createElement('canvas'); canvas.width=512; canvas.height=512; const ctx=canvas.getContext('2d');
-      ctx.fillStyle='#000'; ctx.fillRect(0,0,512,512);
-      await new Promise(r=>{ if(cropImg.complete) r(); else cropImg.onload=r; });
+      const BASE_SIZE = 512;
+      const MAX_BYTES = 600 * 1024; // ~600KB target
+      const MIN_QUALITY = 0.5;
+      const MIN_SIZE = 320;
+      const canvas = document.createElement('canvas');
+      canvas.width = BASE_SIZE;
+      canvas.height = BASE_SIZE;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, BASE_SIZE, BASE_SIZE);
+
+      await new Promise(res => { if (cropImg.complete) res(); else cropImg.onload = res; });
       const z = parseFloat(cropModal.querySelector('#cropZoom').value);
-      const drawW = cropImg.naturalWidth * z; const drawH = cropImg.naturalHeight * z;
-      const dx = (512 - drawW)/2 + pan.x; const dy = (512 - drawH)/2 + pan.y;
-      ctx.imageSmoothingQuality='high'; ctx.drawImage(cropImg, dx, dy, drawW, drawH);
-      return await new Promise(res=> canvas.toBlob(res, 'image/jpeg', 0.9));
+      const drawW = cropImg.naturalWidth * z;
+      const drawH = cropImg.naturalHeight * z;
+      const dx = (BASE_SIZE - drawW) / 2 + pan.x;
+      const dy = (BASE_SIZE - drawH) / 2 + pan.y;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(cropImg, dx, dy, drawW, drawH);
+
+      const toJpegBlob = (quality, sourceCanvas = canvas) => new Promise((resolve, reject) => {
+        sourceCanvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Impossibile generare l\'avatar')), 'image/jpeg', quality);
+      });
+
+      let quality = 0.9;
+      let blob = await toJpegBlob(quality);
+
+      while (blob && blob.size > MAX_BYTES && quality > MIN_QUALITY) {
+        quality = Math.max(MIN_QUALITY, quality - 0.1);
+        blob = await toJpegBlob(quality);
+      }
+
+      if (blob && blob.size > MAX_BYTES) {
+        let targetSize = BASE_SIZE;
+        while (blob && blob.size > MAX_BYTES && targetSize > MIN_SIZE) {
+          targetSize = Math.max(MIN_SIZE, Math.round(targetSize * 0.85));
+
+          const downscaleCanvas = document.createElement('canvas');
+          downscaleCanvas.width = targetSize;
+          downscaleCanvas.height = targetSize;
+          const downCtx = downscaleCanvas.getContext('2d');
+          downCtx.imageSmoothingEnabled = true;
+          downCtx.imageSmoothingQuality = 'high';
+          downCtx.drawImage(canvas, 0, 0, targetSize, targetSize);
+
+          const tempQuality = Math.max(MIN_QUALITY, quality);
+          blob = await toJpegBlob(tempQuality, downscaleCanvas);
+        }
+      }
+
+      return blob;
     }
 
     function updateAvatarPreview(){
@@ -488,8 +559,9 @@
       const file = e.target.files[0];
       if (!file) return;
       
-      if (file.size > 2 * 1024 * 1024) {
-        alert('Immagine troppo grande! Max 2MB');
+      const MAX_SOURCE_SIZE = 20 * 1024 * 1024; // 20MB per consentire resize automatico
+      if (file.size > MAX_SOURCE_SIZE) {
+        alert('Immagine troppo grande! Max 20MB prima della compressione automatica');
         return;
       }
       // Apri cropper con ratio 1:1
@@ -500,9 +572,26 @@
 
     async function uploadAvatarBlob(blob){
       try {
-        if (userData.photoURL) { try { await storage.refFromURL(userData.photoURL).delete(); } catch(e){} }
-        const storageRef = storage.ref(`avatars/${currentUser.uid}/avatar.jpg`);
+        const avatarPath = `avatars/${currentUser.uid}/avatar.jpg`;
+        const storageRef = storage.ref(avatarPath);
+        try {
+          await storageRef.delete();
+        } catch (deleteError) {
+          if (!(deleteError && deleteError.code === 'storage/object-not-found')) {
+            console.warn('Impossibile eliminare avatar precedente:', deleteError);
+          }
+        }
         await storageRef.put(blob, { contentType: 'image/jpeg', cacheControl: 'public, max-age=31536000' });
+        if (userData.photoURL) {
+          try {
+            const previousRef = storage.refFromURL(userData.photoURL);
+            if (previousRef.fullPath !== avatarPath) {
+              await previousRef.delete();
+            }
+          } catch (cleanupError) {
+            console.warn('Impossibile eliminare avatar legacy:', cleanupError);
+          }
+        }
         const photoURL = await storageRef.getDownloadURL();
         await db.collection('users').doc(currentUser.uid).update({ photoURL });
         document.getElementById('profileAvatar').src = photoURL + `?v=${Date.now()}`; // cache-busting
@@ -614,21 +703,51 @@
       }
     });
 
-    // Elimina account
-    document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
-      const confirmation = prompt('Sei SICURO? Scrivi "ELIMINA" per confermare:');
-      if (confirmation !== 'ELIMINA') return;
-      
-      try {
-        await db.collection('users').doc(currentUser.uid).delete();
-        await currentUser.delete();
-        alert('Account eliminato');
-        window.location.href = 'index.html';
-      } catch (error) {
-        console.error('Errore eliminazione account:', error);
-        alert('âŒ Errore: ' + error.message);
-      }
-    });
+    // Elimina account con conferma "DELETE"
+    (function setupDeleteAccount() {
+      const deleteBtn = document.getElementById('deleteAccountBtn');
+      const confirmInput = document.getElementById('deleteConfirmInput');
+      if (!deleteBtn || !confirmInput) return;
+
+      // Inizialmente disabilitato finché non viene digitato DELETE
+      deleteBtn.disabled = true;
+
+      confirmInput.addEventListener('input', () => {
+        const value = (confirmInput.value || '').trim().toUpperCase();
+        deleteBtn.disabled = value !== 'DELETE';
+      });
+
+      deleteBtn.addEventListener('click', async () => {
+        const value = (confirmInput.value || '').trim().toUpperCase();
+        if (value !== 'DELETE') {
+          alert('Per eliminare l\'account devi scrivere DELETE in maiuscolo nel campo di conferma.');
+          return;
+        }
+
+        if (!currentUser) {
+          alert('Nessun utente autenticato. Ricarica la pagina e riprova.');
+          return;
+        }
+
+        if (!confirm('Questa operazione eliminerà definitivamente il tuo account e i dati associati. Vuoi continuare?')) {
+          return;
+        }
+
+        try {
+          await db.collection('users').doc(currentUser.uid).delete();
+          await currentUser.delete();
+          alert('Account eliminato definitivamente.');
+          window.location.href = 'index.html';
+        } catch (error) {
+          console.error('Errore eliminazione account:', error);
+          if (error && error.code === 'auth/requires-recent-login') {
+            alert('Per motivi di sicurezza devi effettuare nuovamente il login prima di eliminare l\'account.\n\nEsci (Logout) e rientra, poi riprova a usare il pulsante Elimina Account.');
+          } else {
+            alert('âŒ Errore: ' + (error && error.message ? error.message : 'Operazione non riuscita'));
+          }
+        }
+      });
+    })();
 
     // Annulla modifiche
     document.getElementById('cancelBtn').addEventListener('click', () => {
@@ -654,9 +773,9 @@
     <script src="resources/navbar-autohide.js?v=2025101805"></script>
   <script src="resources/lazy-load.js?v=20251020"></script>
   <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=202510172227"></script>
+  <script src="resources/navbar.js?v=2025110701"></script>
   <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
   <script src="resources/league-selector.js?v=2025101905"></script>
   <script src="resources/auth-ui.js?v=202510172227"></script>
 </body>
