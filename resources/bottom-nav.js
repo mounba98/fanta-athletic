@@ -9,11 +9,11 @@
   }
 
   const navItems = [
-    { id: 'dashboard', label: 'Home', icon: '🏠', href: 'index.html' },
-    { id: 'formazioni', label: 'Formazioni', icon: '⚽', href: 'formazioni.html' },
-    { id: 'squadre', label: 'Squadre', icon: '🏆', href: 'squadre.html' },
-    { id: 'classifiche', label: 'Classifiche', icon: '📊', href: 'classifiche.html' },
-    { id: 'bacheca', label: 'Bacheca', icon: '💬', href: 'bacheca.html' }
+    { id: 'dashboard', label: 'Home', icon: '<img src="resources/icons/home.png" alt="Home" />', href: 'index.html' },
+    { id: 'formazioni', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', href: 'formazioni.html' },
+    { id: 'squadre', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', href: 'squadre.html' },
+    { id: 'classifiche', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', href: 'classifiche.html' },
+    { id: 'bacheca', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', href: 'bacheca.html' }
   ];
 
   function createBottomNav() {

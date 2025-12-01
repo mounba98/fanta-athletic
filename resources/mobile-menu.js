@@ -9,14 +9,14 @@
   }
 
   const menuItems = [
-    { href: 'index.html', label: 'Dashboard', icon: '🏠', priority: 1 },
-    { href: 'squadre.html', label: 'Squadre', icon: '🏆', priority: 2 },
-    { href: 'formazioni.html', label: 'Formazioni', icon: '⚽', priority: 3 },
-    { href: 'calendario.html', label: 'Calendario', icon: '📅', priority: 4 },
-    { href: 'classifiche.html', label: 'Classifiche', icon: '📊', priority: 5 },
+    { href: 'index.html', label: 'Dashboard', icon: '<img src="resources/icons/home.png" alt="Home" />', priority: 1 },
+    { href: 'squadre.html', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', priority: 2 },
+    { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', priority: 3 },
+    { href: 'calendario.html', label: 'Calendario', icon: '<img src="resources/icons/calendario.png" alt="Calendario" />', priority: 4 },
+    { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', priority: 5 },
     { href: 'matchday.html', label: 'Giornate', icon: '🎯', priority: 6 },
     { href: 'statistiche.html', label: 'Statistiche', icon: '📈', priority: 7 },
-    { href: 'bacheca.html', label: 'Bacheca', icon: '💬', priority: 8 },
+    { href: 'bacheca.html', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', priority: 8 },
     { href: 'profile.html', label: 'Profilo', icon: '👤', priority: 9 },
     { href: 'notifications.html', label: 'Notifiche', icon: '🔔', priority: 10 }
   ];

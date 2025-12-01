@@ -6,13 +6,13 @@
   function createNavbar(currentPage, isAdmin = false) {
     // Store è sempre visibile, non dipende da isAdmin
     const allPages = [
-      { href: 'index.html', label: 'Home', icon: '🏠', desktop: true, mobile: true },
-      { href: 'squadre.html', label: 'Squadre', icon: '🏆', desktop: true, mobile: false },
-      { href: 'formazioni.html', label: 'Formazioni', icon: '⚽', desktop: true, mobile: true },
-      { href: 'classifiche.html', label: 'Classifiche', icon: '📊', desktop: true, mobile: false },
+      { href: 'index.html', label: 'Home', icon: '<img src="resources/icons/home.png" alt="Home" />', desktop: true, mobile: true },
+      { href: 'squadre.html', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', desktop: true, mobile: false },
+      { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', desktop: true, mobile: true },
+      { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', desktop: true, mobile: false },
       { href: 'statistiche.html', label: 'Statistiche', icon: '📈', desktop: true, mobile: false },
       { href: 'store.html', label: 'Store', icon: '🛒', desktop: true, mobile: true },
-      { href: 'bacheca.html', label: 'Bacheca', icon: '💬', desktop: true, mobile: true }
+      { href: 'bacheca.html', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', desktop: true, mobile: true }
     ];
     
     // Calcolo (ex Giornate) solo per admin

@@ -1642,6 +1642,22 @@ body.dark .hamburger-btn:focus {
   text-align: center;
 }
 
+/* Icone PNG in navbar / bottom nav / mobile menu */
+.nav-icon img,
+.bottom-nav-icon img,
+.mobile-menu-item .menu-icon img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.bottom-nav-icon img {
+  width: 26px;
+  height: 26px;
+  filter: contrast(1.25) brightness(0.95);
+}
+
 .mobile-menu-item .menu-label {
   font-size: 16px;
   font-weight: 500;
