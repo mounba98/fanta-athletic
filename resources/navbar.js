@@ -3,6 +3,29 @@
 (function() {
   'use strict';
 
+  const APP_VERSION = '2025.12.01-1';
+  const APP_VERSION_STORAGE_KEY = 'fantaAthletic_app_version';
+
+  function trackAppVersion() {
+    try {
+      const previous = localStorage.getItem(APP_VERSION_STORAGE_KEY);
+      if (previous === APP_VERSION) {
+        return;
+      }
+
+      localStorage.setItem(APP_VERSION_STORAGE_KEY, APP_VERSION);
+      window.FantaAthleticAppVersion = APP_VERSION;
+      console.log('[FantaAthletic] App version', APP_VERSION, '(previous:', previous || 'none', ')');
+
+      // Mostra un piccolo avviso solo quando la versione cambia realmente
+      if (previous && typeof window.toast === 'function') {
+        window.toast(`App aggiornata alla versione ${APP_VERSION}`);
+      }
+    } catch (e) {
+      console.warn('[FantaAthletic] Impossibile tracciare la versione app', e);
+    }
+  }
+
   function createNavbar(currentPage, isAdmin = false) {
     // Store è sempre visibile, non dipende da isAdmin
     const allPages = [
@@ -222,6 +245,9 @@
         }
       });
     }
+    
+    // Traccia versione app per distinguere utenti su build vecchia/nuova
+    trackAppVersion();
     
     // Scroll handler per navbar compatta
     let lastScroll = 0;
