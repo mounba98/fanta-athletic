@@ -1657,7 +1657,6 @@ body.dark .hamburger-btn:focus {
   height: 26px;
   filter: contrast(1.25) brightness(0.95);
 }
-
 .mobile-menu-item .menu-label {
   font-size: 16px;
   font-weight: 500;
@@ -1956,4 +1955,13 @@ body.dark .hamburger-btn:focus {
 
 .result-score {
   font-size: 18px;
+}
+
+/* Schermi ultra-stretti: forza una larghezza minima per evitare sovrapposizioni */
+@media (max-width: 320px) {
+  html,
+  body {
+    min-width: 320px;
+    overflow-x: auto;
+  }
 }

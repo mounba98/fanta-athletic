@@ -89,17 +89,17 @@
         const photoURL = userData.photoURL || user.photoURL || null;
 
         if (photoURL) {
-          // Mostra foto profilo
+          // Mostra foto profilo con fallback alla PNG profilo
           container.innerHTML = `
             <a href="profile.html" style="display: block; width: 36px; height: 36px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.4); transition: all 0.2s;">
-              <img src="${photoURL}" alt="Profilo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;\\'>👤</div>'">
+              <img src="${photoURL}" alt="Profilo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='resources/icons/profilo.png'; this.style.objectFit='contain';">
             </a>
           `;
         } else {
-          // Icona default 👤
+          // Icona default: PNG profilo
           container.innerHTML = `
             <a href="profile.html" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); font-size: 20px; transition: all 0.2s; text-decoration: none;">
-              👤
+              <img src="resources/icons/profilo.png" alt="Profilo" style="width: 22px; height: 22px; object-fit: contain;" />
             </a>
           `;
         }
@@ -134,7 +134,7 @@
         // Fallback icona default
         container.innerHTML = `
           <a href="profile.html" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); font-size: 20px;">
-            👤
+            <img src="resources/icons/profilo.png" alt="Profilo" style="width: 22px; height: 22px; object-fit: contain;" />
           </a>
         `;
       }

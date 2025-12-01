@@ -14,11 +14,11 @@
     { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', priority: 3 },
     { href: 'calendario.html', label: 'Calendario', icon: '<img src="resources/icons/calendario.png" alt="Calendario" />', priority: 4 },
     { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', priority: 5 },
-    { href: 'matchday.html', label: 'Giornate', icon: '🎯', priority: 6 },
-    { href: 'statistiche.html', label: 'Statistiche', icon: '📈', priority: 7 },
+    { href: 'matchday.html', label: 'Calcolo', icon: '<img src="resources/icons/calcolo.png" alt="Calcolo" />', priority: 6 },
+    { href: 'statistiche.html', label: 'Statistiche', icon: '<img src="resources/icons/statistiche.png" alt="Statistiche" />', priority: 7 },
     { href: 'bacheca.html', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', priority: 8 },
-    { href: 'profile.html', label: 'Profilo', icon: '👤', priority: 9 },
-    { href: 'notifications.html', label: 'Notifiche', icon: '🔔', priority: 10 }
+    { href: 'profile.html', label: 'Profilo', icon: '<img src="resources/icons/profilo.png" alt="Profilo" />', priority: 9 },
+    { href: 'notifications.html', label: 'Notifiche', icon: '<img src="resources/icons/notifiche.png" alt="Notifiche" />', priority: 10 }
   ];
 
   function createHamburgerMenu() {
@@ -74,7 +74,7 @@
           <span class="menu-label" id="themeToggleLabel">Tema Scuro</span>
         </button>
         <button class="mobile-menu-item logout-btn" onclick="window.handleMobileLogout()">
-          <span class="menu-icon">🚪</span>
+          <span class="menu-icon"><img src="resources/icons/logout.png" alt="Logout" /></span>
           <span class="menu-label">Esci</span>
         </button>
       </nav>
@@ -139,7 +139,7 @@
               <span>Amministrazione</span>
             </div>
             <a href="admin.html" class="mobile-menu-item mobile-menu-admin ${isActive ? 'active' : ''}">
-              <span class="menu-icon">🛠️</span>
+              <span class="menu-icon"><img src="resources/icons/admin.png" alt="Admin" /></span>
               <span class="menu-label">Admin Panel</span>
             </a>
           `;

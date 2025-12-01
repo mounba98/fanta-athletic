@@ -104,7 +104,7 @@
     }
 
     placeholder.innerHTML = `
-      <span style="font-size: 20px;">🔔</span>
+      <img src="resources/icons/notifiche.png" alt="Notifiche" style="width: 20px; height: 20px; object-fit: contain;" />
       <span id="notifBadge" style="
         position: absolute;
         top: -2px;
@@ -175,7 +175,7 @@
 
     panel.innerHTML = `
       <div style="padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white;">
-        <h3 style="margin: 0; font-size: 16px;">🔔 Notifiche</h3>
+        <h3 style="margin: 0; font-size: 16px;"><img src="resources/icons/notifiche.png" alt="Notifiche" style="width: 18px; height: 18px; object-fit: contain; vertical-align: middle; margin-right: 6px;" /> Notifiche</h3>
         <button id="closeNotifDropdown" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; width: 28px; height: 28px;">✕</button>
       </div>
       <div id="notificationDropdownList" style="flex: 1; overflow-y: auto; padding: 12px;">

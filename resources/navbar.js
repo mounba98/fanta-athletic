@@ -10,16 +10,16 @@
       { href: 'squadre.html', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', desktop: true, mobile: false },
       { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', desktop: true, mobile: true },
       { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', desktop: true, mobile: false },
-      { href: 'statistiche.html', label: 'Statistiche', icon: '📈', desktop: true, mobile: false },
-      { href: 'store.html', label: 'Store', icon: '🛒', desktop: true, mobile: true },
+      { href: 'statistiche.html', label: 'Statistiche', icon: '<img src="resources/icons/statistiche.png" alt="Statistiche" />', desktop: true, mobile: false },
+      { href: 'store.html', label: 'Store', icon: '<img src="resources/icons/store.png" alt="Store" />', desktop: true, mobile: true },
       { href: 'bacheca.html', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', desktop: true, mobile: true }
     ];
     
     // Calcolo (ex Giornate) solo per admin
     if (isAdmin) {
-      allPages.splice(4, 0, { href: 'matchday.html', label: 'Calcolo', icon: '🧮', desktop: true, mobile: false, isAdminOnly: true });
-      allPages.push({ href: 'admin-setup.html', label: 'Setup', icon: '⚙️', desktop: true, mobile: false, isAdmin: true });
-      allPages.push({ href: 'admin.html', label: 'Admin', icon: '🛠️', desktop: true, mobile: false, isAdmin: true });
+      allPages.splice(4, 0, { href: 'matchday.html', label: 'Calcolo', icon: '<img src="resources/icons/calcolo.png" alt="Calcolo" />', desktop: true, mobile: false, isAdminOnly: true });
+      allPages.push({ href: 'admin-setup.html', label: 'Setup', icon: '<img src="resources/icons/impostazioni.png" alt="Setup" />', desktop: true, mobile: false, isAdmin: true });
+      allPages.push({ href: 'admin.html', label: 'Admin', icon: '<img src="resources/icons/admin.png" alt="Admin" />', desktop: true, mobile: false, isAdmin: true });
     }
 
     let navHTML = '<nav class="nav" role="navigation">';
