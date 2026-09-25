@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fanta-athletic-v2026092501';
+const CACHE_NAME = 'fanta-athletic-v2026092502';
 // Precaricati all'installazione: le librerie Firebase (le più pesanti, ~550 KB,
 // identiche finché non si cambia versione) e le pagine principali.
 const urlsToCache = [

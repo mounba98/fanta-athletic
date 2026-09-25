@@ -3,7 +3,7 @@
   'use strict';
 
   // Carica tema IMMEDIATAMENTE (prima del DOM)
-  const savedTheme = localStorage.getItem('fantaAthletic_theme') || 'light';
+  const savedTheme = localStorage.getItem('fantaAthletic_theme') || 'dark';
   if (savedTheme === 'dark') {
     document.documentElement.classList.add('dark');
   }
