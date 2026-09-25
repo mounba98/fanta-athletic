@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -11,9 +11,10 @@
   <meta name="description" content="Consulta tutte le notifiche ricevute su Fanta Athletic." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=20251018" />
-  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
-  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .notifications-page {
       max-width: 860px;
@@ -111,12 +112,12 @@
       color: var(--primary);
       padding: 6px 10px;
       border-radius: 10px;
-      background: rgba(220, 20, 60, 0.1);
+      background: rgba(146, 1, 0, 0.1);
       transition: background 0.2s;
     }
 
     .notification-actions a:hover {
-      background: rgba(220, 20, 60, 0.2);
+      background: rgba(146, 1, 0, 0.2);
     }
 
     @media (max-width: 640px) {
@@ -136,7 +137,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>🔔 Notifiche</h1>
+    <h1>Notifiche</h1>
   </header>
 
   <main class="notifications-page">
@@ -150,12 +151,10 @@
   <footer style="text-align:center; margin-top:auto;">
     <small>&copy; <span id="year"></span> Nicola Mocci</small>
   </footer>
-
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Verifica che Firebase sia caricato prima di inizializzare
     if (typeof firebase === 'undefined') {
@@ -174,20 +173,22 @@
       }
     }
   </script>
-  <script src="resources/app-init.js"></script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
-  <script src="resources/mobile-header-fix.js?v=20251107"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
-  <script src="resources/league-context.js?v=2025101901"></script>
-  <script src="resources/notifications.js?v=2025101706"></script>
-  <script src="resources/error-logger.js?v=20251018"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/navbar-scroll-hide.js?v=20260920-final"></script>
+  <script src="resources/mobile-header-fix.js?v=20260925c"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/league-context.js?v=20260920-final"></script>
+  <script src="resources/notifications.js?v=20260925"></script>
+  <script src="resources/error-logger.js?v=20260920-final"></script>
   <script>
     (function() {
       'use strict';

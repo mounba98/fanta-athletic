@@ -21,13 +21,13 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      border-left: 4px solid #3b82f6;
+      border-left: 4px solid #0c0f6d;
     }
     .player-card.has-photo {
-      border-left-color: #10b981;
+      border-left-color: #16a34a;
     }
     .player-card.no-photo {
-      border-left-color: #ef4444;
+      border-left-color: #920100;
     }
     img {
       width: 60px;
@@ -55,15 +55,15 @@
       border-radius: 4px;
     }
     .status.ok {
-      background: #10b981;
+      background: #16a34a;
       color: white;
     }
     .status.fail {
-      background: #ef4444;
+      background: #920100;
       color: white;
     }
     button {
-      background: #dc143c;
+      background: #920100;
       color: white;
       border: none;
       padding: 12px 24px;
@@ -73,7 +73,7 @@
       margin: 10px 5px;
     }
     button:hover {
-      background: #b91846;
+      background: #740100;
     }
     .header {
       background: #1e293b;
@@ -93,19 +93,21 @@
 </head>
 <body>
   <div class="header">
-    <h1 style="margin: 0 0 16px 0;">🔍 Test Foto Live</h1>
+  <p style="margin:0 0 18px;"><a href="admin.html" style="display:inline-block; color:#facc15; text-decoration:none; font-weight:600; font-size:14px; border:1px solid rgba(250,204,21,0.45); padding:7px 14px; border-radius:999px;">&larr; Torna al pannello admin</a></p>
+    <h1 style="margin: 0 0 16px 0;">Test Foto Live</h1>
     <p style="margin: 0 0 16px 0; color: #94a3b8;">
       Verifica quali giocatori hanno foto nel DB e se le foto si caricano correttamente
     </p>
-    <button onclick="testPhotos()">🔄 Testa Foto</button>
-    <button onclick="clearCache()">🗑️ Pulisci Cache Immagini</button>
+    <button onclick="testPhotos()">Testa Foto</button>
+    <button onclick="clearCache()">Pulisci Cache Immagini</button>
     <div id="stats" style="margin-top: 16px;"></div>
   </div>
 
   <div id="results"></div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
   
   <script>
@@ -211,7 +213,7 @@
 
       } catch (error) {
         console.error('Error loading players:', error);
-        results.innerHTML = `<p style="color:#ef4444;text-align:center;">❌ Errore: ${error.message}</p>`;
+        results.innerHTML = `<p style="color:#920100;text-align:center;">❌ Errore: ${error.message}</p>`;
       }
     }
 

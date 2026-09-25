@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fanta Athletic - Verifica AdSense</title>
   <meta name="description" content="Fanta Athletic - Fantasy Football League Manager. Verifica AdSense per Google." />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
   <style>
     body {
       background: var(--bg);
@@ -47,11 +47,11 @@
 </head>
 <body>
   <div class="verification-content">
-    <h1>🏆 Fanta Athletic</h1>
+    <h1>Fanta Athletic</h1>
     <p>Fantasy Football League Manager - Sistema completo per gestire la tua lega di fantacalcio.</p>
     
-    <div class="ad-placeholder" style="width: 728px; height: 90px; margin: 30px auto; border: 3px dashed #dc143c; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #666; font-weight: 700;">
-      <div style="font-size: 18px; color: #dc143c; margin-bottom: 8px;">728×90</div>
+    <div class="ad-placeholder" style="width: 728px; height: 90px; margin: 30px auto; border: 3px dashed #920100; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #666; font-weight: 700;">
+      <div style="font-size: 18px; color: #920100; margin-bottom: 8px;">728×90</div>
       <div style="font-size: 14px; color: #999;">Slot AdSense - Header Banner</div>
     </div>
     
@@ -65,8 +65,8 @@
       <li>Bacheca e social features</li>
     </ul>
     
-    <div class="ad-placeholder" style="width: 300px; height: 250px; margin: 30px auto; border: 3px dashed #dc143c; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #666; font-weight: 700;">
-      <div style="font-size: 18px; color: #dc143c; margin-bottom: 8px;">300×250</div>
+    <div class="ad-placeholder" style="width: 300px; height: 250px; margin: 30px auto; border: 3px dashed #920100; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #666; font-weight: 700;">
+      <div style="font-size: 18px; color: #920100; margin-bottom: 8px;">300×250</div>
       <div style="font-size: 14px; color: #999;">Slot AdSense - Rectangle</div>
     </div>
     
@@ -76,9 +76,14 @@
   </div>
   
   <!-- Firebase SDKs (senza auth guard) -->
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <!-- resources/firebase-config.js assume che firebase.firestore esista già
+       (fa firebase.firestore.bind(firebase) senza controllare) — questa
+       pagina non usava Firestore ma caricava comunque quel file, causando
+       un crash silenzioso ad ogni visita (2026-09-20). Aggiunto lo script
+       Firestore solo per soddisfare quell'assunzione, nessun'altra modifica. -->
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Disabilita auth guard PRIMA di qualsiasi altro script
     if (document.body) {

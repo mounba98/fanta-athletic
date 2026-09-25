@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Classifica Scontri Diretti</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .container { max-width: 1000px; margin: 0 auto; padding: 16px; }
     .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
@@ -25,8 +28,8 @@
 
   <main class="container">
     <section>
-      <h2>Classifica H2H (18 Squadre)</h2>
-      <p>Sistema 3-1-0. Criteri: Punti, Scontri diretti, Differenza punti, Punti totali.</p>
+      <h2>Classifica scontri diretti</h2>
+      <p id="h2hRules">Criteri: punti in classifica, differenza reti, reti fatte.</p>
       <table class="table" id="h2hTable">
         <thead>
           <tr>
@@ -47,10 +50,12 @@
     </section>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/h2h.js?v=20260925e"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -63,63 +68,55 @@
     }
     const db = firebase.firestore();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script>
-    const SEASON = '2024-25';
+    let SEASON = '2024-25'; // cartella scontri diretti: dal 25/09/2026 la decide la Stagione (D087)
+    async function seasonKey() {
+      if (window.Season) { try { SEASON = (await window.Season.load()).h2h.key || SEASON; } catch (e) {} }
+      return SEASON;
+    }
 
     async function boot(){
-      // Load team names
-      const teamsSnap = await db.collection('teams').orderBy(firebase.firestore.FieldPath.documentId()).get();
-      const teamNames = teamsSnap.docs.map((d,i)=> d.data().name || `Squadra ${i+1}`);
+      // Numeri delle squadre = id del documento, come nel Calcolo giornata e nel calendario (D100)
+      const teamsSnap = await db.collection('teams').get();
+      const names = {};
+      teamsSnap.docs.forEach(d => { names[d.id] = (d.data() || {}).name || ('Squadra ' + d.id); });
 
-      // Load all h2h results
-      const resultsSnap = await db.collection('h2h_results').doc(SEASON).collection('giornate').get();
-      const stats = Array.from({length:18}, (_,i)=>({ idx:i, name:teamNames[i], g:0, v:0, n:0, p:0, pf:0, ps:0, pts:0 }));
-
-      resultsSnap.docs.forEach(doc=>{
-        const data = doc.data();
-        if (!data.matches) return;
-        data.matches.forEach(m=>{
-          if (m.home==null || m.away==null || m.scoreHome==null || m.scoreAway==null) return;
-          stats[m.home].g++; stats[m.away].g++;
-          stats[m.home].pf += m.scoreHome; stats[m.home].ps += m.scoreAway;
-          stats[m.away].pf += m.scoreAway; stats[m.away].ps += m.scoreHome;
-          
-          // Track forfeit penalties
-          if (m.forfeitHome) {
-            stats[m.home].forfeit = (stats[m.home].forfeit || 0) + 1;
-          }
-          if (m.forfeitAway) {
-            stats[m.away].forfeit = (stats[m.away].forfeit || 0) + 1;
-          }
-          
-          if (m.scoreHome > m.scoreAway){ stats[m.home].v++; stats[m.away].p++; stats[m.home].pts+=3; }
-          else if (m.scoreHome < m.scoreAway){ stats[m.away].v++; stats[m.home].p++; stats[m.away].pts+=3; }
-          else { stats[m.home].n++; stats[m.away].n++; stats[m.home].pts++; stats[m.away].pts++; }
-        });
-      });
-
-      // Sort: pts desc, h2h (TODO), diff desc, pf desc
-      stats.sort((a,b)=> (b.pts-a.pts) || ((b.pf-b.ps)-(a.pf-a.ps)) || (b.pf-a.pf));
-
+      const season = window.Season ? await window.Season.load() : null;
+      const cfg = (season && season.h2h) || { vittoria: 3, pareggio: 1, sconfitta: 0 };
       const tb = document.querySelector('#h2hTable tbody');
-      tb.innerHTML = stats.map((s,i)=>{
+      document.getElementById('h2hRules').textContent =
+        `Vittoria ${cfg.vittoria} · pareggio ${cfg.pareggio} · sconfitta ${cfg.sconfitta}. Criteri: punti in classifica, differenza reti, reti fatte.`;
+      if (season && !window.H2H.active(season)) {
+        tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;">Quest\'anno si gioca in modalità classica: niente scontri diretti.</td></tr>';
+        return;
+      }
+
+      const resultsSnap = await db.collection('h2h_results').doc(await seasonKey()).collection('giornate').get();
+      const rows = window.H2H.standings(resultsSnap.docs.map(d => d.data() || {}), cfg);
+      if (!rows.length) {
+        tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;">Nessuno scontro diretto ancora giocato.</td></tr>';
+        return;
+      }
+
+      tb.innerHTML = rows.map((s,i)=>{
         let bg='', color='#000';
-        if (i===0){ bg='#ffd700'; color='#000'; }
+        if (i===0){ bg='#facc15'; color='#000'; }
         else if (i===1){ bg='#c0c0c0'; color='#000'; }
         else if (i===2){ bg='#cd7f32'; color='#000'; }
         else { color='#fff'; }
-        const forfeitIndicator = s.forfeit ? ` ⚠️(${s.forfeit})` : '';
+        const name = names[String(s.team)] || ('Squadra ' + s.team);
+        const forfeitIndicator = s.tavolino ? ` ⚠️(${s.tavolino})` : '';
         return `<tr style="background:${bg};color:${color};">
           <td>${i+1}</td>
-          <td style="font-weight:${i<3?'800':'600'};">${s.name}${forfeitIndicator}</td>
+          <td style="font-weight:${i<3?'800':'600'};">${name}${forfeitIndicator}</td>
           <td>${s.g}</td>
           <td>${s.v}</td>
           <td>${s.n}</td>
           <td>${s.p}</td>
-          <td>${s.pf.toFixed(2)}</td>
-          <td>${s.ps.toFixed(2)}</td>
-          <td>${(s.pf-s.ps).toFixed(2)}</td>
+          <td>${Number(s.gf).toFixed(2)}</td>
+          <td>${Number(s.gs).toFixed(2)}</td>
+          <td>${(s.gf-s.gs).toFixed(2)}</td>
           <td style="font-weight:${i<3?'900':'700'};">${s.pts}</td>
         </tr>`;
       }).join('');
@@ -127,11 +124,10 @@
 
     firebase.auth().onAuthStateChanged(user=>{ if (user) boot(); else location.href='auth.html'; });
   </script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
 </body>
 </html>

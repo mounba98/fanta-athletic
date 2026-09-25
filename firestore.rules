@@ -1,0 +1,449 @@
+// FONTE LOCALE delle regole Firestore (D077). Ciò che sta in Console Firebase
+// deve coincidere con questo file: si modifica QUI, poi si incolla in Console.
+// Base: regole reali copiate dalla Console il 24/09/2026 + modifiche D075/D076
+// (fazione Curva Morello/Piana, contest_predictions, contest_standings).
+// Stato: PUBBLICATO in Console il 24/09/2026 (vedi docs/FIREBASE_ALLINEAMENTO.md).
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isLeagueMember(leagueId) {
+      return isSignedIn() && (
+        isAdmin() ||
+        request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.members ||
+        request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins
+      );
+    }
+
+    function isLeagueAdmin(leagueId) {
+      return isSignedIn() && (
+        isAdmin() ||
+        request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins
+      );
+    }
+
+    // Vero se l'operazione cambierebbe una fazione GIÀ impostata (la prima scelta è libera)
+    function factionLocked() {
+      return ('fazione' in resource.data) &&
+             request.resource.data.get('fazione', null) != resource.data.fazione;
+    }
+
+    // Vero se la fazione, quando presente, è un valore valido
+    function factionValid() {
+      return !('fazione' in request.resource.data) ||
+             request.resource.data.fazione in ['curva', 'piana'];
+    }
+
+    // ========== Leagues/Competizioni ==========
+    match /leagues/{leagueId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        request.auth.uid in resource.data.admins ||
+        isAdmin() ||
+        (!(request.auth.uid in resource.data.members) &&
+         request.auth.uid in request.resource.data.members &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members']))
+      );
+      allow delete: if isAdmin();
+
+      match /teams/{teamId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+        allow update: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin() ||
+          (!factionLocked() && factionValid() && (
+            request.auth.uid == resource.data.owner ||
+            ((!('owner' in resource.data) || resource.data.owner == null || resource.data.owner == '') &&
+             request.resource.data.owner == request.auth.uid)
+          )) ||
+          // un membro della squadra può impostare la fazione UNA volta, se non c'è ancora
+          (!('fazione' in resource.data) &&
+           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fazione']) &&
+           request.resource.data.fazione in ['curva', 'piana'] &&
+           isLeagueMember(leagueId) &&
+           string(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.team_index) == teamId)
+        );
+        allow delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+
+        match /saved/{giornata} {
+          allow read: if isLeagueMember(leagueId);
+          allow write: if isLeagueMember(leagueId);
+        }
+      }
+
+      match /players/{playerId} {
+        allow read: if isLeagueMember(leagueId);
+        allow write: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+
+      match /coaches/{coachId} {
+        allow read: if isLeagueMember(leagueId);
+        allow write: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+
+      match /results/{giornata} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+
+        match /teams/{teamId} {
+          allow read: if isLeagueMember(leagueId);
+          allow create, update, delete: if isSignedIn() && (
+            request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+            isAdmin()
+          );
+        }
+      }
+
+      match /days/{giornata} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+
+      match /deadlines/{giornataId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+
+      match /matchday_temp/{giornataId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+
+      match /rules/{ruleId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isSignedIn() && (
+          request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
+          isAdmin()
+        );
+      }
+
+      match /h2h_schedule/{seasonId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isLeagueAdmin(leagueId);
+
+        match /giornate/{giornataId} {
+          allow read: if isLeagueMember(leagueId);
+          allow create, update, delete: if isLeagueAdmin(leagueId);
+        }
+      }
+
+      match /h2h_results/{seasonId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update, delete: if isLeagueAdmin(leagueId);
+
+        match /giornate/{giornataId} {
+          allow read: if isLeagueMember(leagueId);
+          allow create, update, delete: if isLeagueAdmin(leagueId);
+        }
+      }
+
+      match /posts/{postId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create: if isLeagueMember(leagueId);
+        allow update: if isLeagueMember(leagueId);
+        allow delete: if isLeagueAdmin(leagueId) || (isSignedIn() && request.auth.uid == resource.data.authorUid);
+      }
+    }
+
+    // ========== Legacy Collections (backward compatibility) ==========
+    match /results/{giornata} {
+      allow read: if true;
+      allow write: if false;
+
+      match /teams/{teamId} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    match /days/{giornata} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /matchday_temp/{giornataId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /h2h_schedule/{seasonId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+
+      match /giornate/{giornataId} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+    }
+
+    match /h2h_results/{seasonId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+
+      match /giornate/{giornataId} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+    }
+
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /teams/{teamId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+
+      match /saved/{giornata} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+    }
+
+    match /players/{playerId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /coaches/{coachId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    // ========== Global Catalog ==========
+    match /clubs/{clubId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /rosters/{rosterId} {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /roster_members/{memberId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    match /players_global/{playerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /coaches_global/{coachId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /taxonomies/{taxonomyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ========== Store ==========
+    match /store_products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ========== Config ==========
+    match /config/{configId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /leagues/{leagueId}/config/{configId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
+    }
+
+    match /rules/{ruleId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ========== Admins ==========
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ========== Username cache (lookup pubblico per login) ==========
+    match /usernames/{usernameKey} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isSignedIn() && (request.resource.data.uid == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // ========== Users ==========
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create, delete: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      // la fazione, una volta scelta, la cambia solo un admin
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) &&
+                       (isAdmin() || (!factionLocked() && factionValid()));
+    }
+
+    // ========== Notifications ==========
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /leagues/{leagueId}/notifications/{notificationId} {
+      allow read, update, delete: if isLeagueMember(leagueId) &&
+        request.auth.uid == resource.data.userId;
+      allow create: if isLeagueMember(leagueId);
+    }
+
+    match /leagues/{leagueId}/teamInvites/{inviteId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isLeagueAdmin(leagueId);
+    }
+
+    match /leagues/{leagueId}/cups/{cupId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
+
+      match /rounds/{roundId} {
+        allow read: if isLeagueMember(leagueId);
+        allow write: if isLeagueAdmin(leagueId);
+
+        match /matches/{matchId} {
+          allow read: if isLeagueMember(leagueId);
+          allow write: if isLeagueAdmin(leagueId);
+        }
+      }
+    }
+
+    match /leagues/{leagueId}/achievements/{achievementId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
+    }
+
+    match /leagues/{leagueId}/trades/{tradeId} {
+      allow read: if isLeagueMember(leagueId);
+      allow write: if isLeagueAdmin(leagueId);
+    }
+
+    // ========== Archivio stagioni (D087) ==========
+    // Copia completa di una stagione chiusa: la leggono i membri della lega,
+    // la scrivono gli admin; cancellare un archivio solo admin globali.
+    match /leagues/{leagueId}/archive/{seasonId} {
+      allow read: if isLeagueMember(leagueId);
+      allow create, update: if isLeagueAdmin(leagueId);
+      allow delete: if isAdmin();
+
+      match /items/{itemId} {
+        allow read: if isLeagueMember(leagueId);
+        allow create, update: if isLeagueAdmin(leagueId);
+        allow delete: if isAdmin();
+      }
+    }
+
+    // ========== Partita live (D093) ==========
+    // Stato della giornata live (incrocio, revisione): solo admin.
+    // Ogni admin scrive SOLO il proprio foglio; gli admin li leggono tutti per l'incrocio.
+    match /leagues/{leagueId}/live/{giornata} {
+      allow read, write: if isLeagueAdmin(leagueId);
+
+      match /sheets/{adminId} {
+        allow read: if isLeagueAdmin(leagueId);
+        allow write: if isLeagueAdmin(leagueId) && request.auth.uid == adminId;
+      }
+    }
+
+    match /athletic_calendar/{matchId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ========== Contest pronostici ==========
+    match /contest/matches {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /contest/scores {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /contest/predictions/{uid}/{predictionId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Voti del contest: una riga per utente e partita ("G3_<uid>")
+    match /contest_predictions/{predId} {
+      allow read: if isSignedIn();
+
+      allow create, update: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && predId == request.resource.data.matchKey + '_' + request.auth.uid
+        && request.resource.data.pick in ['1', 'X', '2']
+        && request.resource.data.points == null
+        && (resource == null || resource.data.points == null)
+        && request.resource.data.faction ==
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('fazione', null);
+
+      // l'admin assegna i punti (admin-contest.html) e può correggere o cancellare
+      allow update, delete: if isAdmin();
+    }
+
+    // Classifica calcolata da admin-contest.html
+    match /contest_standings/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ========== Asta giocatori ==========
+    match /auction/current {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+
+      match /bids/{bidId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+      }
+    }
+  }
+}

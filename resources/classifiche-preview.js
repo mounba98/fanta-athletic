@@ -209,7 +209,7 @@
 
     } catch (error) {
         console.error('Error loading classifica preview:', error);
-      container.innerHTML = `<div style="text-align: center; color: #dc2626; padding: 20px;">
+      container.innerHTML = `<div style="text-align: center; color: #920100; padding: 20px;">
         ❌ Errore: ${error.message || 'Caricamento fallito'}
       </div>`;
     }
@@ -228,7 +228,7 @@
     const userTeam = teams.find(t => t.isUserTeam);
     
     const html = teams.map((team, index) => `
-      <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: ${team.isUserTeam ? 'rgba(59, 130, 246, 0.1)' : index === 0 ? 'rgba(255, 215, 0, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid ${team.isUserTeam ? '#3b82f6' : index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : 'var(--primary)'};">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: ${team.isUserTeam ? 'rgba(12, 15, 109, 0.1)' : index === 0 ? 'rgba(250, 204, 21, 0.1)' : 'rgba(0,0,0,0.03)'}; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid ${team.isUserTeam ? '#0c0f6d' : index === 0 ? '#facc15' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : 'var(--primary)'};">
         <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
           <span style="font-size: 20px;">${medals[index]}</span>
           <div style="flex: 1; min-width: 0;">

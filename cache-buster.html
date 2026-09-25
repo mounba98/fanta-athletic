@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cache Buster - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <style>
     .container { max-width: 800px; margin: 0 auto; padding: 20px; }
     .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
     .btn-large { padding: 16px 32px; font-size: 18px; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; width: 100%; transition: all 0.2s; }
-    .btn-danger { background: #dc3545; color: white; }
-    .btn-warning { background: #ffc107; color: #000; }
-    .btn-success { background: #28a745; color: white; }
+    .btn-danger { background: #920100; color: white; }
+    .btn-warning { background: #facc15; color: #000; }
+    .btn-success { background: #16a34a; color: white; }
     .btn-large:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
     .status { padding: 16px; border-radius: 8px; margin: 16px 0; font-weight: 600; }
     .status-success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
@@ -23,9 +25,9 @@
     .version-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
     .version-value { font-size: 20px; font-weight: 700; color: var(--primary); }
     code { background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
-    .warning-box { background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 16px; margin: 20px 0; }
+    .warning-box { background: #fff3cd; border: 2px solid #facc15; border-radius: 8px; padding: 16px; margin: 20px 0; }
     .warning-box h3 { margin: 0 0 8px 0; color: #856404; }
-    .info-box { background: #e7f3ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 16px; margin: 20px 0; }
+    .info-box { background: #e7f3ff; border: 2px solid #0c0f6d; border-radius: 8px; padding: 16px; margin: 20px 0; }
   </style>
 </head>
 <body>
@@ -33,7 +35,7 @@
     <a class="logo-home" href="admin.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>🔄 Cache Buster</h1>
+    <h1>Cache Buster</h1>
   </header>
 
   <main class="container">
@@ -53,32 +55,30 @@
       </div>
 
       <div class="warning-box">
-        <h3>⚠️ Attenzione</h3>
+        <h3>Attenzione</h3>
         <p>Questo tool aggiorna automaticamente tutti i query string <code>?v=YYYYMMDDXX</code> nei file HTML.</p>
         <p><strong>Effetto</strong>: Tutti gli utenti scaricheranno le versioni aggiornate di CSS/JS alla prossima visita.</p>
       </div>
 
       <div class="info-box">
-        <h3>📋 File che verranno aggiornati:</h3>
+        <h3>File che verranno aggiornati:</h3>
         <ul style="margin: 8px 0;">
-          <li><code>resources/sheet.css</code></li>
+          <li><code>resources/sheet.css?v=20260920-final></li>
           <li><code>resources/*.js</code> (tutti i JavaScript)</li>
           <li>Tutti i file HTML con query string</li>
         </ul>
       </div>
 
-      <button class="btn-large btn-warning" onclick="generateNewVersion()" style="margin-bottom: 12px;">
-        📅 Genera Nuova Versione
+      <button class="btn-large btn-warning" onclick="generateNewVersion()" style="margin-bottom: 12px;">Genera Nuova Versione
       </button>
 
-      <button class="btn-large btn-danger" onclick="bustCache()" id="bustBtn" disabled>
-        🚀 FORZA REFRESH CACHE GLOBALE
+      <button class="btn-large btn-danger" onclick="bustCache()" id="bustBtn" disabled>FORZA REFRESH CACHE GLOBALE
       </button>
 
       <div id="statusMsg"></div>
 
       <div class="card" style="margin-top: 24px; background: rgba(0,0,0,0.03);">
-        <h3>🛠️ Come Funziona</h3>
+        <h3>Come Funziona</h3>
         <ol>
           <li>Clicca "Genera Nuova Versione" per creare un nuovo timestamp</li>
           <li>Clicca "FORZA REFRESH CACHE GLOBALE"</li>
@@ -92,9 +92,8 @@
       </div>
 
       <div class="card" style="margin-top: 16px; background: rgba(34, 197, 94, 0.1);">
-        <h3>✅ Alternative Veloci</h3>
-        <button class="btn-large btn-success" onclick="copyManualCommand()" style="margin-bottom: 12px;">
-          📋 Copia Comando Manuale
+        <h3>Alternative Veloci</h3>
+        <button class="btn-large btn-success" onclick="copyManualCommand()" style="margin-bottom: 12px;">Copia Comando Manuale
         </button>
         <p style="font-size: 14px; color: var(--muted); margin-top: 12px;">
           Oppure incrementa manualmente la versione in <code>sw.js</code> e rideploya.

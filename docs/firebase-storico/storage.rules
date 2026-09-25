@@ -1,0 +1,59 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Avatar utenti: cartella per utente avatars/{uid}/...
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+                     (request.auth.uid == userId || exists(/databases/(default)/documents/admins/$(request.auth.uid))) &&
+                     request.resource.size < 8 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+    }
+    
+    // Copertine profilo
+    match /covers/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                     (request.auth.uid == userId || 
+                      exists(/databases/(default)/documents/admins/$(request.auth.uid))) &&
+                     request.resource.size < 5 * 1024 * 1024 && // Max 5MB
+                     request.resource.contentType.matches('image/.*');
+    }
+    
+    // Loghi squadre (solo admin)
+    match /team_logos/{teamId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                     exists(/databases/(default)/documents/admins/$(request.auth.uid)) &&
+                     request.resource.size < 1 * 1024 * 1024 && // Max 1MB
+                     request.resource.contentType.matches('image/.*');
+    }
+    
+    // Immagini post bacheca
+    match /posts/{postId} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+                     request.resource.size < 10 * 1024 * 1024 && // Max 10MB
+                     request.resource.contentType.matches('image/.*');
+    }
+    
+    // Card home (solo admin)
+    match /cards/{cardId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                     exists(/databases/(default)/documents/admins/$(request.auth.uid)) &&
+                     request.resource.size < 5 * 1024 * 1024 && // Max 5MB
+                     request.resource.contentType.matches('image/.*');
+    }
+    
+    // Foto giocatori per lega (solo admin di quella lega)
+    match /players/{leagueId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                     (exists(/databases/(default)/documents/admins/$(request.auth.uid)) ||
+                      exists(/databases/(default)/documents/leagues/$(leagueId)/admins/$(request.auth.uid))) &&
+                     request.resource.size < 5 * 1024 * 1024 && // Max 5MB
+                     request.resource.contentType.matches('image/.*');
+    }
+  }
+}

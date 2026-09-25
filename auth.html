@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fanta Athletic - Accesso</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+    <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .card { max-width: 420px; margin: 40px auto; background: var(--card); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 20px; }
     .row { display:flex; gap:10px; align-items:center; }
@@ -86,22 +89,21 @@
   </main>
 
   <!-- Firebase SDKs -->
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/toast.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
   </script>
-  <script src="resources/firebase.js"></script>
-    <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
   <script>
-    function toast(msg){ const el=document.createElement('div'); el.textContent=msg; el.style.position='fixed'; el.style.bottom='16px'; el.style.right='16px'; el.style.background='#2d6cdf'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.boxShadow='var(--shadow)'; el.style.zIndex='9999'; document.body.appendChild(el); setTimeout(()=> el.remove(), 2000); }
+    // toast(msg) centralizzata in resources/toast.js (2026-09-19)
     const $ = s=>document.querySelector(s);
     const loginBtn = document.getElementById('loginBtn');
     const googleBtn = document.getElementById('googleBtn');
@@ -399,10 +401,7 @@
     });
   </script>
   
-    <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
+    <script src="resources/mobile-detect.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
 </body>
 </html>

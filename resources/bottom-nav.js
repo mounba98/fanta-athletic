@@ -8,12 +8,15 @@
     return;
   }
 
+  // Icone ricolorate in oro (#facc15, lo stesso del bordo "capitano"):
+  // uguali in tutte le sezioni, la sezione attiva si riconosce dalla
+  // scritta rossa e dallo sfondo sotto l'icona (2026-09-20).
   const navItems = [
-    { id: 'dashboard', label: 'Home', icon: '<img src="resources/icons/home.png" alt="Home" />', href: 'index.html' },
-    { id: 'formazioni', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', href: 'formazioni.html' },
-    { id: 'squadre', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', href: 'squadre.html' },
-    { id: 'classifiche', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', href: 'classifiche.html' },
-    { id: 'bacheca', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', href: 'bacheca.html' }
+    { id: 'dashboard', label: 'Home', iconFile: 'home', href: 'index.html' },
+    { id: 'formazioni', label: 'Formazioni', iconFile: 'formazioni', href: 'formazioni.html' },
+    { id: 'squadre', label: 'Squadre', iconFile: 'squadre', href: 'squadre.html' },
+    { id: 'classifiche', label: 'Classifiche', iconFile: 'classifica', href: 'classifiche.html' },
+    { id: 'bacheca', label: 'Bacheca', iconFile: 'bacheca', href: 'bacheca.html' }
   ];
 
   function createBottomNav() {
@@ -36,9 +39,10 @@
     
     nav.innerHTML = navItems.map(item => {
       const isActive = currentPage === item.href;
+      const iconSrc = `resources/icons/${item.iconFile}.png`;
       return `
         <a href="${item.href}" class="bottom-nav-item ${isActive ? 'active' : ''}" data-id="${item.id}">
-          <span class="bottom-nav-icon">${item.icon}</span>
+          <span class="bottom-nav-icon"><img src="${iconSrc}" alt="${item.label}" /></span>
           <span class="bottom-nav-label">${item.label}</span>
         </a>
       `;

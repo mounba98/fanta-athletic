@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestione Coppa - Admin</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <style>
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     .bracket { display: grid; gap: 40px; margin: 20px 0; }
@@ -19,15 +21,15 @@
 <body>
   <header>
     <a class="logo-home" href="index.html"><img src="resources/logo.png" alt="Fanta Athletic" /></a>
-    <h1>?? Gestione Coppa</h1>
+    <h1>Gestione Coppa</h1>
   </header>
   <main class="container">
     <div class="card"><h2>Coppa in Sviluppo</h2><p>Feature in arrivo...</p></div>
   </main>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -38,6 +40,7 @@
     if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
     const db = firebase.firestore();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="stagione"></script>
 </body>
 </html>

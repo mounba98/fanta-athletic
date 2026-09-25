@@ -5,10 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contest Pronostici | Athletic Brescia</title>
   <link rel="icon" href="resources/favicon.ico">
-  <link rel="stylesheet" href="resources/theme.css">
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <!-- Questa pagina usava var(--bg)/var(--text)/var(--card) senza mai
+       caricare il foglio di stile che le definisce: risultato, sfondo e
+       testo restavano senza colore (testo nero su sfondo scuro) e il
+       font era diverso dal resto dell'app. Collegato theme-tokens.css
+       (2026-09-20). -->
+  <link rel="stylesheet" href="resources/theme-tokens.css?v=20260920-final">
   <style>
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg);
       color: var(--text);
       margin: 0;
@@ -16,14 +22,14 @@
     }
     
     .hero {
-      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      background: linear-gradient(135deg, #920100 0%, #0c0f6d 100%);
       color: white;
       padding: 60px 20px;
       text-align: center;
     }
     
     .hero h1 {
-      font-size: 2.5rem;
+      font-size: clamp(26px, 5vw, 36px);
       margin: 0 0 10px;
       font-weight: 900;
     }
@@ -43,6 +49,31 @@
       font-weight: 700;
       font-size: 1.3rem;
     }
+
+    /* Questa pagina non carica sheet.css (D050), quindi non ha il menu
+       condiviso: una barra minima e autosufficiente per non restare
+       "bloccati" qui dentro (navigabilità, D067). */
+    .mini-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #0c0f6d;
+    }
+    .mini-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .mini-nav img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
     
     .container {
       max-width: 900px;
@@ -59,44 +90,72 @@
     }
     
     .matchday-selector {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
       gap: 10px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
-    
+
     .matchday-btn {
-      padding: 12px 20px;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      background: white;
+      position: relative;
+      padding: 12px 0;
+      border: 1px solid rgba(148,163,184,0.35);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--text);
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
+      font-family: inherit;
       transition: all 0.2s;
+      overflow: hidden;
     }
-    
+
     .matchday-btn:hover {
-      border-color: #2d6cdf;
-      background: #eff6ff;
+      border-color: #0c0f6d;
+      background: rgba(12,15,109,0.12);
     }
-    
-    .matchday-btn.active {
-      background: #2d6cdf;
-      color: white;
-      border-color: #2d6cdf;
-    }
-    
+
+    /* giornata passata (chiusa o con risultato): sbarrata da una "/" */
     .matchday-btn.locked {
-      opacity: 0.5;
-      cursor: not-allowed;
+      opacity: 0.55;
+      color: rgba(148,163,184,0.9);
     }
-    
+    .matchday-btn.locked::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top right, transparent calc(50% - 1px), rgba(148,163,184,0.75) calc(50% - 1px), rgba(148,163,184,0.75) calc(50% + 1px), transparent calc(50% + 1px));
+      pointer-events: none;
+    }
+
+    /* votabile adesso */
+    .matchday-btn.open {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 1px #16a34a inset;
+    }
+
+    .matchday-btn.active {
+      background: #0c0f6d;
+      color: white;
+      border-color: #0c0f6d;
+      opacity: 1;
+    }
+    .matchday-btn.active.locked::after {
+      background: linear-gradient(to top right, transparent calc(50% - 1px), rgba(255,255,255,0.7) calc(50% - 1px), rgba(255,255,255,0.7) calc(50% + 1px), transparent calc(50% + 1px));
+    }
+
+    .matchday-legend {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      font-size: 12px; color: rgba(148,163,184,0.95);
+      margin-bottom: 24px;
+    }
+
     .match-box {
-      background: #f9fafb;
+      background: rgba(148,163,184,0.10);
       border-radius: 12px;
       padding: 25px;
       margin-bottom: 20px;
-      border: 2px solid #e5e7eb;
+      border: 1px solid rgba(148,163,184,0.25);
     }
     
     .match-header {
@@ -127,13 +186,13 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: white;
+      background: var(--card);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
       font-size: 1.5rem;
-      border: 3px solid #e5e7eb;
+      border: 2px solid rgba(148,163,184,0.35);
     }
     
     .team-name {
@@ -144,12 +203,12 @@
     .vs {
       font-weight: 900;
       font-size: 1.2rem;
-      color: #6b7280;
+      color: var(--muted);
     }
     
     .match-info {
       text-align: center;
-      color: #6b7280;
+      color: var(--muted);
       font-size: 0.9rem;
       margin-bottom: 15px;
     }
@@ -166,21 +225,28 @@
       height: 70px;
       font-size: 2rem;
       text-align: center;
-      border: 3px solid #2d6cdf;
+      border: 2px solid #0c0f6d;
       border-radius: 12px;
       font-weight: 900;
+      background: var(--card);
+      color: var(--text);
     }
     
     .score-separator {
       font-size: 2rem;
       font-weight: 900;
-      color: #6b7280;
+      color: var(--muted);
     }
     
+    .pick-group { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:25px; }
+    .pick-btn { padding:14px 6px; border-radius:12px; border:2px solid #334155; background:transparent;
+                color:var(--text); font-weight:700; font-size:.95rem; cursor:pointer; line-height:1.2; }
+    .pick-btn.selected { background:#0c0f6d; border-color:#0c0f6d; color:#fff; }
+    .pick-btn:disabled { opacity:.5; cursor:not-allowed; }
     .submit-btn {
       width: 100%;
       padding: 18px;
-      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      background: linear-gradient(135deg, #920100 0%, #0c0f6d 100%);
       color: white;
       border: none;
       border-radius: 12px;
@@ -220,12 +286,12 @@
     
     .status-closed {
       background: #fee2e2;
-      color: #991b1b;
+      color: #5c0000;
     }
     
     .my-prediction {
-      background: #eff6ff;
-      border: 2px solid #2d6cdf;
+      background: rgba(12,15,109,0.12);
+      border: 1px solid rgba(12,15,109,0.45);
       padding: 15px;
       border-radius: 10px;
       margin-top: 15px;
@@ -240,7 +306,7 @@
     .leaderboard-link a {
       display: inline-block;
       padding: 15px 30px;
-      background: #10b981;
+      background: #16a34a;
       color: white;
       text-decoration: none;
       border-radius: 10px;
@@ -252,7 +318,7 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #2d6cdf;
+      background: #0c0f6d;
       color: white;
       padding: 15px 25px;
       border-radius: 10px;
@@ -267,19 +333,26 @@
     }
     
     @media (max-width: 640px) {
-      .hero h1 { font-size: 1.8rem; }
+      .hero h1 { font-size: clamp(26px, 5vw, 36px); }
       .hero p { font-size: 1rem; }
       .match-teams { flex-direction: column; gap: 10px; }
-      .vs { transform: rotate(90deg); }
+      /* Vedi calendario-athletic.html: ruotare il "VS" a tutta larghezza
+         lo faceva sbordare sugli stemmi (2026-09-20). */
+      .vs { transform: none; }
       .score-input { width: 60px; height: 60px; font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
-  <div id="navbar-container"></div>
+  <div class="mini-nav">
+    <a href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+      Home
+    </a>
+  </div>
   <!-- Hero -->
   <div class="hero">
-    <h1>🏆 Contest Pronostici</h1>
+    <h1>Contest Pronostici</h1>
     <p>Indovina il risultato e vinci la felpa Athletic!</p>
     <div class="prize">🎁 Premio: Felpa Ufficiale</div>
   </div>
@@ -288,7 +361,7 @@
   <div class="container">
     <!-- Login Card -->
     <div class="card" id="loginCard" style="display:none;">
-      <h2 style="text-align:center;">🔐 Login Richiesto</h2>
+      <h2 style="text-align:center;">Login Richiesto</h2>
       <p style="text-align:center; color:#6b7280;">Devi essere loggato per partecipare al contest.</p>
       <button class="submit-btn" onclick="window.location.href='/auth.html'">Accedi Ora</button>
     </div>
@@ -299,6 +372,7 @@
       <div class="card">
         <h2 style="margin-top:0;">Seleziona Giornata</h2>
         <div class="matchday-selector" id="matchdaySelector"></div>
+        <div class="matchday-legend"><span>╱ passata</span><span style="color:#16a34a;">● votabile ora</span><span>○ prossima</span></div>
       </div>
 
       <!-- Match Card -->
@@ -318,16 +392,15 @@
             </div>
           </div>
 
-          <div class="prediction-input" style="margin-top:25px;">
-            <input type="number" class="score-input" id="homeScore" min="0" max="99" placeholder="0">
-            <span class="score-separator">-</span>
-            <input type="number" class="score-input" id="awayScore" min="0" max="99" placeholder="0">
+          <div class="pick-group" id="pickGroup">
+            <button type="button" class="pick-btn" data-pick="1" id="pick1"></button>
+            <button type="button" class="pick-btn" data-pick="X" id="pickX">Pareggio</button>
+            <button type="button" class="pick-btn" data-pick="2" id="pick2"></button>
           </div>
 
           <div id="myPredictionBox" style="display:none;"></div>
 
-          <button class="submit-btn" id="submitBtn" onclick="submitPrediction()">
-            📤 Invia Pronostico
+          <button class="submit-btn" id="submitBtn" onclick="submitPrediction()">Conferma voto
           </button>
         </div>
       </div>
@@ -340,29 +413,31 @@
   </div>
 
   <!-- Navbar Script -->
-  <script src="resources/navbar.js?v=2025110701"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
+  <script src="resources/toast-css-class.js?v=20260920-final"></script>
+  <script src="resources/contest-scoring.js?v=20260925"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
 
   <script>
+    const CS = window.ContestScoring;
+
     let state = {
       user: null,
+      faction: null,
+      name: '',
       selectedMatchday: 1,
       matches: {},
       myPredictions: {}
     };
 
-    function toast(msg) {
-      const el = document.createElement('div');
-      el.className = 'toast';
-      el.textContent = msg;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 3000);
-    }
+    // toast(msg) centralizzata in resources/toast-css-class.js (2026-09-19)
 
     async function init() {
       // Wait for Firebase
@@ -380,70 +455,73 @@
       // Auth check
       window.auth.onAuthStateChanged(async (user) => {
         state.user = user;
-        
+
         if (!user) {
           document.getElementById('loginCard').style.display = 'block';
           document.getElementById('mainContent').style.display = 'none';
         } else {
           document.getElementById('loginCard').style.display = 'none';
           document.getElementById('mainContent').style.display = 'block';
+          try {
+            // Fazione obbligatoria (Curva Morello / Piana): finestra non chiudibile
+            state.faction = await FactionSystem.ensure(user);
+          } catch (e) {
+            console.error('Fazione non disponibile', e);
+            toast('❌ Impossibile leggere la tua fazione');
+            return;
+          }
           await loadData();
         }
       });
     }
 
     async function loadData() {
+      if (window.Season) { try { await window.Season.load(); } catch (e) {} }
       try {
-        // Load matches from contest (with results) AND calendario (for future)
-        const matchesSnap = await window.db.collection('contest').doc('matches').get();
-        if (matchesSnap.exists) {
-          state.matches = matchesSnap.data() || {};
-        }
-        
-        // Also load from athletic_calendar to get real match data
-        const calendarSnap = await window.db.collection('athletic_calendar')
-          .where('homeScore', '==', null) // Only future matches
-          .limit(10)
-          .get();
-        
+        // Partite e risultati: unica fonte = athletic_calendar (gestito da admin-calendario)
+        const startYear = CS.seasonStartYear();
+        const calendarSnap = await window.db.collection('athletic_calendar').get();
+        state.matches = {};
+
         calendarSnap.docs.forEach(doc => {
-          const match = doc.data();
-          const giornataKey = `G${match.giornata}`;
-          
-          // Only add if not already in contest
-          if (!state.matches[giornataKey]) {
-            // Calculate deadline: 30min before match
-            const [day, monthName] = match.date.split(' ');
-            const monthIndex = [
-              'Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
-              'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'
-            ].indexOf(monthName);
-            
-            const year = monthIndex >= 8 ? 2024 : 2025;
-            const [hours, minutes] = (match.time || '15:00').split(':');
-            
-            const matchDate = new Date(year, monthIndex, parseInt(day), 
-                                      parseInt(hours), parseInt(minutes));
-            matchDate.setMinutes(matchDate.getMinutes() - 30);
-            
-            state.matches[giornataKey] = {
-              homeTeam: match.homeTeam,
-              awayTeam: match.awayTeam,
-              deadline: matchDate.toISOString(),
-              result: null
-            };
-          }
+          const cal = doc.data();
+          const n = parseInt(cal.giornata, 10);
+          if (isNaN(n)) return;
+          const start = CS.matchStart(cal, startYear);
+          if (!start) return;
+          const deadline = CS.deadlineOf(start);
+          state.matches['G' + n] = {
+            giornata: n,
+            homeTeam: cal.homeTeam,
+            awayTeam: cal.awayTeam,
+            start: start.toISOString(),
+            opens: CS.opensOf(start).toISOString(),
+            deadline: deadline.toISOString(),
+            postponed: !!cal.postponed,
+            result: CS.resultOf(cal)
+          };
         });
 
-        // Load my predictions
-        if (state.user) {
-          const predSnap = await window.db.collection('contest').doc('predictions')
-            .collection(state.user.uid).get();
-          
-          predSnap.docs.forEach(doc => {
-            state.myPredictions[doc.id] = doc.data();
-          });
-        }
+        // Il mio profilo (nome) e i miei pronostici
+        const meDoc = await window.db.collection('users').doc(state.user.uid).get();
+        const me = meDoc.exists ? meDoc.data() : {};
+        state.name = me.displayName || me.username || (state.user.email || '').split('@')[0] || 'Giocatore';
+
+        state.myPredictions = {};
+        const predSnap = await window.db.collection('contest_predictions')
+          .where('uid', '==', state.user.uid).get();
+        predSnap.docs.forEach(doc => {
+          const d = doc.data();
+          state.myPredictions[d.matchKey] = d;
+        });
+
+        // Giornata di partenza: prima quella con votazione aperta, poi la prossima, altrimenti l'ultima
+        const now = new Date();
+        const keys = Object.keys(state.matches).sort((a, b) => state.matches[a].giornata - state.matches[b].giornata);
+        const isOpen = k => { const m = state.matches[k]; return !m.result && !m.postponed && now >= new Date(m.opens) && now < new Date(m.deadline); };
+        const isFuture = k => { const m = state.matches[k]; return !m.result && now < new Date(m.deadline); };
+        const pick = keys.find(isOpen) || keys.find(isFuture) || keys[keys.length - 1];
+        if (pick) state.selectedMatchday = state.matches[pick].giornata;
 
         renderMatchdaySelector();
         renderMatch();
@@ -456,21 +534,21 @@
     function renderMatchdaySelector() {
       const container = document.getElementById('matchdaySelector');
       let html = '';
-      
+
       for (let i = 1; i <= 24; i++) {
-        const matchKey = `G${i}`;
-        const match = state.matches[matchKey];
-        const hasMatch = !!match;
-        const isLocked = match && new Date() >= new Date(match.deadline);
+        const match = state.matches['G' + i];
+        const isLocked = match && (match.result || new Date() >= new Date(match.deadline));
         const active = i === state.selectedMatchday ? 'active' : '';
         const locked = isLocked ? 'locked' : '';
-        
-        html += `<button class="matchday-btn ${active} ${locked}" 
-                  onclick="selectMatchday(${i})" ${isLocked ? 'disabled' : ''}>
+        const open = match && !isLocked && new Date() >= new Date(match.opens) ? 'open' : '';
+        const dim = match ? '' : 'style="opacity:.35"';
+
+        html += `<button class="matchday-btn ${active} ${locked} ${open}" ${dim}
+                  onclick="selectMatchday(${i})">
                   G${i}
                 </button>`;
       }
-      
+
       container.innerHTML = html;
     }
 
@@ -480,11 +558,18 @@
       renderMatch();
     }
 
+    const PICK_LABEL = { '1': m => 'Vince ' + m.homeTeam, 'X': () => 'Pareggio', '2': m => 'Vince ' + m.awayTeam };
+    let selectedPick = null;
+
+    function fmt(d) {
+      return new Date(d).toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+
     function renderMatch() {
-      const matchKey = `G${state.selectedMatchday}`;
+      const matchKey = 'G' + state.selectedMatchday;
       const match = state.matches[matchKey];
       const myPred = state.myPredictions[matchKey];
-      
+
       if (!match) {
         document.getElementById('matchCard').style.display = 'none';
         return;
@@ -492,61 +577,57 @@
 
       document.getElementById('matchCard').style.display = 'block';
 
-      // Match info
-      const deadline = new Date(match.deadline);
-      const isLocked = new Date() >= deadline;
-      const timeStr = deadline.toLocaleString('it-IT', { 
-        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
-      });
-      
+      const now = new Date();
+      const notYetOpen = now < new Date(match.opens);
+      const closed = now >= new Date(match.deadline);
+
       let status = '';
       if (match.result) {
         status = `<span class="status-badge status-closed">Risultato: ${match.result.home}-${match.result.away}</span>`;
-      } else if (isLocked) {
-        status = `<span class="status-badge status-locked">⏰ Deadline scaduta</span>`;
+      } else if (match.postponed) {
+        status = `<span class="status-badge status-locked">Partita rinviata</span>`;
+      } else if (closed) {
+        status = `<span class="status-badge status-locked">⏰ Votazioni chiuse</span>`;
+      } else if (notYetOpen) {
+        status = `<span class="status-badge status-locked">🕒 Si vota da ${fmt(match.opens)}</span>`;
       } else {
-        status = `<span class="status-badge status-open">✅ Aperto fino al ${timeStr}</span>`;
+        status = `<span class="status-badge status-open">✅ Aperto fino a ${fmt(match.deadline)}</span>`;
       }
-      
+
+      const teamName = (CS.FACTIONS[state.faction] || {}).name || '';
       document.getElementById('matchInfo').innerHTML = `
-        Giornata ${state.selectedMatchday} • ${timeStr}<br>${status}
+        Giornata ${state.selectedMatchday} • ${fmt(match.start)}<br>${status}<br>
+        <small>Giochi per: <strong>${teamName}</strong> • esito giusto = ${CS.POINTS.correct} punti</small>
       `;
 
-      // Teams
       document.getElementById('homeTeamName').textContent = match.homeTeam || 'Athletic Brescia';
       document.getElementById('awayTeamName').textContent = match.awayTeam || 'Avversario';
       document.getElementById('homeTeamLogo').textContent = (match.homeTeam || 'ATH').substring(0, 3).toUpperCase();
       document.getElementById('awayTeamLogo').textContent = (match.awayTeam || '???').substring(0, 3).toUpperCase();
 
-      // Inputs
-      const homeInput = document.getElementById('homeScore');
-      const awayInput = document.getElementById('awayScore');
-      const submitBtn = document.getElementById('submitBtn');
-      
-      if (myPred) {
-        homeInput.value = myPred.home;
-        awayInput.value = myPred.away;
-      } else {
-        homeInput.value = '';
-        awayInput.value = '';
-      }
+      // Tre pulsanti 1 - X - 2
+      selectedPick = myPred ? myPred.pick : null;
+      const canEdit = !notYetOpen && !closed && !match.result && !match.postponed;
+      ['1', 'X', '2'].forEach(k => {
+        const btn = document.getElementById('pick' + k);
+        btn.textContent = PICK_LABEL[k](match);
+        btn.disabled = !canEdit;
+        btn.classList.toggle('selected', selectedPick === k);
+        btn.onclick = () => { selectedPick = k; renderPickState(); };
+      });
+      document.getElementById('submitBtn').disabled = !canEdit;
 
-      // Lock if deadline passed or result exists
-      const canEdit = !isLocked && !match.result;
-      homeInput.disabled = !canEdit;
-      awayInput.disabled = !canEdit;
-      submitBtn.disabled = !canEdit;
-
-      // Show my prediction
       const predBox = document.getElementById('myPredictionBox');
       if (myPred) {
         let points = '';
-        if (match.result && myPred.points !== undefined) {
+        if (match.result && typeof myPred.points === 'number') {
           points = ` • <strong>${myPred.points} punti</strong>`;
+        } else if (match.result) {
+          points = ' • <em>punti in arrivo</em>';
         }
         predBox.innerHTML = `
           <div class="my-prediction">
-            Il tuo pronostico: <strong>${myPred.home}-${myPred.away}</strong>${points}
+            Il tuo voto: <strong>${PICK_LABEL[myPred.pick] ? PICK_LABEL[myPred.pick](match) : myPred.pick}</strong>${points}
           </div>
         `;
         predBox.style.display = 'block';
@@ -555,39 +636,51 @@
       }
     }
 
-    async function submitPrediction() {
-      const homeScore = parseInt(document.getElementById('homeScore').value);
-      const awayScore = parseInt(document.getElementById('awayScore').value);
+    function renderPickState() {
+      ['1', 'X', '2'].forEach(k => document.getElementById('pick' + k).classList.toggle('selected', selectedPick === k));
+    }
 
-      if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0) {
-        toast('⚠️ Inserisci un punteggio valido!');
+    async function submitPrediction() {
+      if (CS.PICKS.indexOf(selectedPick) < 0) {
+        toast('⚠️ Scegli prima 1, X o 2!');
         return;
       }
 
       try {
-        const matchKey = `G${state.selectedMatchday}`;
+        const matchKey = 'G' + state.selectedMatchday;
         const match = state.matches[matchKey];
-        
+
         if (!match) {
           toast('❌ Partita non trovata');
           return;
         }
 
-        if (new Date() >= new Date(match.deadline)) {
-          toast('⏰ Deadline scaduta!');
+        const now = new Date();
+        if (match.result || now >= new Date(match.deadline)) {
+          toast('⏰ Votazioni chiuse!');
+          return;
+        }
+        if (now < new Date(match.opens)) {
+          toast('🕒 Le votazioni non sono ancora aperte');
           return;
         }
 
-        await window.db.collection('contest').doc('predictions')
-          .collection(state.user.uid).doc(matchKey).set({
-            home: homeScore,
-            away: awayScore,
-            timestamp: new Date().toISOString()
-          });
+        const doc = {
+          uid: state.user.uid,
+          matchKey: matchKey,
+          giornata: match.giornata,
+          pick: selectedPick,
+          faction: state.faction,
+          name: state.name,
+          timestamp: now.toISOString(),
+          points: null
+        };
 
-        state.myPredictions[matchKey] = { home: homeScore, away: awayScore };
-        
-        toast('✅ Pronostico salvato!');
+        await window.db.collection('contest_predictions').doc(matchKey + '_' + state.user.uid).set(doc);
+
+        state.myPredictions[matchKey] = doc;
+
+        toast('✅ Voto salvato!');
         renderMatch();
       } catch (e) {
         console.error('Submit error:', e);

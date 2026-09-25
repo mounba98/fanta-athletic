@@ -89,7 +89,7 @@
             th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
             th { background-color: #4CAF50; color: white; font-weight: bold; }
             tr:nth-child(even) { background-color: #f2f2f2; }
-            .gold { background-color: #ffd700 !important; }
+            .gold { background-color: #facc15 !important; }
             .silver { background-color: #c0c0c0 !important; }
             .bronze { background-color: #cd7f32 !important; }
           </style>

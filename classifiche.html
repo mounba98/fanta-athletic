@@ -1,40 +1,164 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fanta Athletic - Classifiche</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
-  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .container { width: min(100%, 1100px); margin: 0 auto; padding: 16px; box-sizing: border-box; }
     .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: nowrap; background: var(--card); padding: 12px; border-radius: 12px; box-shadow: var(--shadow); overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .tab-btn { padding: 12px 20px; border-radius: 8px; background: transparent; color: var(--text); border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 15px; white-space: nowrap; flex-shrink: 0; }
-    .tab-btn:hover { background: rgba(220, 20, 60, 0.1); }
+    .tab-btn { padding: 12px 20px; border-radius: 8px; background: transparent; color: var(--text); border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 15px; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; }
+    .tab-btn:hover { background: rgba(146, 1, 0, 0.1); }
     .tab-btn.active { background: var(--primary); color: white; }
+    .tab-label-short { display: none; }
+    @media (max-width: 480px) {
+      .tab-label-full { display: none; }
+      .tab-label-short { display: inline; }
+    }
+    .fz-tiles { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:8px; }
+    .fz-tile { border-radius:14px; padding:16px 10px; text-align:center; color:#fff; }
+    .fz-tile.curva { background:#920100; } .fz-tile.piana { background:#0c0f6d; }
+    .fz-tile .n { font-size:34px; font-weight:900; line-height:1.1; }
+    .fz-tile .s { font-size:12px; opacity:.9; }
+    .fz-h { margin:22px 0 8px; font-size:16px; }
+    .fz-table { width:100%; border-collapse:collapse; font-size:14px; }
+    .fz-table th, .fz-table td { padding:8px 6px; border-bottom:1px solid rgba(148,163,184,.2); text-align:center; }
+    .fz-table td:first-child, .fz-table th:first-child { text-align:left; }
+    .fz-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+    .fz-dot.curva { background:#920100; } .fz-dot.piana { background:#0c0f6d; }
+    .fz-bar { height:10px; border-radius:6px; background:rgba(148,163,184,.25); overflow:hidden; margin:4px 0 10px; }
+    .fz-bar > span { display:block; height:100%; }
+    .fz-note { color:var(--muted); font-size:12px; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    
+
     .export-buttons { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
     .export-btn { width: 100%; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 14px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; }
     .export-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-    
+
     /* Mobile-friendly table scroll */
     .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
     .table { width: 100%; border-collapse: collapse; margin: 20px 0; min-width: 540px; }
     .table th, .table td { border-bottom: 1px solid rgba(0,0,0,0.08); padding: 10px; text-align: left; white-space: nowrap; }
     .table th { background: var(--primary); color: white; font-weight: 700; position: sticky; top: 0; z-index: 10; }
+
+    /* Righe classifica con badge/podio (D057 — recuperato dalla versione
+       che era rimasta solo pubblicata su Firebase, mai portata nel
+       repository Git). */
+    .rank-table {
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.12);
+      background: var(--card);
+    }
+    .rank-table thead th {
+      background: rgba(148,163,184,0.12);
+      border-bottom: 1px solid rgba(148,163,184,0.25);
+      color: var(--text);
+      font-weight: 800;
+    }
+    :root.dark .rank-table thead th {
+      background: rgba(15,23,42,0.72);
+      border-bottom: 1px solid rgba(148,163,184,0.25);
+      color: var(--text);
+    }
+    :root.dark .rank-table { box-shadow: 0 12px 34px rgba(0,0,0,0.42); }
+    .rank-table tbody tr { background: transparent; }
+    .rank-table tbody tr:nth-child(even) { background: rgba(148,163,184,0.06); }
+    :root.dark .rank-table tbody tr:nth-child(even) { background: rgba(148,163,184,0.08); }
+    .rank-table tbody tr:hover { background: rgba(146,1,0,0.06); }
+
+    /* Card espandibile (vista "Estesa"/mobile) per squadre e per-giornata */
+    .team-card {
+      background: var(--card);
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    .team-card.active { border-color: rgba(146,1,0,0.4); box-shadow: 0 10px 30px -10px rgba(146,1,0,0.25); }
+    .card-header { display: flex; align-items: center; padding: 14px; background: linear-gradient(to right, rgba(255,255,255,0.02), transparent); }
+    .rank { width: 32px; height: 32px; display: grid; place-items: center; font-weight: 800; font-size: 1rem; border-radius: 8px; margin-right: 12px; flex-shrink: 0; color: #fff; background: rgba(12,15,109,0.25); box-shadow: inset 0 0 0 1px rgba(12,15,109,0.35); }
+    .rank[data-rank="1"] { background: linear-gradient(135deg, #facc15 0%, #d97706 100%); box-shadow: 0 4px 12px rgba(250,204,21,0.25); }
+    .rank[data-rank="2"] { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%); color: #0f172a; }
+    .rank[data-rank="3"] { background: linear-gradient(135deg, #fdba74 0%, #c2410c 100%); }
+    .team-body { flex-grow: 1; display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .team-logo { width: 42px; height: 42px; border-radius: 12px; background: #334155; flex-shrink: 0; }
+    .team-logo img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; display: block; }
+    .team-name { font-weight: 800; font-size: 1.02rem; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .team-meta { font-size: 0.75rem; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+    .points-box { text-align: right; min-width: 64px; margin-left: 10px; flex-shrink: 0; }
+    .points-val { font-size: 1.35rem; font-weight: 900; letter-spacing: -0.5px; color: var(--text); }
+    .points-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .toggle-icon { margin-left: 10px; color: var(--muted); transition: transform 0.25s ease; font-size: 0.9rem; line-height: 1; user-select: none; }
+    .team-card.active .toggle-icon { transform: rotate(180deg); color: var(--primary); }
+    .card-details { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: rgba(0,0,0,0.12); border-top: 1px solid rgba(255,255,255,0.06); }
+    .team-card.active .card-details,
+    .team-card.extended.active .card-details { max-height: 320px; }
+    .details-grid { padding: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-item { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 10px 12px; border: 1px solid rgba(148,163,184,0.12); }
+    .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; font-weight: 800; letter-spacing: 0.7px; }
+    .stat-value { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+
+    /* Card giocatore (classifica giocatori + per-giornata) */
+    .player-card { background: var(--card); border: 1px solid rgba(148,163,184,0.18); border-radius: 14px; overflow: hidden; }
+    .player-card-header { display: grid; grid-template-columns: 28px 38px 1fr auto; align-items: center; column-gap: 8px; padding: 8px; background: linear-gradient(to right, rgba(255,255,255,0.02), transparent); }
+    .player-avatar { width: 38px; height: 38px; border-radius: 12px; overflow: hidden; background: rgba(148,163,184,0.12); box-shadow: inset 0 0 0 1px rgba(148,163,184,0.22); cursor: pointer; flex-shrink: 0; }
+    .player-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .player-card .rank { width: 28px; height: 28px; font-size: 0.95rem; border-radius: 7px; margin-right: 0; }
+    .player-card-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .player-card-name { font-weight: 800; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-role-inline { font-size: 0.78rem; font-weight: 800; color: var(--muted); margin-left: 6px; }
+    .player-card-meta { font-size: 0.72rem; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-card-stats { padding: 0 10px 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .player-card-stats .player-pill { padding: 2px 8px; border-radius: 999px; background: rgba(248,250,252,0.95); border: 1px solid rgba(226,232,240,0.9); font-size: 12px; }
+    :root.dark .player-card-stats .player-pill { background: rgba(15,23,42,0.9); border-color: rgba(148,163,184,0.7); }
+    .player-pill-sel { border-color: rgba(146,1,0,0.6); background: rgba(146,1,0,0.10); }
+
+    /* Filtri a comparsa, ordinamento, selettore vista */
+    .filters-toggle { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(148,163,184,0.22); background: rgba(148,163,184,0.10); color: var(--text); border-radius: 12px; padding: 10px 12px; font-weight: 800; cursor: pointer; margin: 10px 0; width: 100%; justify-content: center; }
+    .filters-panel { border: 1px solid rgba(148,163,184,0.18); background: rgba(148,163,184,0.06); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+
+    .sort-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 10px 0 6px; }
+    .sort-controls .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .sort-controls label { font-size: 13px; font-weight: 700; color: var(--muted); }
+    .sort-controls select { min-width: 190px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.35); background: var(--card); color: inherit; font-size: 14px; }
+    .sort-dir-btn { padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.35); background: rgba(148,163,184,0.08); color: var(--text); font-weight: 800; cursor: pointer; min-width: 84px; }
+
+    .giornate-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+    .giornate-segment { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid rgba(148,163,184,0.35); background: rgba(148,163,184,0.08); }
+    :root.dark .giornate-segment { border-color: rgba(148,163,184,0.35); background: rgba(148,163,184,0.10); }
+    .giornate-segment .seg-btn { border: none; background: transparent; color: var(--text); padding: 8px 12px; border-radius: 999px; font-weight: 700; cursor: pointer; font-size: 13px; line-height: 1; }
+    .giornate-segment .seg-btn.active { background: var(--primary); color: #fff; box-shadow: 0 8px 18px rgba(146,1,0,0.22); }
+
+    /* Interruttore Compatta/Estesa (solo mobile) */
+    .mobile-layout-toggle { display: none; align-items: center; justify-content: flex-end; gap: 6px; margin: 4px 0 0; }
+    .mobile-layout-toggle span { font-size: 11px; color: var(--muted); }
+    .toggle-switch { position: relative; width: 42px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #d1d5db; border-radius: 999px; transition: 0.2s; }
+    .toggle-slider::before { position: absolute; content: ''; height: 18px; width: 18px; left: 2px; top: 2px; background: #f9fafb; border-radius: 999px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: 0.2s; }
+    .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
     .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 20px; overflow-x: hidden; }
     .giornata-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .giornata-controls .control-group { display: flex; flex-direction: column; gap: 6px; }
     .giornata-controls label { font-size: 13px; font-weight: 600; color: var(--muted); }
     .giornata-controls select { min-width: 160px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.35); background: var(--card); color: inherit; font-size: 14px; }
-    #myLineupBtn { padding: 10px 16px; border-radius: 10px; border: none; background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(99,102,241,0.25); transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    #myLineupBtn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(99,102,241,0.35); }
-    
+    #myLineupBtn { padding: 10px 16px; border-radius: 10px; border: none; background: linear-gradient(135deg, #38bdf8, #0c0f6d); color: white; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(12,15,109,0.25); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    #myLineupBtn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(12,15,109,0.35); }
+
     /* Mobile/Tablet responsive */
     @media (max-width: 768px) {
       .container { padding: 8px; max-width: 100vw; overflow-x: hidden; }
@@ -46,10 +170,14 @@
       .table { min-width: 380px; font-size: 16px; }
       .table th, .table td { padding: 10px 6px; font-size: 16px; }
       .card { padding: 12px; max-width: 100%; }
-      .giornata-controls { flex-direction: column; align-items: stretch; }
+      .giornata-controls { flex-direction: column; align-items: stretch; gap: 8px; }
       #myLineupBtn { width: 100%; font-size: 16px; }
+      #toggleGiornataFilters { display: inline-flex !important; align-self: flex-end; font-size: 13px; padding: 6px 10px; }
+      .giornata-controls.collapsed .control-group:not(.always-visible),
+      .giornata-controls.collapsed #myLineupBtn { display: none; }
+      .giornata-controls.collapsed #toggleGiornataFilters { align-self: flex-start; }
     }
-    
+
     @media (max-width: 480px) {
       .container { padding: 4px; }
       .tabs { padding: 4px; gap: 3px; }
@@ -61,19 +189,44 @@
       .table th, .table td { padding: 8px 4px; font-size: 14px; }
       .card { padding: 8px; }
     }
-    
+
     /* Mobile device classes */
     .device-smartphone .table,
-    .device-tablet .table {
-      font-size: 16px !important;
-    }
-    
+    .device-tablet .table { font-size: 16px !important; }
     .device-smartphone .table th,
     .device-smartphone .table td,
     .device-tablet .table th,
-    .device-tablet .table td {
-      font-size: 16px !important;
-      padding: 10px 6px !important;
+    .device-tablet .table td { font-size: 16px !important; padding: 10px 6px !important; }
+
+    /* Sotto una certa larghezza (o con schermo touch): tabella -> card */
+    @media (max-width: 760px), (pointer: coarse) {
+      #teamsRank, #byTeamDay, #playersRank, #byPlayerDay { min-width: 0; width: 100%; }
+      #teamsRank thead, #byTeamDay thead, #playersRank thead, #byPlayerDay thead { display: none; }
+      .table-wrapper { overflow-x: hidden; }
+      .sort-controls { display: grid; grid-template-columns: 1fr auto; align-items: end; }
+      .sort-controls select { width: 100%; min-width: 0; }
+      .sort-dir-btn { min-width: 76px; }
+
+      .team-card .card-header { display: grid; grid-template-columns: 32px 1fr auto 18px; align-items: center; column-gap: 10px; padding: 10px; }
+      .team-card { border-radius: 14px; }
+      .team-card .rank { width: 28px; height: 28px; font-size: 0.95rem; border-radius: 7px; margin-right: 0; }
+      .team-card .team-logo { width: 36px; height: 36px; border-radius: 10px; }
+      .team-card .team-logo img { border-radius: 10px; }
+      .team-card .team-name { font-size: 0.95rem; }
+      .team-card .team-meta { font-size: 0.7rem; max-width: 180px; }
+      .team-card .points-val { font-size: 1.05rem; }
+      .team-card .team-body { min-width: 0; gap: 10px; }
+      .team-card .points-box { width: auto; min-width: 72px; margin-left: 0; padding-left: 0; padding-right: 0; text-align: right; }
+      .team-card .toggle-icon { margin-left: 0; position: static; justify-self: end; }
+
+      #teamsRank tbody tr.teams-row-mobile td,
+      #byTeamDay tbody tr.byday-row-mobile td { padding: 10px 8px; white-space: normal; }
+
+      .mobile-layout-toggle { display: flex; }
+      #playersRank thead th[data-sort-key="name"],
+      #byPlayerDay thead th[data-sort-key="name"] { display: none; }
+      #playersRank tbody tr.player-row-mobile td,
+      #byPlayerDay tbody tr.player-row-mobile td { padding: 6px 8px; text-align: left; }
     }
   </style>
 </head>
@@ -82,40 +235,96 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>📊 Classifiche</h1>
+    <h1>Classifiche</h1>
   </header>
 
   <main class="container">
     <!-- Export & Podio Buttons -->
     <div class="export-buttons">
-      <button onclick="showFinalPodium()" class="export-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; ">
-        🏆 Podio
+      <button onclick="showFinalPodium()" class="export-btn" style="background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%); color: white; ">Podio
       </button>
-      <button onclick="exportStandings('csv')" class="export-btn" style="background: #27ae60; color: white;">
-        📥 CSV
+      <button onclick="exportStandings('csv')" class="export-btn" style="background: #15803d; color: white;">CSV
       </button>
-      <button onclick="exportStandings('excel')" class="export-btn" style="background: #2ecc71; color: white;">
-        📊 Excel
+      <button onclick="exportStandings('excel')" class="export-btn" style="background: #16a34a; color: white;">Excel
       </button>
     </div>
-    
+
     <div class="tabs">
-      <button class="tab-btn active" data-tab="squadre" onclick="switchTab('squadre', event)">🏆 Classifica Squadre</button>
-      <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h', event)">⚔️ Scontri Diretti</button>
-      <button class="tab-btn" data-tab="giornate" onclick="switchTab('giornate', event)">📅 Per Giornata</button>
+      <button class="tab-btn active" data-tab="squadre" onclick="switchTab('squadre', event)">
+        <span class="tab-label-full">Classifica Squadre</span><span class="tab-label-short">Squadre</span>
+      </button>
+      <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h', event)">
+        <span class="tab-label-full">Scontri Diretti</span><span class="tab-label-short">H2H</span>
+      </button>
+      <button class="tab-btn" data-tab="giornate" onclick="switchTab('giornate', event)">
+        <span class="tab-label-full">Per Giornata</span><span class="tab-label-short">Giornate</span>
+      </button>
+      <button class="tab-btn" data-tab="giocatori" onclick="switchTab('giocatori', event)">
+        <span class="tab-label-full">Classifica Giocatori</span><span class="tab-label-short">Giocatori</span>
+      </button>
+      <button class="tab-btn" data-tab="fazioni" onclick="switchTab('fazioni', event); loadFazioni();">
+        <span class="tab-label-full">Curva vs Piana</span><span class="tab-label-short">Fazioni</span>
+      </button>
     </div>
 
     <!-- Tab Classifica Squadre -->
     <div id="tab-squadre" class="tab-content active">
       <div class="card">
         <h2>Classifica Squadre (Cumulata)</h2>
+        <button type="button" id="toggleTeamsFilters" class="filters-toggle">Mostra filtri</button>
+        <div id="teamsFiltersPanel" class="filters-panel">
+          <div class="muted" style="font-size:13px;margin-bottom:8px;">
+            <div class="giornate-segment" id="teamsRangeMode" role="tablist" aria-label="Modalità intervallo squadre" style="margin-left:0;margin-bottom:8px;">
+              <button type="button" class="seg-btn active" data-mode="range">Intervallo</button>
+              <button type="button" class="seg-btn" data-mode="until">Fino a</button>
+            </div>
+            <span id="teamsRangeLabel">Intervallo giornate:</span>
+            <select id="teamsRangeFrom" class="input" style="max-width:140px;margin-left:8px;"></select>
+            <span id="teamsRangeArrow" style="margin:0 6px;">→</span>
+            <select id="teamsRangeTo" class="input" style="max-width:140px;"></select>
+          </div>
+        </div>
+        <div class="mobile-layout-toggle">
+          <span>Compatta</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="teamsLayoutExtended" />
+            <span class="toggle-slider"></span>
+          </label>
+          <span>Estesa</span>
+        </div>
+
+        <div class="sort-controls">
+          <div class="control-group">
+            <label for="teamsSortSel">Ordina per</label>
+            <select id="teamsSortSel" class="input">
+              <option value="total">Totale</option>
+              <option value="giocatori">Giocatori</option>
+              <option value="captain">Capitano</option>
+              <option value="coachPoints">Coach</option>
+              <option value="name">Nome</option>
+            </select>
+          </div>
+          <button type="button" id="teamsSortDirBtn" class="sort-dir-btn">↓ Desc</button>
+        </div>
+
         <div class="table-wrapper">
-          <table class="table" id="teamsRank">
+          <table class="table rank-table" id="teamsRank">
             <thead>
-              <tr><th>#</th><th>Squadra</th><th>Totale</th></tr>
+              <tr>
+                <th>#</th>
+                <th data-sort-key="name">Squadra</th>
+                <th data-sort-key="curva">Curva</th>
+                <th data-sort-key="giocatori">Giocatori</th>
+                <th data-sort-key="captain">Cap</th>
+                <th data-sort-key="coachPoints">Coach</th>
+                <th id="teamsTotalHeader" data-sort-key="total">Totale</th>
+              </tr>
             </thead>
             <tbody></tbody>
           </table>
+        </div>
+        <div class="muted" id="teamsLegend" style="font-size:12px;margin-top:6px;">
+          C = Curva, g = Giocatori, Cap = Capitano, M = Mister, T = Totale
         </div>
       </div>
     </div>
@@ -124,9 +333,9 @@
     <div id="tab-h2h" class="tab-content">
       <div class="card">
         <h2>Classifica Scontri Diretti H2H</h2>
-        <p>Sistema 3-1-0. Criteri: Punti, Scontri diretti, Differenza punti, Punti totali.</p>
+        <p id="h2hRulesLine">Criteri: punti in classifica, differenza reti, reti fatte.</p>
         <div class="table-wrapper">
-          <table class="table" id="h2hTable">
+          <table class="table rank-table" id="h2hTable">
             <thead>
               <tr>
                 <th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th>
@@ -143,37 +352,210 @@
     <div id="tab-giornate" class="tab-content">
       <div class="card">
         <h2>Dettaglio per Giornata</h2>
-        <div class="giornata-controls">
-          <div class="control-group">
+        <div class="giornate-header">
+          <div class="giornate-segment" role="tablist" aria-label="Vista dettaglio">
+            <button type="button" class="seg-btn active" data-giornate-view="teams">Squadre</button>
+            <button type="button" class="seg-btn" data-giornate-view="players">Giocatori</button>
+          </div>
+          <div class="control-group" style="min-width:200px;">
             <label for="giornataSel">Seleziona Giornata</label>
-          <select id="giornataSel" class="input" style="max-width:200px;"></select>
+            <select id="giornataSel" class="input" style="max-width:200px;"></select>
           </div>
-          <div class="control-group">
-            <label for="teamFilterSel">Filtra Squadra</label>
-          <select id="teamFilterSel" class="input" style="max-width:200px;">
-            <option value="">Tutte le squadre</option>
-          </select>
+          <div class="mobile-layout-toggle">
+            <span>Compatta</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="byDayLayoutExtended" />
+              <span class="toggle-slider"></span>
+            </label>
+            <span>Estesa</span>
           </div>
-          <button id="myLineupBtn">👥 I miei titolari</button>
         </div>
+
+        <div id="giornateTeamsView">
+          <div class="giornata-controls">
+            <div class="control-group">
+              <label for="teamFilterSel">Filtra Squadra</label>
+              <select id="teamFilterSel" class="input" style="max-width:200px;">
+                <option value="">Tutte le squadre</option>
+              </select>
+            </div>
+            <button id="myLineupBtn">I miei titolari</button>
+            <button id="toggleGiornataFilters" type="button" class="btn btn-secondary" style="display:none;">Nascondi filtri</button>
+          </div>
+
+          <div class="sort-controls">
+            <div class="control-group">
+              <label for="byDaySortSel">Ordina per</label>
+              <select id="byDaySortSel" class="input">
+                <option value="points">Totale</option>
+                <option value="curva">Curva</option>
+                <option value="giocatori">Giocatori</option>
+                <option value="captain">Capitano</option>
+                <option value="coach">Coach</option>
+                <option value="name">Nome</option>
+              </select>
+            </div>
+            <button type="button" id="byDaySortDirBtn" class="sort-dir-btn">↓ Desc</button>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="table rank-table" id="byTeamDay">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th data-sort-key="name">Squadra</th>
+                  <th data-sort-key="curva">Curva</th>
+                  <th data-sort-key="giocatori">Giocatori</th>
+                  <th data-sort-key="captain">Capitano</th>
+                  <th data-sort-key="coach">Coach</th>
+                  <th data-sort-key="points">Totale</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="muted" style="font-size:12px;margin-top:6px;">* Formazione non inviata</div>
+        </div>
+
+        <div id="giornatePlayersView" style="display:none;">
+          <button type="button" id="toggleGiornatePlayersFilters" class="filters-toggle">Mostra filtri</button>
+          <div id="giornatePlayersFiltersPanel" class="filters-panel">
+            <div class="muted" style="font-size:13px;margin-bottom:8px;">
+              Bonus / malus dallo storico:
+              <select id="playerRuleSelectDay" class="input" style="max-width:260px;margin-left:8px;">
+                <option value="">Tutti i bonus/malus</option>
+              </select>
+            </div>
+
+            <div class="sort-controls" style="margin:0;">
+              <div class="control-group">
+                <label for="byPlayerDaySortSel">Ordina per</label>
+                <select id="byPlayerDaySortSel" class="input">
+                  <option value="points">Punti</option>
+                  <option value="goals">Gol</option>
+                  <option value="assists">Assist</option>
+                  <option value="yellows">Gialli</option>
+                  <option value="reds">Rossi</option>
+                  <option value="selectedRule">Bonus sel.</option>
+                  <option value="role">Ruolo</option>
+                </select>
+              </div>
+              <button type="button" id="byPlayerDaySortDirBtn" class="sort-dir-btn">↓ Desc</button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="table rank-table" id="byPlayerDay">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th data-sort-key="name">Giocatore</th>
+                  <th data-sort-key="role">Ruolo</th>
+                  <th data-sort-key="points">Punti</th>
+                  <th data-sort-key="goals">Gol</th>
+                  <th data-sort-key="assists">Assist</th>
+                  <th data-sort-key="yellows">Gialli</th>
+                  <th data-sort-key="reds">Rossi</th>
+                  <th data-sort-key="selectedRule">Selez.</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Classifica Giocatori -->
+    <!-- Tab Curva vs Piana (D074) -->
+    <div id="tab-fazioni" class="tab-content">
+      <a href="contest.html" style="display:block;text-align:center;margin:0 0 12px;padding:12px;border-radius:999px;background:linear-gradient(135deg,#920100,#0c0f6d);color:#fff;font-weight:700;text-decoration:none;">🗳️ Vota la prossima partita</a>
+      <div class="card">
+        <h2>Curva Morello vs Piana</h2>
+        <div id="fazioniBody"><p style="color:var(--muted);">Apri la scheda per caricare i dati.</p></div>
+      </div>
+    </div>
+
+    <div id="tab-giocatori" class="tab-content">
+      <div class="card">
+        <h2>Classifica Giocatori</h2>
+        <div class="mobile-layout-toggle">
+          <span>Compatta</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="playersLayoutExtended" />
+            <span class="toggle-slider"></span>
+          </label>
+          <span>Estesa</span>
+        </div>
+        <button type="button" id="togglePlayersFilters" class="filters-toggle">Mostra filtri</button>
+        <div id="playersFiltersPanel" class="filters-panel">
+          <div class="muted" style="font-size:13px;margin-bottom:8px;">
+            Bonus / malus dallo storico:
+            <select id="playerRuleSelect" class="input" style="max-width:260px;margin-left:8px;">
+              <option value="">Tutti i bonus/malus</option>
+            </select>
+          </div>
+
+          <div class="muted" style="font-size:13px;margin-bottom:8px;">
+            <div class="giornate-segment" id="playersRangeMode" role="tablist" aria-label="Modalità classifica giocatori" style="margin-left:0;margin-bottom:8px;">
+              <button type="button" class="seg-btn active" data-mode="range">Intervallo</button>
+              <button type="button" class="seg-btn" data-mode="single">Giornata</button>
+              <button type="button" class="seg-btn" data-mode="until">Fino a</button>
+            </div>
+            <span id="playersRangeLabel">Intervallo giornate:</span>
+            <select id="playersRangeFrom" class="input" style="max-width:140px;margin-left:8px;"></select>
+            <span id="playersRangeArrow" style="margin:0 6px;">→</span>
+            <select id="playersRangeTo" class="input" style="max-width:140px;"></select>
+          </div>
+
+          <div class="sort-controls" style="margin:0;">
+            <div class="control-group">
+              <label for="playersSortSel">Ordina per</label>
+              <select id="playersSortSel" class="input">
+                <option value="points">Punti</option>
+                <option value="goals">Gol</option>
+                <option value="assists">Assist</option>
+                <option value="yellows">Gialli</option>
+                <option value="reds">Rossi</option>
+                <option value="selectedRule">Bonus sel.</option>
+                <option value="role">Ruolo</option>
+              </select>
+            </div>
+            <button type="button" id="playersSortDirBtn" class="sort-dir-btn">↓ Desc</button>
+          </div>
+        </div>
+
         <div class="table-wrapper">
-          <table class="table" id="byTeamDay">
+          <table class="table rank-table" id="playersRank">
             <thead>
-              <tr><th>#</th><th>Squadra</th><th>Curva</th><th>Giocatori</th><th>Capitano</th><th>Coach</th><th>Totale</th></tr>
+              <tr>
+                <th>#</th>
+                <th data-sort-key="name">Giocatore</th>
+                <th data-sort-key="role">Ruolo</th>
+                <th data-sort-key="points">Punti</th>
+                <th data-sort-key="goals">Gol</th>
+                <th data-sort-key="assists">Assist</th>
+                <th data-sort-key="yellows">Gialli</th>
+                <th data-sort-key="reds">Rossi</th>
+                <th data-sort-key="selectedRule">Selez.</th>
+              </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
-        <div class="muted" style="font-size:12px;margin-top:6px;">* Formazione non inviata</div>
+        <div class="muted" style="font-size:12px;margin-top:6px;">Tocca la foto di un giocatore per caricarne una personalizzata (salvata solo su questo dispositivo).</div>
       </div>
     </div>
   </main>
-
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/provisional-badge.js?v=20260925"></script>
+  <script src="resources/league-helper.js?v=20260920-final"></script>
+  <script src="resources/toast-with-fallback.js?v=20260920-final"></script>
+  <script src="resources/rules-loader.js?v=20260920-final"></script>
   <script>
     // Init Firebase IMMEDIATAMENTE
     if (!firebase.apps.length) {
@@ -182,14 +564,20 @@
     window.db = firebase.firestore();
     window.auth = firebase.auth();
     const db = window.db; // Alias locale per compatibilità
-    
+
   </script>
-  <script src="resources/firebase.js"></script>
-  <script src="resources/app-init.js"></script>
-  <script src="resources/standings-export.js"></script>
-  <script src="resources/podium-animation.js"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/standings-export.js?v=20260920-final"></script>
+  <script src="resources/podium-animation.js?v=20260920-final"></script>
   <script>
-    const SEASON = '2024-25';
+    let SEASON = '2024-25'; // cartella scontri diretti: dal 25/09/2026 la decide la Stagione (D087)
+    async function seasonKey() {
+      if (window.Season) { try { const s = await window.Season.load(); window.__SEASON = s; SEASON = s.h2h.key || SEASON; } catch (e) {} }
+      return SEASON;
+    }
+    // Scontri diretti visibili solo se la Stagione li prevede (D100)
+    function h2hModeOn() { const s = window.__SEASON; return !s || s.modalita === 'scontri' || s.modalita === 'entrambe'; }
     const leagueHelper = window.LeagueHelper || null;
     let missingLeagueToastShown = false;
 
@@ -221,30 +609,21 @@
       standingsUi = ui;
       isRealityLeague = !!isReality;
 
-      if (typeof window.getLeagueType === 'function') {
-        console.log('[classifiche] leagueType:', window.getLeagueType(league), 'isReality:', isRealityLeague);
-      } else {
-        console.log('[classifiche] leagueType: (fallback sport_league)', 'isReality:', isRealityLeague);
-      }
-
       // reality_show: solo cambio testi (Giornata -> Puntata), dati invariati.
       try {
         const dayLabelSingular = ui.dayLabelSingular || 'Giornata';
-        const dayLabelPlural = ui.dayLabelPlural || 'Giornate';
 
-        // Tab "Per Giornata" -> Per <label>
         const tabGiornateBtn = document.querySelector('.tab-btn[data-tab="giornate"]');
         if (tabGiornateBtn) {
-          tabGiornateBtn.textContent = `📅 Per ${dayLabelSingular}`;
+          const full = tabGiornateBtn.querySelector('.tab-label-full');
+          if (full) full.textContent = `Per ${dayLabelSingular}`;
         }
 
-        // Titolo sezione dettaglio
         const dettaglioTitle = document.querySelector('#tab-giornate h2');
         if (dettaglioTitle) {
           dettaglioTitle.textContent = `Dettaglio per ${dayLabelSingular}`;
         }
 
-        // Label selettore giornata
         const giornataLabel = document.querySelector('label[for="giornataSel"]');
         if (giornataLabel) {
           giornataLabel.textContent = `Seleziona ${dayLabelSingular}`;
@@ -258,29 +637,8 @@
       return window.db || firebase.firestore();
     }
 
-    function showFallbackToast(msg) {
-      const el = document.createElement('div');
-      el.textContent = msg;
-      el.style.position = 'fixed';
-      el.style.bottom = '16px';
-      el.style.right = '16px';
-      el.style.background = '#2d6cdf';
-      el.style.color = '#fff';
-      el.style.padding = '10px 14px';
-      el.style.borderRadius = '8px';
-      el.style.boxShadow = '0 10px 30px rgba(15,23,42,0.4)';
-      el.style.zIndex = '9999';
-      document.body.appendChild(el);
-      setTimeout(() => { el.remove(); }, 2500);
-    }
-
-    function showToast(msg) {
-      if (typeof window.toast === 'function') {
-        window.toast(msg);
-      } else {
-        showFallbackToast(msg);
-      }
-    }
+    // showToast(msg) / showFallbackToast(msg) centralizzate in
+    // resources/toast-with-fallback.js (2026-09-19)
 
     function notifyMissingLeague(context = 'questa operazione') {
       console.warn(`[classifiche] League ID mancante (${context})`);
@@ -291,34 +649,8 @@
       }
     }
 
-    function getCurrentLeagueIdCached() {
-      if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
-        const id = leagueHelper.getCurrentLeagueId();
-        if (id) return id;
-      }
-      if (window.currentLeague && window.currentLeague.id) {
-        return window.currentLeague.id;
-      }
-      return null;
-    }
-
-    function getCurrentLeagueId() {
-      return getCurrentLeagueIdCached();
-    }
-
-    async function ensureLeagueReady(timeoutMs = 7000) {
-      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
-        try {
-          const info = await leagueHelper.waitForLeague(timeoutMs);
-          if (info && info.id) {
-            return info.id;
-          }
-        } catch (err) {
-          console.warn('[classifiche] Timeout attesa lega:', err?.message || err);
-        }
-      }
-      return getCurrentLeagueIdCached();
-    }
+    // getCurrentLeagueIdCached / getCurrentLeagueId / ensureLeagueReady
+    // sono centralizzate in resources/league-helper.js (2026-09-19)
 
     function getLeagueCollection(collection, leagueId = null) {
       const dbRef = firestore();
@@ -368,7 +700,7 @@
       try {
         const baseCol = getLeagueCollection('h2h_schedule', leagueId);
         if (!baseCol) return { docs: [] };
-        return await baseCol.doc(SEASON).collection('giornate').get();
+        return await baseCol.doc(await seasonKey()).collection('giornate').get();
       } catch (err) {
         console.warn('[classifiche] Errore caricamento h2h_schedule:', err);
         return { docs: [] };
@@ -380,7 +712,7 @@
       try {
         const baseCol = getLeagueCollection('h2h_results', leagueId);
         if (!baseCol) return null;
-        const doc = await baseCol.doc(SEASON).collection('giornate').doc(giornataId).get();
+        const doc = await baseCol.doc(await seasonKey()).collection('giornate').doc(giornataId).get();
         return doc.exists ? doc.data() : null;
       } catch (err) {
         console.warn('[classifiche] Errore caricamento h2h_results per', giornataId, err);
@@ -391,12 +723,14 @@
     function switchTab(tab, ev) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
+
       const trigger = ev?.currentTarget || document.querySelector(`.tab-btn[data-tab="${tab}"]`);
       if (trigger) trigger.classList.add('active');
       const pane = document.getElementById(`tab-${tab}`);
       if (pane) pane.classList.add('active');
     }
+
+    if (location.hash === '#fazioni') window.addEventListener('load', function(){ switchTab('fazioni'); loadFazioni(); });
 
     const state = {
       leagueId: null,
@@ -406,16 +740,172 @@
       results: new Map(),
       teamMetaByKey: new Map(),
       selectedGiornata: null,
-      hasH2H: false
+      hasH2H: false,
+      teamsSortKey: 'total',
+      teamsSortDir: 'desc',
+      teamsRangeFrom: '',
+      teamsRangeTo: '',
+      teamsRangeMode: 'range',
+      byDaySortKey: 'points',
+      byDaySortDir: 'desc',
+      byPlayerDaySortKey: 'points',
+      byPlayerDaySortDir: 'desc'
     };
 
+    function parseGiornataNumber(id) {
+      const m = String(id || '').match(/^G(\d+)$/i);
+      return m ? Number(m[1]) : null;
+    }
+
+    function normalizeGiornataRange(fromId, toId) {
+      const fromN = parseGiornataNumber(fromId);
+      const toN = parseGiornataNumber(toId);
+      if (fromN == null || toN == null) return { fromId, toId };
+      if (fromN <= toN) return { fromId, toId };
+      return { fromId: toId, toId: fromId };
+    }
+
+    function getAvailableGiornataIds() {
+      return Array.from(state.results.keys())
+        .filter(id => /^G\d+$/i.test(id))
+        .sort((a, b) => (parseGiornataNumber(a) || 0) - (parseGiornataNumber(b) || 0));
+    }
+
+    function setupTeamsRangeSelectors() {
+      const fromSel = document.getElementById('teamsRangeFrom');
+      const toSel = document.getElementById('teamsRangeTo');
+      if (!fromSel || !toSel) return;
+
+      const ids = getAvailableGiornataIds();
+      if (!ids.length) return;
+
+      const optionsHtml = ids.map(id => `<option value="${id}">G${String(parseGiornataNumber(id))}</option>`).join('');
+      fromSel.innerHTML = optionsHtml;
+      toSel.innerHTML = optionsHtml;
+
+      if (!state.teamsRangeFrom) state.teamsRangeFrom = ids[0];
+      if (!state.teamsRangeTo) state.teamsRangeTo = ids[ids.length - 1];
+      const norm = normalizeGiornataRange(state.teamsRangeFrom, state.teamsRangeTo);
+      state.teamsRangeFrom = norm.fromId;
+      state.teamsRangeTo = norm.toId;
+
+      fromSel.value = state.teamsRangeFrom;
+      toSel.value = state.teamsRangeTo;
+
+      const modeWrap = document.getElementById('teamsRangeMode');
+      const label = document.getElementById('teamsRangeLabel');
+      const arrow = document.getElementById('teamsRangeArrow');
+
+      const applyModeUi = () => {
+        const mode = state.teamsRangeMode || 'range';
+        if (mode === 'until') {
+          if (label) label.textContent = 'Fino a giornata:';
+          if (fromSel) fromSel.style.display = 'none';
+          if (arrow) arrow.style.display = 'none';
+        } else {
+          if (label) label.textContent = 'Intervallo giornate:';
+          if (fromSel) fromSel.style.display = '';
+          if (arrow) arrow.style.display = '';
+        }
+        if (modeWrap) {
+          const btns = modeWrap.querySelectorAll('.seg-btn[data-mode]');
+          btns.forEach(b => {
+            const m = b.getAttribute('data-mode');
+            b.classList.toggle('active', m === mode);
+          });
+        }
+      };
+
+      if (modeWrap && !modeWrap.dataset.listenerAttached) {
+        modeWrap.addEventListener('click', (e) => {
+          const btn = e.target && e.target.closest ? e.target.closest('.seg-btn[data-mode]') : null;
+          if (!btn) return;
+          const mode = btn.getAttribute('data-mode') || 'range';
+          state.teamsRangeMode = mode;
+          if (mode === 'until') {
+            state.teamsRangeFrom = ids[0];
+            state.teamsRangeTo = toSel.value;
+          }
+          const normalized = normalizeGiornataRange(state.teamsRangeFrom, state.teamsRangeTo);
+          state.teamsRangeFrom = normalized.fromId;
+          state.teamsRangeTo = normalized.toId;
+          fromSel.value = state.teamsRangeFrom;
+          toSel.value = state.teamsRangeTo;
+          applyModeUi();
+          renderTeamsRanking();
+        });
+        modeWrap.dataset.listenerAttached = '1';
+      }
+
+      applyModeUi();
+
+      if (!fromSel.dataset.listenerAttached) {
+        fromSel.addEventListener('change', () => {
+          state.teamsRangeFrom = fromSel.value;
+          state.teamsRangeMode = 'range';
+          const normalized = normalizeGiornataRange(state.teamsRangeFrom, state.teamsRangeTo);
+          state.teamsRangeFrom = normalized.fromId;
+          state.teamsRangeTo = normalized.toId;
+          fromSel.value = state.teamsRangeFrom;
+          toSel.value = state.teamsRangeTo;
+          applyModeUi();
+          renderTeamsRanking();
+        });
+        fromSel.dataset.listenerAttached = '1';
+      }
+      if (!toSel.dataset.listenerAttached) {
+        toSel.addEventListener('change', () => {
+          state.teamsRangeTo = toSel.value;
+          if (state.teamsRangeMode === 'until') {
+            state.teamsRangeFrom = ids[0];
+          }
+          const normalized = normalizeGiornataRange(state.teamsRangeFrom, state.teamsRangeTo);
+          state.teamsRangeFrom = normalized.fromId;
+          state.teamsRangeTo = normalized.toId;
+          fromSel.value = state.teamsRangeFrom;
+          toSel.value = state.teamsRangeTo;
+          applyModeUi();
+          renderTeamsRanking();
+        });
+        toSel.dataset.listenerAttached = '1';
+      }
+    }
+
     const lineupBtn = document.getElementById('myLineupBtn');
+    const giornataControlsEl = document.querySelector('.giornata-controls');
+    const toggleGiornataFiltersBtn = document.getElementById('toggleGiornataFilters');
 
     const podiumStyles = [
-      { bg: '#ffd700', color: '#000' },
+      { bg: '#facc15', color: '#000' },
       { bg: '#c0c0c0', color: '#000' },
       { bg: '#cd7f32', color: '#000' }
     ];
+
+    function isMobileFilters() {
+      return !!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+    }
+
+    function setGiornataFiltersCollapsed(collapsed) {
+      if (!giornataControlsEl) return;
+      const isCollapsed = !!collapsed;
+      giornataControlsEl.classList.toggle('collapsed', isCollapsed);
+      if (toggleGiornataFiltersBtn) {
+        toggleGiornataFiltersBtn.textContent = isCollapsed ? 'Mostra filtri' : 'Nascondi filtri';
+      }
+    }
+
+    function autoCollapseGiornataFilters() {
+      if (isMobileFilters()) {
+        setGiornataFiltersCollapsed(true);
+      }
+    }
+
+    if (toggleGiornataFiltersBtn) {
+      toggleGiornataFiltersBtn.addEventListener('click', () => {
+        const nowCollapsed = !giornataControlsEl?.classList.contains('collapsed');
+        setGiornataFiltersCollapsed(nowCollapsed);
+      });
+    }
 
     function normalizeTeamKey(key) {
       if (key === undefined || key === null) return null;
@@ -434,6 +924,19 @@
       return Number.isFinite(num) ? num : 0;
     }
 
+    function getTeamLogoFromStorage(meta) {
+      if (!meta) return '';
+      const leagueId = state.leagueId || getCurrentLeagueIdCached();
+      const numericId = meta.numericId;
+      if (numericId === null || numericId === undefined) return '';
+      const key = leagueId ? `team_logo_${numericId}_${leagueId}` : `team_logo_${numericId}`;
+      try {
+        return localStorage.getItem(key) || '';
+      } catch (_) {
+        return '';
+      }
+    }
+
     function getTeamMeta(teamKey) {
       const normalized = normalizeTeamKey(teamKey);
       if (!normalized) return null;
@@ -450,12 +953,48 @@
       return null;
     }
 
+    function applyTeamsSort(rows) {
+      const sortKey = state.teamsSortKey || 'total';
+      const dir = state.teamsSortDir === 'asc' ? 1 : -1;
+
+      return rows.slice().sort((a, b) => {
+        if (sortKey === 'name') {
+          const cmp = a.name.localeCompare(b.name, 'it');
+          if (cmp !== 0) return cmp * dir;
+          return (b.total - a.total);
+        }
+
+        const numericMap = {
+          total: 'total',
+          curva: 'curva',
+          giocatori: 'giocatori',
+          captain: 'captain',
+          coachPoints: 'coachPoints'
+        };
+
+        const key = numericMap[sortKey] || 'total';
+        const av = Number(a[key] || 0);
+        const bv = Number(b[key] || 0);
+        if (av !== bv) {
+          return dir === 1 ? (av - bv) : (bv - av);
+        }
+
+        const totTie = (Number(b.total || 0) - Number(a.total || 0));
+        if (totTie) return totTie;
+        return a.name.localeCompare(b.name, 'it');
+      });
+    }
+
+    window.__teamsLayoutExtended = !!window.__teamsLayoutExtended;
+    window.__playersLayoutExtended = !!window.__playersLayoutExtended;
+    window.__byDayLayoutExtended = !!window.__byDayLayoutExtended;
+
     function renderTeamsRanking() {
       const tbody = document.querySelector('#teamsRank tbody');
       if (!tbody) return;
 
       if (!state.teams.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted);">Nessuna squadra trovata.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">Nessuna squadra trovata.</td></tr>';
         return;
       }
 
@@ -464,10 +1003,14 @@
         const entry = {
           teamId: team.id,
           numericId: team.numericId,
-        name: team.name,
-        coach: team.coachLabel,
-        total: 0,
-        giornate: 0,
+          name: team.name,
+          coach: team.coachLabel,
+          total: 0,
+          curva: 0,
+          giocatori: 0,
+          captain: 0,
+          coachPoints: 0,
+          giornate: 0,
           forfeit: 0
         };
         aggregateById.set(team.id, entry);
@@ -478,8 +1021,14 @@
         return entry;
       });
 
-      // NUOVO: Somma punti da results/{giornata}/teams/{teamId}
+      const range = normalizeGiornataRange(state.teamsRangeFrom, state.teamsRangeTo);
+      const fromN = parseGiornataNumber(range.fromId);
+      const toN = parseGiornataNumber(range.toId);
+
       state.results.forEach((giornataData, giornataId) => {
+        const n = parseGiornataNumber(giornataId);
+        if (n != null && fromN != null && n < fromN) return;
+        if (n != null && toN != null && n > toN) return;
         const teams = giornataData.teams || {};
         Object.entries(teams).forEach(([teamId, teamData]) => {
           const aggregate = aggregateById.get(teamId);
@@ -490,6 +1039,19 @@
           const pts = extractPoints(teamData);
           aggregate.total += pts;
           aggregate.giornate += 1;
+
+          const breakdown = teamData.breakdown || {};
+          const curvaVal = Number(breakdown.curva || 0) || 0;
+          const playersVal = Number(breakdown.players || 0) || 0;
+          const formationVal = Number(breakdown.formation || 0) || 0;
+          const captainVal = Number(breakdown.captain || 0) || 0;
+          const coachVal = Number(breakdown.coach || 0) || 0;
+
+          aggregate.curva += curvaVal;
+          aggregate.giocatori += (playersVal + formationVal);
+          aggregate.captain += captainVal;
+          aggregate.coachPoints += coachVal;
+
           const forfeits = Number(teamData.forfeit || 0);
           if (forfeits) {
             aggregate.forfeit = (aggregate.forfeit || 0) + forfeits;
@@ -499,21 +1061,494 @@
           }
         });
       });
-      const rows = aggregates
-        .slice()
-        .sort((a, b) => (b.total - a.total) || a.name.localeCompare(b.name, 'it'));
+
+      const rows = applyTeamsSort(aggregates);
+      const isMobileTeams = !!(window.matchMedia && window.matchMedia('(max-width: 640px)').matches);
+      const extendedMobile = !!window.__teamsLayoutExtended;
+
+      const initialsFor = (label) => {
+        const parts = String(label || '').trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return 'FA';
+        const a = parts[0]?.[0] || '';
+        const b = (parts.length > 1 ? parts[1]?.[0] : parts[0]?.[1]) || '';
+        return (a + b).toUpperCase();
+      };
 
       tbody.innerHTML = rows.map((row, index) => {
-        const style = podiumStyles[index] || { bg: 'transparent', color: 'var(--text)' };
         const forfeitIndicator = row.forfeit ? ` ⚠️(${row.forfeit})` : '';
+
+        if (isMobileTeams) {
+          const metricKey = (state.teamsSortKey && state.teamsSortKey !== 'name') ? state.teamsSortKey : 'total';
+          const metricLabelMap = { total: 'Totali', giocatori: 'Giocatori', captain: 'Capitano', coachPoints: 'Coach' };
+          const metricLabel = metricLabelMap[metricKey] || 'Totali';
+          const metricValue = Number(row[metricKey] ?? row.total ?? 0);
+
+          const rank = index + 1;
+          const initials = initialsFor(row.name);
+          const meta = getTeamMeta(row.teamId || row.numericId);
+          const storedLogo = getTeamLogoFromStorage(meta);
+          const rawLogo = meta?.logo ? String(meta.logo) : '';
+          const fallbackLogo = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(initials)}`;
+          const logoUrl = storedLogo || rawLogo || fallbackLogo;
+          const coachMeta = row.coach ? escapeHtml(row.coach) : '—';
+          const details = `
+            <div class="card-details">
+              <div class="details-grid">
+                <div class="stat-item"><div class="stat-label">Capitano</div><div class="stat-value">${row.captain.toFixed(1)}</div></div>
+                <div class="stat-item"><div class="stat-label">Curva</div><div class="stat-value">${row.curva.toFixed(1)}</div></div>
+                <div class="stat-item"><div class="stat-label">Giocatori</div><div class="stat-value">${row.giocatori.toFixed(1)}</div></div>
+                <div class="stat-item"><div class="stat-label">Coach</div><div class="stat-value">${row.coachPoints.toFixed(1)}</div></div>
+              </div>
+            </div>
+          `;
+
+          const extraClass = extendedMobile ? ' extended active' : '';
+          return `
+            <tr class="teams-row-mobile">
+              <td colspan="7">
+                <div class="team-card${extraClass}" onclick="this.classList.toggle('active')">
+                  <div class="card-header">
+                    <div class="rank" data-rank="${rank}">${rank}</div>
+                    <div class="team-body">
+                      <div class="team-logo"><img src="${logoUrl}" alt="${escapeHtml(row.name)}" onerror="this.onerror=null;this.src='${fallbackLogo}'" /></div>
+                      <div style="min-width:0;">
+                        <div class="team-name">${escapeHtml(row.name)}${forfeitIndicator}</div>
+                        <div class="team-meta">Coach: ${coachMeta}</div>
+                      </div>
+                    </div>
+                    <div class="points-box">
+                      <div class="points-val">${metricValue.toFixed(1)}</div>
+                      <div class="points-label">${escapeHtml(metricLabel)}</div>
+                    </div>
+                    <span class="toggle-icon">⌄</span>
+                  </div>
+                  ${details}
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+
+        const style = podiumStyles[index] || { bg: 'transparent', color: 'var(--text)' };
         return `
           <tr style="background:${style.bg};color:${style.color};">
             <td>${index + 1}</td>
             <td style="font-weight:${index < 3 ? '800' : '600'};">${row.name}${forfeitIndicator}</td>
-            <td>${row.total.toFixed(2)}</td>
+            <td>${row.curva.toFixed(1)}</td>
+            <td>${row.giocatori.toFixed(1)}</td>
+            <td>${row.captain.toFixed(1)}</td>
+            <td>${row.coachPoints.toFixed(1)}</td>
+            <td>${row.total.toFixed(1)}</td>
           </tr>
         `;
       }).join('');
+
+      if (window.__giornateView === 'players') {
+        renderPlayersByDay(state.selectedGiornata);
+      }
+    }
+
+    const REPEATABLE_PLAYER_RULES = new Set([
+      'R040','R041','R042','R072','R075','R089','R097','R044','R045',
+      'R056','R057','R058','R061','R070','R063','R073','R092',
+      'R076','R077','R078','R079','R080','R081'
+    ]);
+
+    function resolveSelectionValue(raw) {
+      if (raw === undefined || raw === null) return raw;
+      if (typeof raw === 'object') {
+        if (raw.value !== undefined) return raw.value;
+        if (raw.count !== undefined) return raw.count;
+        if (raw.qty !== undefined) return raw.qty;
+      }
+      return raw;
+    }
+
+    const playerDayState = {
+      loaded: false,
+      loading: false,
+      players: [],
+      ruleById: new Map(),
+      sortKey: 'points',
+      sortDir: 'desc',
+      selectedRuleId: ''
+    };
+
+    function shortRole(role) {
+      switch (role) {
+        case 'Portiere': return 'P';
+        case 'Difensore': return 'D';
+        case 'Centrocampista': return 'C';
+        case 'Attaccante': return 'A';
+        default: return role || '';
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getRuleLabel(rule) {
+      if (!rule) return '';
+      const base = rule.nome_bonus || rule.nome || rule.label || rule.name || rule.rule_id || '';
+      if (rule.tipo === 'Bonus') return `Bonus - ${base}`;
+      if (rule.tipo === 'Malus') return `Malus - ${base}`;
+      return base;
+    }
+
+    function normalizeRules(rules, soggetto) {
+      return (rules || [])
+        .filter(rule => rule.soggetto === soggetto)
+        .map(rule => ({
+          ...rule,
+          input: REPEATABLE_PLAYER_RULES.has(rule.rule_id) ? 'counter' : 'toggle'
+        }));
+    }
+
+    async function ensurePlayerDayMetaLoaded() {
+      if (playerDayState.loaded || playerDayState.loading) return;
+      playerDayState.loading = true;
+      try {
+        const [rulesSource, playersRes] = await Promise.all([
+          window.loadRulesJSON ? window.loadRulesJSON() : fetch('resources/rules.json').then(r => r.json()),
+          fetch('resources/players.json')
+        ]);
+        const rulesArray = Array.isArray(rulesSource.rules) ? rulesSource.rules : [];
+        const playersJson = await playersRes.json();
+        playerDayState.players = Array.isArray(playersJson.players) ? playersJson.players : [];
+        const playerRules = normalizeRules(rulesArray, 'Giocatore');
+        playerDayState.ruleById = new Map(playerRules.map(r => [r.rule_id, r]));
+
+        const select = document.getElementById('playerRuleSelectDay');
+        if (select) {
+          const sorted = playerRules.slice().sort((a, b) => getRuleLabel(a).localeCompare(getRuleLabel(b), 'it'));
+          const bonusRules = sorted.filter(r => r.tipo === 'Bonus');
+          const malusRules = sorted.filter(r => r.tipo === 'Malus');
+          const otherRules = sorted.filter(r => r.tipo !== 'Bonus' && r.tipo !== 'Malus');
+
+          const buildOptions = (list) => list.map(rule => {
+            const label = getRuleLabel(rule);
+            if (!label) return '';
+            return `<option value="${rule.rule_id}">${escapeHtml(label)}</option>`;
+          }).filter(Boolean).join('');
+
+          const parts = ['<option value="">Tutti i bonus/malus</option>'];
+          if (bonusRules.length) { parts.push('<optgroup label="Bonus">', buildOptions(bonusRules), '</optgroup>'); }
+          if (malusRules.length) { parts.push('<optgroup label="Malus">', buildOptions(malusRules), '</optgroup>'); }
+          if (otherRules.length) { parts.push('<optgroup label="Altro">', buildOptions(otherRules), '</optgroup>'); }
+          select.innerHTML = parts.join('');
+
+          if (!select.dataset.listenerAttached) {
+            select.addEventListener('change', (e) => {
+              playerDayState.selectedRuleId = e.target.value || '';
+              const sortSel = document.getElementById('byPlayerDaySortSel');
+              const dirBtn = document.getElementById('byPlayerDaySortDirBtn');
+              if (playerDayState.selectedRuleId) {
+                playerDayState.sortKey = 'selectedRule';
+                playerDayState.sortDir = 'desc';
+                if (sortSel) sortSel.value = 'selectedRule';
+                if (dirBtn) dirBtn.textContent = '↓ Desc';
+              } else {
+                playerDayState.sortKey = 'points';
+                playerDayState.sortDir = 'desc';
+                if (sortSel) sortSel.value = 'points';
+                if (dirBtn) dirBtn.textContent = '↓ Desc';
+              }
+              renderPlayersByDay(state.selectedGiornata);
+            });
+            select.dataset.listenerAttached = '1';
+          }
+        }
+
+        playerDayState.loaded = true;
+      } catch (err) {
+        console.warn('[classifiche] ensurePlayerDayMetaLoaded error:', err);
+      } finally {
+        playerDayState.loading = false;
+      }
+    }
+
+    function getPlayersByDayTbody() {
+      const table = document.getElementById('byPlayerDay');
+      if (!table) return null;
+      return table.querySelector('tbody');
+    }
+
+    function setByPlayerDayMessage(msg) {
+      const tbody = getPlayersByDayTbody();
+      if (!tbody) return;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted);">${msg}</td></tr>`;
+    }
+
+    function applyPlayerDaySort(rows) {
+      const sortKey = playerDayState.sortKey || 'points';
+      const dir = playerDayState.sortDir === 'asc' ? 1 : -1;
+      const numericKeys = new Set(['points', 'goals', 'assists', 'yellows', 'reds', 'selectedRule']);
+      return rows.slice().sort((a, b) => {
+        if (sortKey === 'name') {
+          return String(a.name || '').localeCompare(String(b.name || ''), 'it') * dir;
+        }
+        if (sortKey === 'role') {
+          const cmp = String(a.role || '').localeCompare(String(b.role || ''), 'it');
+          if (cmp !== 0) return cmp * dir;
+          return String(a.name || '').localeCompare(String(b.name || ''), 'it');
+        }
+        if (!numericKeys.has(sortKey)) {
+          return String(a.name || '').localeCompare(String(b.name || ''), 'it') * dir;
+        }
+        const av = Number(a[sortKey] || 0);
+        const bv = Number(b[sortKey] || 0);
+        if (av !== bv) return dir === 1 ? (av - bv) : (bv - av);
+        return String(a.name || '').localeCompare(String(b.name || ''), 'it');
+      });
+    }
+
+    function attachByPlayerDaySortHandlers() {
+      const table = document.getElementById('byPlayerDay');
+      if (!table || table.dataset.sortAttached) return;
+      const headers = table.querySelectorAll('thead th[data-sort-key]');
+      headers.forEach(th => {
+        const key = th.getAttribute('data-sort-key');
+        if (!key) return;
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+          if (playerDayState.sortKey === key) {
+            playerDayState.sortDir = playerDayState.sortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            playerDayState.sortKey = key;
+            playerDayState.sortDir = (key === 'name' || key === 'role') ? 'asc' : 'desc';
+          }
+          renderPlayersByDay(state.selectedGiornata);
+        });
+      });
+      table.dataset.sortAttached = '1';
+    }
+
+    async function renderPlayersByDay(giornataId) {
+      const tbody = getPlayersByDayTbody();
+      if (!tbody) return;
+
+      if (!giornataId) {
+        setByPlayerDayMessage('Seleziona una giornata per vedere la classifica giocatori.');
+        return;
+      }
+
+      await ensurePlayerDayMetaLoaded();
+
+      const leagueId = state.leagueId || await getLeagueIdOrNotify('caricare la classifica giocatori per giornata');
+      if (!leagueId || !window.db) {
+        setByPlayerDayMessage('❌ Seleziona una lega valida per vedere la classifica giocatori.');
+        return;
+      }
+
+      let dayDoc = null;
+      try {
+        const ref = getLeagueDoc('days', giornataId, leagueId);
+        if (ref) dayDoc = await ref.get();
+      } catch (err) {
+        console.warn('[classifiche] Errore lettura day per giocatori:', err);
+      }
+
+      if (!dayDoc || !dayDoc.exists) {
+        try {
+          const legacy = window.db.collection('days').doc(giornataId);
+          dayDoc = await legacy.get();
+        } catch (err) { /* ignore */ }
+      }
+
+      const data = dayDoc && dayDoc.exists ? (dayDoc.data() || {}) : null;
+      const playersSelections = data ? (data.players || {}) : null;
+      if (!playersSelections || !Object.keys(playersSelections).length) {
+        setByPlayerDayMessage('Nessun dato disponibile per questa giornata.');
+        return;
+      }
+
+      const rows = Object.entries(playersSelections).map(([playerId, selection]) => {
+        const player = playerDayState.players.find(p => p.player_id === playerId) || {
+          player_id: playerId, role: '', nome_completo: String(playerId), image_url: ''
+        };
+
+        const points = Object.entries(selection || {}).reduce((sum, [rid, raw]) => {
+          const rule = playerDayState.ruleById.get(rid);
+          if (!rule) return sum;
+          const resolved = resolveSelectionValue(raw);
+          const amount = rule.input === 'counter' ? Number(resolved || 0) : (resolved ? 1 : 0);
+          return sum + amount * Number(rule.valore || 0);
+        }, 0);
+
+        const goals = (Number(selection?.['R040'] || 0) + Number(selection?.['R041'] || 0));
+        const assists = Number(selection?.['R042'] || 0);
+        const yellows = Number(selection?.['R075'] || 0) + Number(selection?.['R076'] || 0) + Number(selection?.['R077'] || 0);
+        const reds = Number(selection?.['R078'] || 0) + Number(selection?.['R079'] || 0) + Number(selection?.['R080'] || 0) + Number(selection?.['R081'] || 0);
+        const selectedRuleRaw = playerDayState.selectedRuleId ? selection?.[playerDayState.selectedRuleId] : 0;
+        const selectedResolved = resolveSelectionValue(selectedRuleRaw);
+        const selectedRule = playerDayState.selectedRuleId ? Number(selectedResolved || 0) : 0;
+
+        return {
+          playerId,
+          name: String(player.nome_completo || playerId).trim(),
+          role: shortRole(player.role || ''),
+          imageUrl: String(player.image_url || '').trim(),
+          points, goals, assists, yellows, reds, selectedRule
+        };
+      }).filter(r => Number.isFinite(r.points) && r.points !== 0);
+
+      if (!rows.length) {
+        setByPlayerDayMessage('Nessun dato disponibile per questa giornata.');
+        return;
+      }
+
+      const sorted = applyPlayerDaySort(rows);
+      const isMobile = !!(
+        document.body.classList.contains('device-smartphone') ||
+        document.body.classList.contains('device-tablet') ||
+        (window.matchMedia && (window.matchMedia('(max-width: 760px)').matches || window.matchMedia('(pointer: coarse)').matches))
+      );
+      const extendedMobile = !!window.__byDayLayoutExtended;
+
+      const surnameDisplay = (fullName) => {
+        const tokens = String(fullName || '').trim().split(/\s+/).filter(Boolean);
+        if (!tokens.length) return '';
+        const particles = new Set(['di','de','del','della','dello','dei','degli','delle','da','dal','dai','dalle','dallo','d','d\'','d’','van','von','der','den','la','le','lo']);
+        let start = tokens.length - 1;
+        while (start > 0) {
+          const prev = String(tokens[start - 1] || '').toLowerCase();
+          if (!particles.has(prev)) break;
+          start -= 1;
+        }
+        return tokens.slice(start).join(' ');
+      };
+
+      tbody.innerHTML = sorted.map((row, index) => {
+        const sortKey = playerDayState.sortKey || 'points';
+        const hasSelectedRule = !!playerDayState.selectedRuleId;
+        const selectedDisplay = hasSelectedRule ? `x${String(row.selectedRule)}` : '-';
+        const selectedLabel = (() => {
+          if (!playerDayState.selectedRuleId) return '';
+          const rule = playerDayState.ruleById.get(playerDayState.selectedRuleId);
+          return rule?.label || rule?.name || getRuleLabel(rule) || 'Selez.';
+        })();
+
+        if (!isMobile) {
+          return `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${escapeHtml(row.name)}</td>
+              <td>${escapeHtml(row.role)}</td>
+              <td>${Number(row.points).toFixed(1)}</td>
+              <td>${row.goals}</td>
+              <td>${row.assists}</td>
+              <td>${row.yellows}</td>
+              <td>${row.reds}</td>
+              <td>${selectedDisplay}</td>
+            </tr>
+          `;
+        }
+
+        const metricLabel = (() => {
+          if (sortKey === 'goals') return 'Gol';
+          if (sortKey === 'assists') return 'Assist';
+          if (sortKey === 'yellows') return 'Gialli';
+          if (sortKey === 'reds') return 'Rossi';
+          if (sortKey === 'selectedRule') return selectedLabel || 'Selez.';
+          return 'Totale';
+        })();
+        const metricValue = (() => {
+          if (sortKey === 'goals') return Number(row.goals || 0);
+          if (sortKey === 'assists') return Number(row.assists || 0);
+          if (sortKey === 'yellows') return Number(row.yellows || 0);
+          if (sortKey === 'reds') return Number(row.reds || 0);
+          if (sortKey === 'selectedRule') return Number(row.selectedRule || 0);
+          return Number(row.points || 0);
+        })();
+        const mainValueLabel = (sortKey === 'selectedRule') ? `x${String(metricValue)}` : (sortKey === 'points' ? Number(metricValue).toFixed(1) : String(metricValue));
+        const selMeta = hasSelectedRule ? ` • ${selectedLabel || 'Selez.'} ${selectedDisplay}` : '';
+        const surname = surnameDisplay(row.name) || String(row.name || '').trim();
+
+        const leagueIdForPhoto = state.leagueId || getCurrentLeagueIdCached();
+        const photoKey = leagueIdForPhoto ? `player_photo_${row.playerId}_${leagueIdForPhoto}` : `player_photo_${row.playerId}`;
+        let storedPhoto = '';
+        try { storedPhoto = localStorage.getItem(photoKey) || ''; } catch (_) { storedPhoto = ''; }
+        const initials = String(row.name || '').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0]).join('') || 'P';
+        const fallbackAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(initials)}`;
+        const photoUrl = storedPhoto || String(row.imageUrl || '').trim() || fallbackAvatar;
+
+        if (!extendedMobile) {
+          return `
+            <tr class="player-row-mobile compact">
+              <td colspan="9">
+                <div class="player-card">
+                  <div class="player-card-header">
+                    <div class="rank" data-rank="${index + 1}">${index + 1}</div>
+                    <div class="player-avatar" data-player-id="${escapeHtml(row.playerId)}"><img src="${photoUrl}" alt="${escapeHtml(row.name)}" onerror="this.onerror=null;this.src='${fallbackAvatar}'" /></div>
+                    <div class="player-card-body">
+                      <div class="player-card-name">${escapeHtml(surname || row.name)} <span class="player-role-inline">${escapeHtml(row.role)}</span></div>
+                      <div class="player-card-meta">Gol ${row.goals} • Assist ${row.assists}${selMeta}</div>
+                    </div>
+                    <div class="points-box">
+                      <div class="points-val">${mainValueLabel}</div>
+                      <div class="points-label">${escapeHtml(metricLabel)}</div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+
+        return `
+          <tr class="player-row-mobile extended">
+            <td colspan="9">
+              <div class="player-card">
+                <div class="player-card-header">
+                  <div class="rank" data-rank="${index + 1}">${index + 1}</div>
+                  <div class="player-avatar" data-player-id="${escapeHtml(row.playerId)}"><img src="${photoUrl}" alt="${escapeHtml(row.name)}" onerror="this.onerror=null;this.src='${fallbackAvatar}'" /></div>
+                  <div class="player-card-body">
+                    <div class="player-card-name">${escapeHtml(row.name)} <span class="player-role-inline">${escapeHtml(row.role)}</span></div>
+                    <div class="player-card-meta">Pres 1</div>
+                  </div>
+                  <div class="points-box">
+                    <div class="points-val">${mainValueLabel}</div>
+                    <div class="points-label">${escapeHtml(metricLabel)}</div>
+                  </div>
+                </div>
+                <div class="player-card-stats">
+                  <span class="player-pill">Gol <strong>${row.goals}</strong></span>
+                  <span class="player-pill">Assist <strong>${row.assists}</strong></span>
+                  <span class="player-pill">Gialli <strong>${row.yellows}</strong></span>
+                  <span class="player-pill">Rossi <strong>${row.reds}</strong></span>
+                  ${playerDayState.selectedRuleId ? `<span class="player-pill player-pill-sel">${escapeHtml(selectedLabel || 'Selez.')} <strong>${selectedDisplay}</strong></span>` : ''}
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function attachTeamsSortHandlers() {
+      const table = document.getElementById('teamsRank');
+      if (!table) return;
+      const headers = table.querySelectorAll('thead th[data-sort-key]');
+      headers.forEach(th => {
+        const key = th.getAttribute('data-sort-key');
+        if (!key) return;
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+          if (state.teamsSortKey === key) {
+            state.teamsSortDir = state.teamsSortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            state.teamsSortKey = key;
+            state.teamsSortDir = (key === 'name') ? 'asc' : 'desc';
+          }
+          renderTeamsRanking();
+        });
+      });
     }
 
     function renderH2HTable() {
@@ -526,6 +1561,9 @@
       }
       const tbody = document.querySelector('#h2hTable tbody');
       if (!tbody) return;
+      const rulesCfg = (window.__SEASON && window.__SEASON.h2h) || { vittoria: 3, pareggio: 1, sconfitta: 0 };
+      const rulesLine = document.getElementById('h2hRulesLine');
+      if (rulesLine) rulesLine.textContent = `Vittoria ${rulesCfg.vittoria} · pareggio ${rulesCfg.pareggio} · sconfitta ${rulesCfg.sconfitta}. Criteri: punti in classifica, differenza reti, reti fatte.`;
 
       if (!state.teams.length) {
         tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--muted);">Nessuna squadra trovata.</td></tr>';
@@ -533,17 +1571,8 @@
       }
 
       const stats = state.teams.map(team => ({
-        teamId: team.id,
-        numericId: team.numericId,
-        name: team.name,
-        g: 0,
-        v: 0,
-        n: 0,
-        p: 0,
-        pf: 0,
-        ps: 0,
-        pts: 0,
-        forfeit: 0
+        teamId: team.id, numericId: team.numericId, name: team.name,
+        g: 0, v: 0, n: 0, p: 0, pf: 0, ps: 0, pts: 0, forfeit: 0
       }));
 
       const statByKey = new Map();
@@ -571,27 +1600,20 @@
           awayStat.pf += Number.isFinite(awayScore) ? awayScore : 0;
           awayStat.ps += Number.isFinite(homeScore) ? homeScore : 0;
 
-          // Track forfeit penalties
-          if (forfeitHome) {
-            homeStat.forfeit = (homeStat.forfeit || 0) + 1;
-          }
-          if (forfeitAway) {
-            awayStat.forfeit = (awayStat.forfeit || 0) + 1;
-          }
+          if (forfeitHome) homeStat.forfeit = (homeStat.forfeit || 0) + 1;
+          if (forfeitAway) awayStat.forfeit = (awayStat.forfeit || 0) + 1;
 
-          if (homeScore > awayScore) {
-            homeStat.v += 1;
-            awayStat.p += 1;
-            homeStat.pts += 3;
-          } else if (homeScore < awayScore) {
-            awayStat.v += 1;
-            homeStat.p += 1;
-            awayStat.pts += 3;
+          // Punti vittoria/pareggio/sconfitta dalle Impostazioni della stagione (D100)
+          const cfg = (window.__SEASON && window.__SEASON.h2h) || { vittoria: 3, pareggio: 1, sconfitta: 0 };
+          const esito = match.esito || (homeScore > awayScore ? '1' : homeScore < awayScore ? '2' : 'X');
+          if (esito === '1') {
+            homeStat.v += 1; awayStat.p += 1; homeStat.pts += cfg.vittoria; awayStat.pts += cfg.sconfitta;
+          } else if (esito === '2') {
+            awayStat.v += 1; homeStat.p += 1; awayStat.pts += cfg.vittoria; homeStat.pts += cfg.sconfitta;
+          } else if (esito === 'X') {
+            homeStat.n += 1; awayStat.n += 1; homeStat.pts += cfg.pareggio; awayStat.pts += cfg.pareggio;
           } else {
-            homeStat.n += 1;
-            awayStat.n += 1;
-            homeStat.pts += 1;
-            awayStat.pts += 1;
+            homeStat.p += 1; awayStat.p += 1;   // mancano entrambe le formazioni: nessuno prende punti
           }
         });
       });
@@ -605,13 +1627,8 @@
           <tr style="background:${style.bg};color:${style.color};">
             <td>${index + 1}</td>
             <td style="font-weight:${index < 3 ? '800' : '600'};">${row.name}${forfeitIndicator}</td>
-            <td>${row.g}</td>
-            <td>${row.v}</td>
-            <td>${row.n}</td>
-            <td>${row.p}</td>
-            <td>${row.pf.toFixed(2)}</td>
-            <td>${row.ps.toFixed(2)}</td>
-            <td>${(row.pf - row.ps).toFixed(2)}</td>
+            <td>${row.g}</td><td>${row.v}</td><td>${row.n}</td><td>${row.p}</td>
+            <td>${row.pf.toFixed(2)}</td><td>${row.ps.toFixed(2)}</td><td>${(row.pf - row.ps).toFixed(2)}</td>
             <td style="font-weight:${index < 3 ? '900' : '700'};">${row.pts}</td>
           </tr>
         `;
@@ -622,7 +1639,6 @@
       const select = document.getElementById('giornataSel');
       if (!select) return;
 
-      // NUOVO: Usa results invece di schedule
       const giornate = Array.from(state.results.keys()).sort((a, b) => {
         const na = Number(a.replace('G', ''));
         const nb = Number(b.replace('G', ''));
@@ -631,27 +1647,33 @@
 
       if (!giornate.length) {
         const dayLabelSingular = standingsUi.dayLabelSingular || 'Giornata';
-        const lower = dayLabelSingular.toLowerCase();
-        select.innerHTML = `<option value="">Nessuna ${lower} calcolata</option>`;
+        select.innerHTML = `<option value="">Nessuna ${dayLabelSingular.toLowerCase()} calcolata</option>`;
         renderGiornata(null);
         return;
       }
 
       const dayLabelSingular = standingsUi.dayLabelSingular || 'Giornata';
       select.innerHTML = giornate.map(id => `<option value="${id}">${dayLabelSingular} ${id.replace('G', '')}</option>`).join('');
-      select.onchange = (e) => renderGiornata(e.target.value);
-      
-      // Listener per filtro squadra
+      select.onchange = (e) => {
+        renderGiornata(e.target.value);
+        if (window.__giornateView === 'players') {
+          renderPlayersByDay(e.target.value);
+        }
+        if (select && typeof select.blur === 'function') select.blur();
+        autoCollapseGiornataFilters();
+      };
+
       const teamFilterSel = document.getElementById('teamFilterSel');
       if (teamFilterSel) {
         teamFilterSel.onchange = () => {
-          if (state.selectedGiornata) {
-            renderGiornata(state.selectedGiornata);
-          }
+          if (state.selectedGiornata) renderGiornata(state.selectedGiornata);
+          if (typeof teamFilterSel.blur === 'function') teamFilterSel.blur();
+          autoCollapseGiornataFilters();
         };
       }
-      
+
       renderGiornata(giornate[0]);
+      if (isMobileFilters()) setGiornataFiltersCollapsed(true);
 
       if (lineupBtn) {
         lineupBtn.disabled = !giornate.length;
@@ -665,71 +1687,182 @@
       }
     }
 
+    function applyByDaySort(rows) {
+      const sortKey = state.byDaySortKey || 'points';
+      const dir = state.byDaySortDir === 'asc' ? 1 : -1;
+
+      return rows.slice().sort((a, b) => {
+        if (sortKey === 'name') {
+          const cmp = a.name.localeCompare(b.name, 'it');
+          if (cmp !== 0) return cmp * dir;
+          return (b.points - a.points);
+        }
+        const numericMap = { points: 'points', curva: 'curva', giocatori: 'giocatori', captain: 'captain', coach: 'coach' };
+        const key = numericMap[sortKey] || 'points';
+        const av = Number(a[key] || 0);
+        const bv = Number(b[key] || 0);
+        if (av !== bv) return dir === 1 ? (av - bv) : (bv - av);
+        const ptsTie = (Number(b.points || 0) - Number(a.points || 0));
+        if (ptsTie) return ptsTie;
+        return a.name.localeCompare(b.name, 'it');
+      });
+    }
+
     function renderGiornata(giornataId) {
       const tbody = document.querySelector('#byTeamDay tbody');
       if (!tbody) return;
 
       state.selectedGiornata = giornataId || null;
-      if (lineupBtn) {
-        lineupBtn.disabled = !state.selectedGiornata;
-      }
+      if (lineupBtn) lineupBtn.disabled = !state.selectedGiornata;
 
       const dayLabelSingular = standingsUi.dayLabelSingular || 'Giornata';
 
       if (!giornataId || !state.results.has(giornataId)) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">Nessun dato disponibile per questa ${dayLabelSingular.toLowerCase()}.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Nessun dato disponibile per questa ${dayLabelSingular.toLowerCase()}.</td></tr>`;
         return;
       }
 
-      // NUOVO: Leggi direttamente da results/{giornataId}/teams/*
       const giornataData = state.results.get(giornataId) || {};
       const teams = giornataData.teams || {};
-      
+
       const rows = Object.entries(teams).map(([teamId, teamData]) => {
         const meta = getTeamMeta(teamId);
         const points = extractPoints(teamData);
         const breakdown = teamData.breakdown || {};
         const missingLineup = !!teamData.missingLineup;
         const fallbackName = meta?.numericId != null ? `Squadra ${meta.numericId + 1}` : `Squadra ${teamId}`;
+        const curvaVal = Number(breakdown.curva || 0) || 0;
+        const playersVal = Number(breakdown.players || 0) || 0;
+        const captainVal = Number(breakdown.captain || 0) || 0;
+        const coachVal = Number(breakdown.coach || 0) || 0;
+        const formationVal = Number(breakdown.formation || 0) || 0;
         return {
           teamKey: teamId,
           name: teamData.teamName || meta?.name || fallbackName,
-          points,
-          breakdown,
-          missingLineup
+          points, breakdown, missingLineup,
+          curva: curvaVal, giocatori: playersVal + formationVal, captain: captainVal, coach: coachVal
         };
       });
 
       if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">${dayLabelSingular} non ancora calcolata.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${dayLabelSingular} non ancora calcolata.</td></tr>`;
         return;
       }
 
-      // Applica filtro squadra se presente
       const teamFilterSel = document.getElementById('teamFilterSel');
       const selectedTeamId = teamFilterSel ? teamFilterSel.value : '';
       const filteredRows = selectedTeamId ? rows.filter(row => row.teamKey === selectedTeamId) : rows;
-      
-      filteredRows.sort((a, b) => b.points - a.points || a.name.localeCompare(b.name, 'it'));
 
-      tbody.innerHTML = filteredRows.map((row, index) => {
-        const { curva, players, captain, coach } = row.breakdown;
+      const sortedRows = applyByDaySort(filteredRows);
+
+      const isMobile = !!(
+        document.body.classList.contains('device-smartphone') ||
+        document.body.classList.contains('device-tablet') ||
+        (window.matchMedia && (window.matchMedia('(max-width: 760px)').matches || window.matchMedia('(pointer: coarse)').matches))
+      );
+      const extendedMobile = !!window.__byDayLayoutExtended;
+
+      const initialsFor = (label) => {
+        const parts = String(label || '').trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return 'FA';
+        const a = parts[0]?.[0] || '';
+        const b = (parts.length > 1 ? parts[1]?.[0] : parts[0]?.[1]) || '';
+        return (a + b).toUpperCase();
+      };
+
+      tbody.innerHTML = sortedRows.map((row, index) => {
+        const breakdown = row.breakdown || {};
+        const curvaVal = Number(row.curva || breakdown.curva || 0) || 0;
+        const giocatoriVal = Number(row.giocatori || 0) || 0;
+        const captainVal = Number(row.captain || breakdown.captain || 0) || 0;
+        const coachVal = Number(row.coach || breakdown.coach || 0) || 0;
         const nameLabel = row.missingLineup ? `${row.name} *` : row.name;
+        const meta = getTeamMeta(row.teamKey);
+        const coachLabel = meta?.coachLabel ? String(meta.coachLabel) : '';
+
+        if (!isMobile) {
+          return `
+            <tr>
+              <td style="font-weight:${index < 3 ? '800' : '600'};">${index + 1}</td>
+              <td style="font-weight:${index < 3 ? '700' : '600'};">${nameLabel}</td>
+              <td>${curvaVal.toFixed(1)}</td>
+              <td>${giocatoriVal.toFixed(1)}</td>
+              <td>${captainVal.toFixed(1)}</td>
+              <td>${coachVal.toFixed(1)}</td>
+              <td>${row.points.toFixed(1)}</td>
+            </tr>
+          `;
+        }
+
+        const metricKey = (state.byDaySortKey && state.byDaySortKey !== 'name') ? state.byDaySortKey : 'points';
+        const metricLabelMap = { points: 'Totali', curva: 'Curva', giocatori: 'Giocatori', captain: 'Capitano', coach: 'Coach' };
+        const metricLabel = metricLabelMap[metricKey] || 'Totali';
+        const metricValue = Number(row[metricKey] ?? row.points ?? 0);
+
+        const rank = index + 1;
+        const initials = initialsFor(nameLabel);
+        const storedLogo = getTeamLogoFromStorage(meta);
+        const rawLogo = meta?.logo ? String(meta.logo) : '';
+        const fallbackLogo = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(initials)}`;
+        const logoUrl = storedLogo || rawLogo || fallbackLogo;
+        const coachMeta = coachLabel ? escapeHtml(coachLabel) : '—';
+        const details = `
+          <div class="card-details">
+            <div class="details-grid">
+              <div class="stat-item"><div class="stat-label">Capitano</div><div class="stat-value">${captainVal.toFixed(1)}</div></div>
+              <div class="stat-item"><div class="stat-label">Curva</div><div class="stat-value">${curvaVal.toFixed(1)}</div></div>
+              <div class="stat-item"><div class="stat-label">Giocatori</div><div class="stat-value">${giocatoriVal.toFixed(1)}</div></div>
+              <div class="stat-item"><div class="stat-label">Coach</div><div class="stat-value">${coachVal.toFixed(1)}</div></div>
+            </div>
+          </div>
+        `;
+        const extraClass = extendedMobile ? ' extended active' : '';
+
         return `
-          <tr>
-            <td style="font-weight:${index < 3 ? '800' : '600'};">${index + 1}</td>
-            <td style="font-weight:${index < 3 ? '700' : '600'};">${nameLabel}</td>
-            <td>${row.points.toFixed(2)}</td>
-            <td style="font-size:11px;color:var(--muted);">
-              Curva ${(curva || 0).toFixed(1)} | 
-              Form ${(row.breakdown?.formation || 0).toFixed(1)} |
-              Gioc ${(players || 0).toFixed(1)} | 
-              Cap ${(captain || 0).toFixed(1)} | 
-              Coach ${(coach || 0).toFixed(1)}
+          <tr class="byday-row-mobile">
+            <td colspan="7">
+              <div class="team-card${extraClass}" onclick="this.classList.toggle('active')">
+                <div class="card-header">
+                  <div class="rank" data-rank="${rank}">${rank}</div>
+                  <div class="team-body">
+                    <div class="team-logo"><img src="${logoUrl}" alt="${escapeHtml(nameLabel)}" onerror="this.onerror=null;this.src='${fallbackLogo}'" /></div>
+                    <div style="min-width:0;">
+                      <div class="team-name">${escapeHtml(nameLabel)}</div>
+                      <div class="team-meta">Coach: ${coachMeta}</div>
+                    </div>
+                  </div>
+                  <div class="points-box">
+                    <div class="points-val">${metricValue.toFixed(1)}</div>
+                    <div class="points-label">${escapeHtml(metricLabel)}</div>
+                  </div>
+                  <span class="toggle-icon">⌄</span>
+                </div>
+                ${details}
+              </div>
             </td>
           </tr>
         `;
       }).join('');
+    }
+
+    function attachByDaySortHandlers() {
+      const table = document.getElementById('byTeamDay');
+      if (!table) return;
+      const headers = table.querySelectorAll('thead th[data-sort-key]');
+      headers.forEach(th => {
+        const key = th.getAttribute('data-sort-key');
+        if (!key) return;
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+          if (state.byDaySortKey === key) {
+            state.byDaySortDir = state.byDaySortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            state.byDaySortKey = key;
+            state.byDaySortDir = (key === 'name') ? 'asc' : 'desc';
+          }
+          if (state.selectedGiornata) renderGiornata(state.selectedGiornata);
+        });
+      });
     }
 
     async function loadClassificheData() {
@@ -740,9 +1873,7 @@
           const msg = '❌ Seleziona una lega valida per vedere le classifiche della lega.';
           tables.forEach(sel => {
             const tbody = document.querySelector(sel);
-            if (tbody) {
-              tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${msg}</td></tr>`;
-            }
+            if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${msg}</td></tr>`;
           });
           return;
         }
@@ -752,12 +1883,9 @@
         let coachesSnap = null;
         let scheduleSnap = { docs: [] };
 
-        // Carica squadre dalla lega corrente
         try {
           const teamsCol = getLeagueCollection('teams', leagueId);
-          if (!teamsCol) {
-            throw new Error('Impossibile ottenere la collection teams per questa lega');
-          }
+          if (!teamsCol) throw new Error('Impossibile ottenere la collection teams per questa lega');
           teamsSnap = await teamsCol.get();
         } catch (err) {
           if (err?.code === 'permission-denied') {
@@ -765,9 +1893,7 @@
             const errorMessage = 'Non hai i permessi per visualizzare le classifiche. Contatta un amministratore per essere aggiunto a una lega.';
             tables.forEach(sel => {
               const tbody = document.querySelector(sel);
-              if (tbody) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${errorMessage}</td></tr>`;
-              }
+              if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${errorMessage}</td></tr>`;
             });
             showToast('❌ Non hai i permessi per visualizzare le classifiche di questa lega.');
             return;
@@ -778,27 +1904,20 @@
           }
         }
 
-        // Carica allenatori dalla lega corrente (se esistono)
         try {
           const coachesCol = getLeagueCollection('coaches', leagueId);
-          if (coachesCol) {
-            coachesSnap = await coachesCol.get();
-          } else {
-            coachesSnap = null;
-          }
+          coachesSnap = coachesCol ? await coachesCol.get() : null;
         } catch (err) {
           console.warn('[classifiche] Impossibile caricare lista allenatori:', err);
           coachesSnap = null;
         }
 
-        // Carica calendario H2H per la lega
         scheduleSnap = await fetchH2HScheduleSnapshot(leagueId);
-        state.hasH2H = Array.isArray(scheduleSnap?.docs) && scheduleSnap.docs.length > 0;
+        state.hasH2H = Array.isArray(scheduleSnap?.docs) && scheduleSnap.docs.length > 0 && h2hModeOn();
         const h2hTabBtn = document.querySelector('.tab-btn[data-tab="h2h"]');
         const h2hTabPane = document.getElementById('tab-h2h');
 
         if (isRealityLeague) {
-          // reality_show: nascondi completamente tab H2H (UI sola)
           if (h2hTabBtn) h2hTabBtn.style.display = 'none';
           if (h2hTabPane) h2hTabPane.style.display = 'none';
         } else if (!state.hasH2H) {
@@ -810,35 +1929,26 @@
 
         state.coaches.clear();
         if (coachesSnap) {
-          coachesSnap.docs.forEach(doc => {
-            const data = doc.data();
-            state.coaches.set(doc.id, data);
-          });
+          coachesSnap.docs.forEach(doc => state.coaches.set(doc.id, doc.data()));
         }
 
         const rawTeams = teamsSnap.docs.map((doc, idx) => {
           const data = doc.data() || {};
           const coachLabel = (data.coach_ids || [])
-            .map(id => {
-              const coach = state.coaches.get(id) || {};
-              return coach.nome || coach.name || null;
-            })
-            .filter(Boolean)
-            .join(', ') || '—';
+            .map(id => { const coach = state.coaches.get(id) || {}; return coach.nome || coach.name || null; })
+            .filter(Boolean).join(', ') || '—';
           const numericId = toNumberSafe(doc.id);
           return {
             id: doc.id,
             numericId,
             name: data.name || (numericId !== null ? `Squadra ${numericId + 1}` : `Squadra ${idx + 1}`),
-            coachLabel
+            coachLabel,
+            logo: data.logo || ''
           };
         });
 
-        // Ordina per ID numerico o alfabetico
         state.teams = rawTeams.sort((a, b) => {
-          if (a.numericId !== null && b.numericId !== null) {
-            return a.numericId - b.numericId;
-          }
+          if (a.numericId !== null && b.numericId !== null) return a.numericId - b.numericId;
           if (a.numericId !== null) return -1;
           if (b.numericId !== null) return 1;
           return a.name.localeCompare(b.name, 'it');
@@ -847,18 +1957,14 @@
         state.teamMetaByKey = new Map();
         state.teams.forEach(team => {
           const keys = [team.id];
-          if (team.numericId !== null && team.numericId !== undefined) {
-            keys.push(team.numericId, String(team.numericId));
-          }
+          if (team.numericId !== null && team.numericId !== undefined) keys.push(team.numericId, String(team.numericId));
           keys.forEach(key => state.teamMetaByKey.set(key, team));
         });
-        
-        // Popola select filtro squadre (verrà aggiornato anche con squadre dai risultati)
+
         const teamFilterSel = document.getElementById('teamFilterSel');
         if (teamFilterSel) {
           const teamOptions = state.teams.map(team => ({ id: team.id, name: team.name }));
-          // Aggiungi anche squadre dai risultati se non sono già presenti
-          state.results.forEach((giornataData, giornataId) => {
+          state.results.forEach((giornataData) => {
             if (giornataData && giornataData.teams) {
               Object.entries(giornataData.teams).forEach(([teamId, teamData]) => {
                 if (!teamOptions.find(t => t.id === teamId)) {
@@ -867,95 +1973,87 @@
               });
             }
           });
-          // Ordina per nome
           teamOptions.sort((a, b) => a.name.localeCompare(b.name, 'it'));
-          teamFilterSel.innerHTML = '<option value="">Tutte le squadre</option>' + 
+          teamFilterSel.innerHTML = '<option value="">Tutte le squadre</option>' +
             teamOptions.map(team => `<option value="${team.id}">${team.name}</option>`).join('');
         }
 
         state.schedule.clear();
         scheduleSnap.docs.forEach(doc => state.schedule.set(doc.id, doc.data() || {}));
 
-        // Carica risultati da leagues/{leagueId}/results/{giornata}/teams/*
         state.results.clear();
 
-        const giornataIds = Array.from({ length: 24 }, (_, i) => `G${i + 1}`);
+        // Usa preferibilmente le giornate marcate come "computed" in days/{giornata}
+        let giornataIds = [];
+        try {
+          const daysCol = getLeagueCollection('days', leagueId);
+          if (daysCol) {
+            const daysSnap = await daysCol.where('computed', '==', true).get();
+            giornataIds = daysSnap.docs
+              .map(doc => doc.id)
+              .filter(id => /^G\d+$/.test(id))
+              .sort((a, b) => Number(a.replace('G', '')) - Number(b.replace('G', '')));
+          }
+        } catch (err) {
+          console.warn('[classifiche] Errore caricamento days per risultati:', err);
+        }
+        if (!giornataIds.length) {
+          giornataIds = Array.from({ length: 24 }, (_, i) => `G${i + 1}`);
+        }
 
         const resultsCol = getLeagueCollection('results', leagueId);
         const giornateResults = resultsCol
-          ? await Promise.all(
-              giornataIds.map(async giornataId => {
-                try {
-                  const snap = await resultsCol.doc(giornataId).collection('teams').get();
-                  return { giornataId, snap };
-                } catch (error) {
-                  console.warn(`[classifiche] Errore caricamento risultati ${giornataId}:`, error);
-                  return { giornataId, snap: null, error };
-                }
-              })
-            )
+          ? await Promise.all(giornataIds.map(async giornataId => {
+              try {
+                const snap = await resultsCol.doc(giornataId).collection('teams').get();
+                return { giornataId, snap };
+              } catch (error) {
+                console.warn(`[classifiche] Errore caricamento risultati ${giornataId}:`, error);
+                return { giornataId, snap: null, error };
+              }
+            }))
           : [];
 
         giornateResults.forEach(({ giornataId, snap, error }) => {
           const giornataData = state.results.get(giornataId) || { teams: {}, matches: [] };
-
-          if (error) {
-            // Log solo se c'è un errore reale (non solo "non trovato")
-            if (error.code !== 'not-found') {
-              console.warn(`⚠️ Errore caricamento risultati ${giornataId}:`, error);
-            }
+          if (error && error.code !== 'not-found') {
+            console.warn(`⚠️ Errore caricamento risultati ${giornataId}:`, error);
           }
-
           if (snap && !snap.empty) {
             giornataData.teams = {};
-          snap.docs.forEach(doc => {
-            giornataData.teams[doc.id] = doc.data();
-          });
-            // Rimuovi log dettagliato per ogni giornata
+            snap.docs.forEach(doc => { giornataData.teams[doc.id] = doc.data(); });
           }
-          
           state.results.set(giornataId, giornataData);
         });
 
         const h2hResults = await Promise.all(
-          giornataIds.map(async giornataId => ({
-            giornataId,
-            data: await fetchH2HResultData(giornataId, leagueId)
-          }))
+          giornataIds.map(async giornataId => ({ giornataId, data: await fetchH2HResultData(giornataId, leagueId) }))
         );
-
         h2hResults.forEach(({ giornataId, data }) => {
           if (!data) return;
           const existing = state.results.get(giornataId) || { teams: {}, matches: [] };
           existing.matches = Array.isArray(data.matches) ? data.matches : [];
           state.results.set(giornataId, existing);
         });
-        
-        // Log solo se ci sono giornate con dati
-        const giornateConDati = Array.from(state.results.values()).filter(g => Object.keys(g.teams || {}).length > 0).length;
-        if (giornateConDati > 0) {
-          // Summary available for debugging if needed
-        }
 
+        setupTeamsRangeSelectors();
         renderTeamsRanking();
         renderH2HTable();
         renderGiornataSelect();
       } catch (error) {
         console.error('[classifiche] Errore caricamento classifiche:', error);
         const tables = ['#teamsRank tbody', '#h2hTable tbody', '#byTeamDay tbody'];
-        const errorMessage = error?.code === 'permission-denied' 
+        const errorMessage = error?.code === 'permission-denied'
           ? 'Non hai i permessi per visualizzare le classifiche. Contatta un amministratore per essere aggiunto a una lega.'
           : 'Errore nel caricamento delle classifiche per questa lega.';
         showToast(`❌ ${errorMessage}`);
         tables.forEach(sel => {
           const tbody = document.querySelector(sel);
-          if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${errorMessage}</td></tr>`;
-          }
+          if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">${errorMessage}</td></tr>`;
         });
       }
     }
-    
+
     // Show final podium
     function showFinalPodium() {
       const leagueId = state.leagueId || getCurrentLeagueIdCached();
@@ -964,14 +2062,13 @@
         alert('Seleziona una lega prima!');
         return;
       }
-      
-      // Get top 3 from table
+
       const rows = document.querySelectorAll('#teamsRank tbody tr');
       if (rows.length < 3) {
         alert('Servono almeno 3 squadre in classifica!');
         return;
       }
-      
+
       const top3 = Array.from(rows).slice(0, 3).map(row => {
         const cells = row.cells;
         return {
@@ -979,15 +2076,16 @@
           points: parseInt(cells[3]?.textContent || '0')
         };
       });
-      
-      // Get season from localStorage or default
+
       const season = localStorage.getItem('current_season') || '24/25';
       PodiumAnimation.showPodium(top3, `Classifica Finale ${season}`);
     }
 
     // Applica etichette UI adattive quando la lega è pronta
     applyClassificheUiStrings();
-    
+    attachTeamsSortHandlers();
+    attachByDaySortHandlers();
+
     // Bootstrap classifica quando la lega è pronta
     async function bootstrapClassifiche() {
       try {
@@ -996,7 +2094,192 @@
         console.error('[classifiche] Errore bootstrap:', error);
       }
     }
-    
+
+    // Toggle layout mobile (compatta/estesa) per squadre, giornate, giocatori
+    (function setupMobileLayoutToggles() {
+      const teamsToggle = document.getElementById('teamsLayoutExtended');
+      if (teamsToggle) {
+        teamsToggle.checked = !!window.__teamsLayoutExtended;
+        teamsToggle.addEventListener('change', () => {
+          window.__teamsLayoutExtended = !!teamsToggle.checked;
+          renderTeamsRanking();
+        });
+      }
+
+      const playersToggle = document.getElementById('playersLayoutExtended');
+      if (playersToggle) {
+        playersToggle.checked = !!window.__playersLayoutExtended;
+        playersToggle.addEventListener('change', () => {
+          window.__playersLayoutExtended = !!playersToggle.checked;
+          if (window.PlayersLeaderboard && typeof window.PlayersLeaderboard.rerender === 'function') {
+            window.PlayersLeaderboard.rerender();
+          }
+        });
+      }
+    })();
+
+    // Toggle vista Giornate (Squadre/Giocatori) + toggle compatta/estesa
+    (function setupGiornateViewUi() {
+      const teamsView = document.getElementById('giornateTeamsView');
+      const playersView = document.getElementById('giornatePlayersView');
+      const segButtons = document.querySelectorAll('.giornate-segment .seg-btn[data-giornate-view]');
+      const byDayToggle = document.getElementById('byDayLayoutExtended');
+
+      window.__giornateView = window.__giornateView || 'teams';
+
+      const applyView = (view) => {
+        window.__giornateView = view;
+        segButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-giornate-view') === view));
+        if (teamsView) teamsView.style.display = view === 'teams' ? '' : 'none';
+        if (playersView) playersView.style.display = view === 'players' ? '' : 'none';
+        if (view === 'players') {
+          attachByPlayerDaySortHandlers();
+          renderPlayersByDay(state.selectedGiornata);
+        }
+      };
+
+      segButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const view = btn.getAttribute('data-giornate-view');
+          if (view) applyView(view);
+        });
+      });
+
+      if (byDayToggle) {
+        byDayToggle.checked = !!window.__byDayLayoutExtended;
+        byDayToggle.addEventListener('change', () => {
+          window.__byDayLayoutExtended = !!byDayToggle.checked;
+          if (state.selectedGiornata) {
+            renderGiornata(state.selectedGiornata);
+            renderPlayersByDay(state.selectedGiornata);
+          }
+        });
+      }
+
+      applyView(window.__giornateView);
+    })();
+
+    (function setupSortControls() {
+      const dirLabel = (dir) => (dir === 'asc' ? '↑ Asc' : '↓ Desc');
+
+      const teamsSortSel = document.getElementById('teamsSortSel');
+      const teamsSortDirBtn = document.getElementById('teamsSortDirBtn');
+      if (teamsSortSel) {
+        teamsSortSel.value = state.teamsSortKey || 'total';
+        teamsSortSel.addEventListener('change', () => {
+          state.teamsSortKey = teamsSortSel.value || 'total';
+          state.teamsSortDir = (state.teamsSortKey === 'name') ? 'asc' : (state.teamsSortDir || 'desc');
+          if (teamsSortDirBtn) teamsSortDirBtn.textContent = dirLabel(state.teamsSortDir);
+          renderTeamsRanking();
+        });
+      }
+      if (teamsSortDirBtn) {
+        teamsSortDirBtn.textContent = dirLabel(state.teamsSortDir || 'desc');
+        teamsSortDirBtn.addEventListener('click', () => {
+          state.teamsSortDir = (state.teamsSortDir === 'asc') ? 'desc' : 'asc';
+          teamsSortDirBtn.textContent = dirLabel(state.teamsSortDir);
+          renderTeamsRanking();
+        });
+      }
+
+      const byDaySortSel = document.getElementById('byDaySortSel');
+      const byDaySortDirBtn = document.getElementById('byDaySortDirBtn');
+      if (byDaySortSel) {
+        byDaySortSel.value = state.byDaySortKey || 'points';
+        byDaySortSel.addEventListener('change', () => {
+          state.byDaySortKey = byDaySortSel.value || 'points';
+          state.byDaySortDir = (state.byDaySortKey === 'name') ? 'asc' : (state.byDaySortDir || 'desc');
+          if (byDaySortDirBtn) byDaySortDirBtn.textContent = dirLabel(state.byDaySortDir);
+          if (state.selectedGiornata) renderGiornata(state.selectedGiornata);
+        });
+      }
+      if (byDaySortDirBtn) {
+        byDaySortDirBtn.textContent = dirLabel(state.byDaySortDir || 'desc');
+        byDaySortDirBtn.addEventListener('click', () => {
+          state.byDaySortDir = (state.byDaySortDir === 'asc') ? 'desc' : 'asc';
+          byDaySortDirBtn.textContent = dirLabel(state.byDaySortDir);
+          if (state.selectedGiornata) renderGiornata(state.selectedGiornata);
+        });
+      }
+
+      const byPlayerDaySortSel = document.getElementById('byPlayerDaySortSel');
+      const byPlayerDaySortDirBtn = document.getElementById('byPlayerDaySortDirBtn');
+      if (byPlayerDaySortSel) {
+        byPlayerDaySortSel.value = playerDayState.sortKey || 'points';
+        byPlayerDaySortSel.addEventListener('change', () => {
+          playerDayState.sortKey = byPlayerDaySortSel.value || 'points';
+          playerDayState.sortDir = (playerDayState.sortKey === 'name' || playerDayState.sortKey === 'role') ? 'asc' : (playerDayState.sortDir || 'desc');
+          if (byPlayerDaySortDirBtn) byPlayerDaySortDirBtn.textContent = dirLabel(playerDayState.sortDir);
+          renderPlayersByDay(state.selectedGiornata);
+        });
+      }
+      if (byPlayerDaySortDirBtn) {
+        byPlayerDaySortDirBtn.textContent = dirLabel(playerDayState.sortDir || 'desc');
+        byPlayerDaySortDirBtn.addEventListener('click', () => {
+          playerDayState.sortDir = (playerDayState.sortDir === 'asc') ? 'desc' : 'asc';
+          byPlayerDaySortDirBtn.textContent = dirLabel(playerDayState.sortDir);
+          renderPlayersByDay(state.selectedGiornata);
+        });
+      }
+
+      const playersSortSel = document.getElementById('playersSortSel');
+      const playersSortDirBtn = document.getElementById('playersSortDirBtn');
+      const setPlayersSort = () => {
+        if (!window.PlayersLeaderboard || typeof window.PlayersLeaderboard.setSort !== 'function') return;
+        const key = playersSortSel ? (playersSortSel.value || 'points') : 'points';
+        const dir = window.__playersSortDir || 'desc';
+        window.PlayersLeaderboard.setSort(key, dir);
+        if (playersSortDirBtn) playersSortDirBtn.textContent = dirLabel(dir);
+      };
+      if (playersSortSel) {
+        playersSortSel.value = 'points';
+        playersSortSel.addEventListener('change', () => {
+          const key = playersSortSel.value || 'points';
+          window.__playersSortDir = (key === 'name' || key === 'role') ? 'asc' : (window.__playersSortDir || 'desc');
+          setPlayersSort();
+        });
+      }
+      if (playersSortDirBtn) {
+        window.__playersSortDir = 'desc';
+        playersSortDirBtn.textContent = dirLabel(window.__playersSortDir);
+        playersSortDirBtn.addEventListener('click', () => {
+          window.__playersSortDir = (window.__playersSortDir === 'asc') ? 'desc' : 'asc';
+          setPlayersSort();
+        });
+      }
+    })();
+
+    (function setupFiltersPanels() {
+      const isMobile = () => !!(
+        document.body.classList.contains('device-smartphone') ||
+        document.body.classList.contains('device-tablet') ||
+        (window.matchMedia && (window.matchMedia('(max-width: 760px)').matches || window.matchMedia('(pointer: coarse)').matches))
+      );
+
+      const setupPanel = (btnId, panelId, stateKey) => {
+        const btn = document.getElementById(btnId);
+        const panel = document.getElementById(panelId);
+        if (!btn || !panel) return;
+        window[stateKey] = (window[stateKey] === undefined) ? isMobile() : !!window[stateKey];
+
+        const apply = () => {
+          const collapsed = !!window[stateKey];
+          panel.style.display = collapsed ? 'none' : '';
+          btn.textContent = collapsed ? 'Mostra filtri' : 'Nascondi filtri';
+        };
+        apply();
+
+        btn.addEventListener('click', () => {
+          window[stateKey] = !window[stateKey];
+          apply();
+        });
+      };
+
+      setupPanel('togglePlayersFilters', 'playersFiltersPanel', '__playersFiltersCollapsed');
+      setupPanel('toggleGiornatePlayersFilters', 'giornatePlayersFiltersPanel', '__giornatePlayersFiltersCollapsed');
+      setupPanel('toggleTeamsFilters', 'teamsFiltersPanel', '__teamsFiltersCollapsed');
+    })();
+
     // Aspetta che la lega sia pronta poi carica i dati
     if (window.ensureLeagueReady) {
       window.ensureLeagueReady(10000).then(leagueId => {
@@ -1009,29 +2292,112 @@
         console.error('[classifiche] Errore attesa lega:', err);
       });
     } else {
-      // Fallback: prova subito
       setTimeout(bootstrapClassifiche, 1000);
     }
-    
+
     window.addEventListener('league-ready', () => {
-      try { 
-        applyClassificheUiStrings(); 
+      try {
+        applyClassificheUiStrings();
         bootstrapClassifiche();
       } catch (_) {}
     });
 
   </script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/lazy-load.js?v=20251020"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/auth-guard.js?v=2025101901"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
+  <input type="file" id="playerPhotoInput" accept="image/*" style="display:none" />
+  <script src="resources/players-leaderboard-classifiche.js?v=20260921-final"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/lazy-load.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/auth-guard.js?v=20260925c"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+
+  <script>
+    // Sezione "Curva vs Piana": mini-gioco (contest_standings/current) + bonus di giornata
+    // (leagues/{lega}/results/{g}.faction_bonus, scritto dal Calcolo giornata). D074/D080
+    let fazioniLoaded = false;
+    function fzEsc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    async function loadFazioni() {
+      if (fazioniLoaded) return;
+      const body = document.getElementById('fazioniBody');
+      body.innerHTML = '<p style="color:var(--muted);">Caricamento…</p>';
+      let mini = null, bonus = {}, denied = false;
+      try {
+        const d = await window.db.collection('contest_standings').doc('current').get();
+        mini = d.exists ? d.data() : null;
+      } catch (e) { denied = true; }
+      try {
+        const lid = (typeof getCurrentLeagueIdCached === 'function' && getCurrentLeagueIdCached()) || (state && state.leagueId);
+        if (lid) {
+          const snap = await window.db.collection('leagues/' + lid + '/results').get();
+          snap.docs.forEach(doc => { const fb = doc.data().faction_bonus; if (fb) bonus[doc.id] = fb; });
+        }
+      } catch (e) { /* nessun bonus leggibile */ }
+      if (!mini && !Object.keys(bonus).length) {
+        body.innerHTML = '<p style="color:var(--muted);">' + (denied ? 'Dati non disponibili al momento (permessi).' : 'Nessun punteggio ancora: la classifica parte dopo la prima partita votata o la prima giornata con bonus di fazione.') + '</p>';
+        return;
+      }
+      fazioniLoaded = true;
+      renderFazioni(mini || { teams: {}, users: {}, byMatch: {} }, bonus);
+    }
+    function renderFazioni(st, bonus) {
+      bonus = bonus || {};
+      const N = { curva: 'Curva Morello', piana: 'Piana' };
+      const t = st.teams || {}, c = t.curva || { points:0, players:0, hits:0, predictions:0 }, p = t.piana || { points:0, players:0, hits:0, predictions:0 };
+      const bSum = { curva: 0, piana: 0 };
+      Object.values(bonus).forEach(b => ['curva','piana'].forEach(f => { bSum[f] += Number((b[f] || {}).total || 0); }));
+      const total = { curva: (c.points || 0) + bSum.curva, piana: (p.points || 0) + bSum.piana };
+      const pct = x => x.predictions ? Math.round(100 * (x.hits || 0) / x.predictions) : 0;
+      const avg = x => x.players ? (x.points / x.players).toFixed(1) : '0';
+      let h = '';
+      // 1) Totale = mini-gioco + bonus
+      h += '<div class="fz-tiles">' + ['curva','piana'].map(id => {
+        const mg = (t[id] || {}).points || 0;
+        return '<div class="fz-tile ' + id + '"><div>' + N[id] + '</div><div class="n">' + total[id] + '</div><div class="s">mini-gioco ' + mg + ' • bonus ' + bSum[id] + '</div></div>'; }).join('') + '</div>';
+      const lead = total.curva === total.piana ? 'Parità' : (total.curva > total.piana ? N.curva + ' in vantaggio di ' + (total.curva - total.piana) : N.piana + ' in vantaggio di ' + (total.piana - total.curva));
+      h += '<p class="fz-note" style="text-align:center;">' + lead + ' punti</p>';
+      // 2) Bonus di giornata
+      const bk = Object.keys(bonus).sort((a, b) => Number(a) - Number(b));
+      if (bk.length) {
+        h += '<h3 class="fz-h">Bonus di giornata</h3><table class="fz-table"><tr><th>Giornata</th><th>Curva Morello</th><th>Piana</th></tr>' +
+          bk.map(k => { const b = bonus[k]; const cell = f => { const x = b[f] || {}; return (x.total || 0) + ' <span class="fz-note">(squadre ' + (x.squadre || 0) + ' • eventi ' + (x.eventi || 0) + ')</span>'; };
+            return '<tr><td>G' + fzEsc(k) + '</td><td>' + cell('curva') + '</td><td>' + cell('piana') + '</td></tr>'; }).join('') + '</table>' +
+          '<p class="fz-note">I bonus comuni uguali per tutte le squadre non contano qui: si annullano. Contano le presenze per squadra e gli eventi di fazione (una volta per fazione).</p>';
+      }
+      // 3) Partecipazione al mini-gioco
+      h += '<h3 class="fz-h">Mini-gioco: partecipazione</h3><table class="fz-table"><tr><th></th><th>Giocatori</th><th>Voti</th><th>Media/giocatore</th></tr>' +
+        ['curva','piana'].map(id => { const x = t[id] || { players:0, predictions:0, points:0 };
+          return '<tr><td><span class="fz-dot ' + id + '"></span>' + N[id] + '</td><td>' + x.players + '</td><td>' + x.predictions + '</td><td>' + avg(x) + '</td></tr>'; }).join('') + '</table>' +
+        '<p class="fz-note">Il titolo va alla somma dei punti; la media mostra l\'effetto del numero di giocatori.</p>';
+      // 4) Precisione dei voti
+      h += '<h3 class="fz-h">Mini-gioco: precisione dei voti</h3>' + ['curva','piana'].map(id => { const x = t[id] || {}; const v = pct(x);
+        return '<div>' + N[id] + ': <strong>' + v + '%</strong> <span class="fz-note">(' + (x.hits || 0) + ' su ' + (x.predictions || 0) + ')</span></div>' +
+          '<div class="fz-bar"><span style="width:' + v + '%;background:' + (id === 'curva' ? '#920100' : '#0c0f6d') + ';"></span></div>'; }).join('');
+      // 5) Andamento per giornata (mini-gioco)
+      const bm = st.byMatch || {}; const keys = Object.keys(bm).sort((a, b) => (bm[a].giornata || 0) - (bm[b].giornata || 0));
+      if (keys.length) {
+        let cc = 0, pp = 0;
+        h += '<h3 class="fz-h">Mini-gioco: andamento per giornata</h3><table class="fz-table"><tr><th>Giornata</th><th>Curva</th><th>Piana</th><th>Totale C / P</th></tr>' +
+          keys.map(k => { const m = bm[k]; cc += m.curva.points; pp += m.piana.points;
+            return '<tr><td>G' + fzEsc(m.giornata) + '</td><td>' + m.curva.points + ' <span class="fz-note">(' + m.curva.hits + '/' + m.curva.votes + ')</span></td><td>' + m.piana.points + ' <span class="fz-note">(' + m.piana.hits + '/' + m.piana.votes + ')</span></td><td>' + cc + ' / ' + pp + '</td></tr>'; }).join('') + '</table>';
+      }
+      // 6) Classifica individuale
+      const users = Object.entries(st.users || {}).map(([uid, u]) => ({ uid, ...u })).sort((a, b) => b.points - a.points || b.hits - a.hits);
+      if (users.length) {
+        const me = window.auth && window.auth.currentUser ? window.auth.currentUser.uid : null;
+        h += '<h3 class="fz-h">Mini-gioco: classifica individuale</h3><table class="fz-table"><tr><th>#</th><th>Giocatore</th><th>Punti</th><th>Azzeccati</th></tr>' +
+          users.slice(0, 30).map((u, i) => '<tr' + (u.uid === me ? ' style="font-weight:800;"' : '') + '><td>' + (i + 1) + '</td><td><span class="fz-dot ' + (u.faction || '') + '"></span>' + fzEsc(u.name) + (u.uid === me ? ' (Tu)' : '') + '</td><td>' + u.points + '</td><td>' + (u.hits || 0) + '/' + (u.predictions || 0) + '</td></tr>').join('') + '</table>';
+      }
+      document.getElementById('fazioniBody').innerHTML = h;
+    }
+  </script>
 </body>
 </html>

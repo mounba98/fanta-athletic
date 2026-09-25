@@ -516,7 +516,7 @@
       .dash-stat {
         text-align: center;
         padding: 16px;
-        background: rgba(52, 152, 219, 0.05);
+        background: rgba(12, 15, 109, 0.05);
         border-radius: 12px;
       }
       
@@ -577,7 +577,7 @@
       }
       
       :root.dark .dash-stat {
-        background: rgba(52, 152, 219, 0.1);
+        background: rgba(12, 15, 109, 0.1);
       }
     `;
     

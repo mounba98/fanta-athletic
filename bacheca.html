@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -12,8 +12,9 @@
   <meta name="description" content="Bacheca goliardica e trash talk" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
-  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+      <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .bacheca-container { max-width: 900px; margin: 0 auto; }
     
@@ -31,14 +32,22 @@
       padding: 15px;
       border: 2px solid #dbe1e8;
       border-radius: 10px;
+      /* Le textarea non ereditano il font della pagina: senza questa riga
+         il browser usa un font a spaziatura fissa, diverso dal resto
+         dell'app (2026-09-20). */
+      font-family: inherit;
       font-size: 16px;
       resize: vertical;
       transition: border-color 0.3s;
+      /* "block" toglie i 4px di spazio che il browser lascia sotto gli
+         elementi in linea: servono per far risultare il pulsante verde
+         sotto equidistante dal box e dai pulsanti (2026-09-20). */
+      display: block;
     }
     .post-textarea:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      box-shadow: 0 0 0 3px rgba(12, 15, 109, 0.1);
     }
     .post-actions {
       display: flex;
@@ -102,7 +111,7 @@
     }
     
     .user-item:hover {
-      background: rgba(220,20,60,0.1);
+      background: rgba(146,1,0,0.1);
     }
     
     /* Post Menu */
@@ -153,15 +162,15 @@
     }
     
     .post-menu-item:hover {
-      background: rgba(220,20,60,0.1);
+      background: rgba(146,1,0,0.1);
     }
     
     .post-menu-item.delete {
-      color: #e74c3c;
+      color: #920100;
     }
     
     .post-menu-item.delete:hover {
-      background: rgba(231,76,60,0.1);
+      background: rgba(146,1,0,0.1);
       cursor: pointer;
       padding: 5px;
       border-radius: 5px;
@@ -188,7 +197,7 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(231, 76, 60, 0.9);
+      background: rgba(146, 1, 0, 0.9);
       color: white;
       border: none;
       border-radius: 50%;
@@ -199,7 +208,7 @@
       transition: all 0.2s;
     }
     .image-preview-remove:hover {
-      background: #e74c3c;
+      background: #920100;
       transform: scale(1.1);
     }
     .image-preview-info {
@@ -215,7 +224,7 @@
       gap: 10px;
       margin-top: 15px;
       padding: 15px;
-      background: rgba(52, 152, 219, 0.1);
+      background: rgba(12, 15, 109, 0.1);
       border-radius: 8px;
       border-left: 4px solid var(--primary);
     }
@@ -225,7 +234,7 @@
     .spinner {
       width: 20px;
       height: 20px;
-      border: 3px solid rgba(52, 152, 219, 0.3);
+      border: 3px solid rgba(12, 15, 109, 0.3);
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
@@ -245,7 +254,7 @@
       gap: 10px;
     }
     .toast {
-      background: #2ecc71;
+      background: #16a34a;
       color: white;
       padding: 15px 20px;
       border-radius: 10px;
@@ -256,10 +265,17 @@
       animation: slideIn 0.3s ease;
     }
     .toast.error {
-      background: #e74c3c;
+      background: #920100;
     }
     .toast.info {
-      background: #3498db;
+      background: #0c0f6d;
+    }
+    :root.dark .toast {
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+    :root.dark .toast.error {
+      background: #5c0000;
     }
     @keyframes slideIn {
       from {
@@ -424,7 +440,7 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      background: #e74c3c;
+      background: #920100;
       color: white;
       border: none;
       border-radius: 50%;
@@ -497,7 +513,7 @@
     }
     
     /* Badges */
-    .badge-trash { background: #e74c3c; color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
+    .badge-trash { background: #920100; color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
     .badge-epic { background: #9b59b6; color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
     
     @media (max-width: 640px) {
@@ -513,7 +529,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>💬 Bacheca</h1>
+    <h1>Bacheca</h1>
   </header>
 
   <main class="container bacheca-container">
@@ -522,7 +538,7 @@
       <textarea 
         id="postContent" 
         class="post-textarea" 
-        placeholder="Scrivi qualcosa di epico, trash o semplicemente insulta qualcuno... 😈"
+        placeholder='Scrivi qualcosa tipo... "Che schifo la piana viva la morello" o quel che ti pare...'
       ></textarea>
       
       <!-- Image Preview -->
@@ -538,21 +554,21 @@
         <span id="uploadLoadingText">Caricamento in corso...</span>
       </div>
       
-      <div style="margin-bottom:15px;">
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:#1e40af; color:#fff; padding:10px 14px; border-radius:8px; font-weight:600; font-size:14px; width:fit-content;">
-          <input type="checkbox" id="postAsTeam" style="width:18px; height:18px; cursor:pointer; margin:0;" />
-          <span>🏆 Pubblica come squadra</span>
+      <div style="margin:15px 0; display:flex; justify-content:center;">
+        <label style="display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; background-color:#16a34a; background-image:linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 45%, rgba(0,0,0,0.10) 100%); color:#fff; padding:7px 14px; border:1px solid rgba(0,0,0,0.18); border-radius:999px; box-shadow:0 2px 6px rgba(15,23,42,0.18); font-size:14px; font-weight:600; width:fit-content;">
+          <input type="checkbox" id="postAsTeam" style="width:15px; height:15px; cursor:pointer; margin:0;" />
+          <span>Pubblica come squadra</span>
         </label>
       </div>
       
       <div class="post-actions" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-        <button class="btn btn-secondary" onclick="toggleEmojiPicker()">😀 Emoji</button>
+        <button class="btn btn-secondary" onclick="toggleEmojiPicker()">Emoji</button>
         <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)" />
-        <button class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">📷 Foto</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">Foto</button>
         <input type="file" id="videoInput" accept="video/*" style="display:none;" onchange="handleVideoSelect(event)" />
-        <button class="btn btn-secondary" onclick="document.getElementById('videoInput').click()">🎥 Video</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('videoInput').click()">Video</button>
         <button class="btn btn-secondary" onclick="toggleUserPicker()">@ Tagga</button>
-        <button class="btn" onclick="publishPost()">🚀 Pubblica</button>
+        <button class="btn" onclick="publishPost()">Pubblica</button>
       </div>
       
       <!-- Emoji Picker Carosello -->
@@ -588,19 +604,15 @@
     <div id="postsFeed"></div>
   </main>
 
-  <footer class="footer">
-    <small>&copy; <span id="year"></span> Nicola Mocci</small>
-  </footer>
 
   <script src="resources/firebase-app-compat.js"></script>
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-storage-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-6"></script>
-  <script src="resources/firebase.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
 
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -1740,21 +1752,23 @@
       return html.replace(/(@[a-z0-9._-]+)/gi, '<span class="mention-highlight">$1</span>');
     }
   </script>
-      <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/lazy-load.js?v=20251020"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
-  <script src="resources/league-invite-modal.js?v=2025102403"></script>
-  <script src="resources/social-notifications.js?v=2025102404"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
-  <script src="resources/footer.js?v=20251027"></script>
-  <script src="resources/cookie-consent.js?v=20251027"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+    <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/lazy-load.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/league-invite-modal.js?v=20260920-final"></script>
+  <script src="resources/social-notifications.js?v=20260925"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+  <script src="resources/footer.js?v=20260920-final3"></script>
+  <script src="resources/cookie-consent.js?v=20260920-final"></script>
   
   <!-- Toast Container -->
   <div id="toastContainer" class="toast-container"></div>

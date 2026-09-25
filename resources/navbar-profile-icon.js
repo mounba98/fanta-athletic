@@ -22,6 +22,24 @@
     const host = getNoTeamBadgeHost();
     if (!host) return;
 
+    // Stesso avvolgimento del testo titolo usato da navbar.js (D059) —
+    // qui ripetuto in modo indipendente perché questo script può
+    // caricare prima o dopo navbar.js, e la funzione è idempotente.
+    if (host.tagName === 'H1' && !host.querySelector('.header-title-text')) {
+      if (typeof window.__wrapHeaderTitleText === 'function') {
+        window.__wrapHeaderTitleText(host);
+      } else {
+        const walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT);
+        const textNode = walker.nextNode();
+        if (textNode && textNode.textContent.trim()) {
+          const span = document.createElement('span');
+          span.className = 'header-title-text';
+          span.textContent = textNode.textContent;
+          textNode.parentNode.replaceChild(span, textNode);
+        }
+      }
+    }
+
     let badge = document.getElementById(NO_TEAM_BADGE_ID);
     if (!badge) {
       badge = document.createElement('span');
@@ -32,7 +50,7 @@
         'display:inline-flex',
         'align-items:center',
         'justify-content:center',
-        'margin-left:8px',
+        'flex-shrink:0',
         'padding:3px 8px',
         'border-radius:999px',
         'background:#b91c1c',

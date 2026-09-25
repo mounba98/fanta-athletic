@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -11,8 +11,11 @@
   <meta name="description" content="Classifica cumulativa su tutte le giornate salvate (locale)." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
-  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
     .table { width:100%; border-collapse: collapse; }
@@ -73,17 +76,11 @@
       <p>Questa classifica è calcolata localmente leggendo i salvataggi in questo browser. L'assegnazione alle squadre sarà aggiunta più avanti.</p>
     </section>
   </main>
-
-  <footer class="footer">
-    <small>&copy; <span id="year"></span> Nicola Mocci</small>
-  </footer>
-
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
-  <script src="resources/rules-loader.js?v=2025110301"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/rules-loader.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -96,10 +93,9 @@
     }
     window.db = firebase.firestore();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script>
     
-    document.getElementById('year').textContent = new Date().getFullYear();
 
     const prulesCache = null;
     function computeTotalRules(selMap, rules){
@@ -265,7 +261,7 @@
       tBody.innerHTML = entries.map((e,i)=> {
         let bgColor = '';
         let textColor = '#000';
-        if (i === 0) { bgColor = '#ffd700'; textColor = '#000'; } // Oro
+        if (i === 0) { bgColor = '#facc15'; textColor = '#000'; } // Oro
         else if (i === 1) { bgColor = '#c0c0c0'; textColor = '#000'; } // Argento
         else if (i === 2) { bgColor = '#cd7f32'; textColor = '#000'; } // Bronzo
         else { bgColor=''; textColor = '#fff'; }
@@ -296,14 +292,17 @@
 
     boot();
   </script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+    <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+  <script src="resources/footer.js?v=20260920-final3"></script>
 </body>
 </html>

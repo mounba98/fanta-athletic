@@ -47,3 +47,9 @@ Desktop.ini
 *.backup
 *~
 
+# Copie di backup locali della sessione di revisione (mai da committare)
+fanta-athletic-code-BACKUP-*/
+
+
+# Backup completi del database Firestore (dati personali, mai da committare) — D088
+backups-firestore/

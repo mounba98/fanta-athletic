@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -10,7 +10,10 @@
   <title>Calendario Scontri - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
     .giornata-card {
@@ -43,7 +46,7 @@
       gap: 15px;
     }
     .scontro {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%);
       border-radius: 10px;
       padding: 15px;
       color: white;
@@ -101,8 +104,8 @@
     .status.played { background: rgba(76, 175, 80, 0.3); }
     .status.upcoming { background: rgba(255, 152, 0, 0.3); }
     .riposo { background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); }
-    .forfeit { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
-    .forfeit-penalty { background: rgba(231, 76, 60, 0.3); border-radius: 8px; padding: 10px; margin: -2px 0; }
+    .forfeit { background: linear-gradient(135deg, #920100 0%, #c0392b 100%); }
+    .forfeit-penalty { background: rgba(146, 1, 0, 0.3); border-radius: 8px; padding: 10px; margin: -2px 0; }
     .admin-controls { background: var(--card); padding: 16px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .view-switcher {
       display: flex;
@@ -128,13 +131,13 @@
     }
     .view-btn:hover:not(.disabled):not(:disabled) {
       border-color: var(--primary);
-      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+      box-shadow: 0 4px 12px rgba(12, 15, 109, 0.15);
     }
     .view-btn.active {
-      background: linear-gradient(135deg, rgba(102,126,234,0.18) 0%, rgba(118,75,162,0.20) 100%);
+      background: linear-gradient(135deg, rgba(12,15,109,0.18) 0%, rgba(146,1,0,0.20) 100%);
       border-color: var(--primary);
       color: var(--primary);
-      box-shadow: 0 4px 14px rgba(102,126,234,0.18);
+      box-shadow: 0 4px 14px rgba(12,15,109,0.18);
     }
     .view-btn.disabled,
     .view-btn:disabled {
@@ -149,8 +152,8 @@
       margin-bottom: 16px;
     }
     .calendar-status .info-banner {
-      background: rgba(59,130,246,0.12);
-      border: 1px solid rgba(59,130,246,0.25);
+      background: rgba(12,15,109,0.12);
+      border: 1px solid rgba(12,15,109,0.25);
       color: var(--text);
       padding: 14px 16px;
       border-radius: 12px;
@@ -187,7 +190,7 @@
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 15px;
-      border-bottom: 2px solid rgba(102,126,234,0.35);
+      border-bottom: 2px solid rgba(12,15,109,0.35);
       padding-bottom: 10px;
     }
     .cup-round-title {
@@ -201,7 +204,7 @@
       text-align: right;
     }
     .cup-match {
-      background: linear-gradient(135deg, rgba(102,126,234,0.95) 0%, rgba(118,75,162,0.95) 100%);
+      background: linear-gradient(135deg, rgba(12,15,109,0.95) 0%, rgba(146,1,0,0.95) 100%);
       border-radius: 10px;
       padding: 14px;
       color: #fff;
@@ -261,7 +264,7 @@
     <a class="logo-home" href="index.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>📅 Calendario Scontri</h1>
+    <h1>Calendario Scontri</h1>
   </header>
 
   <main class="container">
@@ -269,26 +272,29 @@
       <h3>Controlli Admin</h3>
       <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <label style="white-space:nowrap;">Numero Giornate:</label>
+          <label style="white-space:nowrap;">Numero giornate:</label>
           <input type="number" id="numRounds" value="34" min="1" max="100" style="width:80px;padding:8px;border-radius:8px;border:1px solid #ddd;" />
         </div>
-        <button class="btn" onclick="generateSchedule()">⚙️ Genera Calendario</button>
-        <button class="btn btn-secondary" onclick="clearResults()">🧹 Cancella Risultati</button>
-        <button class="btn" onclick="deleteCalendar()" style="background:#e74c3c;color:white;">🗑️ Elimina Calendario</button>
+        <button class="btn" onclick="generateSchedule()">Genera Calendario</button>
+        <button class="btn btn-secondary" onclick="clearResults()">Cancella Risultati</button>
+        <button class="btn" onclick="deleteCalendar()" style="background:#920100;color:white;">Elimina Calendario</button>
       </div>
+      <p style="margin:10px 0 0;font-size:13px;opacity:.8;">Genera le sfide delle squadre attuali: all'andata ognuno incontra tutti una volta, poi il ritorno a campi invertiti. I risultati si calcolano solo se nelle Impostazioni della stagione la modalità è "Scontri diretti" o "Entrambe".</p>
     </div>
     <section class="view-switcher" id="viewSwitcher">
-      <button type="button" class="view-btn active" data-view="h2h">⚽ Campionato H2H</button>
-      <button type="button" class="view-btn" data-view="cup">🏆 Coppa / Playoff</button>
+      <button type="button" class="view-btn active" data-view="h2h">Campionato H2H</button>
+      <button type="button" class="view-btn" data-view="cup">Coppa / Playoff</button>
     </section>
     <div id="calendarStatus" class="calendar-status"></div>
     <div id="calendario"></div>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/h2h.js?v=20260925e"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -308,9 +314,13 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script>
-    const SEASON = '2024-25';
+    let SEASON = '2024-25'; // cartella scontri diretti: dal 25/09/2026 la decide la Stagione (D087)
+    async function seasonKey() {
+      if (window.Season) { try { const s = await window.Season.load(); window.__SEASON = s; SEASON = s.h2h.key || SEASON; } catch (e) {} }
+      return SEASON;
+    }
     const leagueHelper = window.LeagueHelper || null;
     let calendarioUi = {
       dayLabelSingular: 'Giornata',
@@ -473,6 +483,7 @@
     }
 
     async function loadTeams() {
+      await seasonKey();   // carica la Stagione (giornate proposte)
       state.teams = [];
       state.teamNames = [];
       state.teamMetaByKey = new Map();
@@ -495,7 +506,8 @@
       snapshot.docs.forEach((doc, index) => {
         const data = doc.data() || {};
         const name = data.name || `Squadra ${index + 1}`;
-        const numericId = data.numericId ?? index;
+        // Numero della squadra = id del documento, come nel Calcolo giornata (D100)
+        const numericId = /^\d+$/.test(doc.id) ? Number(doc.id) : (data.numericId ?? index);
         const meta = {
           id: doc.id,
           name,
@@ -509,9 +521,15 @@
         if (numericId !== undefined && numericId !== null) {
           state.teamMetaByKey.set(String(numericId), meta);
         }
-        state.teamMetaByKey.set(String(index), meta);
-        state.teamMetaByIndex.set(index, meta);
+        state.teamMetaByIndex.set(numericId, meta);
       });
+      // Giornate proposte: quelle della Stagione, altrimenti andata + ritorno (D100)
+      const inp = document.getElementById('numRounds');
+      if (inp) {
+        const n = state.teams.length, andata = n % 2 ? n : n - 1;
+        const ng = window.__SEASON && Number(window.__SEASON.numGiornate);
+        inp.value = ng > 0 ? ng : Math.max(andata * 2, 1);
+      }
     }
 
     async function loadH2HSchedule() {
@@ -520,7 +538,7 @@
 
       let schedSnap = null;
       try {
-        schedSnap = await getScopedCollection('h2h_schedule').doc(SEASON).collection('giornate').orderBy('giornata').get();
+        schedSnap = await getScopedCollection('h2h_schedule').doc(await seasonKey()).collection('giornate').orderBy('giornata').get();
       } catch (err) {
         console.warn('[calendario] errore h2h_schedule', err);
         // ✅ NESSUN FALLBACK LEGACY - solo multilega
@@ -529,7 +547,7 @@
 
       let resSnap = null;
       try {
-        resSnap = await getScopedCollection('h2h_results').doc(SEASON).collection('giornate').get();
+        resSnap = await getScopedCollection('h2h_results').doc(await seasonKey()).collection('giornate').get();
       } catch (err) {
         console.warn('[calendario] errore h2h_results', err);
         // ✅ NESSUN FALLBACK LEGACY - solo multilega
@@ -575,7 +593,7 @@
         try {
           let ref = getScopedCollection(candidate.collection);
           if (candidate.sub) {
-            ref = ref.doc(SEASON).collection(candidate.sub);
+            ref = ref.doc(await seasonKey()).collection(candidate.sub);
           }
           let queryRef = ref;
           if (candidate.orderBy) {
@@ -780,7 +798,7 @@
       }
       if (typeof ref === 'number') {
         const meta = state.teamMetaByIndex.get(ref) || state.teamMetaByKey.get(String(ref));
-        return meta ? meta.name : `Squadra ${ref + 1}`;
+        return meta ? meta.name : `Squadra ${ref}`;
       }
       const key = String(ref).trim();
       if (!key) return 'TBD';
@@ -808,14 +826,26 @@
     }
 
     async function generateSchedule(){
-      const numRounds = parseInt(document.getElementById('numRounds').value) || 34;
-      const numTeams = state.teamNames.length || state.teams.length;
+      const teamIds = state.teams.map(t => t.numericId).filter(n => Number.isFinite(n));
+      const numTeams = teamIds.length;
       if (numTeams < 2) return alert('Serve almeno 2 squadre');
-      if (!confirm(`Generare calendario per ${numTeams} squadre (${numRounds} giornate)?`)) return;
-      const schedule = roundRobinN(numTeams, numRounds);
+      const andata = numTeams % 2 ? numTeams : numTeams - 1;
+      const numRounds = parseInt(document.getElementById('numRounds').value) || andata * 2;
+      const key = await seasonKey();
+      // Se ci sono già risultati non si rigenera: cambierebbero le sfide già giocate
+      const resSnap = await getScopedCollection('h2h_results').doc(key).collection('giornate').limit(1).get();
+      if (!resSnap.empty) return alert('Ci sono già risultati degli scontri diretti: prima usa "Cancella Risultati".');
+      const oldSnap = await getScopedCollection('h2h_schedule').doc(key).collection('giornate').get();
+      const msg = `Generare il calendario sfide per ${numTeams} squadre, ${numRounds} giornate?\n` +
+        `Andata: ${andata} giornate, ognuno incontra tutti una volta; poi ritorno a campi invertiti.` +
+        (oldSnap.empty ? '' : `\n\nATTENZIONE: sostituisce il calendario esistente (${oldSnap.size} giornate).`);
+      if (!confirm(msg)) return;
+      // Generatore corretto a rotazione (D100): il vecchio faceva incontrare ogni squadra solo con metà degli avversari
+      const schedule = window.H2H.generate(teamIds, numRounds);
       const batch = db.batch();
+      oldSnap.docs.forEach(d => batch.delete(d.ref));
       schedule.forEach((g,i)=>{
-        const ref = getScopedCollection('h2h_schedule').doc(SEASON).collection('giornate').doc(`G${i+1}`);
+        const ref = getScopedCollection('h2h_schedule').doc(key).collection('giornate').doc(`G${i+1}`);
         batch.set(ref, { giornata: i+1, matches: g.matches, bye: g.bye });
       });
       await batch.commit();
@@ -824,46 +854,9 @@
       renderCurrentView();
     }
 
-    function roundRobinN(n, totalRounds){
-      const teams = Array.from({length:n},(_,i)=>i);
-      const rounds = [];
-      const isOdd = n % 2 === 1;
-      const activeCount = isOdd ? n : n;
-      const maxRounds = isOdd ? n : (n-1)*2;
-      
-      for (let r=0; r<totalRounds; r++){
-        const matches = [];
-        let bye = null;
-        
-        if (isOdd){
-          bye = teams[0];
-          const active = teams.slice(1);
-          for (let i=0; i<Math.floor(active.length/2); i++){
-            const home = active[i];
-            const away = active[active.length-1-i];
-            if (r%2===0) matches.push({home,away});
-            else matches.push({home:away,away:home});
-          }
-        } else {
-          for (let i=0; i<n/2; i++){
-            const home = teams[i];
-            const away = teams[n-1-i];
-            if (r%2===0) matches.push({home,away});
-            else matches.push({home:away,away:home});
-          }
-        }
-        
-        rounds.push({ matches, bye });
-        // Rotate (keep first fixed if odd)
-        if (isOdd) teams.splice(1,0,teams.pop());
-        else teams.splice(0,0,teams.pop());
-      }
-      return rounds;
-    }
-
     async function clearResults(){
       if (!confirm('Cancellare tutti i risultati?')) return;
-      const snap = await getScopedCollection('h2h_results').doc(SEASON).collection('giornate').get();
+      const snap = await getScopedCollection('h2h_results').doc(await seasonKey()).collection('giornate').get();
       const batch = db.batch();
       snap.docs.forEach(d=> batch.delete(d.ref));
       await batch.commit();
@@ -877,13 +870,13 @@
       if (!confirm('Sei davvero sicuro? Verranno eliminati calendario E risultati!')) return;
       
       // Elimina calendario
-      const schedSnap = await getScopedCollection('h2h_schedule').doc(SEASON).collection('giornate').get();
+      const schedSnap = await getScopedCollection('h2h_schedule').doc(await seasonKey()).collection('giornate').get();
       const batch1 = db.batch();
       schedSnap.docs.forEach(d=> batch1.delete(d.ref));
       await batch1.commit();
       
       // Elimina risultati
-      const resSnap = await getScopedCollection('h2h_results').doc(SEASON).collection('giornate').get();
+      const resSnap = await getScopedCollection('h2h_results').doc(await seasonKey()).collection('giornate').get();
       const batch2 = db.batch();
       resSnap.docs.forEach(d=> batch2.delete(d.ref));
       await batch2.commit();
@@ -894,15 +887,17 @@
     }
   </script>
   
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+    <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
 </body>
 </html>

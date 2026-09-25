@@ -1,0 +1,71 @@
+/* Tema Fanta Athletic — SOLO colori e font, nessuna impaginazione.
+ *
+ * Perché esiste questo file (2026-09-20): alcune pagine hanno
+ * un'impaginazione tutta loro (contest, classifica contest, calendario
+ * Athletic) e usano nomi di classe generici (.card, .match-card,
+ * .team-logo) che vanno in conflitto con quelli di sheet.css. Caricando
+ * sheet.css intero quelle pagine si scomponevano. Qui ci sono solo le
+ * "variabili" di colore e il font: così qualunque pagina può seguire il
+ * tema dell'app senza ereditarne il layout.
+ *
+ * ATTENZIONE: questo è l'UNICO posto dove vivono i colori del tema.
+ * sheet.css importa questo file, non ne tiene una copia: modificare i
+ * colori qui li aggiorna ovunque.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --bg: #f4f4f4;
+  --card: #ffffff;
+  --text: #2c3e50;
+  --muted: #6b7a8a;
+  /* Rosso/blu presi dal logo ufficiale Athletic 2018 (campionati dal
+     file del logo, non a occhio): rosso #920100, blu navy #0c0f6d.
+     Verde #16a34a preso dal campo da gioco, oro #facc15 dal bordo
+     "capitano". */
+  --primary: #920100;
+  --secondary: #0c0f6d;
+  --primary-hover: #740100;
+  --success: #16a34a;
+  --success-hover: #15803d;
+  --gold: #facc15;
+  --gold-light: #fde047;
+  --ring: rgba(146,1,0,0.35);
+  --shadow: 0 2px 5px rgba(0,0,0,0.1);
+  --layout-max: 1200px;
+  --layout-max-wide: 1320px;
+  --layout-padding: clamp(18px, 3vw, 42px);
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --layout-max: 1320px;
+    --layout-max-wide: 1440px;
+  }
+}
+
+@media (min-width: 1680px) {
+  :root {
+    --layout-max: 1440px;
+    --layout-max-wide: 1560px;
+  }
+}
+
+/* Tema scuro */
+:root.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --primary: #920100;
+  --secondary: #0c0f6d;
+  --primary-hover: #740100;
+  --success: #16a34a;
+  --success-hover: #15803d;
+  --gold: #facc15;
+  --gold-light: #fde047;
+  --ring: rgba(146,1,0,0.35);
+  --shadow: 0 4px 10px rgba(0,0,0,0.5);
+}

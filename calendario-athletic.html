@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendario Athletic | Stagione 2024/25</title>
+  <title>Calendario Athletic - Fanta Athletic</title>
   <link rel="icon" href="resources/favicon.ico">
-  <link rel="stylesheet" href="resources/theme.css">
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <!-- Questa pagina usava var(--bg)/var(--text)/var(--card) senza mai
+       caricare il foglio di stile che le definisce: colori e font
+       restavano fuori dal tema dell'app. Collegato theme-tokens.css
+       (2026-09-20). -->
+  <link rel="stylesheet" href="resources/theme-tokens.css?v=20260920-final">
   <style>
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg);
       color: var(--text);
       margin: 0;
@@ -16,14 +21,31 @@
     }
     
     .hero {
-      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      background: linear-gradient(135deg, #920100 0%, #0c0f6d 100%);
       color: white;
       padding: 60px 20px;
       text-align: center;
+      position: relative;
     }
+
+    .back-link {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      padding: 7px 14px;
+      border-radius: 999px;
+    }
+
+    .back-link:hover { background: rgba(255,255,255,0.24); }
     
     .hero h1 {
-      font-size: 2.5rem;
+      font-size: clamp(26px, 5vw, 36px);
       margin: 0 0 10px;
       font-weight: 900;
     }
@@ -52,23 +74,24 @@
     
     .month-btn {
       padding: 12px 24px;
-      border: 2px solid #e5e7eb;
+      border: 1px solid rgba(148,163,184,0.35);
       border-radius: 10px;
-      background: white;
+      background: var(--card);
+      color: var(--text);
       cursor: pointer;
       font-weight: 600;
       transition: all 0.2s;
     }
     
     .month-btn:hover {
-      border-color: #2d6cdf;
-      background: #eff6ff;
+      border-color: #0c0f6d;
+      background: rgba(12,15,109,0.12);
     }
     
     .month-btn.active {
-      background: #2d6cdf;
+      background: #0c0f6d;
       color: white;
-      border-color: #2d6cdf;
+      border-color: #0c0f6d;
     }
     
     .matches-grid {
@@ -81,7 +104,7 @@
       border-radius: 16px;
       padding: 25px;
       box-shadow: var(--shadow);
-      border-left: 6px solid #2d6cdf;
+      border-left: 6px solid #0c0f6d;
       transition: transform 0.2s;
     }
     
@@ -98,7 +121,7 @@
     }
     
     .giornata-badge {
-      background: #2d6cdf;
+      background: #0c0f6d;
       color: white;
       padding: 6px 16px;
       border-radius: 20px;
@@ -107,7 +130,7 @@
     }
     
     .match-date {
-      color: #6b7280;
+      color: var(--muted);
       font-weight: 600;
     }
     
@@ -133,7 +156,7 @@
       width: 80px;
       height: 80px;
       margin: 0 auto 10px;
-      background: linear-gradient(135deg, #dc2626, #2d6cdf);
+      background: linear-gradient(135deg, #920100, #0c0f6d);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -144,31 +167,31 @@
     }
     
     .team.home .team-logo {
-      background: linear-gradient(135deg, #dc2626, #ef4444);
+      background: linear-gradient(135deg, #920100, #920100);
     }
     
     .team.away .team-logo {
-      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      background: linear-gradient(135deg, #1e40af, #0c0f6d);
     }
     
     .team-score {
       font-size: 3rem;
       font-weight: 900;
-      color: #2d6cdf;
+      color: #0c0f6d;
     }
     
     .team.winner .team-score {
-      color: #10b981;
+      color: #16a34a;
     }
     
     .vs {
       font-weight: 900;
       font-size: 1.5rem;
-      color: #9ca3af;
+      color: var(--muted);
     }
     
     .match-info {
-      background: #f9fafb;
+      background: rgba(148,163,184,0.12);
       padding: 15px;
       border-radius: 10px;
       margin-top: 15px;
@@ -182,7 +205,7 @@
     }
     
     .match-info-label {
-      color: #6b7280;
+      color: var(--muted);
       font-weight: 600;
     }
     
@@ -210,13 +233,13 @@
     
     .status-postponed {
       background: #fee2e2;
-      color: #991b1b;
+      color: #5c0000;
     }
     
     .empty-state {
       text-align: center;
       padding: 60px 20px;
-      color: #6b7280;
+      color: var(--muted);
     }
     
     .empty-state h3 {
@@ -230,7 +253,12 @@
         gap: 10px;
       }
       .vs {
-        transform: rotate(90deg);
+        /* Niente rotazione su schermo stretto: l'elemento è largo quanto
+           la card, quindi ruotandolo di 90° il suo ingombro visivo
+           sbordava di ~150px sopra e sotto, finendo sugli stemmi delle
+           squadre. Con le squadre incolonnate "VS" si legge benissimo
+           anche dritto (2026-09-20). */
+        transform: none;
         margin: 10px 0;
       }
       .team-logo {
@@ -247,8 +275,11 @@
 <body>
   <!-- Hero -->
   <div class="hero">
-    <h1>📅 Calendario Athletic</h1>
-    <div class="season-badge">Stagione 2024/25</div>
+    <!-- Questa pagina non ha la barra di navigazione dell'app: senza
+         questo link si restava bloccati qui (2026-09-20). -->
+    <a href="index.html" class="back-link">&larr; Torna alla Home</a>
+    <h1>Calendario Athletic</h1>
+    <div class="season-badge" id="seasonBadge" style="display:none"></div>
   </div>
 
   <!-- Container -->
@@ -265,9 +296,9 @@
   </div>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
 
   <script>
@@ -295,7 +326,28 @@
       }
 
       renderMonthSelector();
+      showSeason();
       await loadMatches();
+    }
+
+    // Stagione dalla lega dell'utente (prima era "2024/25" scritto a mano, D097)
+    function showSeason() {
+      if (!window.firebase || !firebase.auth) return;
+      firebase.auth().onAuthStateChanged(async user => {
+        if (!user) return;
+        try {
+          const raw = window.__LEGACY_DB__ || firebase.firestore();
+          const u = await raw.collection('users').doc(user.uid).get();
+          const lid = u.exists && u.data().currentLeague;
+          if (!lid) return;
+          const lg = await raw.collection('leagues').doc(lid).get();
+          const season = lg.exists && lg.data().season;
+          if (!season) return;
+          const b = document.getElementById('seasonBadge');
+          b.textContent = 'Stagione ' + season;
+          b.style.display = '';
+        } catch (e) { console.warn('[calendario-athletic] stagione', e && (e.code || e.message)); }
+      });
     }
 
     function renderMonthSelector() {
@@ -333,7 +385,7 @@
         console.error('Errore caricamento:', e);
         document.getElementById('matchesGrid').innerHTML = `
           <div class="empty-state">
-            <h3>❌ Errore caricamento</h3>
+            <h3>Errore caricamento</h3>
             <p>Impossibile caricare le partite</p>
           </div>
         `;
@@ -349,7 +401,7 @@
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>📭 Nessuna partita</h3>
+            <h3>Nessuna partita</h3>
             <p>Non ci sono partite programmate per ${state.selectedMonth}</p>
           </div>
         `;

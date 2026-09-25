@@ -60,3 +60,50 @@
   }
 })();
 
+/**
+ * getCurrentLeagueIdCached / getCurrentLeagueId / ensureLeagueReady
+ *
+ * Prima erano ridefinite (identiche) in classifiche.html, matchday.html,
+ * squadre.html, formazioni.html e lineup-summary.html. Centralizzate qui
+ * il 2026-09-19 senza cambiare la logica: stesso comportamento, un solo
+ * posto da aggiornare in futuro. Ogni pagina deve caricare questo file
+ * DOPO resources/firebase-config.js.
+ */
+if (typeof window !== 'undefined') {
+  if (typeof window.getCurrentLeagueIdCached !== 'function') {
+    window.getCurrentLeagueIdCached = function getCurrentLeagueIdCached() {
+      if (window.LeagueHelper && typeof window.LeagueHelper.getCurrentLeagueId === 'function') {
+        const id = window.LeagueHelper.getCurrentLeagueId();
+        if (id) return id;
+      }
+      if (window.currentLeague && window.currentLeague.id) {
+        return window.currentLeague.id;
+      }
+      return null;
+    };
+  }
+
+  if (typeof window.getCurrentLeagueId !== 'function') {
+    // Compatibilità con codice esistente che usa getCurrentLeagueId()
+    window.getCurrentLeagueId = function getCurrentLeagueId() {
+      return window.getCurrentLeagueIdCached();
+    };
+  }
+
+  if (typeof window.ensureLeagueReady !== 'function') {
+    window.ensureLeagueReady = async function ensureLeagueReady(timeoutMs = 7000) {
+      if (window.LeagueHelper && typeof window.LeagueHelper.waitForLeague === 'function') {
+        try {
+          const info = await window.LeagueHelper.waitForLeague(timeoutMs);
+          if (info && info.id) {
+            return info.id;
+          }
+        } catch (err) {
+          console.warn('[league-helper] Timeout attesa lega:', err?.message || err);
+        }
+      }
+      return window.getCurrentLeagueIdCached();
+    };
+  }
+}
+

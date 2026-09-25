@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Upload Foto Giocatori - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <style>
     .upload-container { max-width: 900px; margin: 0 auto; }
@@ -25,7 +28,7 @@
     
     .drop-zone:hover, .drop-zone.drag-over {
       border-color: var(--primary);
-      background: rgba(220, 20, 60, 0.05);
+      background: rgba(146, 1, 0, 0.05);
     }
     
     .crop-container {
@@ -74,9 +77,9 @@
     }
     
     .btn-primary:hover {
-      background: #b91846;
+      background: #740100;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+      box-shadow: 0 4px 12px rgba(146, 1, 0, 0.3);
     }
     
     .btn-secondary {
@@ -89,7 +92,7 @@
     }
     
     .btn-success {
-      background: #28a745;
+      background: #16a34a;
       color: white;
     }
     
@@ -137,7 +140,7 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      background: #e53e3e;
+      background: #920100;
       color: white;
       border: none;
       border-radius: 50%;
@@ -197,7 +200,7 @@
     <a class="logo-home" href="index.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>📸 Upload Foto Giocatori</h1>
+    <h1>Upload Foto Giocatori</h1>
   </header>
 
   <main class="upload-container">
@@ -208,7 +211,7 @@
 
     <!-- Upload Section -->
     <div class="upload-section">
-      <h3>📤 Carica Nuova Foto</h3>
+      <h3>Carica Nuova Foto</h3>
       
       <!-- Player Selector -->
       <div style="margin-bottom: 20px;">
@@ -242,19 +245,19 @@
         </div>
         
         <div class="crop-controls">
-          <button class="btn btn-secondary" onclick="cropper.zoom(0.1)">🔍 Zoom +</button>
-          <button class="btn btn-secondary" onclick="cropper.zoom(-0.1)">🔍 Zoom -</button>
-          <button class="btn btn-secondary" onclick="cropper.rotate(90)">🔄 Ruota</button>
-          <button class="btn btn-secondary" onclick="cropper.reset()">↺ Reset</button>
-          <button class="btn btn-success" onclick="saveCroppedImage()">✅ Salva Foto</button>
-          <button class="btn btn-secondary" onclick="cancelCrop()">✖ Annulla</button>
+          <button class="btn btn-secondary" onclick="cropper.zoom(0.1)">Zoom +</button>
+          <button class="btn btn-secondary" onclick="cropper.zoom(-0.1)">Zoom -</button>
+          <button class="btn btn-secondary" onclick="cropper.rotate(90)">Ruota</button>
+          <button class="btn btn-secondary" onclick="cropper.reset()">Reset</button>
+          <button class="btn btn-success" onclick="saveCroppedImage()">Salva Foto</button>
+          <button class="btn btn-secondary" onclick="cancelCrop()">Annulla</button>
         </div>
       </div>
     </div>
 
     <!-- Players Grid -->
     <div class="upload-section">
-      <h3>👥 Giocatori con Foto</h3>
+      <h3>Giocatori con Foto</h3>
       <input type="text" class="search-box" id="searchPlayers" placeholder="🔍 Cerca giocatore..." />
       
       <div id="loadingPlayers" class="loading">
@@ -268,12 +271,12 @@
     </div>
   </main>
 
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-3"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase IMMEDIATAMENTE
     if (!firebase.apps.length) {
@@ -284,15 +287,14 @@
     window.storage = firebase.storage();
   </script>
 
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/navbar-scroll-hide.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
   
   <script>
     let cropper = null;
@@ -375,7 +377,7 @@
         document.getElementById('playersGrid').style.display = 'grid';
       } catch (error) {
         console.error('Error loading players:', error);
-        document.getElementById('loadingPlayers').innerHTML = '<div style="color: #e53e3e;">Errore caricamento giocatori</div>';
+        document.getElementById('loadingPlayers').innerHTML = '<div style="color: #920100;">Errore caricamento giocatori</div>';
       }
     }
 
@@ -409,7 +411,7 @@
 
       grid.innerHTML = filtered.map(player => `
         <div class="player-card">
-          <button class="delete-photo-btn" onclick="deletePhoto('${player.id}')" title="Elimina foto">✕</button>
+          <button class="delete-photo-btn" onclick="deletePhoto('${player.id}')" title="Elimina foto">&times;</button>
           <img src="${player.photoURL}" class="player-photo" alt="${player.cognome}" onerror="this.src='resources/logo.png'" />
           <div class="player-name">${player.cognome || 'N/A'}</div>
           <div class="player-role">${player.ruolo || 'N/A'}</div>
@@ -663,5 +665,6 @@
       }
     }
   </script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="archivio"></script>
 </body>
 </html>

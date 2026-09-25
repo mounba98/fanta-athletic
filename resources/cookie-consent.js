@@ -63,7 +63,7 @@
       left: 0;
       right: 0;
       background: var(--card, #ffffff);
-      border-top: 2px solid var(--primary, #dc143c);
+      border-top: 2px solid var(--primary, #920100);
       padding: 20px;
       box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
       z-index: 10000;
@@ -83,18 +83,18 @@
       <div style="display: flex; flex-direction: column; gap: 12px; max-width: 1200px; margin: 0 auto; width: 100%;">
         <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 280px;">
-            <h3 style="margin: 0 0 8px 0; color: var(--primary, #dc143c); font-size: 18px; font-weight: 600;">
+            <h3 style="margin: 0 0 8px 0; color: var(--primary, #920100); font-size: 18px; font-weight: 600;">
               🍪 Utilizziamo cookie e localStorage
             </h3>
             <p style="margin: 0; font-size: 14px; line-height: 1.5; color: var(--text, #1e293b);">
               Utilizziamo cookie tecnici essenziali e localStorage per salvare le tue preferenze (tema, lega selezionata) e mantenere la sessione di login. 
-              <a href="cookie-policy.html" style="color: var(--primary, #dc143c); text-decoration: underline;">Maggiori informazioni</a>
+              <a href="cookie-policy.html" style="color: var(--primary, #920100); text-decoration: underline;">Maggiori informazioni</a>
             </p>
           </div>
           <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             <button id="cookieConsentAccept" style="
               padding: 10px 20px;
-              background: var(--primary, #dc143c);
+              background: var(--primary, #920100);
               color: white;
               border: none;
               border-radius: 8px;

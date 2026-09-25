@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verifica Squadre & Utenti</title>
-  <link rel="stylesheet" href="resources/sheet.css">
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header">
   <style>
     body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%);
       min-height: 100vh;
       padding: 20px;
     }
@@ -36,19 +36,19 @@
       justify-content: space-between;
       align-items: center;
     }
-    .user-card.no-team { border-color: #ef4444; background: rgba(239,68,68,0.1); }
-    .user-card.has-team { border-color: #22c55e; }
+    .user-card.no-team { border-color: #920100; background: rgba(239,68,68,0.1); }
+    .user-card.has-team { border-color: #16a34a; }
     .btn {
       padding: 8px 16px;
-      background: #d91847;
+      background: #920100;
       border: none;
       border-radius: 6px;
       color: white;
       cursor: pointer;
       font-weight: 600;
     }
-    .btn:hover { background: #b91846; }
-    .btn.assign { background: #22c55e; }
+    .btn:hover { background: #740100; }
+    .btn.assign { background: #16a34a; }
     select {
       padding: 8px 12px;
       border-radius: 6px;
@@ -61,27 +61,27 @@
 </head>
 <body>
   <div class="container">
-    <h1>🔍 Verifica Squadre & Utenti</h1>
+    <h1>Verifica Squadre & Utenti</h1>
     
     <div class="section">
-      <h2>📊 Statistiche</h2>
+      <h2>Statistiche</h2>
       <div id="stats"></div>
     </div>
 
     <div class="section">
-      <h2>👥 Utenti Senza Squadra</h2>
+      <h2>Utenti Senza Squadra</h2>
       <div id="usersWithoutTeam"></div>
     </div>
 
     <div class="section">
-      <h2>⚽ Squadre</h2>
+      <h2>Squadre</h2>
       <div id="teamsList"></div>
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
   
   <script>
@@ -203,10 +203,10 @@
         if (teams.length === 0) {
           alert('⚠️ Nessuna squadra trovata!\n\nCrea squadre in admin.html → Gestione Squadre');
           document.getElementById('stats').innerHTML = `
-            <div style="background: #ef4444; color: white; padding: 24px; border-radius: 12px; text-align: center;">
-              <h2 style="margin: 0 0 12px 0;">❌ Nessuna Squadra</h2>
+            <div style="background: #920100; color: white; padding: 24px; border-radius: 12px; text-align: center;">
+              <h2 style="margin: 0 0 12px 0;">Nessuna Squadra</h2>
               <p>Crea squadre prima di assegnare utenti.</p>
-              <a href="admin-teams.html" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: white; color: #ef4444; border-radius: 8px; text-decoration: none; font-weight: 600;">
+              <a href="admin-teams.html" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: white; color: #920100; border-radius: 8px; text-decoration: none; font-weight: 600;">
                 Gestione Squadre
               </a>
             </div>
@@ -247,15 +247,15 @@
       document.getElementById('stats').innerHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
           <div style="background: #334155; padding: 16px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 32px; font-weight: 700; color: #22c55e;">${users.length}</div>
+            <div style="font-size: 32px; font-weight: 700; color: #16a34a;">${users.length}</div>
             <div style="color: #94a3b8;">Utenti Totali</div>
           </div>
           <div style="background: #334155; padding: 16px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">${teams.length}</div>
+            <div style="font-size: 32px; font-weight: 700; color: #0c0f6d;">${teams.length}</div>
             <div style="color: #94a3b8;">Squadre</div>
           </div>
           <div style="background: #334155; padding: 16px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 32px; font-weight: 700; color: ${usersWithoutTeam.length > 0 ? '#ef4444' : '#22c55e'}">${usersWithoutTeam.length}</div>
+            <div style="font-size: 32px; font-weight: 700; color: ${usersWithoutTeam.length > 0 ? '#920100' : '#16a34a'}">${usersWithoutTeam.length}</div>
             <div style="color: #94a3b8;">Senza Squadra</div>
           </div>
         </div>
@@ -264,7 +264,7 @@
       // Users without team
       if (usersWithoutTeam.length === 0) {
         document.getElementById('usersWithoutTeam').innerHTML = `
-          <div style="text-align: center; padding: 32px; color: #22c55e;">
+          <div style="text-align: center; padding: 32px; color: #16a34a;">
             ✅ Tutti gli utenti sono assegnati a una squadra!
           </div>
         `;
@@ -282,8 +282,7 @@
                   `<option value="${team.id}">${team.name || team.nome || `Team ${team.id}`}</option>`
                 ).join('')}
               </select>
-              <button class="btn assign" onclick="assignUser('${user.uid}')">
-                ✅ Assegna
+              <button class="btn assign" onclick="assignUser('${user.uid}')">Assegna
               </button>
             </div>
           </div>
@@ -310,8 +309,7 @@
                       <strong>${user.displayName || user.email || 'User'}</strong><br>
                       <span style="color: #94a3b8; font-size: 13px;">${user.email || user.uid}</span>
                     </div>
-                    <button class="btn" onclick="removeUser('${user.uid}')">
-                      ❌ Rimuovi
+                    <button class="btn" onclick="removeUser('${user.uid}')">Rimuovi
                     </button>
                   </div>
                 `).join('')}
@@ -373,6 +371,7 @@
     }
   </script>
   
-  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="squadre"></script>
 </body>
 </html>

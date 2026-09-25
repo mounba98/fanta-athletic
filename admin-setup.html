@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>🔧 Admin Setup - Athletic 2018</title>
+  <title>Admin Setup - Athletic 2018</title>
   <style>
     body {
       font-family: system-ui;
@@ -17,16 +17,16 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    h1 { color: #2d6cdf; margin-top: 0; }
+    h1 { color: #0c0f6d; margin-top: 0; }
     .section {
       background: #f9fafb;
       padding: 20px;
       border-radius: 8px;
       margin: 20px 0;
-      border-left: 4px solid #2d6cdf;
+      border-left: 4px solid #0c0f6d;
     }
     .btn {
-      background: #2d6cdf;
+      background: #0c0f6d;
       color: white;
       border: none;
       padding: 12px 24px;
@@ -36,11 +36,11 @@
       margin: 10px 5px;
       font-weight: 600;
     }
-    .btn:hover { background: #1e5bbf; }
-    .btn-danger { background: #dc2626; }
+    .btn:hover { background: #080a4d; }
+    .btn-danger { background: #920100; }
     .btn-danger:hover { background: #b91c1c; }
-    .btn-success { background: #10b981; }
-    .btn-success:hover { background: #059669; }
+    .btn-success { background: #16a34a; }
+    .btn-success:hover { background: #15803d; }
     #log {
       background: #1e293b;
       color: #e2e8f0;
@@ -53,10 +53,10 @@
       font-size: 13px;
       line-height: 1.8;
     }
-    .success { color: #10b981; }
-    .error { color: #ef4444; }
+    .success { color: #16a34a; }
+    .error { color: #920100; }
     .info { color: #60a5fa; }
-    .warning { color: #fbbf24; }
+    .warning { color: #facc15; }
     .status-box {
       display: inline-block;
       padding: 8px 16px;
@@ -65,19 +65,19 @@
       font-weight: 600;
     }
     .status-ok { background: #d1fae5; color: #065f46; }
-    .status-error { background: #fee2e2; color: #991b1b; }
+    .status-error { background: #fee2e2; color: #5c0000; }
     .status-pending { background: #fef3c7; color: #92400e; }
   </style>
 </head>
 <body>
   <div id="navbar-container"></div>
   <div class="container">
-    <h1>🔧 Admin Setup - Athletic 2018</h1>
+    <h1>Admin Setup - Athletic 2018</h1>
     <p>Script completo per inizializzare database e contest</p>
 
     <!-- Status -->
     <div class="section">
-      <h3>📊 Status</h3>
+      <h3>Status</h3>
       <div id="statusBox">
         <span class="status-box status-pending">⏳ In attesa...</span>
       </div>
@@ -85,42 +85,40 @@
 
     <!-- Actions -->
     <div class="section">
-      <h3>🎯 Azioni Disponibili</h3>
+      <h3>Azioni Disponibili</h3>
       
       <h4>📋 Regole</h4>
-      <button class="btn" onclick="uploadRules()">📤 Upload Regole (97)</button>
-      <button class="btn btn-danger" onclick="deleteAllRules()">🗑️ Reset Regole</button>
-      <button class="btn btn-success" onclick="verifyRules()">✅ Verifica Regole</button>
+      <button class="btn" onclick="uploadRules()">Upload Regole (97)</button>
+      <button class="btn btn-danger" onclick="deleteAllRules()">Reset Regole</button>
+      <button class="btn btn-success" onclick="verifyRules()">Verifica Regole</button>
       
       <h4 style="margin-top:20px;">🏆 Contest</h4>
-      <button class="btn" onclick="setupContest()">🎮 Setup Contest Completo</button>
-      <button class="btn btn-success" onclick="verifyContest()">✅ Verifica Contest</button>
+      <button class="btn" onclick="setupContest()">Setup Contest Completo</button>
+      <button class="btn btn-success" onclick="verifyContest()">Verifica Contest</button>
       
       <h4 style="margin-top:20px;">📅 Calendario Athletic</h4>
-      <button class="btn" onclick="setupCalendario()">📆 Setup Calendario Ottobre</button>
-      <button class="btn btn-success" onclick="verifyCalendario()">✅ Verifica Calendario</button>
+      <button class="btn" onclick="setupCalendario()">Setup Calendario Ottobre</button>
+      <button class="btn btn-success" onclick="verifyCalendario()">Verifica Calendario</button>
       
       <h4 style="margin-top:20px;">🚀 All-in-One</h4>
-      <button class="btn btn-success" style="font-size:18px;" onclick="setupAll()">
-        ⚡ SETUP TUTTO (Regole + Contest + Calendario)
+      <button class="btn btn-success" style="font-size:18px;" onclick="setupAll()">SETUP TUTTO (Regole + Contest + Calendario)
       </button>
     </div>
 
     <!-- Log -->
     <div class="section">
-      <h3>📝 Log</h3>
+      <h3>Log</h3>
       <div id="log"></div>
     </div>
   </div>
 
   <!-- Firebase SDKs -->
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
-  <script src="resources/rules-loader.js?v=2025110301"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/rules-loader.js?v=20260920-final"></script>
   
   <script>
     if (!firebase.apps.length) {
@@ -549,5 +547,6 @@
       }
     });
   </script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="archivio"></script>
 </body>
 </html>

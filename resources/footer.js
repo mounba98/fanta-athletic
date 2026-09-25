@@ -23,8 +23,8 @@
     const footer = document.createElement('footer');
     footer.setAttribute('data-fanta-footer', 'true');
     footer.style.cssText = `
-      margin-top: 60px;
-      padding: 30px 20px;
+      margin-top: 40px;
+      padding: 20px 20px;
       background: var(--card, #ffffff);
       border-top: 1px solid var(--border, #e2e8f0);
       text-align: center;
@@ -36,17 +36,26 @@
       footer.style.borderTopColor = '#334155';
     }
 
+    // Il rosso del brand (--primary, #920100) è pensato per sfondi chiari:
+    // su sfondo scuro il contrasto è troppo basso per leggerlo, quindi in
+    // tema scuro i link usano un rosso più chiaro.
+    const linkColor = darkMode ? '#f87171' : 'var(--primary, #920100)';
+    const linkStyle = `color: ${linkColor}; text-decoration: none; font-size: 14px; transition: opacity 0.2s;`;
+
     footer.innerHTML = `
-      <div style="max-width: 1200px; margin: 0 auto;">
-        <p style="margin: 0 0 12px 0; color: var(--muted, #64748b); font-size: 14px;">
+      <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+        <p style="margin: 0 0 8px 0; color: var(--muted, #64748b); font-size: 14px; text-align: center;">
           © 2025 Fanta Athletic. Tutti i diritti riservati.
         </p>
-        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 12px;">
-          <a href="privacy.html" style="color: var(--primary, #dc143c); text-decoration: none; font-size: 14px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Privacy Policy</a>
-          <a href="terms.html" style="color: var(--primary, #dc143c); text-decoration: none; font-size: 14px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Termini e Condizioni</a>
-          <a href="cookie-policy.html" style="color: var(--primary, #dc143c); text-decoration: none; font-size: 14px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Cookie Policy</a>
-          <a href="javascript:void(0);" onclick="if(typeof window.manageCookieConsent==='function')window.manageCookieConsent();" style="color: var(--primary, #dc143c); text-decoration: none; font-size: 14px; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Gestisci Cookie</a>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 8px 20px; flex-wrap: wrap; margin-top: 4px; text-align: center;">
+          <a href="privacy.html" style="${linkStyle}" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Privacy Policy</a>
+          <a href="terms.html" style="${linkStyle}" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Termini e Condizioni</a>
+          <a href="cookie-policy.html" style="${linkStyle}" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Cookie Policy</a>
+          <a href="javascript:void(0);" onclick="if(typeof window.manageCookieConsent==='function')window.manageCookieConsent();" style="${linkStyle} cursor: pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Gestisci Cookie</a>
         </div>
+        <p style="margin: 8px 0 0 0; color: var(--muted, #64748b); font-size: 12px; opacity: 0.7; text-align: center;">
+          Created by Nicola Mocci
+        </p>
       </div>
     `;
 

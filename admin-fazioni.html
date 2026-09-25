@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Fazioni e nomi</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
+  <style>
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .team-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+    .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700; color:#fff; }
+    .badge.curva { background:#920100; } .badge.piana { background:#0c0f6d; } .badge.none { background:#64748b; }
+    .member { display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:8px 0; border-top:1px solid rgba(148,163,184,.2); }
+    .member input { flex:1; min-width:140px; padding:8px 10px; border-radius:10px; border:1px solid #334155; background:transparent; color:var(--text); font-family:inherit; }
+    .btn { padding:8px 14px; border-radius:999px; font-weight:600; cursor:pointer; border:none; color:#fff; }
+    .btn.curva { background:#920100; } .btn.piana { background:#0c0f6d; } .btn.ok { background:#16a34a; } .btn:disabled { opacity:.5; }
+    #log { font-size:13px; white-space:pre-wrap; background:rgba(148,163,184,.12); border-radius:10px; padding:12px; min-height:30px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home"><img src="resources/logo.png" alt="Fanta Athletic" /></a>
+    <h1>Fazioni e nomi</h1>
+  </header>
+
+  <main class="container">
+    <section class="card" id="denied" style="display:none;"><h2>Accesso riservato</h2><p>Solo per gli amministratori.</p></section>
+    <div id="adminContent" style="display:none;">
+      <section class="card">
+        <p class="muted" id="summary">Caricamento…</p>
+        <p class="muted">La fazione si sceglie una volta per squadra: qui puoi correggerla per tutta la squadra (aggiorna anche i suoi utenti) e correggere i nomi reali.</p>
+      </section>
+      <div id="teams"></div>
+      <section class="card"><h3 style="margin-top:0;">Registro</h3><div id="log">—</div></section>
+    </div>
+  </main>
+
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script>
+    const FACT = { curva: 'Curva Morello', piana: 'Piana' };
+    let leagueId = null, teams = {}, users = [];
+
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function log(m) { const el = document.getElementById('log'); el.textContent = (el.textContent === '—' ? '' : el.textContent + '\n') + m; }
+
+    async function init() {
+      let r = 0; while ((!window.auth || !window.db) && r++ < 50) await new Promise(x => setTimeout(x, 100));
+      window.auth.onAuthStateChanged(async (user) => {
+        if (!user) { location.href = 'auth.html?redirect=' + encodeURIComponent(location.href); return; }
+        let ok = false;
+        try { ok = (await window.db.collection('admins').doc(user.uid).get()).exists; } catch (e) {}
+        if (!ok) { document.getElementById('denied').style.display = 'block'; return; }
+        document.getElementById('adminContent').style.display = 'block';
+        const me = (await window.db.collection('users').doc(user.uid).get()).data() || {};
+        leagueId = me.currentLeague;
+        await load();
+      });
+    }
+
+    async function load() {
+      try {
+        const ts = await window.db.collection('leagues/' + leagueId + '/teams').get();
+        teams = {}; ts.docs.forEach(d => { teams[d.id] = { id: d.id, ...d.data() }; });
+        const us = await window.db.collection('users').get();
+        users = us.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.currentLeague === leagueId);
+        render();
+      } catch (e) { log('❌ Errore di lettura: ' + (e.code || e.message)); }
+    }
+
+    function render() {
+      const by = {}; users.forEach(u => { const k = (u.team_index === null || u.team_index === undefined) ? '_none' : String(u.team_index); (by[k] = by[k] || []).push(u); });
+      const ids = Object.keys(teams).sort((a, b) => Number(a) - Number(b));
+      if (by._none) ids.push('_none');
+      const noName = users.filter(u => !(u.nomeReale && u.nomeReale.trim().length >= 2)).length;
+      const noFaction = users.filter(u => !FACT[u.fazione]).length;
+      document.getElementById('summary').textContent = users.length + ' utenti nella lega • ' + noFaction + ' senza fazione • ' + noName + ' senza nome reale';
+
+      document.getElementById('teams').innerHTML = ids.map(id => {
+        const t = teams[id] || { nome: 'Senza squadra' };
+        const members = by[id] || [];
+        const f = FACT[t.fazione] ? t.fazione : (members.find(m => FACT[m.fazione]) || {}).fazione;
+        const badge = f ? '<span class="badge ' + f + '">' + FACT[f] + '</span>' : '<span class="badge none">nessuna fazione</span>';
+        const btns = id === '_none' ? '' :
+          '<button class="btn curva" data-team="' + id + '" data-f="curva">Curva Morello</button> ' +
+          '<button class="btn piana" data-team="' + id + '" data-f="piana">Piana</button>';
+        return '<section class="card"><div class="team-head"><div><strong>' + esc(t.nome || t.name || ('Squadra ' + id)) + '</strong> ' + badge + '</div><div>' + btns + '</div></div>' +
+          (members.length ? members.map(m =>
+            '<div class="member"><span style="min-width:110px;">' + esc(m.displayName || m.username || m.email || m.uid) + '</span>' +
+            '<input data-uid="' + m.uid + '" value="' + esc(m.nomeReale || '') + '" placeholder="Nome e cognome reali">' +
+            '<button class="btn ok" data-save="' + m.uid + '">Salva nome</button></div>').join('') : '<div class="muted">Nessun utente</div>') +
+          '</section>';
+      }).join('');
+
+      document.querySelectorAll('button[data-team]').forEach(b => b.addEventListener('click', () => setTeamFaction(b.dataset.team, b.dataset.f)));
+      document.querySelectorAll('button[data-save]').forEach(b => b.addEventListener('click', () => saveName(b.dataset.save)));
+    }
+
+    async function setTeamFaction(teamId, f) {
+      const t = teams[teamId]; const members = users.filter(u => String(u.team_index) === String(teamId));
+      if (!confirm('Impostare "' + FACT[f] + '" per la squadra "' + (t.nome || t.name || teamId) + '" e per i suoi ' + members.length + ' utenti?')) return;
+      try {
+        const batch = window.db.batch();
+        batch.set(window.db.collection('leagues/' + leagueId + '/teams').doc(teamId), { fazione: f }, { merge: true });
+        members.forEach(m => batch.set(window.db.collection('users').doc(m.uid), { fazione: f, fazioneAt: new Date().toISOString(), fazioneDa: 'admin' }, { merge: true }));
+        await batch.commit();
+        log('✅ ' + (t.nome || teamId) + ' → ' + FACT[f] + ' (' + members.length + ' utenti)');
+        await load();
+      } catch (e) { log('❌ ' + (e.code || e.message)); }
+    }
+
+    async function saveName(uid) {
+      const v = document.querySelector('input[data-uid="' + uid + '"]').value.trim().replace(/\s+/g, ' ');
+      if (v.length < 2) { log('⚠ Scrivi almeno 2 caratteri'); return; }
+      try { await window.db.collection('users').doc(uid).set({ nomeReale: v }, { merge: true }); log('✅ Nome salvato: ' + v); await load(); }
+      catch (e) { log('❌ ' + (e.code || e.message)); }
+    }
+
+    init();
+  </script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="squadre"></script>
+</body>
+</html>

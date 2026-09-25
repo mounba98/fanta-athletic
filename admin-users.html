@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin • Gestione Utenti</title>
+  <title>Admin â€¢ Gestione Utenti</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+    <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .container { max-width: 1400px; margin: 0 auto; padding: 16px; }
     .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 20px; }
@@ -24,7 +27,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Admin • Gestione Utenti</h1>
+    <h1>Admin â€¢ Gestione Utenti</h1>
   </header>
 
   <main class="container">
@@ -74,15 +77,15 @@
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn btn-secondary" onclick="closeEditModal()">Annulla</button>
-        <button class="btn" onclick="saveEdit()">?? Salva</button>
+        <button class="btn" onclick="saveEdit()">Salva</button>
       </div>
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -95,7 +98,7 @@
     }
     const db = firebase.firestore();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script>
 
     firebase.auth().onAuthStateChanged(async (user)=>{
@@ -140,8 +143,8 @@
       
       const tbody = document.querySelector('#usersTable tbody');
       tbody.innerHTML = filtered.map(u=>{
-        const teamName = teamsData.find(t=> t.id === String(u.team_index))?.name || '—';
-        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('it-IT') : '—';
+        const teamName = teamsData.find(t=> t.id === String(u.team_index))?.name || 'â€”';
+        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('it-IT') : 'â€”';
         const shortId = u.id.substring(0, 8);
         const firstName = capitalize(u.firstName || '');
         const lastName = capitalize(u.lastName || '');
@@ -149,14 +152,14 @@
         return `
           <tr>
             <td class="uid" title="${u.id}">${shortId}</td>
-            <td>${firstName || '—'}</td>
-            <td>${lastName || '—'}</td>
-            <td>${u.email || '—'}</td>
+            <td>${firstName || 'â€”'}</td>
+            <td>${lastName || 'â€”'}</td>
+            <td>${u.email || 'â€”'}</td>
             <td>${teamName}</td>
             <td>${date}</td>
             <td>
-              <button class="btn btn-sm btn-edit" onclick="openEditModal('${u.id}')">??</button>
-              <button class="btn btn-sm btn-delete" onclick="deleteUser('${u.id}')">???</button>
+              <button class="btn btn-sm btn-edit" onclick="openEditModal('${u.id}')">Modifica</button>
+              <button class="btn btn-sm btn-delete" onclick="deleteUser('${u.id}')">Elimina</button>
             </td>
           </tr>
         `;
@@ -213,15 +216,15 @@
 
     async function deleteUser(id){
       const user = usersData.find(u=> u.id === id);
-      if (!confirm(`Eliminare utente ${user.email || user.id}?\n\nQuesta azione è irreversibile.`)) return;
+      if (!confirm(`Eliminare utente ${user.email || user.id}?\n\nQuesta azione Ã¨ irreversibile.`)) return;
       await db.collection('users').doc(id).delete();
     }
   </script>
-    <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="archivio"></script>
 </body>
 </html>

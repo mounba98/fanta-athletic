@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Riepilogo Titolari - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script src="resources/theme-preload.js"></script>
-  <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     :root {
       --card-bg: var(--card, #ffffff);
@@ -100,7 +101,7 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0c0f6d, #920100);
       color: white;
       border: none;
       border-radius: 10px;
@@ -108,12 +109,12 @@
       font-weight: 600;
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+      box-shadow: 0 10px 25px rgba(12, 15, 109, 0.2);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.35);
+      box-shadow: 0 12px 30px rgba(12, 15, 109, 0.35);
     }
 
     .summary-grid {
@@ -316,8 +317,8 @@
       width: 20px;
       height: 20px;
       border-radius: 4px;
-      background: rgba(99, 102, 241, 0.2);
-      border: 1px solid rgba(99, 102, 241, 0.4);
+      background: rgba(12, 15, 109, 0.2);
+      border: 1px solid rgba(12, 15, 109, 0.4);
       font-size: 12px;
       line-height: 18px;
       text-align: center;
@@ -437,7 +438,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      background: rgba(99, 102, 241, 0.15);
+      background: rgba(12, 15, 109, 0.15);
       color: #4338ca;
       padding: 3px 8px;
       border-radius: 999px;
@@ -452,7 +453,7 @@
     .points .total {
       font-size: 24px;
       font-weight: 800;
-      color: var(--primary, #dc2626);
+      color: var(--primary, #920100);
     }
 
     .points .detail {
@@ -461,7 +462,7 @@
     }
 
     .points .total.negative {
-      color: #dc2626;
+      color: #920100;
     }
 
     .badge {
@@ -469,7 +470,7 @@
       align-items: center;
       gap: 6px;
       padding: 6px 10px;
-      background: rgba(99, 102, 241, 0.12);
+      background: rgba(12, 15, 109, 0.12);
       color: #3730a3;
       border-radius: 999px;
       font-size: 12px;
@@ -620,7 +621,7 @@
     }
 
     .player-row-points.negative {
-      color: #dc2626;
+      color: #920100;
     }
 
     .player-row-toggle {
@@ -687,8 +688,8 @@
       font-size: 11px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: #f59e0b;
-      background: rgba(245, 158, 11, 0.15);
+      color: #facc15;
+      background: rgba(250, 204, 21, 0.15);
       border-radius: 999px;
       padding: 2px 8px;
       font-weight: 700;
@@ -741,10 +742,10 @@
 
     .coach-card {
       margin-top: 20px;
-      background: rgba(59, 130, 246, 0.08);
+      background: rgba(12, 15, 109, 0.08);
       border-radius: 14px;
       padding: 18px;
-      border: 1px solid rgba(59, 130, 246, 0.25);
+      border: 1px solid rgba(12, 15, 109, 0.25);
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -762,8 +763,8 @@
       height: 56px;
       border-radius: 50%;
       overflow: hidden;
-      border: 2px solid rgba(59,130,246,0.35);
-      background: rgba(59,130,246,0.1);
+      border: 2px solid rgba(12,15,109,0.35);
+      background: rgba(12,15,109,0.1);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -791,7 +792,7 @@
     }
 
     .coach-total-value.negative {
-      color: #dc2626;
+      color: #920100;
     }
 
     .curva-card {
@@ -850,7 +851,7 @@
     }
 
     .curva-points.negative {
-      color: #dc2626;
+      color: #920100;
     }
 
     :root.dark .curva-points {
@@ -867,12 +868,12 @@
     }
 
     .curva-total.negative {
-      color: #dc2626;
+      color: #920100;
     }
 
     :root.dark .coach-card {
-      background: rgba(59, 130, 246, 0.18);
-      border-color: rgba(59, 130, 246, 0.35);
+      background: rgba(12, 15, 109, 0.18);
+      border-color: rgba(12, 15, 109, 0.35);
       color: #e2e8f0;
     }
 
@@ -1013,8 +1014,8 @@
       <div class="players-header">
         <h2>Dettaglio giocatori titolari</h2>
         <div id="viewToggle" class="view-toggle">
-          <button type="button" data-view="cards" class="active">🌟 Griglia</button>
-          <button type="button" data-view="list">📋 Lista</button>
+          <button type="button" data-view="cards" class="active">Griglia</button>
+          <button type="button" data-view="list">Lista</button>
         </div>
       </div>
       <div id="playersContent" class="loading">In attesa dati…</div>
@@ -1023,32 +1024,34 @@
     </section>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
   <script>
     if (!window.firebase) {
-      document.write('<script src="resources/firebase-app-compat.js?v=20251107"><\\/script>');
+      document.write('<script src="resources/firebase-app-compat.js?v=20260920-final"><\\/script>');
     }
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
   <script>
     if (!(window.firebase && firebase.auth)) {
-      document.write('<script src="resources/firebase-auth-compat.js?v=20251107"><\\/script>');
+      document.write('<script src="resources/firebase-auth-compat.js?v=20260920-final"><\\/script>');
     }
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script>
     if (!(window.firebase && firebase.firestore)) {
-      document.write('<script src="resources/firebase-firestore-compat.js?v=20251107"><\\/script>');
+      document.write('<script src="resources/firebase-firestore-compat.js?v=20260920-final"><\\/script>');
     }
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
   <script>
     if (!(window.firebase && firebase.storage)) {
-      document.write('<script src="resources/firebase-storage-compat.js?v=20251107"><\\/script>');
+      document.write('<script src="resources/firebase-storage-compat.js?v=20260920-final"><\\/script>');
     }
   </script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
-  <script src="resources/rules-loader.js?v=2025110301"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/league-helper.js?v=20260920-final"></script>
+  <script src="resources/toast-with-fallback.js?v=20260920-final"></script>
+  <script src="resources/rules-loader.js?v=20260920-final"></script>
   <script>
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
@@ -1270,29 +1273,8 @@
       return window.db || firebase.firestore();
     }
 
-    function showFallbackToast(msg) {
-      const el = document.createElement('div');
-      el.textContent = msg;
-      el.style.position = 'fixed';
-      el.style.bottom = '16px';
-      el.style.right = '16px';
-      el.style.background = '#2d6cdf';
-      el.style.color = '#fff';
-      el.style.padding = '10px 14px';
-      el.style.borderRadius = '8px';
-      el.style.boxShadow = '0 10px 30px rgba(15,23,42,0.4)';
-      el.style.zIndex = '9999';
-      document.body.appendChild(el);
-      setTimeout(() => { el.remove(); }, 2500);
-    }
-
-    function showToast(msg) {
-      if (typeof window.toast === 'function') {
-        window.toast(msg);
-      } else {
-        showFallbackToast(msg);
-      }
-    }
+    // showToast(msg) / showFallbackToast(msg) centralizzate in
+    // resources/toast-with-fallback.js (2026-09-19)
 
     function notifyMissingLeague(context = 'questa operazione') {
       console.warn(`[lineup-summary] League ID mancante (${context})`);
@@ -1303,34 +1285,8 @@
       }
     }
 
-    function getCurrentLeagueIdCached() {
-      if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
-        const id = leagueHelper.getCurrentLeagueId();
-        if (id) return id;
-      }
-      if (window.currentLeague && window.currentLeague.id) {
-        return window.currentLeague.id;
-      }
-      return null;
-    }
-
-    function getCurrentLeagueId() {
-      return getCurrentLeagueIdCached();
-    }
-
-    async function ensureLeagueReady(timeoutMs = 7000) {
-      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
-        try {
-          const info = await leagueHelper.waitForLeague(timeoutMs);
-          if (info && info.id) {
-            return info.id;
-          }
-        } catch (err) {
-          console.warn('[lineup-summary] Timeout attesa lega:', err?.message || err);
-        }
-      }
-      return getCurrentLeagueIdCached();
-    }
+    // getCurrentLeagueIdCached / getCurrentLeagueId / ensureLeagueReady
+    // sono centralizzate in resources/league-helper.js (2026-09-19)
 
     function getLeagueDoc(collection, docId, leagueId = null) {
       const db = firestore();
@@ -1824,7 +1780,7 @@
       summaryContent.innerHTML = `
         <div class="summary-grid">
           ${tiles.map(tile => `
-            <div class="summary-tile" style="${tile.highlight ? 'background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(236,72,153,0.12));' : ''}">
+            <div class="summary-tile" style="${tile.highlight ? 'background: linear-gradient(135deg, rgba(12,15,109,0.12), rgba(146,1,0,0.12));' : ''}">
               <span>${tile.label}</span>
               <strong>${tile.value}</strong>
             </div>
@@ -1959,7 +1915,7 @@
               ${info.nickname ? `<div style="font-size:11px;color:var(--text-muted);">${escapeHtml(capitalizeDisplay(info.nickname))}</div>` : ''}
             </td>
             <td>${escapeHtml(info.role || '—')}</td>
-            <td style="font-weight:700;color:${playerData.totalWithCaptain < 0 ? '#dc2626' : 'var(--primary)'};">${playerData.totalWithCaptain.toFixed(2)}${playerData.isCaptain ? ' ⭐' : ''}</td>
+            <td style="font-weight:700;color:${playerData.totalWithCaptain < 0 ? '#920100' : 'var(--primary)'};">${playerData.totalWithCaptain.toFixed(2)}${playerData.isCaptain ? ' ⭐' : ''}</td>
             <td class="breakdown-text">${escapeHtml(breakdown.text)}</td>
           </tr>
         `;
@@ -2204,7 +2160,7 @@
 
       curvaContent.innerHTML = `
         <div class="curva-card">
-          <h3>🎺 Curva</h3>
+          <h3>Curva</h3>
           <div style="font-size:14px;">
             <span style="font-weight:700;">Totale curva:</span>
             <span class="curva-total ${total < 0 ? 'negative' : 'positive'}">${total.toFixed(2)}</span>
@@ -2445,17 +2401,19 @@
 
   </script>
 
-  <script src="resources/feature-flags.js?v=20251103"></script>
-  <script src="resources/player-photo-loader.js?v=2025110701"></script>
-  <script src="resources/app-init.js"></script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
+  <script src="resources/feature-flags.js?v=20260920-final"></script>
+  <script src="resources/player-photo-loader.js?v=20260920-final"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
 </body>
 </html>
 

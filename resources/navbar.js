@@ -32,6 +32,7 @@
       { href: 'index.html', label: 'Home', icon: '<img src="resources/icons/home.png" alt="Home" />', desktop: true, mobile: true },
       { href: 'squadre.html', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', desktop: true, mobile: false },
       { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', desktop: true, mobile: true },
+      { href: 'contest.html', label: 'Mini-gioco', icon: '', desktop: true, mobile: false },
       { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', desktop: true, mobile: false },
       { href: 'statistiche.html', label: 'Statistiche', icon: '<img src="resources/icons/statistiche.png" alt="Statistiche" />', desktop: true, mobile: false },
       { href: 'store.html', label: 'Store', icon: '<img src="resources/icons/store.png" alt="Store" />', desktop: true, mobile: true },
@@ -81,6 +82,24 @@
 
   const BADGE_ID = 'currentLeagueBadge';
 
+  // Avvolge il testo del titolo (es. "Squadre") in uno <span> che può
+  // crescere per riempire lo spazio libero nell'intestazione — così i
+  // badge aggiunti dopo (stagione, "Nessuna squadra"...) restano sempre
+  // raggruppati sulla destra, qualunque sia il loro numero, invece di
+  // sparpagliarsi con margin-left:auto su ciascuno (D059).
+  function wrapHeaderTitleText(h1) {
+    if (!h1 || h1.querySelector('.header-title-text')) return;
+    const walker = document.createTreeWalker(h1, NodeFilter.SHOW_TEXT);
+    const textNode = walker.nextNode();
+    if (textNode && textNode.textContent.trim()) {
+      const span = document.createElement('span');
+      span.className = 'header-title-text';
+      span.textContent = textNode.textContent;
+      textNode.parentNode.replaceChild(span, textNode);
+    }
+  }
+  window.__wrapHeaderTitleText = wrapHeaderTitleText;
+
   async function fetchLeagueDoc(leagueId) {
     if (!leagueId || !window.firebase || !firebase.firestore) return null;
     try {
@@ -95,21 +114,24 @@
 
   function ensureLeagueBadge(hostElement) {
     if (!hostElement) return null;
+    wrapHeaderTitleText(hostElement);
     let badge = document.getElementById(BADGE_ID);
     if (badge) return badge;
     badge = document.createElement('span');
     badge.id = BADGE_ID;
     badge.style.cssText = `
       display:none;
-      margin-left:12px;
-      padding:4px 10px;
+      flex-shrink:0;
+      padding:4px 12px;
       border-radius:999px;
-      background:rgba(31,41,55,0.85);
+      background:rgba(255,255,255,0.14);
+      border:1px solid rgba(250,204,21,0.55);
       color:#fff;
       font-size:11px;
-      font-weight:600;
+      font-weight:700;
       text-transform:uppercase;
       letter-spacing:0.04em;
+      white-space:nowrap;
     `;
     hostElement.appendChild(badge);
     return badge;
@@ -145,7 +167,9 @@
     const extras = [];
     if (config?.label) extras.push(config.label);
     if (leagueData.season) extras.push(leagueData.season);
-    badge.textContent = `${leagueData.name || 'Lega'}${extras.length ? ' · ' + extras.join(' · ') : ''}`;
+    // Il nome della lega è già mostrato nel tab selettore lega subito sotto
+    // l'intestazione: ripeterlo qui creava un doppione visivo (2026-09-20).
+    badge.textContent = extras.length ? extras.join(' · ') : (leagueData.name || 'Lega');
     badge.style.display = 'inline-flex';
   }
 

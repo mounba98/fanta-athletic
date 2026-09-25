@@ -6,6 +6,9 @@
 
 (function() {
   'use strict';
+  // Caricato sia dalla pagina sia da app-init.js: il secondo avvio si ferma qui (D099)
+  if (window.__FA_AUTH_GUARD_ON) return;
+  window.__FA_AUTH_GUARD_ON = true;
   
   const USERNAME_REGEX = /^[a-z0-9._-]{3,20}$/;
   const RESERVED_USERNAMES = new Set(['utente', 'admin', 'administrator', 'root', 'supporto', 'support', 'moderator', 'mod']);
@@ -22,7 +25,7 @@
   }
   
   // Pages che NON richiedono login
-  const PUBLIC_PAGES = ['auth.html', 'login.html', 'register.html', 'index.html', 'store.html', 'adsense-verification.html', 'adsense-preview.html', 'privacy.html', 'terms.html', 'join-league.html', 'scegli-squadra.html', 'join-team.html'];
+  const PUBLIC_PAGES = ['auth.html', 'login.html', 'register.html', 'index.html', 'store.html', 'adsense-verification.html', 'privacy.html', 'terms.html', 'join-league.html', 'scegli-squadra.html', 'join-team.html'];
   const currentPage = window.location.pathname.split('/').pop();
   
   // Se è pagina pubblica, esci
@@ -716,7 +719,7 @@ function detectExistingUsername(data = {}, user = null) {
             <p style="margin:0;font-size:14px;line-height:1.5;color:var(--muted,#94a3b8);">
               Per partecipare alla lega devi impostare un nome utente unico. Sarà visibile agli altri membri.
             </p>
-            ${(displayName || email) ? `<div style="font-size:13px;background:rgba(59,130,246,0.08);padding:10px 12px;border-radius:10px;border:1px solid rgba(59,130,246,0.18);">
+            ${(displayName || email) ? `<div style="font-size:13px;background:rgba(12,15,109,0.08);padding:10px 12px;border-radius:10px;border:1px solid rgba(12,15,109,0.18);">
               <strong>Profilo:</strong> ${displayName || email}
             </div>` : ''}
           </div>

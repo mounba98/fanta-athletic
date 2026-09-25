@@ -1,22 +1,15 @@
-const CACHE_NAME = 'fanta-athletic-v2025102720';
+const CACHE_NAME = 'fanta-athletic-v2026092501';
+// Precaricati all'installazione: le librerie Firebase (le più pesanti, ~550 KB,
+// identiche finché non si cambia versione) e le pagine principali.
 const urlsToCache = [
   '/',
   '/index.html',
-  '/squadre.html',
-  '/matchday.html',
-  '/standings.html',
-  '/statistiche.html',
-  '/allenatori.html',
-  '/giocatori.html',
   '/auth.html',
-  '/resources/sheet.css',
   '/resources/logo.png',
-  '/resources/firebase-cdn-loader.js',
   '/resources/firebase-app-compat.js',
   '/resources/firebase-auth-compat.js',
   '/resources/firebase-firestore-compat.js',
-  '/resources/firebase-storage-compat.js',
-  '/notifications.html'
+  '/resources/firebase-storage-compat.js'
 ];
 
 // Install event - cache resources
@@ -46,54 +39,75 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch event - NETWORK FIRST (no cache for HTML/JS/CSS)
+// Fetch event (D099)
+// - File con etichetta di versione (?v=...) e librerie Firebase locali:
+//   PRIMA IL MAGAZZINO. Non possono essere vecchi: quando un file cambia
+//   gli si cambia l'etichetta, quindi l'indirizzo è nuovo e si riscarica.
+// - HTML e JS/CSS senza etichetta: PRIMA LA RETE (sempre freschi), con
+//   copia di riserva per quando si è offline.
+// - Immagini e altro: prima il magazzino (come prima).
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
-  
-  // Skip Firestore and Firebase completely - let them handle their own requests
-  if (url.hostname.includes('firestore.googleapis.com') || 
-      url.hostname.includes('firebase') ||
-      url.hostname.includes('googleapis.com')) {
-    return; // Don't intercept Firebase requests at all
+
+  // Solo file del sito: Firebase/Google e altri domini fanno da sé
+  if (url.origin !== self.location.origin) return;
+
+  const isCode = url.pathname.endsWith('.js') || url.pathname.endsWith('.css');
+  const isVersioned = url.searchParams.has('v');
+  const isFirebaseLib = /\/resources\/firebase-[a-z-]+-compat\.js$/.test(url.pathname);
+
+  if (isCode && (isVersioned || isFirebaseLib)) {
+    event.respondWith(cacheFirst(event.request, url));
+    return;
   }
-  
-  // Skip cache for HTML, JS, CSS - always fetch fresh (network-first con fallback)
-  if (url.pathname.endsWith('.html') || 
-      url.pathname.endsWith('.js') || 
-      url.pathname.endsWith('.css') ||
-      url.pathname === '/') {
+
+  if (isCode || url.pathname.endsWith('.html') || url.pathname === '/') {
     event.respondWith(networkFirst(event.request));
     return;
   }
-  
-  // For images and other assets, use cache first
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(response => {
-          if(!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
-          });
-          return response;
-        });
-      })
+    caches.match(event.request).then(hit => hit || fetch(event.request).then(response => {
+      if (response && response.status === 200 && response.type === 'basic') {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+      }
+      return response;
+    }))
   );
 });
 
-function networkFirst(request) {
-  return fetch(request).catch(() => {
-    return caches.match(request).then(match => {
-      if (match) return match;
-      return offlineResponse();
+async function cacheFirst(request, url) {
+  const cache = await caches.open(CACHE_NAME);
+  const hit = await cache.match(request);
+  if (hit) return hit;
+  // Prima copia: la chiede al server (non a una copia del browser magari vecchia)
+  const response = await fetch(request, { cache: 'no-cache' });
+  if (response && response.status === 200 && response.type === 'basic') {
+    await cache.put(request, response.clone());
+    // Toglie le versioni vecchie dello stesso file (stesso percorso, etichetta diversa)
+    const keys = await cache.keys();
+    keys.forEach(k => {
+      const ku = new URL(k.url);
+      if (ku.pathname === url.pathname && ku.search !== url.search) cache.delete(k);
     });
-  });
+  }
+  return response;
+}
+
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    if (response && response.status === 200 && response.type === 'basic') {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+    }
+    return response;
+  } catch (e) {
+    const match = await caches.match(request);
+    return match || offlineResponse();
+  }
 }
 
 function offlineResponse() {

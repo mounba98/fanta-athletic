@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -11,16 +11,17 @@
   <meta name="description" content="Inserimento punteggi per Giornata." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
-  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
-  <link rel="stylesheet" href="resources/tablet-landscape.css?v=2025102101" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+    <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) 2.3fr; gap: 20px; }
     .sidebar, .panel { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
     .panel { min-height: calc(100vh - 120px); }
     .tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .tab { padding: 10px 16px; font-weight: 700; border-radius: 999px; border: 2px solid #c7d1db; background:#fff; cursor:pointer; }
-    .tab.active { background:#e8f3fc; border-color: var(--primary); color: var(--primary); box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
+    .tab.active { background:#e8f3fc; border-color: var(--primary); color: var(--primary); box-shadow: 0 0 0 3px rgba(12,15,109,0.15); }
     .rule { display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 6px 0; border-bottom:1px dashed #eee; }
     .rule .count { display:inline-flex; min-width:32px; justify-content:center; font-weight:700; color: var(--text); }
     .rule:last-child { border-bottom: 0; }
@@ -87,7 +88,7 @@
         border-bottom: 0;
       }
       .desktop-bonus-malus-grid h3 {
-        border-bottom: 2px solid var(--primary, #3498db);
+        border-bottom: 2px solid var(--primary, #0c0f6d);
         padding-bottom: 8px;
         margin-bottom: 12px;
       }
@@ -103,14 +104,14 @@
       }
       :root.dark .desktop-bonus-malus-grid h3 {
         color: #e2e8f0;
-        border-bottom-color: var(--primary, #3498db);
+        border-bottom-color: var(--primary, #0c0f6d);
       }
     }
     /* Curva layout */
     .curva-wrap { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
     .curva-section { border:1px solid #e7edf3; border-radius:10px; padding:8px; background:#fff; }
     .curva-subtitle { font-weight:700; margin:10px 0 6px; font-size:13px; color:#64748b; text-transform:uppercase; letter-spacing:0.06em; }
-    .curva-subtitle.malus { color:#dc2626; }
+    .curva-subtitle.malus { color:#920100; }
     .curva-header { font-weight:800; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
     .curva-body { display:grid; gap:6px; }
     .curva-section.collapsed .curva-body { display:none; }
@@ -253,14 +254,14 @@
     /* Dark mode mobile buttons */
     :root.dark #saveRow {
       background: #1e293b;
-      border-top-color: #3b82f6;
+      border-top-color: #0c0f6d;
     }
     
     /* Dark Mode Styles */
     :root.dark .tab { background: #1e293b; border-color: #334155; color: #e2e8f0; }
-    :root.dark .tab.active { background: #1e40af; border-color: #3b82f6; color: #fff; }
+    :root.dark .tab.active { background: #1e40af; border-color: #0c0f6d; color: #fff; }
     :root.dark .chip { background: #1e293b; border-color: #334155; color: #e2e8f0; }
-    :root.dark .chip.on { background: #1e40af; border-color: #3b82f6; }
+    :root.dark .chip.on { background: #1e40af; border-color: #0c0f6d; }
     :root.dark .item { background: #1e293b; border-color: #334155; color: #e2e8f0; }
     :root.dark .item:hover { background: #334155; }
     :root.dark .role-section { background: #1e293b; border-color: #334155; }
@@ -304,6 +305,7 @@
         <button class="tab active" data-tab="players">Giocatori</button>
         <button class="tab" data-tab="coaches">Coach</button>
         <button class="tab" data-tab="curva">Curva</button>
+        <button class="tab" data-tab="fazioni">Fazioni</button>
         <button class="tab" data-tab="squads">Squadre</button>
       </div>
       <div style="margin-top:14px;">
@@ -311,16 +313,16 @@
         <div id="summary" class="list"></div>
       </div>
       <div id="saveRow" style="margin-top:10px; display:grid; gap:4px;">
-        <button class="btn" id="saveAll" style="background:#22c55e; border-color:#16a34a; padding:8px 12px; font-size:13px;">💾 Salva giornata</button>
+        <button class="btn" id="saveAll" style="background:#16a34a; border-color:#16a34a; padding:8px 12px; font-size:13px;">Salva giornata</button>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
-          <button class="btn btn-secondary" id="resetGiornata" style="font-size:12px; padding:8px 12px;">🗑️ Reset Giornata</button>
-          <button class="btn" id="saveTempBtn" style="background:#f59e0b; border-color:#d97706; padding:8px 12px; font-size:13px;">📝 Salva Live</button>
+          <button class="btn btn-secondary" id="resetGiornata" style="font-size:12px; padding:8px 12px;">Reset Giornata</button>
+          <button class="btn" id="saveTempBtn" style="background:#facc15; border-color:#d97706; padding:8px 12px; font-size:13px;">Salva Live</button>
         </div>
-        <button class="btn btn-secondary" id="resetAll" style="font-size:12px; padding:8px 12px;">🗑️ Reset TUTTO</button>
+        <button class="btn btn-secondary" id="resetAll" style="font-size:12px; padding:8px 12px;">Reset TUTTO</button>
         <div class="desktop-only" id="resetControlsDesktop" style="display:flex; gap:6px; margin-top:4px;">
-          <button class="btn btn-secondary" data-reset="players" style="font-size:11px; padding:6px 10px; flex:1;">🗑️ Giocatori</button>
-          <button class="btn btn-secondary" data-reset="coaches" style="font-size:11px; padding:6px 10px; flex:1;">🗑️ Coach</button>
-          <button class="btn btn-secondary" data-reset="curva" style="font-size:11px; padding:6px 10px; flex:1;">🗑️ Curva</button>
+          <button class="btn btn-secondary" data-reset="players" style="font-size:11px; padding:6px 10px; flex:1;">Giocatori</button>
+          <button class="btn btn-secondary" data-reset="coaches" style="font-size:11px; padding:6px 10px; flex:1;">Coach</button>
+          <button class="btn btn-secondary" data-reset="curva" style="font-size:11px; padding:6px 10px; flex:1;">Curva</button>
         </div>
       </div>
     </section>
@@ -329,32 +331,36 @@
     </section>
   </main>
 
-  <footer class="footer">
-    <small>&copy; <span id="year"></span> Nicola Mocci</small>
-  </footer>
   <!-- Firebase SDKs -->
-  <script src="resources/firebase-cdn-loader.js?v=2025110701"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
-  <script src="resources/rules-loader.js?v=2025110301"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/h2h.js?v=20260925e"></script>
+  <script src="resources/league-helper.js?v=20260920-final"></script>
+  <script src="resources/toast.js?v=20260920-final"></script>
+  <script src="resources/rules-loader.js?v=20260920-final"></script>
+  <script src="resources/faction-bonus.js?v=20260924"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
   </script>
-  <script src="resources/firebase.js"></script>
-  <script src="resources/feature-flags.js?v=20251103"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
+  <script src="resources/feature-flags.js?v=20260920-final"></script>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
 
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-    const SEASON = '2024-25';
+    let SEASON = '2024-25'; // cartella scontri diretti: dal 25/09/2026 la decide la Stagione (D087)
+    async function seasonKey() {
+      if (window.Season) { try { SEASON = (await window.Season.load()).h2h.key || SEASON; } catch (e) {} }
+      return SEASON;
+    }
     const FORFEIT_WIN_SCORE = 3;
     const FORFEIT_LOSS_SCORE = -10;
     let featureFlags = {
@@ -455,36 +461,9 @@
       }
     }
 
-    function getCurrentLeagueIdCached() {
-      if (leagueHelper && typeof leagueHelper.getCurrentLeagueId === 'function') {
-        const id = leagueHelper.getCurrentLeagueId();
-        if (id) return id;
-      }
-      if (window.currentLeague && window.currentLeague.id) {
-        return window.currentLeague.id;
-      }
-      return null;
-    }
+    // getCurrentLeagueIdCached / getCurrentLeagueId / ensureLeagueReady
+    // sono centralizzate in resources/league-helper.js (2026-09-19)
 
-    // Compatibilità con codice esistente che usa getCurrentLeagueId()
-    function getCurrentLeagueId() {
-      return getCurrentLeagueIdCached();
-    }
-    
-    async function ensureLeagueReady(timeoutMs = 7000) {
-      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
-        try {
-          const info = await leagueHelper.waitForLeague(timeoutMs);
-          if (info && info.id) {
-            return info.id;
-          }
-        } catch (err) {
-          console.warn('[matchday] Timeout attesa lega:', err?.message || err);
-        }
-      }
-      return getCurrentLeagueIdCached();
-    }
-    
     // Helper multilega - unica fonte di verità per i path
     function getLeagueDoc(collection, docId, leagueId = null) {
       const db = firestore();
@@ -664,7 +643,7 @@
       wrap.innerHTML = rows.map((r, idx)=> `
         <div class="item" style="cursor:pointer;" onclick="alert('${r.name}:\\n\\nCurva (globale): ${r.curvaBase.toFixed(2)}\\nGiocatori titolari: ${r.playerSum.toFixed(2)}\\nCapitano (raddoppiato): ${r.captainBonus.toFixed(2)}\\nAllenatore: ${r.coachPts.toFixed(2)}\\n\\nTOTALE: ${r.total.toFixed(2)} pt')">
           <div style="display:flex; align-items:center; gap:8px;">
-            <div style="min-width:24px; text-align:center; font-weight:700; color:${idx<3?'#dc143c':'var(--muted)'};">${idx+1}°</div>
+            <div style="min-width:24px; text-align:center; font-weight:700; color:${idx<3?'#920100':'var(--muted)'};">${idx+1}°</div>
             <div style="flex:1;">
               <div style="font-weight:700;">${r.name}</div>
               <div class="muted" style="font-size:11px;">
@@ -889,7 +868,7 @@
       });
     }
     function normalizeCurvaRules(raw){
-      return raw.rules.filter(r => r.soggetto === 'Curva' && r.visible !== false).map(r => {
+      return raw.rules.filter(r => r.soggetto === 'Curva' && r.visible !== false && !(window.FactionBonus && window.FactionBonus.isScoped(r))).map(r => {
         // Rispetta input_type o input se presente e non 'auto'
         let inputType = r.input_type || r.input;
         if (!inputType || inputType === 'auto') {
@@ -932,6 +911,10 @@
         localStorage.setItem(`convocati_${state.giornata}`, JSON.stringify(Array.from(convSet)));
       } catch (_) {}
     }
+
+    // Arrivo dalla Partita live (D093): ?g=G5&from=live → si usano SOLO i dati
+    // pubblicati dalla live (matchday_temp), senza mescolarli con salvataggi vecchi.
+    const LIVE_MODE = (function(){ try { const q = new URLSearchParams(location.search); return q.get('from') === 'live' ? { g: q.get('g') } : null; } catch (e) { return null; } })();
 
     async function loadDay(){
       // Pulisci i convocati all'inizio per evitare che rimangano quelli della giornata precedente
@@ -1031,6 +1014,32 @@
       if (!window.db) {
         restoreConvocatiFromSelections();
       }
+
+      if (LIVE_MODE && LIVE_MODE.g === state.giornata && window.db) {
+        try {
+          const leagueId = await getLeagueIdOrNotify('caricare i dati della Partita live', { notify: false });
+          const t = await firestore().collection(`leagues/${leagueId}/matchday_temp`).doc(state.giornata).get();
+          const lv = await firestore().collection(`leagues/${leagueId}/live`).doc(state.giornata).get();
+          if (t.exists) {
+            const d = t.data();
+            state.selPlayers = d.players || {}; state.selCoaches = d.coaches || {}; state.selCurva = d.curva || {};
+            restoreConvocatiFromSelections();
+          }
+          const stato = lv.exists ? lv.data().stato : null;
+          showLiveBanner(stato);
+        } catch (e) { console.warn('[matchday] dati Partita live non caricati', e); }
+      }
+    }
+
+    function showLiveBanner(stato) {
+      let b = document.getElementById('liveBanner');
+      if (!b) {
+        b = document.createElement('div'); b.id = 'liveBanner';
+        b.style.cssText = 'margin:12px 16px;padding:14px 16px;border-radius:14px;color:#fff;font-weight:700;background:' + (stato === 'definitivo' ? '#0c0f6d' : '#b45309');
+        const h = document.querySelector('header'); if (h) h.insertAdjacentElement('afterend', b); else document.body.prepend(b);
+      }
+      b.innerHTML = '⚡ Dati dalla Partita live — ' + (stato === 'definitivo' ? 'DEFINITIVI' : 'PROVVISORI') +
+        '<div style="font-weight:500;font-size:13px;margin-top:4px;">Controlla e premi <b>Salva giornata</b> per calcolare i punti. <a href="live.html?g=' + encodeURIComponent(state.giornata) + '" style="color:#fff;">Torna alla Partita live</a></div>';
     }
     function saveDay(){
       // Debug: verifica integrità dati curva prima di salvare
@@ -1137,7 +1146,12 @@
       let batch = window.db.batch();
       let pending = 0;
       
+      // Casa o trasferta dal calendario (per la presenza), D080
+      await loadCalendar();
+      const fbCtx = { venue: venueForGiornata(state.giornata).venue };
+
       // Calcola punti per ogni squadra
+      const h2hByTeam = {};
       for (const team of teams) {
         // Carica lineup salvata per questa giornata
         let lineup = null;
@@ -1211,8 +1225,13 @@
         const formationValue = getFormationBonusValue();
         let formationBonus = (formationEnabled && starters.length >= 5) ? formationValue : 0;
 
-        let total = curvaBase + playerSum + captainBonus + coachPts + formationBonus;
+        // Bonus di fazione (presenze per squadra + eventi della sua fazione), D080
+        const fbRaw = window.FactionBonus ? window.FactionBonus.teamBonus(team.id, team.fazione, state.selCurva, state.rules, fbCtx) : { total: 0 };
+        let factionBonus = fbRaw.total;
+
+        let total = curvaBase + playerSum + captainBonus + coachPts + formationBonus + factionBonus;
         if (missingLineup) {
+          factionBonus = 0;
           total = 0;
           playerSum = 0;
           captainBonus = 0;
@@ -1220,6 +1239,7 @@
           formationBonus = 0;
         }
         const curvaDisplay = missingLineup ? 0 : curvaBase;
+        h2hByTeam[String(team.id)] = { points: total, starters: starters.length, missing: !!missingLineup };
         
         // Prepara payload risultato
         const payload = {
@@ -1231,8 +1251,10 @@
               players: playerSum,
               captain: captainBonus,
               coach: coachPts,
-              formation: formationBonus
+              formation: formationBonus,
+              fazione: factionBonus
             },
+            faction: team.fazione || null,
             lineup: lineup,
           missingLineup,
             captain: captain,
@@ -1269,6 +1291,32 @@
         await batch.commit();
         console.info('[matchday] batch risultati committed (final)');
       }
+
+      // Scontri diretti (D087): solo se la Stagione li prevede, altrimenti non fa nulla
+      try {
+        if (window.H2H && window.Season) {
+          const season = await window.Season.load();
+          const h2hMatches = await window.H2H.saveDay(leagueId, season, state.giornata, h2hByTeam);
+          if (h2hMatches) console.info('[matchday] scontri diretti salvati:', h2hMatches.length);
+        }
+      } catch (h2hErr) {
+        console.warn('[matchday] impossibile salvare gli scontri diretti', h2hErr);
+        toast('⚠️ Punti salvati, ma non gli scontri diretti');
+      }
+
+      // Classifica di fazione (D080): presenze di tutte le squadre + eventi contati una volta.
+      // I bonus globali "Curva" NON entrano (sono uguali per tutti e si annullano).
+      try {
+        if (window.FactionBonus) {
+          const totals = window.FactionBonus.factionTotals(teams.map(t => ({ id: t.id, fazione: t.fazione })), state.selCurva, state.rules, fbCtx);
+          const resultsCol = getLeagueCollection('results', leagueId);
+          if (resultsCol) {
+            await resultsCol.doc(String(state.giornata)).set({ faction_bonus: totals, factionBonusAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+          }
+        }
+      } catch (fbErr) {
+        console.warn('[matchday] impossibile salvare i bonus di fazione', fbErr);
+      }
       
       console.info('[matchday] saveTeamResults done');
       
@@ -1292,8 +1340,8 @@
         if (!teamsCol) return;
         const [teamsSnap, scheduleSnap, resultsSnap] = await Promise.all([
           teamsCol.orderBy(firebase.firestore.FieldPath.documentId()).get(),
-          firestore().collection(`leagues/${leagueId}/h2h_schedule`).doc(SEASON).collection('giornate').doc(giornataId).get(),
-          firestore().collection(`leagues/${leagueId}/h2h_results`).doc(SEASON).collection('giornate').doc(giornataId).get()
+          firestore().collection(`leagues/${leagueId}/h2h_schedule`).doc(await seasonKey()).collection('giornate').doc(giornataId).get(),
+          firestore().collection(`leagues/${leagueId}/h2h_results`).doc(await seasonKey()).collection('giornate').doc(giornataId).get()
         ]);
 
         if (!scheduleSnap.exists) return;
@@ -1347,7 +1395,7 @@
             }
             base.forfeitHome = homeMissing;
             base.forfeitAway = awayMissing;
-            base.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+            base.updatedAt = firebase.firestore.Timestamp.now(); // serverTimestamp non è ammesso dentro un array (D095)
           }
 
           existingMatches.set(key, base);
@@ -1355,7 +1403,7 @@
 
         existingMatches.forEach(m => updatedMatches.push(m));
 
-        await firestore().collection(`leagues/${leagueId}/h2h_results`).doc(SEASON).collection('giornate').doc(giornataId).set({ matches: updatedMatches }, { merge: true });
+        await firestore().collection(`leagues/${leagueId}/h2h_results`).doc(await seasonKey()).collection('giornate').doc(giornataId).set({ matches: updatedMatches }, { merge: true });
 
         const penaltyPayload = Array.from(missingSet).map(idx => ({
           teamIndex: idx,
@@ -1413,14 +1461,14 @@
         <div class="item"><span class="muted">Totale Coach</span><strong>${c.toFixed(2)}</strong></div>
         <div class="item"><span class="muted">Totale Curva</span><strong>${v.toFixed(2)}</strong></div>
         <div class="item"><span class="muted">Somma (senza squadre)</span><strong>${(p+c+v).toFixed(2)}</strong></div>
-        <div class="item debug-box" style="background:rgba(59,130,246,0.1); cursor:pointer; border:1px dashed #3b82f6;">
+        <div class="item debug-box" style="background:rgba(12,15,109,0.1); cursor:pointer; border:1px dashed #0c0f6d;">
           <span class="muted">🔍 Debug: ${playersWithPoints.length} giocatori con punti</span>
           <span class="muted" style="font-size:10px;">Click per dettagli</span>
         </div>
         <div class="mobile-only" id="resetControlsMobile" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; margin-top:8px;">
-          <button class="btn btn-secondary" data-reset="players" style="font-size:11px; padding:6px 8px;">🗑️ Giocatori</button>
-          <button class="btn btn-secondary" data-reset="coaches" style="font-size:11px; padding:6px 8px;">🗑️ Coach</button>
-          <button class="btn btn-secondary" data-reset="curva" style="font-size:11px; padding:6px 8px;">🗑️ Curva</button>
+          <button class="btn btn-secondary" data-reset="players" style="font-size:11px; padding:6px 8px;">Giocatori</button>
+          <button class="btn btn-secondary" data-reset="coaches" style="font-size:11px; padding:6px 8px;">Coach</button>
+          <button class="btn btn-secondary" data-reset="curva" style="font-size:11px; padding:6px 8px;">Curva</button>
         </div>
       `;
       
@@ -1515,6 +1563,7 @@
       if (state.tab === 'players') renderPlayersTab();
       if (state.tab === 'coaches') renderCoachesTab();
       if (state.tab === 'curva') renderCurvaTab();
+      if (state.tab === 'fazioni') renderFazioniTab();
       if (state.tab === 'squads') renderSquadsTab();
     }
 
@@ -1539,8 +1588,7 @@
           <div class="filters" id="roleFilters">${ROLE_ORDER.map(r=>`<button class="chip toggle ${state.roleFilters[r]?'on':''}" data-role="${r}">${r}</button>`).join('')}</div>
         </div>
         <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
-          <button class="btn btn-primary" id="openConvocatiModal" style="padding:8px 16px; font-size:14px; font-weight:600;">
-            👥 Giocatori Convocati
+          <button class="btn btn-primary" id="openConvocatiModal" style="padding:8px 16px; font-size:14px; font-weight:600;">Giocatori Convocati
             <span id="convocatiCount" style="margin-left:8px; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:12px; font-size:12px;">0</span>
           </button>
           <div class="filters" id="convocatiFilters" style="display:flex; gap:6px;">
@@ -1555,8 +1603,8 @@
           </div>
         </div>
         <div id="filterSummary" style="margin-bottom:12px; font-size:12px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-          ${state.convocatiFilter !== 'all' ? `<span style="background:rgba(52,152,219,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(52,152,219,0.3);">🔍 Convocati: ${state.convocatiFilter === 'convocati' ? 'Solo convocati' : 'Solo non convocati'}</span>` : ''}
-          ${state.bonusMalusFilter !== 'all' ? `<span style="background:rgba(52,152,219,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(52,152,219,0.3);">🔍 Bonus/Malus: ${state.bonusMalusFilter === 'campo' ? 'Solo da campo' : 'Solo da curva'}</span>` : ''}
+          ${state.convocatiFilter !== 'all' ? `<span style="background:rgba(12,15,109,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(12,15,109,0.3);">🔍 Convocati: ${state.convocatiFilter === 'convocati' ? 'Solo convocati' : 'Solo non convocati'}</span>` : ''}
+          ${state.bonusMalusFilter !== 'all' ? `<span style="background:rgba(12,15,109,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(12,15,109,0.3);">🔍 Bonus/Malus: ${state.bonusMalusFilter === 'campo' ? 'Solo da campo' : 'Solo da curva'}</span>` : ''}
         </div>
         <div class="players-wrap" style="position:relative;">
           <!-- Barra fissa per chiudere giocatore quando esce dalla vista -->
@@ -1583,10 +1631,10 @@
                 <button class="chip toggle" data-bm="Malus" style="flex:1; padding:8px 12px; font-weight:600;">Malus</button>
               </div>
             </div>
-            <button class="btn btn-secondary mobile-back-btn" style="display:none;" onclick="closeMobilePlayerDetail()">← Indietro</button>
+            <button class="btn btn-secondary mobile-back-btn" style="display:none;" onclick="closeMobilePlayerDetail()">Indietro</button>
             <!-- Rimosso bmToggles: ci sono già gli accordion Bonus/Malus -->
             <div id="player-detail-content"></div>
-            <button class="btn btn-primary mobile-save-btn" style="display:none;" onclick="saveMobilePlayerDetail()">💾 Salva Giocatore</button>
+            <button class="btn btn-primary mobile-save-btn" style="display:none;" onclick="saveMobilePlayerDetail()">Salva Giocatore</button>
           </div>
         </div>
       `;
@@ -1835,7 +1883,7 @@
           ${headerHtml}
           ${sectionHtml}
           ${state.isAdmin ? `<div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(148,163,184,0.2);">
-            <button class="btn btn-secondary" style="width:100%; padding:8px 12px; font-size:12px;" data-reset-player="${p.player_id}">🗑️ Reset Giocatore</button>
+            <button class="btn btn-secondary" style="width:100%; padding:8px 12px; font-size:12px;" data-reset-player="${p.player_id}">Reset Giocatore</button>
           </div>` : ''}
         `;
         
@@ -2139,8 +2187,8 @@
             
             // Evidenzia il giocatore selezionato nella lista
             $$('#plist .item').forEach(item => {
-              item.style.border = item === el ? '2px solid var(--primary, #3498db)' : '1px solid #ccd6e0';
-              item.style.boxShadow = item === el ? '0 0 0 3px rgba(52,152,219,0.15)' : 'none';
+              item.style.border = item === el ? '2px solid var(--primary, #0c0f6d)' : '1px solid #ccd6e0';
+              item.style.boxShadow = item === el ? '0 0 0 3px rgba(12,15,109,0.15)' : 'none';
             });
           } else {
             // MOBILE: Comportamento inline (come prima)
@@ -2269,10 +2317,10 @@
         if (!summaryEl) return;
         const parts = [];
         if (state.convocatiFilter !== 'all') {
-          parts.push(`<span style="background:rgba(52,152,219,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(52,152,219,0.3);">🔍 Convocati: ${state.convocatiFilter === 'convocati' ? 'Solo convocati' : 'Solo non convocati'}</span>`);
+          parts.push(`<span style="background:rgba(12,15,109,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(12,15,109,0.3);">🔍 Convocati: ${state.convocatiFilter === 'convocati' ? 'Solo convocati' : 'Solo non convocati'}</span>`);
         }
         if (state.bonusMalusFilter !== 'all') {
-          parts.push(`<span style="background:rgba(52,152,219,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(52,152,219,0.3);">🔍 Bonus/Malus: ${state.bonusMalusFilter === 'campo' ? 'Solo da campo' : 'Solo da curva'}</span>`);
+          parts.push(`<span style="background:rgba(12,15,109,0.15); padding:4px 8px; border-radius:6px; border:1px solid rgba(12,15,109,0.3);">🔍 Bonus/Malus: ${state.bonusMalusFilter === 'campo' ? 'Solo da campo' : 'Solo da curva'}</span>`);
         }
         summaryEl.innerHTML = parts.join('');
       }
@@ -2353,15 +2401,15 @@
         const header = document.createElement('div');
         header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid rgba(148,163,184,0.2);';
         header.innerHTML = `
-          <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--text, #1e293b);">👥 Giocatori Convocati</h2>
-          <button class="btn btn-secondary btn-sm" id="closeConvocatiModal" style="padding:8px 12px; min-width:44px;">✕</button>
+          <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--text, #1e293b);">Giocatori Convocati</h2>
+          <button class="btn btn-secondary btn-sm" id="closeConvocatiModal" style="padding:8px 12px; min-width:44px;">&times;</button>
         `;
         
         const controls = document.createElement('div');
         controls.style.cssText = 'display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;';
         controls.innerHTML = `
-          <button class="chip toggle" id="selectAllConvocati" style="padding:6px 12px; font-size:13px;">✓ Seleziona tutti</button>
-          <button class="chip toggle" id="deselectAllConvocati" style="padding:6px 12px; font-size:13px;">✗ Deseleziona tutti</button>
+          <button class="chip toggle" id="selectAllConvocati" style="padding:6px 12px; font-size:13px;">Seleziona tutti</button>
+          <button class="chip toggle" id="deselectAllConvocati" style="padding:6px 12px; font-size:13px;">Deseleziona tutti</button>
           <span style="color:var(--muted, #64748b); font-size:13px; margin-left:auto;">
             <span id="modalConvocatiCount">${state.convocati.size}</span> selezionati
           </span>
@@ -2388,8 +2436,8 @@
             
             const item = document.createElement('label');
             item.style.cssText = 'display:flex; align-items:center; gap:12px; padding:10px; border:1px solid rgba(148,163,184,0.2); border-radius:8px; cursor:pointer; background:var(--card, #fff); transition:all 0.2s;';
-            item.style.background = isConvocato ? 'rgba(52,152,219,0.1)' : 'var(--card, #fff)';
-            item.style.borderColor = isConvocato ? 'var(--primary, #3498db)' : 'rgba(148,163,184,0.2)';
+            item.style.background = isConvocato ? 'rgba(12,15,109,0.1)' : 'var(--card, #fff)';
+            item.style.borderColor = isConvocato ? 'var(--primary, #0c0f6d)' : 'rgba(148,163,184,0.2)';
             item.innerHTML = `
               <input type="checkbox" class="modal-convocato-checkbox" data-player-id="${p.player_id}" ${isConvocato?'checked':''} style="width:20px; height:20px; cursor:pointer; flex-shrink:0;" />
               <img src="${photoUrl}" alt="${p.nome_completo}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.src='${fallbackSvg}'" />
@@ -2407,8 +2455,8 @@
               } else {
                 state.convocati.delete(playerId);
               }
-              item.style.background = checkbox.checked ? 'rgba(52,152,219,0.1)' : 'var(--card, #fff)';
-              item.style.borderColor = checkbox.checked ? 'var(--primary, #3498db)' : 'rgba(148,163,184,0.2)';
+              item.style.background = checkbox.checked ? 'rgba(12,15,109,0.1)' : 'var(--card, #fff)';
+              item.style.borderColor = checkbox.checked ? 'var(--primary, #0c0f6d)' : 'rgba(148,163,184,0.2)';
               updateConvocatiCount();
               const modalCount = document.getElementById('modalConvocatiCount');
               if (modalCount) modalCount.textContent = state.convocati.size;
@@ -2460,8 +2508,8 @@
             cb.checked = true;
             const item = cb.closest('label');
             if (item) {
-              item.style.background = 'rgba(52,152,219,0.1)';
-              item.style.borderColor = 'var(--primary, #3498db)';
+              item.style.background = 'rgba(12,15,109,0.1)';
+              item.style.borderColor = 'var(--primary, #0c0f6d)';
             }
           });
           updateConvocatiCount();
@@ -2663,6 +2711,116 @@
       drawList();
     }
 
+    // ========== Tab "Fazioni" (D080): presenze per squadra + eventi di fazione ==========
+    const FAZ_NAME = { curva: 'Curva Morello', piana: 'Piana' };
+    // Partita della giornata dal calendario Athletic: in casa o in trasferta? (D080)
+    async function loadCalendar(){
+      if (state.calendar) return state.calendar;
+      try { const snap = await firestore().collection('athletic_calendar').get(); state.calendar = snap.docs.map(d => d.data()); }
+      catch (e) { console.warn('[matchday] calendario non leggibile', e && e.code); state.calendar = []; }
+      return state.calendar;
+    }
+    function venueForGiornata(gid){
+      const n = parseInt(String(gid).replace(/\D/g,''), 10);
+      const m = (state.calendar || []).find(c => parseInt(c.giornata, 10) === n);
+      if (!m) return { venue: null, match: null };
+      const isAth = x => /athletic/i.test(x || '');
+      return { venue: isAth(m.homeTeam) ? 'casa' : (isAth(m.awayTeam) ? 'trasferta' : null), match: m };
+    }
+    async function loadFazioniData(){
+      if (state.fazData) return state.fazData;
+      const leagueId = state.leagueId;
+      const teams = []; const members = {};
+      const col = getLeagueCollection('teams', leagueId);
+      if (col) {
+        const snap = await col.get();
+        snap.docs.forEach(d => teams.push({ id: d.id, ...d.data() }));
+        teams.sort((a,b) => Number(a.id) - Number(b.id));
+      }
+      // nomi reali degli utenti di ogni squadra (solo gli admin possono leggere gli utenti)
+      try {
+        const us = await firestore().collection('users').where('currentLeague','==',leagueId).get();
+        us.docs.forEach(d => {
+          const u = d.data(); const k = String(u.team_index);
+          if (u.team_index === null || u.team_index === undefined) return;
+          (members[k] = members[k] || []).push(u.nomeReale || u.displayName || u.username || u.email || '?');
+        });
+      } catch (e) { console.warn('[matchday] nomi utenti non leggibili', e && e.code); }
+      await loadCalendar();
+      state.fazData = { teams, members };
+      return state.fazData;
+    }
+
+    function renderFazioniTab(){
+      const panel = $('#panelContent');
+      const FB = window.FactionBonus;
+      const scoped = FB ? state.rules.filter(r => FB.isScoped(r) && r.attivo !== false && r.visible !== false) : [];
+      if (!scoped.length) {
+        panel.innerHTML = '<div class="muted" style="padding:12px;">Nessun bonus di fazione. Aggiungili da <a href="admin-rules.html">Regole Bonus/Malus</a> scegliendo "Per squadra" o "Evento" nel campo Assegnazione.</div>';
+        return;
+      }
+      if (!state.fazData) {
+        panel.innerHTML = '<div class="muted" style="padding:12px;">Caricamento squadre…</div>';
+        loadFazioniData().then(() => { if (state.tab === 'fazioni') renderFazioniTab(); }).catch(e => { panel.innerHTML = '<div class="muted" style="padding:12px;">Errore nel caricamento delle squadre.</div>'; console.error(e); });
+        return;
+      }
+      const { teams, members } = state.fazData;
+      const disabled = !state.isAdmin ? 'disabled' : '';
+      const ruleControl = (key, r) => {
+        const cur = Number(state.selCurva[key] || 0);
+        const val = Number(r.valore || 0);
+        const label = `<span>${r.nome_bonus}</span> <span class="muted">${val>0?'+':''}${val}${FB.isCounter(r)?' cad.':''}</span>`;
+        const ctl = FB.isCounter(r)
+          ? `<div style="display:flex;align-items:center;gap:6px;"><button class="chip" data-act="dec" ${disabled}>-</button><span class="muted">x</span><span>${cur}</span><button class="chip" data-act="inc" ${disabled}>+</button></div>`
+          : `<label class="row" style="gap:6px;"><input type="checkbox" data-act="toggle" ${cur?'checked':''} ${disabled}/></label>`;
+        return `<div class="rule" data-key="${key}" data-max="${FB.isCounter(r)?50:1}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;">${'<div>'+label+'</div>'}${ctl}</div>`;
+      };
+      const teamRules = scoped.filter(r => r.ambito === 'squadra' && !r.luogo);
+      const presRules = scoped.filter(r => r.ambito === 'squadra' && r.luogo);
+      const vinfo = venueForGiornata(state.giornata);
+      const presRule = vinfo.venue ? presRules.find(r => r.luogo === vinfo.venue) : null;
+      const eventRules = scoped.filter(r => r.ambito === 'fazione');
+
+      let html = '';
+      if (eventRules.length) {
+        html += '<div class="curva-subtitle">Eventi di fazione (una volta, valgono per tutta la fazione)</div><div class="curva-wrap" style="grid-template-columns:1fr 1fr;">';
+        ['curva','piana'].forEach(f => {
+          const rs = eventRules.filter(r => r.fazione === f);
+          if (!rs.length) return;
+          html += `<div class="curva-section"><div class="curva-header">${FAZ_NAME[f]}</div><div class="curva-body">${rs.map(r => ruleControl(`fz:${f}:${FB.ruleId(r)}`, r)).join('')}</div></div>`;
+        });
+        html += '</div>';
+      }
+      if (presRules.length) {
+        const m = vinfo.match;
+        html += '<div class="muted" style="margin:10px 0;padding:8px;border-radius:8px;border:1px solid #334155;">' + (m
+          ? `<strong>${state.giornata}</strong>: ${m.homeTeam} - ${m.awayTeam} → partita <strong>${vinfo.venue === 'casa' ? 'IN CASA' : (vinfo.venue === 'trasferta' ? 'IN TRASFERTA' : '?')}</strong>${presRule ? ` (presenza ${Number(presRule.valore)>0?'+':''}${presRule.valore})` : ''}`
+          : `<span style="color:#920100;">${state.giornata} non trovata nel calendario Athletic: la presenza non darà punti finché non la inserisci in Gestione Calendario.</span>`) + '</div>';
+      }
+      if (teamRules.length || presRules.length) {
+        html += '<div class="curva-subtitle" style="margin-top:14px;">Per squadra</div><div class="list">';
+        html += teams.map(t => {
+          const f = FAZ_NAME[t.fazione] ? t.fazione : null;
+          const rs = teamRules.filter(r => FB.appliesToTeam(r, f));
+          const names = (members[String(t.id)] || []).join(', ');
+          const badge = f ? `<span class="muted" style="font-size:11px;">${FAZ_NAME[f]}</span>` : '<span style="font-size:11px;color:#920100;">senza fazione</span>';
+          const showPres = presRules.some(r => FB.appliesToTeam(r, f));
+          const pKey = `tm:${t.id}:${FB.PRESENCE}`;
+          const pCur = Number(state.selCurva[pKey] || 0);
+          const pres = showPres ? `<div class="rule" data-key="${pKey}" data-max="1" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;"><div><span>Presente alla partita</span> <span class="muted">${presRule && FB.appliesToTeam(presRule, f) ? (Number(presRule.valore)>0?'+':'')+presRule.valore+' ('+vinfo.venue+')' : ''}</span></div><label class="row" style="gap:6px;"><input type="checkbox" data-act="toggle" ${pCur?'checked':''} ${disabled}/></label></div>` : '';
+          return `<div class="item"><div style="width:100%;"><div style="font-weight:700;">${(t.nome||t.name||('Squadra '+t.id))} ${badge}</div>${names ? `<div class="muted" style="font-size:11px;margin-bottom:4px;">${names}</div>` : ''}${pres}${rs.map(r => ruleControl(`tm:${t.id}:${FB.ruleId(r)}`, r)).join('')}</div></div>`;
+        }).join('');
+        html += '</div>';
+      }
+      panel.innerHTML = html;
+      if (state.isAdmin) {
+        const setKey = (row, v) => { state.selCurva[row.dataset.key] = v; saveDay(); renderFazioniTab(); renderSummary(); };
+        $$('#panelContent .rule [data-act="toggle"]').forEach(cb => cb.addEventListener('change', () => setKey(cb.closest('.rule'), cb.checked ? 1 : 0)));
+        $$('#panelContent .rule [data-act="inc"]').forEach(b => b.addEventListener('click', () => { const r = b.closest('.rule'); setKey(r, Math.min(Number(r.dataset.max), Number(state.selCurva[r.dataset.key]||0) + 1)); }));
+        $$('#panelContent .rule [data-act="dec"]').forEach(b => b.addEventListener('click', () => { const r = b.closest('.rule'); setKey(r, Math.max(0, Number(state.selCurva[r.dataset.key]||0) - 1)); }));
+      }
+    }
+
     function renderCurvaTab(){
       const SPECIAL_CURVA_RULE = 'infortunati_squalificati_curva';
       const vrules = normalizeCurvaRules({ rules: state.rules });
@@ -2719,7 +2877,7 @@
         const cur = Number(state.selCurva[rid]||0);
         const unit = val ? `${val>0?'+':''}${val} cad.` : '+1 cad.';
         return `
-          <div class="rule" data-rule-id="${rid}" style="border:2px solid #10b981; background:rgba(16,185,129,0.05); padding:8px; border-radius:8px;">
+          <div class="rule" data-rule-id="${rid}" style="border:2px solid #16a34a; background:rgba(16,185,129,0.05); padding:8px; border-radius:8px;">
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-weight:700;">${specialRule.nome_bonus || 'Infortunati/Squalificati in Curva'}</span>
               <span class="muted">${unit}</span>
@@ -2890,13 +3048,33 @@
               return;
             }
             await daysRef.set(data, { merge: true });
-            await applyForfeitPenalties();
+            if (LIVE_MODE && LIVE_MODE.g === state.giornata) {
+              // set con merge unisce le mappe: qui le sostituiamo per intero, così una voce tolta in revisione sparisce davvero
+              await daysRef.update({ players: data.players, coaches: data.coaches, curva: data.curva });
+            }
+            // Tavolino degli scontri diretti: ora lo calcola H2H.saveDay con le regole della Stagione (D100).
+            // applyForfeitPenalties (3 a -10 fisso, squadre numerate in modo diverso) non si usa più.
             
             // CALCOLA E SALVA RISULTATI SQUADRE
             await saveTeamResults();
             
             // MARCA GIORNATA COME CALCOLATA
             await daysRef.update({ computed: true });
+
+            // Partita live: i giocatori vedono se i punti sono provvisori o definitivi (D092/D093)
+            if (LIVE_MODE && LIVE_MODE.g === state.giornata) {
+              try {
+                const liveRef = firestore().collection(`leagues/${leagueId}/live`).doc(state.giornata);
+                const lv = await liveRef.get();
+                const stato = lv.exists ? lv.data().stato : null;
+                if (stato === 'provvisorio' || stato === 'definitivo') {
+                  await getLeagueCollection('results', leagueId).doc(String(state.giornata)).set({
+                    stato, revisioneEntro: stato === 'provvisorio' ? (lv.data().deadline || null) : null,
+                    statoAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                  await liveRef.set({ calcolato: stato, calcolatoAt: Date.now() }, { merge: true });
+                }
+              } catch (e) { console.warn('[matchday] stato provvisorio/definitivo non salvato', e); }
+            }
             
             // NOTIFICA TUTTI GLI UTENTI
             if (typeof window.notifyGiornataCalcolata === 'function') {
@@ -3198,11 +3376,11 @@
 
       await loadAdmin();
       await autoSelectActiveGiornata();
+      if (LIVE_MODE && /^G\d+$/.test(LIVE_MODE.g || '')) state.giornata = LIVE_MODE.g;
       await loadDay();
       bootSelect();
       renderTabs();
       renderSummary();
-      document.getElementById('year').textContent = new Date().getFullYear();
       applyMobileMode();
     }
     
@@ -3221,26 +3399,24 @@
   </script>
   <script>
     // very small toast helper
-    function toast(msg){
-      const el = document.createElement('div');
-      el.textContent = msg;
-      el.style.position='fixed'; el.style.bottom='16px'; el.style.right='16px'; el.style.background='#2d6cdf'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.boxShadow='var(--shadow)'; el.style.zIndex='9999';
-      document.body.appendChild(el);
-      setTimeout(()=>{ el.remove(); }, 2000);
-    }
+    // toast(msg) centralizzata in resources/toast.js (2026-09-19)
   </script>
-    <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/lazy-load.js?v=20251020"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
-  <script src="resources/social-notifications.js?v=2025102404"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+    <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/lazy-load.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/social-notifications.js?v=20260925"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+  <script src="resources/footer.js?v=20260920-final3"></script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="live"></script>
 </body>
 </html>
 

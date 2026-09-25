@@ -52,7 +52,7 @@
       bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%);
       color: white;
       padding: 18px 28px;
       border-radius: 14px;
@@ -82,7 +82,7 @@
       </div>
       <button id="pwaInstallBtn" style="
         background: white;
-        color: #667eea;
+        color: #0c0f6d;
         border: none;
         padding: 10px 20px;
         border-radius: 8px;
@@ -184,7 +184,7 @@
           poi <span style="font-weight: 600;">Aggiungi a Home</span>
         </div>
         <button onclick="this.parentElement.remove()" style="
-          background: #667eea;
+          background: #0c0f6d;
           color: white;
           border: none;
           padding: 8px 16px;

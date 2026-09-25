@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Partita live - Fanta Athletic</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
+  <style>
+    body { padding-bottom: 150px; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 12px 14px; }
+    .back { display:inline-block; margin-bottom:10px; color:var(--muted); text-decoration:none; font-weight:600; }
+    .top { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+    .top select { padding:10px 14px; border-radius:999px; border:1px solid rgba(148,163,184,.4); background:var(--card); color:var(--text); font-family:inherit; font-size:16px; font-weight:700; }
+    .pill { display:inline-block; padding:5px 12px; border-radius:999px; font-size:13px; font-weight:700; color:#fff; background:#64748b; }
+    .pill.aperta { background:#16a34a; } .pill.provvisorio { background:#b45309; } .pill.definitivo { background:#0c0f6d; }
+    .info { color:var(--muted); font-size:13px; }
+    .l1 { display:flex; gap:8px; overflow-x:auto; padding:6px 0 10px; scrollbar-width:none; position:sticky; top:0; z-index:4; background:var(--bg); }
+    .l1 button { flex:0 0 auto; padding:10px 16px; border-radius:999px; border:1px solid rgba(148,163,184,.35) !important; background:var(--card) !important; color:var(--text) !important; font-weight:700; font-family:inherit; font-size:15px; }
+    .l1 button.on { background:#0c0f6d !important; border-color:#0c0f6d !important; color:#fff !important; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
+    .key { position:relative; min-height:72px; padding:12px; border-radius:16px; border:1px solid rgba(148,163,184,.25); background:var(--card); color:var(--text);
+      text-align:left; font-family:inherit; font-size:15px; font-weight:700; box-shadow:var(--shadow); cursor:pointer; }
+    .key:active { transform:translateY(1px); }
+    .key .sub { display:block; font-size:12px; font-weight:500; color:var(--muted) !important; margin-top:3px; }
+    .key .badge { position:absolute; top:8px; right:8px; min-width:26px; padding:2px 7px; border-radius:999px; background:#0c0f6d !important; color:#fff !important; font-size:12px; text-align:center; }
+    .key .badge.neg { background:#920100 !important; }
+    .key.on { border-color:#16a34a !important; box-shadow:0 0 0 2px #16a34a inset; }
+    .card { background:var(--card); border-radius:16px; box-shadow:var(--shadow); padding:14px; margin-bottom:12px; }
+    .card h3 { margin:0 0 8px; font-size:16px; }
+    .sect { margin:14px 0 6px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+    .sect.hi { color:#16a34a; }
+    /* pannello di un giocatore (livelli 2 e 3) */
+    .sheet { position:fixed; inset:0; z-index:10000; background:var(--bg); overflow:auto; padding:calc(12px + env(safe-area-inset-top)) 14px 110px; display:none; }
+    .sheet.open { display:block; }
+    body.panel-open .bar { bottom:0; }
+    .sheet .head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .sheet .head button { padding:10px 14px; border-radius:999px; border:1px solid rgba(148,163,184,.35) !important; background:var(--card) !important; color:var(--text) !important; font-weight:700; font-family:inherit; }
+    .sheet .who { font-size:20px; font-weight:800; flex:1; }
+    .sheet .pts { font-size:20px; font-weight:800; }
+    .quick { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+    .quick button { position:relative; padding:14px 4px; border-radius:16px; border:none !important; background:#0c0f6d !important; color:#fff !important; font-size:15px; font-weight:800; font-family:inherit; }
+    .quick button .ic { display:block; font-size:24px; }
+    .quick button .badge { position:absolute; top:6px; right:6px; background:#fff !important; color:#0c0f6d !important; border-radius:999px; padding:1px 7px; font-size:12px; }
+    .bm { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+    .bm button { padding:18px; border-radius:16px; border:none !important; color:#fff !important; font-size:18px; font-weight:800; font-family:inherit; opacity:.55; }
+    .bm button.on { opacity:1; box-shadow:0 0 0 3px rgba(255,255,255,.5) inset; }
+    .bm .b { background:#16a34a !important; } .bm .m { background:#920100 !important; }
+    .rule { display:flex; align-items:center; gap:10px; padding:10px 4px; border-top:1px solid rgba(148,163,184,.15); }
+    .rule .n { flex:1; font-weight:600; font-size:15px; } .rule .v { color:var(--muted); font-size:12px; font-weight:500; display:block; }
+    .rule button { width:46px; height:46px; border-radius:999px; border:none !important; font-size:22px; font-weight:800; font-family:inherit; }
+    .rule .plus { background:#16a34a !important; color:#fff !important; } .rule .minus { background:rgba(148,163,184,.25) !important; color:var(--text) !important; }
+    .rule .c { min-width:28px; text-align:center; font-weight:800; font-size:18px; }
+    /* barra in basso */
+    .bar { position:fixed; left:0; right:0; bottom:64px; z-index:10001; display:flex; gap:8px; padding:10px 14px; background:var(--bg); border-top:1px solid rgba(148,163,184,.2); }
+    .bar button { flex:1; padding:14px 8px; border-radius:999px; border:none !important; font-weight:800; font-family:inherit; font-size:15px; }
+    .bar .undo { background:rgba(148,163,184,.25) !important; color:var(--text) !important; } .bar .log { background:#0c0f6d !important; color:#fff !important; } .bar .close { background:#920100 !important; color:#fff !important; }
+    .logrow { display:flex; align-items:center; gap:8px; padding:8px 0; border-top:1px solid rgba(148,163,184,.15); font-size:14px; }
+    .logrow .t { color:var(--muted); font-size:12px; min-width:42px; }
+    .logrow .x { flex:1; } .logrow button { border:none !important; background:rgba(148,163,184,.25) !important; color:var(--text) !important; border-radius:999px; width:34px; height:34px; font-size:16px; }
+    .sbtn { padding:12px 18px; border-radius:999px; border:none !important; color:#fff !important; font-weight:800; font-family:inherit; font-size:15px; cursor:pointer; }
+    .sbtn.ok { background:#16a34a !important; } .sbtn.blue { background:#0c0f6d !important; } .sbtn.red { background:#920100 !important; } .sbtn:disabled { opacity:.45; }
+    .disp { padding:10px 0; border-top:1px solid rgba(148,163,184,.15); }
+    .disp .opts { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .disp .opts button { padding:8px 14px; border-radius:999px; border:1px solid rgba(148,163,184,.35) !important; background:transparent !important; color:var(--text) !important; font-weight:700; font-family:inherit; }
+    .disp .opts button.on { background:#16a34a !important; border-color:#16a34a !important; color:#fff !important; }
+    .f { display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; margin-top:8px; }
+    .f select, .f input { padding:10px 14px; border-radius:999px; border:1px solid rgba(148,163,184,.4); background:transparent; color:var(--text); font-family:inherit; font-size:15px; }
+    .f select option { color:#111; }
+    .empty { text-align:center; padding:30px 10px; color:var(--muted); }
+    .toast { position:fixed; left:50%; bottom:140px; transform:translateX(-50%); background:#111827; color:#fff; padding:10px 16px; border-radius:999px; z-index:10002; font-weight:600; display:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home"><img src="resources/logo.png" alt="Fanta Athletic" /></a>
+    <h1>Partita live</h1>
+  </header>
+
+  <main class="wrap">
+    <a class="back" href="admin.html#live">← Pannello admin</a>
+    <section class="card" id="denied" style="display:none;"><h3>Accesso riservato</h3><p class="info">Solo per gli amministratori.</p></section>
+
+    <div id="app" style="display:none;">
+      <div class="top">
+        <select id="gSel"></select>
+        <span class="pill" id="statePill">…</span>
+        <span class="info" id="venueInfo"></span>
+      </div>
+      <p class="info" id="peers"></p>
+      <div id="view"></div>
+    </div>
+  </main>
+
+  <!-- livelli 2-3 -->
+  <div class="sheet" id="panel">
+    <div class="head"><button id="panelBack">← Indietro</button><div class="who" id="panelWho"></div><div class="pts" id="panelPts"></div></div>
+    <div id="panelBody"></div>
+  </div>
+
+  <div class="bar" id="bar" style="display:none;">
+    <button class="undo" id="undoBtn">↶ Annulla</button>
+    <button class="log" id="logBtn">Diario (0)</button>
+    <button class="close" id="closeBtn">Fischio finale</button>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/live-core.js?v=20260925"></script>
+  <script>
+    const C = window.LiveCore;
+    const $ = id => document.getElementById(id);
+    const FNAME = { curva: 'Curva Morello', piana: 'Piana' };
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(m) { const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 1800); }
+    function fmt(n) { return (n > 0 ? '+' : '') + String(n).replace('.', ','); }
+    function vibe() { try { navigator.vibrate && navigator.vibrate(15); } catch (e) {} }
+
+    const S = {
+      user: null, lid: null, g: null, rules: null, players: [], coaches: [], teams: [], venue: null,
+      sheet: null, live: null, sheets: {}, tab: 'conv', unsub: [], saveT: null
+    };
+    const db = () => window.__LEGACY_DB__;
+    const L = () => db().collection('leagues').doc(S.lid);
+    const liveRef = () => L().collection('live').doc(S.g);
+    const mySheetRef = () => liveRef().collection('sheets').doc(S.user.uid);
+    const localKey = () => 'live_' + S.lid + '_' + S.g + '_' + S.user.uid;
+
+    // ---------- dati ----------
+    async function loadStatic() {
+      const [rs, ps, cj, ts, cal] = await Promise.all([
+        L().collection('rules').get(), L().collection('players').get(),
+        fetch('resources/coaches.json').then(r => r.json()).catch(() => ({ coaches: [] })),
+        L().collection('teams').get(), db().collection('athletic_calendar').get()
+      ]);
+      S.rules = C.groupRules(rs.docs.map(d => Object.assign({ id: d.id }, d.data())));
+      S.conv = C.convocationRule(S.rules.players);
+      const ROLE = { Portiere: 1, Difensore: 2, Centrocampista: 3, Attaccante: 4 };
+      S.players = ps.docs.map(d => Object.assign({ id: d.id }, d.data()))
+        .filter(p => !p.is_dead)
+        .sort((a, b) => (ROLE[a.role] || 9) - (ROLE[b.role] || 9) || String(a.name).localeCompare(String(b.name)));
+      S.coaches = (cj.coaches || cj || []).map(c => ({ id: c.coach_id, name: c.nome }));
+      S.teams = ts.docs.map(d => Object.assign({ id: d.id }, d.data()));
+      S.cal = cal.docs.map(d => d.data());
+    }
+    function venueOf(g) {
+      const n = parseInt(String(g).slice(1), 10);
+      const m = S.cal.find(c => parseInt(c.giornata, 10) === n);
+      if (!m) return null;
+      if (/athletic/i.test(m.homeTeam || '')) return { v: 'casa', m };
+      if (/athletic/i.test(m.awayTeam || '')) return { v: 'trasferta', m };
+      return { v: null, m };
+    }
+    const pname = id => { const p = S.players.find(x => x.id === id); return p ? (p.soprannome || p.name || id) : id; };
+    const cname = id => { const c = S.coaches.find(x => x.id === id); return c ? c.name : id; };
+    const tname = id => { const t = S.teams.find(x => x.id === id); return t ? t.name : 'Squadra ' + id; };
+    function ruleById(id) {
+      return [...S.rules.players, ...S.rules.coaches, ...S.rules.curva, ...S.rules.scoped].find(r => C.rid(r) === id);
+    }
+    // descrizione leggibile di una chiave piatta "p|pid|regola"
+    function describe(key) {
+      const [sc, t, ...rest] = key.split('|'); const k = rest.join('|');
+      if (sc === 'p') return pname(t) + ' — ' + C.label(ruleById(k) || { rule_id: k });
+      if (sc === 'c') return 'All. ' + cname(t) + ' — ' + C.label(ruleById(k) || { rule_id: k });
+      if (k === C.SPECIAL_CURVA) return 'Curva — Giocatori infortunati/squalificati in curva';
+      const parts = k.split(':');
+      if (parts[0] === 'tm') return tname(parts[1]) + ' — ' + (parts[2] === 'presenza' ? 'Presente alla partita' : C.label(ruleById(parts[2]) || { rule_id: parts[2] }));
+      if (parts[0] === 'fz') return FNAME[parts[1]] + ' — ' + C.label(ruleById(parts[2]) || { rule_id: parts[2] });
+      return 'Curva — ' + C.label(ruleById(k) || { rule_id: k });
+    }
+
+    // ---------- foglio ----------
+    function persist() {
+      S.sheet.savedAt = Date.now();
+      try { localStorage.setItem(localKey(), JSON.stringify(S.sheet)); } catch (e) {}
+      clearTimeout(S.saveT);
+      S.saveT = setTimeout(pushSheet, 700);
+    }
+    async function pushSheet() {
+      try {
+        const s = S.sheet;
+        // Prima volta che si segna qualcosa su questa giornata: crea la partita (D102)
+        if (!S.live || !S.live.createdAt) {
+          try { await liveRef().set({ giornata: S.g, stato: 'aperta', createdAt: Date.now(), createdBy: S.user.uid }, { merge: true }); }
+          catch (e) { console.warn('[live] partita non creata sul database (il foglio resta sul telefono)', e && (e.code || e.message)); toast('Senza rete/permessi: il foglio si salva sul telefono'); }
+        }
+        await mySheetRef().set({ uid: S.user.uid, name: S.user.displayName || (S.user.email || '').split('@')[0],
+          players: s.players, coaches: s.coaches, curva: s.curva, log: s.log.slice(-400), closed: !!s.closed,
+          closedAt: s.closedAt || null, savedAt: s.savedAt, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      } catch (e) { console.warn('[live] salvataggio foglio (resta sul telefono)', e && (e.code || e.message)); }
+    }
+    async function openSheet() {
+      let remote = null, local = null;
+      try { const d = await mySheetRef().get(); if (d.exists) remote = d.data(); } catch (e) {}
+      try { local = JSON.parse(localStorage.getItem(localKey()) || 'null'); } catch (e) {}
+      const pick = (local && (!remote || (local.savedAt || 0) > (remote.savedAt || 0))) ? local : remote;
+      S.sheet = Object.assign(C.emptySheet(), pick ? { players: pick.players || {}, coaches: pick.coaches || {}, curva: pick.curva || {}, log: pick.log || [], closed: !!pick.closed, closedAt: pick.closedAt || null, savedAt: pick.savedAt } : {});
+      if (local && pick === local && (!remote || local.savedAt > (remote.savedAt || 0))) pushSheet();
+    }
+    function tap(scope, target, key, delta, rule) {
+      if (S.sheet.closed) return toast('Hai già chiuso il tuo foglio');
+      if (!C.bump(S.sheet, scope, target, key, delta, rule)) return;
+      vibe(); persist(); render(); if ($('panel').classList.contains('open')) renderPanel();
+    }
+    function count(scope, target, key) {
+      const box = scope === 'curva' ? S.sheet.curva : (S.sheet[scope][target] || {});
+      return Number(box[key] || 0);
+    }
+
+    // ---------- livello 1 ----------
+    const TABS = [['conv', 'Convocati'], ['gio', 'Giocatori'], ['all', 'Allenatori'], ['cur', 'Curva'], ['faz', 'Fazioni']];
+    function render() {
+      const st = S.live ? S.live.stato : 'aperta';
+      $('statePill').textContent = { aperta: 'In corso', provvisorio: 'Provvisorio', definitivo: 'Definitivo' }[st] || st;
+      $('statePill').className = 'pill ' + st;
+      renderPeers();
+      const nlog = S.sheet ? S.sheet.log.length : 0;
+      $('logBtn').textContent = 'Diario (' + nlog + ')';
+      if (st !== 'aperta') { $('bar').style.display = 'none'; return renderReview(); }
+      if (S.sheet.closed) { $('bar').style.display = 'none'; return renderClosed(); }
+      $('bar').style.display = 'flex';
+      let h = '<div class="l1">' + TABS.map(([k, t]) => '<button data-t="' + k + '" class="' + (S.tab === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>';
+      if (S.tab === 'conv') {
+        const cid = S.conv ? C.rid(S.conv) : null;
+        const n = S.players.filter(p => cid && count('players', p.id, cid)).length;
+        h += '<p class="info">Tocca chi è convocato (+1). Convocati: <b>' + n + '</b></p><div class="grid">' +
+          S.players.map(p => { const on = cid && count('players', p.id, cid);
+            return '<button class="key ' + (on ? 'on' : '') + '" data-conv="' + p.id + '">' + esc(pname(p.id)) + '<span class="sub">' + esc(p.role || '') + '</span></button>'; }).join('') + '</div>';
+      } else if (S.tab === 'gio') {
+        const cid = S.conv ? C.rid(S.conv) : null;
+        const list = S.players.filter(p => cid && count('players', p.id, cid));
+        const show = list.length ? list : S.players;
+        if (!list.length) h += '<p class="info">Nessun convocato segnato: mostro tutti. Consiglio: prima segna i convocati.</p>';
+        h += '<div class="grid">' + show.map(p => { const pts = C.points(S.sheet.players[p.id], S.rules.players);
+          return '<button class="key" data-open="p|' + p.id + '">' + esc(pname(p.id)) + '<span class="sub">' + esc(p.role || '') + '</span>' +
+            (pts ? '<span class="badge ' + (pts < 0 ? 'neg' : '') + '">' + fmt(pts) + '</span>' : '') + '</button>'; }).join('') + '</div>';
+      } else if (S.tab === 'all') {
+        h += '<div class="grid">' + S.coaches.map(c => { const pts = C.points(S.sheet.coaches[c.id], S.rules.coaches);
+          return '<button class="key" data-open="c|' + c.id + '">' + esc(c.name) + '<span class="sub">Allenatore</span>' + (pts ? '<span class="badge ' + (pts < 0 ? 'neg' : '') + '">' + fmt(pts) + '</span>' : '') + '</button>'; }).join('') + '</div>';
+      } else if (S.tab === 'cur') {
+        const pts = C.points(S.sheet.curva, S.rules.curva) + Number(S.sheet.curva[C.SPECIAL_CURVA] || 0);
+        h += '<div class="grid"><button class="key" data-open="v|curva">📣 Curva<span class="sub">Bonus e malus della curva</span>' + (pts ? '<span class="badge ' + (pts < 0 ? 'neg' : '') + '">' + fmt(pts) + '</span>' : '') + '</button></div>';
+      } else if (S.tab === 'faz') {
+        h += renderFazioni();
+      }
+      $('view').innerHTML = h;
+      $('view').querySelectorAll('.l1 button').forEach(b => b.onclick = () => { S.tab = b.dataset.t; render(); });
+      $('view').querySelectorAll('[data-conv]').forEach(b => b.onclick = () => { const k = C.rid(S.conv); tap('players', b.dataset.conv, k, count('players', b.dataset.conv, k) ? -1 : 1, S.conv); });
+      $('view').querySelectorAll('[data-open]').forEach(b => b.onclick = () => openPanel(b.dataset.open));
+      $('view').querySelectorAll('[data-fz]').forEach(b => b.onclick = () => {
+        const [key, max] = [b.dataset.fz, Number(b.dataset.max || 1)];
+        const cur = count('curva', null, key);
+        const rule = b.dataset.rule ? ruleById(b.dataset.rule) : null;
+        tap('curva', null, key, cur && max === 1 ? -1 : 1, rule ? Object.assign({}, rule, { input: max > 1 ? 'counter' : 'toggle', max }) : { input: 'toggle', max: 1 });
+      });
+    }
+    function renderFazioni() {
+      const withF = S.teams.filter(t => t.fazione);
+      const scoped = S.rules.scoped;
+      let h = '<p class="info">' + (S.venue && S.venue.v ? 'Partita <b>' + (S.venue.v === 'casa' ? 'IN CASA' : 'IN TRASFERTA') + '</b>: la presenza vale il bonus ' + S.venue.v + '.' : 'Casa/trasferta non trovata nel calendario Athletic.') + '</p>';
+      h += '<div class="sect">Presenze delle squadre</div>';
+      if (!withF.length) h += '<p class="info">Nessuna squadra ha ancora una fazione (si imposta da Fazioni e nomi).</p>';
+      h += '<div class="grid">' + withF.map(t => { const k = 'tm:' + t.id + ':presenza'; const on = count('curva', null, k);
+        return '<button class="key ' + (on ? 'on' : '') + '" data-fz="' + k + '">' + esc(t.name) + '<span class="sub">' + FNAME[t.fazione] + (on ? ' • presente' : '') + '</span></button>'; }).join('') + '</div>';
+      const events = scoped.filter(r => r.ambito === 'fazione');
+      if (events.length) {
+        h += '<div class="sect">Eventi di fazione</div><div class="grid">' + events.map(r => { const k = 'fz:' + r.fazione + ':' + C.rid(r); const n = count('curva', null, k);
+          const cnt = (r.input_type || r.input) === 'counter';
+          return '<button class="key ' + (n ? 'on' : '') + '" data-fz="' + k + '" data-rule="' + C.rid(r) + '" data-max="' + (cnt ? 50 : 1) + '">' + esc(C.label(r)) + '<span class="sub">' + FNAME[r.fazione] + ' • ' + fmt(Number(r.valore)) + '</span>' + (n ? '<span class="badge">×' + n + '</span>' : '') + '</button>'; }).join('') + '</div>';
+      }
+      const perTeam = scoped.filter(r => r.ambito === 'squadra' && !r.luogo);
+      perTeam.forEach(r => {
+        const teams = withF.filter(t => (r.fazione || 'comune') === 'comune' || r.fazione === t.fazione);
+        h += '<div class="sect">' + esc(C.label(r)) + ' (' + fmt(Number(r.valore)) + ')</div><div class="grid">' + teams.map(t => { const k = 'tm:' + t.id + ':' + C.rid(r); const n = count('curva', null, k);
+          return '<button class="key ' + (n ? 'on' : '') + '" data-fz="' + k + '" data-rule="' + C.rid(r) + '">' + esc(t.name) + '</button>'; }).join('') + '</div>';
+      });
+      return h;
+    }
+
+    // ---------- livelli 2 e 3 ----------
+    let P = null; // { scope, target, mode: 'bonus'|'malus' }
+    function openPanel(code) {
+      const [sc, t] = code.split('|');
+      P = { scope: sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva', target: sc === 'v' ? null : t, mode: 'bonus' };
+      $('panel').classList.add('open'); document.body.style.overflow = 'hidden'; document.body.classList.add('panel-open');
+      renderPanel();
+    }
+    function closePanel() { $('panel').classList.remove('open'); document.body.style.overflow = ''; document.body.classList.remove('panel-open'); P = null; render(); }
+    $('panelBack').onclick = closePanel;
+    function renderPanel() {
+      const rules = S.rules[P.scope];
+      const sel = P.scope === 'curva' ? S.sheet.curva : (S.sheet[P.scope][P.target] || {});
+      let pts = C.points(sel, rules);
+      if (P.scope === 'curva') pts += Number(sel[C.SPECIAL_CURVA] || 0);
+      $('panelWho').textContent = P.scope === 'players' ? pname(P.target) : P.scope === 'coaches' ? 'All. ' + cname(P.target) : 'Curva';
+      $('panelPts').textContent = fmt(pts) + ' pt';
+      let h = '';
+      if (P.scope === 'players') {
+        h += '<div class="quick">' + C.shortcuts(rules).map(s => { const n = Number(sel[C.rid(s.rule)] || 0);
+          return '<button data-q="' + C.rid(s.rule) + '"><span class="ic">' + s.icon + '</span>' + s.text + (n ? '<span class="badge">' + n + '</span>' : '') + '</button>'; }).join('') + '</div>';
+      }
+      h += '<div class="bm"><button class="b ' + (P.mode === 'bonus' ? 'on' : '') + '" data-m="bonus">Bonus</button><button class="m ' + (P.mode === 'malus' ? 'on' : '') + '" data-m="malus">Malus</button></div>';
+      let list = rules.filter(r => (P.mode === 'bonus' ? String(r.tipo).toLowerCase() !== 'malus' && Number(r.valore) >= 0 : String(r.tipo).toLowerCase() === 'malus' || Number(r.valore) < 0));
+      if (P.scope === 'players' && S.conv) list = list.filter(r => C.rid(r) !== C.rid(S.conv));
+      const row = (key, name, val, n, max) => '<div class="rule"><div class="n">' + esc(name) + '<span class="v">' + fmt(val) + (max > 1 ? ' ciascuno' : '') + '</span></div>' +
+        '<button class="minus" data-k="' + esc(key) + '" data-d="-1">−</button><span class="c">' + (n || '') + '</span><button class="plus" data-k="' + esc(key) + '" data-d="1">+</button></div>';
+      if (P.scope === 'curva') {
+        const v = S.venue && S.venue.v;
+        const groups = [['Generali', r => !/casa|trasfert/i.test(C.label(r))], ['In casa', r => /casa/i.test(C.label(r))], ['In trasferta', r => /trasfert/i.test(C.label(r))]];
+        if (v === 'trasferta') groups.splice(1, 2, groups[2], groups[1]);
+        groups.forEach(([title, f]) => {
+          const items = list.filter(f); if (!items.length && !(title === 'Generali' && P.mode === 'bonus')) return;
+          const hi = (title === 'In casa' && v === 'casa') || (title === 'In trasferta' && v === 'trasferta');
+          h += '<div class="sect ' + (hi ? 'hi' : '') + '">' + title + (hi ? ' — partita di oggi' : '') + '</div>';
+          if (title === 'Generali' && P.mode === 'bonus') h += row(C.SPECIAL_CURVA, 'Giocatori infortunati/squalificati in curva', 1, Number(sel[C.SPECIAL_CURVA] || 0), 50);
+          h += items.map(r => row(C.rid(r), C.label(r), Number(r.valore), Number(sel[C.rid(r)] || 0), r.max)).join('');
+        });
+      } else {
+        h += list.map(r => row(C.rid(r), C.label(r), Number(r.valore), Number(sel[C.rid(r)] || 0), r.max)).join('') || '<p class="empty">Nessuna voce</p>';
+      }
+      $('panelBody').innerHTML = h;
+      $('panelBody').querySelectorAll('[data-m]').forEach(b => b.onclick = () => { P.mode = b.dataset.m; renderPanel(); });
+      $('panelBody').querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const r = ruleById(b.dataset.q); tap(P.scope, P.target, b.dataset.q, 1, rules.find(x => C.rid(x) === b.dataset.q) || r); toast(b.textContent.replace(/\d+$/, '').trim() + ' +1'); });
+      $('panelBody').querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+        const k = b.dataset.k, d = Number(b.dataset.d);
+        const r = k === C.SPECIAL_CURVA ? { input: 'counter', max: 50 } : rules.find(x => C.rid(x) === k);
+        tap(P.scope, P.target, k, d, r);
+      });
+    }
+
+    // ---------- barra ----------
+    $('undoBtn').onclick = () => { if (S.sheet.closed) return; const u = C.undo(S.sheet); if (!u) return toast('Niente da annullare'); vibe(); persist(); render(); if (P) renderPanel(); toast('Annullato: ' + describe(keyOf(u))); };
+    function keyOf(e) { return (e.scope === 'curva' ? 'v|' : e.scope[0] + '|' + e.target + '|') + e.key; }
+    $('logBtn').onclick = () => {
+      P = null; $('panel').classList.add('open'); document.body.style.overflow = 'hidden'; document.body.classList.add('panel-open');
+      $('panelWho').textContent = 'Diario della partita'; $('panelPts').textContent = '';
+      const rows = S.sheet.log.map((e, i) => ({ e, i })).reverse();
+      $('panelBody').innerHTML = rows.length ? rows.map(({ e, i }) => '<div class="logrow"><span class="t">' + new Date(e.at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + '</span><span class="x">' + (e.delta > 0 ? '➕ ' : '➖ ') + esc(describe(keyOf(e))) + '</span>' +
+        (S.sheet.closed ? '' : '<button data-i="' + i + '" title="Togli">✕</button>') + '</div>').join('') : '<p class="empty">Ancora niente segnato.</p>';
+      $('panelBody').querySelectorAll('[data-i]').forEach(b => b.onclick = () => {
+        const e = S.sheet.log[Number(b.dataset.i)];
+        const r = e.key === C.SPECIAL_CURVA ? { input: 'counter', max: 50 } : Object.assign({ input: 'counter', max: 50 }, ruleById(e.key) || {});
+        if (C.bump(S.sheet, e.scope, e.target, e.key, -e.delta, Object.assign({}, r, { input: 'counter', max: 50 }))) { persist(); $('logBtn').onclick(); }
+      });
+    };
+    $('closeBtn').onclick = async () => {
+      if (!confirm('Fischio finale: chiudi il tuo foglio? Dopo non potrai più modificarlo (le correzioni si fanno in revisione).')) return;
+      S.sheet.closed = true; S.sheet.closedAt = Date.now(); persist(); await pushSheet(); render();
+    };
+
+    // ---------- dopo il fischio ----------
+    function peersList() { return Object.values(S.sheets); }
+    function renderPeers() {
+      const ps = peersList();
+      $('peers').innerHTML = ps.length ? 'Fogli: ' + ps.map(s => esc(s.name || 'admin') + (s.uid === S.user.uid ? ' (tu)' : '') + ' ' + (s.closed ? '✅ chiuso' : '✍️ sta segnando')).join(' • ') : '';
+    }
+    function renderClosed() {
+      const ps = peersList();
+      const open = ps.filter(s => !s.closed);
+      let h = '<section class="card"><h3>Hai chiuso il tuo foglio ✅</h3>';
+      if (open.length) {
+        h += '<p class="info">Aspettiamo che chiuda anche: <b>' + open.map(s => esc(s.name)).join(', ') + '</b>. Poi si incrociano i due fogli.</p>';
+      } else if (ps.length <= 1) {
+        h += '<p class="info">Sei l\'unico admin che ha segnato questa partita: il tuo foglio vale così com\'è (punti provvisori, correggibili entro 48 ore).</p>' +
+          '<button class="sbtn ok" id="pubProv">Pubblica punti provvisori</button>';
+      } else {
+        const m = C.merge(ps.map(s => s));
+        h += '<p class="info">Fogli incrociati: <b>' + Object.keys(m.agreed).filter(k => m.agreed[k]).length + '</b> voci uguali, <b>' + m.disputes.length + '</b> diverse (vanno in revisione e per ora non contano).</p>' +
+          '<button class="sbtn ok" id="pubProv">Pubblica punti provvisori</button>';
+      }
+      h += '</section>';
+      $('view').innerHTML = h;
+      const b = $('pubProv'); if (b) b.onclick = publishProvisional;
+    }
+    async function publishProvisional() {
+      const ps = peersList().filter(s => s.closed);
+      const m = C.merge(ps);
+      if (!confirm('Pubblico i punti provvisori (' + m.disputes.length + ' voci in revisione)? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".')) return;
+      const sel = C.unflat(m.agreed);
+      await L().collection('matchday_temp').doc(S.g).set({ giornata: S.g, players: sel.players, coaches: sel.coaches, curva: sel.curva,
+        updatedBy: 'Partita live (provvisorio)', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await liveRef().set({ stato: 'provvisorio', agreed: m.agreed, disputes: m.disputes, sheetsUsed: ps.map(s => ({ uid: s.uid, name: s.name })),
+        resolutions: {}, corrections: [], provisionalAt: Date.now(), deadline: Date.now() + 48 * 3600000, provisionalBy: S.user.uid }, { merge: true });
+      location.href = 'matchday.html?g=' + encodeURIComponent(S.g) + '&from=live';
+    }
+
+    function renderReview() {
+      const lv = S.live;
+      const left = lv.deadline ? Math.max(0, lv.deadline - Date.now()) : 0;
+      const hh = Math.floor(left / 3600000), mm = Math.floor(left % 3600000 / 60000);
+      const names = (lv.sheetsUsed || []).map(s => s.name);
+      let h = '<section class="card"><h3>' + (lv.stato === 'definitivo' ? 'Punti definitivi pubblicati ✅' : 'Revisione') + '</h3>';
+      if (lv.stato === 'provvisorio') h += '<p class="info">Punti provvisori usciti. ' + (left ? 'Tempo per la revisione: <b>' + hh + ' h ' + mm + ' min</b>.' : '<b>Le 48 ore sono passate</b>: pubblica i definitivi.') + ' Basta uno dei due admin.</p>';
+      h += '</section>';
+      const res = lv.resolutions || {};
+      if ((lv.disputes || []).length) {
+        h += '<section class="card"><h3>Voci diverse tra i fogli (' + lv.disputes.length + ')</h3>' + lv.disputes.map(d => {
+          const r = res[d.key];
+          const opt = (v, t) => '<button data-res="' + esc(d.key) + '" data-v="' + v + '" class="' + (r === v ? 'on' : '') + '" ' + (lv.stato === 'definitivo' ? 'disabled' : '') + '>' + t + '</button>';
+          return '<div class="disp"><b>' + esc(describe(d.key)) + '</b><div class="info">' + esc(names[0] || 'Admin 1') + ': ' + d.a + ' • ' + esc(names[1] || 'Admin 2') + ': ' + d.b + '</div><div class="opts">' +
+            opt(d.a, 'Vale ' + d.a) + (d.b !== d.a ? opt(d.b, 'Vale ' + d.b) : '') + (d.a && d.b ? opt(0, 'Nessuna delle due (0)') : '') + '</div></div>';
+        }).join('') + '</section>';
+      }
+      h += '<section class="card"><h3>Correzioni da segnalazioni</h3>' + ((lv.corrections || []).map(c => '<div class="disp"><b>' + esc(describe(c.key)) + '</b> → ' + c.value + '<div class="info">' + esc(c.note || '') + ' — ' + esc(c.byName || '') + '</div></div>').join('') || '<p class="info">Nessuna.</p>');
+      if (lv.stato !== 'definitivo') {
+        h += '<div class="f">Chi <select id="corWho">' +
+          '<optgroup label="Giocatori">' + S.players.map(p => '<option value="p|' + p.id + '">' + esc(pname(p.id)) + '</option>').join('') + '</optgroup>' +
+          '<optgroup label="Allenatori">' + S.coaches.map(c => '<option value="c|' + c.id + '">' + esc(c.name) + '</option>').join('') + '</optgroup>' +
+          '<option value="v|">Curva</option></select></div>' +
+          '<div class="f">Voce <select id="corRule"></select></div>' +
+          '<div class="f">Valore corretto (0 = togli) <input id="corVal" type="number" min="0" value="1"></div>' +
+          '<div class="f">Nota (chi l\'ha segnalata, perché) <input id="corNote" placeholder="es. segnalazione di Marco: il gol era di Rossi"></div>' +
+          '<p style="margin-top:10px"><button class="sbtn blue" id="corAdd">Aggiungi correzione</button></p>';
+      }
+      h += '</section>';
+      if (lv.stato === 'provvisorio') {
+        const pending = (lv.disputes || []).filter(d => !(d.key in res)).length;
+        h += '<section class="card"><p class="info">' + (pending ? 'Mancano <b>' + pending + '</b> voci da decidere.' : 'Tutto deciso.') + '</p><button class="sbtn ok" id="pubFinal" ' + (pending ? 'disabled' : '') + '>Pubblica punti definitivi</button></section>';
+      }
+      $('view').innerHTML = h;
+      $('view').querySelectorAll('[data-res]').forEach(b => b.onclick = async () => {
+        // merge:true aggiunge/cambia solo questa decisione, il resto del documento resta com'è
+        try { await liveRef().set({ resolutions: { [b.dataset.res]: Number(b.dataset.v) }, lastEditBy: S.user.uid }, { merge: true }); }
+        catch (e) { toast('Errore: ' + (e.code || e.message)); }
+      });
+      const who = $('corWho');
+      if (who) {
+        const fill = () => { const [sc] = who.value.split('|'); const rules = S.rules[sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva'];
+          $('corRule').innerHTML = rules.map(r => '<option value="' + C.rid(r) + '">' + esc(C.label(r)) + ' (' + fmt(Number(r.valore)) + ')</option>').join(''); };
+        who.onchange = fill; fill();
+        $('corAdd').onclick = async () => {
+          const [sc, t] = who.value.split('|');
+          const key = sc === 'v' ? 'v||' + $('corRule').value : sc + '|' + t + '|' + $('corRule').value;
+          const note = $('corNote').value.trim();
+          if (!note) return toast('Scrivi una nota');
+          const c = { key, value: Number($('corVal').value || 0), note, by: S.user.uid, byName: S.user.displayName || (S.user.email || '').split('@')[0], at: Date.now() };
+          await liveRef().update({ corrections: firebase.firestore.FieldValue.arrayUnion(c) });
+          toast('Correzione aggiunta');
+        };
+      }
+      const pf = $('pubFinal'); if (pf) pf.onclick = publishFinal;
+    }
+    async function publishFinal() {
+      const lv = S.live;
+      if (!confirm('Pubblico i punti DEFINITIVI? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".')) return;
+      const fin = C.finalMap(lv.agreed, lv.resolutions, lv.corrections);
+      const sel = C.unflat(fin);
+      await L().collection('matchday_temp').doc(S.g).set({ giornata: S.g, players: sel.players, coaches: sel.coaches, curva: sel.curva,
+        updatedBy: 'Partita live (definitivo)', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await liveRef().set({ stato: 'definitivo', final: fin, finalAt: Date.now(), finalBy: S.user.uid }, { merge: true });
+      location.href = 'matchday.html?g=' + encodeURIComponent(S.g) + '&from=live';
+    }
+
+    // ---------- avvio giornata ----------
+    async function openGiornata(g) {
+      S.unsub.forEach(f => f()); S.unsub = [];
+      S.g = g; S.tab = 'conv'; S.live = null;
+      const v = venueOf(g); S.venue = v;
+      $('venueInfo').textContent = v && v.m ? (v.m.homeTeam + ' – ' + v.m.awayTeam) : '';
+      await openSheet();
+      // La partita si crea sul database al primo dato segnato (pushSheet), non alla sola apertura (D102)
+      S.unsub.push(liveRef().onSnapshot(s => { S.live = s.data() || { stato: 'aperta' }; render(); }, e => console.warn('[live]', e.code)));
+      S.unsub.push(liveRef().collection('sheets').onSnapshot(s => {
+        S.sheets = {}; s.docs.forEach(x => { S.sheets[x.id] = x.data(); });
+        if (S.sheet && !S.sheets[S.user.uid]) S.sheets[S.user.uid] = Object.assign({ uid: S.user.uid, name: 'tu' }, S.sheet);
+        render();
+      }, e => console.warn('[live]', e.code)));
+      render();
+    }
+
+    async function init() {
+      let r = 0; while ((!window.auth || !window.db) && r++ < 50) await new Promise(x => setTimeout(x, 100));
+      window.auth.onAuthStateChanged(async (user) => {
+        if (!user) { location.href = 'auth.html?redirect=' + encodeURIComponent(location.href); return; }
+        S.user = user;
+        let ok = false;
+        try { ok = (await db().collection('admins').doc(user.uid).get()).exists; } catch (e) {}
+        if (!ok) { $('denied').style.display = 'block'; return; }
+        const season = await Season.load();
+        S.lid = season.leagueId;
+        if (!S.lid) { $('denied').style.display = 'block'; return; }
+        await loadStatic();
+        const n = Number(season.numGiornate) || 38;
+        let first = 'G1';
+        for (let i = 1; i <= n; i++) { const d = await L().collection('days').doc('G' + i).get().catch(() => null); if (!d || !d.exists || d.data().computed !== true) { first = 'G' + i; break; } }
+        const q = new URLSearchParams(location.search).get('g');
+        $('gSel').innerHTML = Array.from({ length: n }, (_, i) => '<option value="G' + (i + 1) + '">Giornata ' + (i + 1) + '</option>').join('');
+        $('gSel').value = q || first;
+        $('gSel').onchange = () => openGiornata($('gSel').value);
+        $('app').style.display = 'block';
+        openGiornata($('gSel').value);
+      });
+    }
+    init();
+  </script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+</body>
+</html>

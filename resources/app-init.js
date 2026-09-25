@@ -59,22 +59,22 @@ if (document.readyState === 'loading') {
 
 // Load auth-guard (login obbligatorio)
 const authGuardScript = document.createElement('script');
-authGuardScript.src = 'resources/auth-guard.js?v=2025101905';
+authGuardScript.src = 'resources/auth-guard.js?v=20260925c';
 document.head.appendChild(authGuardScript);
 
 // Load league-selector (dropdown navbar)
 const leagueSelectorScript = document.createElement('script');
-leagueSelectorScript.src = 'resources/league-selector.js?v=2025101905';
+leagueSelectorScript.src = 'resources/league-selector.js?v=20260925c';
 document.head.appendChild(leagueSelectorScript);
 
 // Load mobile-header-fix (forza header identico a home su tutte le pagine mobile)
 const mobileHeaderFixScript = document.createElement('script');
-mobileHeaderFixScript.src = 'resources/mobile-header-fix.js?v=20251107';
+mobileHeaderFixScript.src = 'resources/mobile-header-fix.js?v=20260925c';
 document.head.appendChild(mobileHeaderFixScript);
 
 // Load cup-service (supporto coppe opzionali)
 const cupServiceScript = document.createElement('script');
-cupServiceScript.src = 'resources/cup-service.js?v=20251107';
+cupServiceScript.src = 'resources/cup-service.js?v=20260920-final';
 document.head.appendChild(cupServiceScript);
 
 console.log('✅ App initialization scripts loaded');

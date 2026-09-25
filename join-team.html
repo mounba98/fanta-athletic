@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Unisciti alla Squadra</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="stylesheet" href="resources/sheet.css" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .join-container { 
       max-width: 600px; 
@@ -44,7 +47,12 @@
   </style>
 </head>
 <body>
-  <div id="navbar-container"></div>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Unisciti alla Squadra</h1>
+  </header>
   <div class="join-container">
     <div class="join-icon">👥</div>
     <h1>Unisciti alla Squadra</h1>
@@ -52,16 +60,16 @@
     
     <input type="text" id="codeInput" class="code-input" placeholder="T-XXXXXX" maxlength="8">
     
-    <button class="join-btn" onclick="joinTeam()">🚀 Unisciti</button>
+    <button class="join-btn" onclick="joinTeam()">Unisciti</button>
     
     <div id="result" style="margin-top: 20px;"></div>
   </div>
 
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -113,7 +121,7 @@
       if (result.success) {
         resultDiv.innerHTML = `
           <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 20px;">
-            <h3 style="color: #4caf50; margin-top: 0;">✅ Benvenuto nella Squadra!</h3>
+            <h3 style="color: #4caf50; margin-top: 0;">Benvenuto nella Squadra!</h3>
             <p>Ti sei unito con successo come <strong>${result.role === 'head' ? 'Allenatore' : 'Vice-Allenatore'}</strong></p>
             <p>Redirect in 3 secondi...</p>
           </div>
@@ -152,5 +160,9 @@
       }
     });
   </script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
 </body>
 </html>

@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Foto Profilo - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <style>
     .upload-container { max-width: 600px; margin: 0 auto; }
@@ -41,7 +44,7 @@
     
     .drop-zone:hover, .drop-zone.drag-over {
       border-color: var(--primary);
-      background: rgba(220, 20, 60, 0.05);
+      background: rgba(146, 1, 0, 0.05);
     }
     
     .crop-container {
@@ -177,8 +180,8 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-storage-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-3"></script>
-  <script src="resources/app-check-config.js?v=20251021-3"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/app-check-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -188,15 +191,14 @@
     // Attiva App Check (dev: debug token, prod: reCAPTCHA v3)
     activateAppCheck();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/navbar-scroll-hide.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
 
   <script>
     let cropper = null;

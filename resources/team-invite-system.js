@@ -176,46 +176,45 @@
    */
   function renderInviteUI(container, leagueId, teamId, teamName) {
     container.innerHTML = `
-      <div style="background: var(--card); padding: 24px; border-radius: 12px; box-shadow: var(--shadow);">
-        <h3>👥 Invita Vice-Allenatori</h3>
-        <p>Invita altri utenti a gestire <strong>${teamName}</strong></p>
-        
+      <div style="background: var(--card); padding: 24px; border-radius: 16px; box-shadow: var(--shadow); text-align: center; max-width: 480px; margin: 0 auto;">
+        <h3 style="margin-top: 0;">Invita Vice-Allenatori</h3>
+        <p style="color: var(--muted);">Invita altri utenti a gestire <strong style="color: var(--text);">${teamName}</strong></p>
+
         <div style="margin: 20px 0;">
-          <button id="generateCodeBtn" style="background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-            🔗 Genera Codice Invito
+          <button id="generateCodeBtn" class="btn" style="display: inline-block; width: auto; padding-left: 28px; padding-right: 28px;">
+            Genera Codice Invito
           </button>
         </div>
-        
-        <div id="inviteResult" style="display: none; margin-top: 20px;"></div>
+
+        <div id="inviteResult" style="display: none; margin-top: 20px; text-align: center;"></div>
       </div>
     `;
-    
-    document.getElementById('generateCodeBtn').addEventListener('click', async () => {
+
+    container.querySelector('#generateCodeBtn').addEventListener('click', async () => {
       const userId = firebase.auth().currentUser.uid;
       const result = await createTeamInvite(leagueId, teamId, userId, 'assistant');
-      
-      const resultDiv = document.getElementById('inviteResult');
+
+      const resultDiv = container.querySelector('#inviteResult');
       resultDiv.style.display = 'block';
-      
+
       if (result.success) {
         resultDiv.innerHTML = `
-          <div style="background: #e8f5e9; padding: 16px; border-radius: 8px; border-left: 4px solid #4caf50;">
-            <h4 style="margin-top: 0;">✅ Invito Creato!</h4>
-            <p><strong>Codice:</strong> <code style="background: white; padding: 4px 8px; border-radius: 4px; font-size: 18px;">${result.code}</code></p>
-            <p><strong>Link:</strong></p>
-            <input type="text" value="${result.link}" readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace;">
-            <button onclick="navigator.clipboard.writeText('${result.link}')" style="margin-top: 8px; background: #2196f3; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-              📋 Copia Link
+          <div style="background: rgba(22,163,74,0.12); padding: 16px; border-radius: 12px; border: 1px solid var(--success);">
+            <h4 style="margin-top: 0; color: var(--success);">Invito Creato!</h4>
+            <p style="margin: 8px 0;"><strong>Codice:</strong> <code style="background: var(--bg); padding: 4px 10px; border-radius: 999px; font-size: 16px;">${result.code}</code></p>
+            <input type="text" class="input" value="${result.link}" readonly style="width: 100%; box-sizing: border-box; font-family: monospace; font-size: 13px; text-align: center; margin-top: 8px;" onclick="this.select()">
+            <button onclick="navigator.clipboard.writeText('${result.link}')" class="btn btn-secondary" style="display: inline-block; width: auto; margin-top: 10px; padding-left: 24px; padding-right: 24px;">
+              Copia Link
             </button>
-            <p style="font-size: 13px; color: #666; margin-top: 12px;">
+            <p style="font-size: 13px; color: var(--muted); margin: 12px 0 0 0;">
               Condividi questo link con gli utenti che vuoi invitare. Valido per 7 giorni.
             </p>
           </div>
         `;
       } else {
         resultDiv.innerHTML = `
-          <div style="background: #ffebee; padding: 16px; border-radius: 8px; border-left: 4px solid #f44336;">
-            <strong>❌ Errore:</strong> ${result.error}
+          <div style="background: rgba(146,1,0,0.1); padding: 16px; border-radius: 12px; border: 1px solid var(--primary); color: var(--text);">
+            <strong style="color: var(--primary);">Errore:</strong> ${result.error}
           </div>
         `;
       }

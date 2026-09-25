@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -11,14 +11,17 @@
   <meta name="description" content="Sistema di asta per l'acquisto dei giocatori" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+      <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .asta-container { max-width: 1400px; margin: 0 auto; }
     .asta-layout { display: grid; grid-template-columns: 300px 1fr 300px; gap: 20px; }
     
     /* Player Card */
     .player-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%);
       color: white;
       border-radius: 16px;
       padding: 30px;
@@ -57,7 +60,7 @@
       text-align: center;
       margin: 20px 0;
     }
-    .bid-currency { font-size: 24px; color: #f39c12; }
+    .bid-currency { font-size: 24px; color: #d97706; }
     
     /* Timer */
     .timer {
@@ -71,7 +74,7 @@
       margin-bottom: 20px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
-    .timer.warning { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .timer.warning { background: linear-gradient(135deg, #fa709a 0%, #facc15 100%); }
     .timer.danger { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); animation: pulse 1s infinite; }
     
     @keyframes pulse {
@@ -100,7 +103,7 @@
     
     /* Admin Controls */
     .admin-panel {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%);
       border-radius: 16px;
       padding: 24px;
       margin-top: 30px;
@@ -135,9 +138,9 @@
       min-height: 44px;
     }
     .admin-btn.primary {
-      background: #e74c3c;
+      background: #920100;
       color: white;
-      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      box-shadow: 0 4px 12px rgba(146, 1, 0, 0.3);
     }
     .admin-btn.primary:hover {
       background: #c0392b;
@@ -199,7 +202,7 @@
     .team-item.current-bidder { background: #e8f5e9; border-left: 4px solid #4caf50; }
     .team-name { font-weight: 600; }
     .team-budget { 
-      color: #f39c12; 
+      color: #d97706; 
       font-weight: bold;
       font-size: 18px;
     }
@@ -267,7 +270,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>🔨 Asta Giocatori</h1>
+    <h1>Asta Giocatori</h1>
     </header>
 
   <main class="container asta-container">
@@ -278,7 +281,7 @@
     <div class="asta-layout">
       <!-- Sidebar Sinistra: Budget Squadre -->
       <div>
-        <h3>💰 Budget Squadre</h3>
+        <h3>Budget Squadre</h3>
         <div class="teams-list" id="teamsList"></div>
       </div>
 
@@ -306,7 +309,7 @@
           <button class="bid-btn" onclick="placeBid(1)">+1</button>
           <button class="bid-btn" onclick="placeBid(5)">+5</button>
           <button class="bid-btn" onclick="placeBid(10)">+10</button>
-          <button class="bid-btn custom" onclick="customBid()">💰 Offerta Personalizzata</button>
+          <button class="bid-btn custom" onclick="customBid()">Offerta Personalizzata</button>
         </div>
 
         <div class="bid-history">
@@ -317,14 +320,14 @@
 
       <!-- Sidebar Destra: Coda Giocatori -->
       <div>
-        <h3>👥 Prossimi Giocatori</h3>
+        <h3>Prossimi Giocatori</h3>
         <div class="players-queue" id="playersQueue"></div>
       </div>
     </div>
 
     <!-- Admin Controls -->
     <div id="adminControls" class="admin-panel" style="display: none;">
-      <h3>🔧 Controlli Admin</h3>
+      <h3>Controlli Admin</h3>
       <div class="admin-buttons">
         <button class="admin-btn primary" onclick="startAuction()">
           <span>▶️</span>
@@ -354,25 +357,21 @@
     </div>
   </main>
 
-  <footer class="footer">
-    <small>&copy; <span id="year"></span> Nicola Mocci</small>
-  </footer>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
   </script>
-  <script src="resources/firebase.js"></script>
-  <script src="resources/notifications.js"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
+  <script src="resources/notifications.js?v=20260925"></script>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
 
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -564,12 +563,12 @@
       alert('Funzione in sviluppo');
     }
   </script>
-      <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+  <script src="resources/footer.js?v=20260920-final3"></script>
 </body>
 </html>

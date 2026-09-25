@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Stagione</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
+  <style>
+    body { padding-bottom: 90px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .warnbox { background:rgba(217,119,6,.12); border:1px solid rgba(217,119,6,.45); border-radius:10px; padding:10px 12px; font-size:14px; line-height:1.45; }
+    .back { display:inline-block; margin-bottom:12px; color:var(--muted); text-decoration:none; font-weight:600; }
+    .stabs { display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; margin-bottom:14px; scrollbar-width:none; }
+    .stabs button { flex:0 0 auto; padding:9px 16px; border-radius:999px; border:1px solid rgba(148,163,184,.35) !important; background:var(--card) !important; color:var(--text) !important; font-weight:600; font-family:inherit; cursor:pointer; }
+    .stabs button.on { background:#0c0f6d !important; border-color:#0c0f6d !important; color:#fff !important; }
+    .pane { display:none; } .pane.on { display:block; }
+    .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; margin-bottom: 14px; }
+    .card h2 { font-size:18px; margin:0 0 4px; }
+    .muted { color: var(--muted); font-size: 13px; line-height:1.5; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:12px; }
+    label.f { display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; }
+    label.f small { font-weight:400; color:var(--muted); }
+    .f input, .f select { padding:10px 14px; border-radius:999px; border:1px solid rgba(148,163,184,.4); background:transparent; color:var(--text); font-family:inherit; font-size:15px; }
+    .f select option { color:#111; }
+    .choice { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin-top:12px; }
+    .choice label { display:block; padding:12px 14px; border-radius:14px; border:1px solid rgba(148,163,184,.35); cursor:pointer; }
+    .choice input { margin-right:8px; }
+    .choice label:has(input:checked) { border-color:#0c0f6d; box-shadow:0 0 0 1px #0c0f6d inset; }
+    .choice .d { display:block; color:var(--muted); font-size:12px; margin-top:4px; font-weight:400; }
+    .preview { margin-top:12px; padding:12px; border-radius:12px; background:rgba(148,163,184,.12); font-size:14px; }
+    .sbtn { padding:11px 18px; border-radius:999px; font-weight:700; cursor:pointer; border:none !important; color:#fff !important; font-family:inherit; font-size:15px; }
+    .sbtn.ok { background:#16a34a !important; } .sbtn.blue { background:#0c0f6d !important; } .sbtn.red { background:#920100 !important; } .sbtn:disabled { opacity:.45; cursor:not-allowed; }
+    .actions { position:static; display:flex; gap:10px; justify-content:flex-end; padding:10px 0; }
+    .log { font-size:13px; white-space:pre-wrap; background:rgba(148,163,184,.12); border-radius:12px; padding:12px; margin-top:12px; max-height:260px; overflow:auto; }
+    table.counts { width:100%; border-collapse:collapse; font-size:14px; margin-top:10px; }
+    table.counts td { padding:6px 4px; border-top:1px solid rgba(148,163,184,.18); }
+    table.counts td:last-child { text-align:right; font-weight:700; }
+    .state { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700; color:#fff; background:#64748b; }
+    .state.verificato { background:#16a34a; } .state.incompleto { background:#920100; } .state.in_copia, .state.copiato { background:#b45309; }
+    .danger { border:1px solid rgba(146,1,0,.5); }
+    ol.path { list-style:none; padding:0; margin:12px 0 0; counter-reset:st; }
+    ol.path li { position:relative; padding:12px 12px 12px 52px; border-top:1px solid rgba(148,163,184,.18); counter-increment:st; }
+    ol.path li::before { content:counter(st); position:absolute; left:8px; top:12px; width:30px; height:30px; border-radius:999px; display:grid; place-items:center; font-weight:800; background:rgba(148,163,184,.25); }
+    ol.path li.ok::before { content:'✓'; background:#16a34a; color:#fff; }
+    ol.path li.todo::before { background:#b45309; color:#fff; }
+    ol.path li.skip { opacity:.55; }
+    ol.path .t { font-weight:700; } ol.path .d { color:var(--muted); font-size:13px; margin-top:2px; }
+    ol.path a.go { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#0c0f6d; color:#fff; text-decoration:none; font-weight:600; font-size:13px; }
+    .tech { font-size:12px; color:var(--muted); margin-top:10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home"><img src="resources/logo.png" alt="Fanta Athletic" /></a>
+    <h1>Stagione</h1>
+  </header>
+
+  <main class="container">
+    <a class="back" href="admin.html#stagione">← Pannello admin</a>
+    <section class="card" id="denied" style="display:none;"><h2>Accesso riservato</h2><p>Solo per gli amministratori.</p></section>
+
+    <div id="content" style="display:none;">
+      <div class="stabs" id="tabs">
+        <button data-p="param" class="on">Impostazioni</button>
+        <button data-p="arch">Archivia stagione</button>
+        <button data-p="nuova">Nuova stagione</button>
+        <button data-p="percorso">Percorso nuova stagione</button>
+      </div>
+
+      <!-- ============ IMPOSTAZIONI ============ -->
+      <div class="pane on" id="p-param">
+        <section class="card">
+          <h2>Generali</h2>
+          <p class="muted" id="savedInfo"></p>
+          <div class="grid">
+            <label class="f">Nome stagione <input id="label" placeholder="2026/27" /></label>
+            <label class="f">Stato
+              <select id="stato"><option value="preparazione">In preparazione</option><option value="in_corso">In corso</option><option value="chiusa">Chiusa</option></select>
+            </label>
+            <label class="f">Numero squadre <input id="numSquadre" type="number" min="2" max="40" /></label>
+            <label class="f">Numero giornate <input id="numGiornate" type="number" min="1" max="60" placeholder="dal calendario" /><small>Vuoto = quelle del calendario Athletic</small></label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Modalità di gioco</h2>
+          <div class="choice">
+            <label><input type="radio" name="modalita" value="classica" />Classica<span class="d">Vince chi somma più punti in tutta la stagione.</span></label>
+            <label><input type="radio" name="modalita" value="scontri" />Scontri diretti<span class="d">Ogni giornata una sfida: vittoria, pareggio o sconfitta.</span></label>
+            <label><input type="radio" name="modalita" value="entrambe" />Entrambe<span class="d">Due classifiche in parallelo.</span></label>
+          </div>
+        </section>
+
+        <section class="card" id="h2hCard">
+          <h2>Scontri diretti</h2>
+          <p class="muted">Come si decide una sfida.</p>
+          <p class="warnbox"><b>Valori provvisori, da decidere insieme prima di attivare gli scontri.</b> Le soglie di partenza (1° gol a 66 punti, poi uno ogni 6) vengono dal fantacalcio classico: nel Fanta Athletic una squadra fa di solito 5–30 punti a giornata, quindi finirebbe quasi sempre 0-0. Guardate l'esempio qui sotto mentre cambiate i numeri.</p>
+          <div class="grid">
+            <label class="f">Punti vittoria <input id="h2h_vittoria" type="number" step="0.5" /></label>
+            <label class="f">Punti pareggio <input id="h2h_pareggio" type="number" step="0.5" /></label>
+            <label class="f">Punti sconfitta <input id="h2h_sconfitta" type="number" step="0.5" /></label>
+            <label class="f">Come si decide la sfida
+              <select id="h2h_conversione"><option value="soglie">Punti → gol a fasce (stile fantacalcio)</option><option value="diretta">Vince chi fa più punti</option></select>
+            </label>
+            <label class="f soglie">Punti per il 1° gol <input id="h2h_primaSoglia" type="number" step="0.5" /></label>
+            <label class="f soglie">Un gol in più ogni… punti <input id="h2h_ampiezza" type="number" step="0.5" min="0.5" /></label>
+            <label class="f">Formazione mancante: punti a chi vince <input id="h2h_forfaitVincente" type="number" step="0.5" /></label>
+            <label class="f">Formazione mancante: punti a chi perde <input id="h2h_forfaitPerdente" type="number" step="0.5" /></label>
+            <label class="f">Formazione mancante se i titolari sono meno di… <input id="h2h_minTitolari" type="number" min="1" step="1" /></label>
+          </div>
+          <div class="preview" id="h2hPreview"></div>
+          <div class="actions" style="margin-top:12px">
+            <button class="sbtn blue" id="h2hRecalcBtn">Ricalcola tutti gli scontri con le regole salvate</button>
+          </div>
+          <p class="muted" style="margin-top:6px">Da usare dopo aver cambiato e <b>salvato</b> soglie o tavolino a stagione iniziata: rifà tutte le sfide delle giornate già calcolate. I punti vittoria/pareggio/sconfitta invece valgono subito, senza ricalcolo.</p>
+          <div class="log" id="h2hLog" style="display:none;"></div>
+        </section>
+
+        <section class="card">
+          <h2>Mini-gioco Curva vs Piana</h2>
+          <div class="grid">
+            <label class="f">Punti per esito giusto <input id="c_punti" type="number" min="1" /></label>
+            <label class="f">Il voto si apre… ore prima <input id="c_aperturaOre" type="number" min="1" /></label>
+            <label class="f">Il voto si chiude… minuti prima <input id="c_chiusuraMinuti" type="number" min="0" /></label>
+          </div>
+        </section>
+
+        <div class="actions"><button class="sbtn ok" id="saveBtn">Salva impostazioni</button></div>
+        <p class="tech" id="techInfo"></p>
+      </div>
+
+      <!-- ============ ARCHIVIA ============ -->
+      <div class="pane" id="p-arch">
+        <section class="card">
+          <h2>Archivia la stagione <span id="archLabel"></span></h2>
+          <p class="muted">Fa una <b>copia completa</b> della stagione (squadre, rose, formazioni, giornate, bonus, risultati, scontri diretti, calendario Athletic, mini-gioco) nell'archivio consultabile. <b>Non cancella niente.</b> Alla fine rilegge la copia e controlla che ci sia tutto.</p>
+          <p style="margin-top:10px;">Stato archivio: <span class="state" id="archState">nessuno</span></p>
+          <table class="counts" id="archCounts"></table>
+          <div class="actions" style="position:static;">
+            <button class="sbtn blue" id="previewBtn">1. Conta cosa verrà copiato</button>
+            <button class="sbtn ok" id="archBtn" disabled>2. Archivia ora</button>
+          </div>
+          <div class="log" id="archLog" style="display:none;"></div>
+        </section>
+      </div>
+
+      <!-- ============ PERCORSO NUOVA STAGIONE ============ -->
+      <div class="pane" id="p-percorso">
+        <section class="card">
+          <h2>Creazione nuova stagione, passo per passo</h2>
+          <p class="muted">Segui i passi in ordine. Lo stato di ogni passo si aggiorna da solo guardando il database. <button class="sbtn blue" id="refreshPath" style="padding:6px 12px;font-size:13px;margin-left:6px;">Aggiorna</button></p>
+          <ol class="path" id="path"></ol>
+        </section>
+      </div>
+
+      <!-- ============ NUOVA STAGIONE ============ -->
+      <div class="pane" id="p-nuova">
+        <section class="card danger">
+          <h2>Apri la stagione nuova</h2>
+          <p class="muted">Azzera la stagione in corso per ripartire: <b>giornate, bonus segnati, risultati, formazioni salvate, scadenze, calendario Athletic, Partita live, voti e classifica del mini-gioco</b>, e <b>svuota le rose</b> (si rifà l'asta). <br>Restano: utenti, lega, squadre (nome, fazione, allenatori), lista giocatori, regole bonus/malus, archivio.</p>
+          <p style="margin-top:10px;" id="reqArch">Archivio verificato della stagione in corso: …</p>
+          <div class="grid">
+            <label class="f">Nome della stagione nuova <input id="nextLabel" placeholder="2026/27" /></label>
+          </div>
+          <table class="counts" id="resetCounts"></table>
+          <div class="grid">
+            <label class="f">Per confermare scrivi <b>NUOVA STAGIONE</b> <input id="confirmText" autocomplete="off" /></label>
+          </div>
+          <div class="actions" style="position:static;">
+            <button class="sbtn blue" id="planBtn">1. Mostra cosa verrà azzerato</button>
+            <button class="sbtn red" id="newBtn" disabled>2. Apri stagione nuova</button>
+          </div>
+          <div class="log" id="newLog" style="display:none;"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/contest-scoring.js?v=20260925"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/season-archive.js?v=20260925b"></script>
+  <script src="resources/h2h.js?v=20260925e"></script>
+  <script>
+    const KIND = {
+      league: 'Lega', season_config: 'Impostazioni stagione', teams: 'Squadre (con rose)', saved: 'Formazioni salvate',
+      players: 'Giocatori', coaches: 'Allenatori', rules: 'Regole bonus/malus', days: 'Giornate (bonus segnati)',
+      matchday_temp: 'Bozze giornata', deadlines: 'Scadenze', posts: 'Bacheca', results: 'Risultati (intestazioni)',
+      results_teams: 'Risultati per squadra', h2h_schedule: 'Calendario scontri', h2h_results: 'Risultati scontri',
+      athletic_calendar: 'Partite Athletic', contest_predictions: 'Voti mini-gioco', contest_standings: 'Classifica mini-gioco',
+      live: 'Partita live (giornate)', live_sheets: 'Partita live (fogli admin)'
+    };
+    let S = null, collected = null;
+    const $ = id => document.getElementById(id);
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(m) { alert(m); }
+    function logTo(id, m) { const el = $(id); el.style.display = 'block'; el.textContent += (el.textContent ? '\n' : '') + m; el.scrollTop = el.scrollHeight; }
+    function idFromLabel(l) { const m = String(l).match(/(\d{4})\s*[\/-]\s*(\d{2,4})/); return m ? m[1] + '-' + m[2].slice(-2) : String(l).replace(/[^\w-]/g, ''); }
+    function nextLabelOf(l) { const m = String(l).match(/(\d{4})\s*[\/-]\s*(\d{2,4})/); if (!m) return ''; const a = +m[1] + 1; return a + '/' + String((a + 1) % 100).padStart(2, '0'); }
+
+    document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+      document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+      document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'p-' + b.dataset.p));
+      if (b.dataset.p === 'arch') refreshArchive();
+      if (b.dataset.p === 'nuova') refreshReq();
+      if (b.dataset.p === 'percorso') refreshPath();
+    });
+
+    function fill(s) {
+      $('label').value = s.label; $('stato').value = s.stato;
+      $('numSquadre').value = s.numSquadre ?? ''; $('numGiornate').value = s.numGiornate ?? '';
+      document.querySelectorAll('input[name=modalita]').forEach(r => r.checked = r.value === s.modalita);
+      ['vittoria','pareggio','sconfitta','conversione','primaSoglia','ampiezza','forfaitVincente','forfaitPerdente','minTitolari'].forEach(k => $('h2h_' + k).value = s.h2h[k] != null ? s.h2h[k] : '');
+      ['punti','aperturaOre','chiusuraMinuti'].forEach(k => $('c_' + k).value = s.contest[k]);
+      $('savedInfo').textContent = s.saved ? 'Impostazioni salvate nel database.' : 'Mai salvate: stai vedendo i valori di oggi (quelli scritti nel codice). Salvando diventano modificabili da qui.';
+      $('techInfo').textContent = 'Dati tecnici: stagione "' + s.id + '", cartella scontri diretti "' + s.h2h.key + '", lega ' + s.leagueId + '.';
+      $('archLabel').textContent = s.label; $('nextLabel').value = nextLabelOf(s.label);
+      updH2h();
+    }
+
+    function read() {
+      const n = id => { const v = $(id).value; return v === '' ? null : Number(v); };
+      const label = $('label').value.trim();
+      return Season.merge(S, {
+        label, id: S.saved ? S.id : idFromLabel(label) || S.id, stato: $('stato').value,
+        numSquadre: n('numSquadre'), numGiornate: n('numGiornate'),
+        modalita: (document.querySelector('input[name=modalita]:checked') || {}).value || 'classica',
+        h2h: { vittoria: n('h2h_vittoria'), pareggio: n('h2h_pareggio'), sconfitta: n('h2h_sconfitta'), conversione: $('h2h_conversione').value,
+               primaSoglia: n('h2h_primaSoglia'), ampiezza: n('h2h_ampiezza'), forfaitVincente: n('h2h_forfaitVincente'), forfaitPerdente: n('h2h_forfaitPerdente'), minTitolari: Math.max(1, Math.round(n('h2h_minTitolari') || 1)) },
+        contest: { punti: n('c_punti'), aperturaOre: n('c_aperturaOre'), chiusuraMinuti: n('c_chiusuraMinuti') }
+      });
+    }
+
+    function updH2h() {
+      const v = read();
+      const soglie = v.h2h.conversione === 'soglie';
+      document.querySelectorAll('.soglie').forEach(el => el.style.display = soglie ? '' : 'none');
+      $('h2hCard').style.opacity = v.modalita === 'classica' ? .6 : 1;
+      if (!soglie) { $('h2hPreview').textContent = 'Esempio: 58 punti contro 55 → vince chi ne ha 58 (' + v.h2h.vittoria + ' punti in classifica).'; return; }
+      const ex = [v.h2h.primaSoglia - 1, v.h2h.primaSoglia, v.h2h.primaSoglia + v.h2h.ampiezza, v.h2h.primaSoglia + 3 * v.h2h.ampiezza];
+      $('h2hPreview').innerHTML = 'Esempio: ' + ex.map(p => '<b>' + p + '</b> punti = ' + Season.goalsFromPoints(p, v.h2h) + ' gol').join(' • ');
+    }
+    document.querySelectorAll('#p-param input, #p-param select').forEach(el => el.addEventListener('input', updH2h));
+
+    $('saveBtn').onclick = async () => {
+      const v = read();
+      if (!v.label) return toast('Scrivi il nome della stagione');
+      if (v.h2h.conversione === 'soglie' && !(v.h2h.ampiezza > 0)) return toast('"Un gol in più ogni… punti" deve essere maggiore di zero');
+      $('saveBtn').disabled = true;
+      try { S = await Season.save(v); fill(S); toast('✅ Impostazioni salvate'); }
+      catch (e) { toast('Errore nel salvataggio: ' + (e.code || e.message)); }
+      finally { $('saveBtn').disabled = false; }
+    };
+
+    // Ricalcolo scontri diretti con le regole salvate (D100)
+    $('h2hRecalcBtn').onclick = async () => {
+      if (!H2H.active(S)) return toast('La modalità è "Classica": non ci sono scontri diretti da ricalcolare');
+      if (!confirm('Ricalcolo tutte le sfide già giocate con le regole salvate adesso?')) return;
+      $('h2hRecalcBtn').disabled = true; $('h2hLog').textContent = '';
+      try {
+        const r = await H2H.recomputeAll(S.leagueId, S, m => logTo('h2hLog', m));
+        logTo('h2hLog', '✅ Fatto: ' + r.giornate + ' giornate ricalcolate');
+      } catch (e) { logTo('h2hLog', '❌ ' + (e.code || e.message)); }
+      finally { $('h2hRecalcBtn').disabled = false; }
+    };
+
+    // ---------- Archivio ----------
+    function countsTable(el, counts) {
+      $(el).innerHTML = Object.keys(counts).map(k => '<tr><td>' + esc(KIND[k] || k) + '</td><td>' + counts[k] + '</td></tr>').join('');
+    }
+    async function refreshArchive() {
+      try {
+        const d = await SeasonArchive.archiveRef(S.leagueId, S.id).get();
+        const st = d.exists ? d.data().stato : 'nessuno';
+        $('archState').textContent = st; $('archState').className = 'state ' + st;
+        if (d.exists && d.data().counts && !collected) countsTable('archCounts', d.data().counts);
+      } catch (e) { $('archState').textContent = 'non leggibile (' + (e.code || e.message) + ')'; }
+    }
+    $('previewBtn').onclick = async () => {
+      $('previewBtn').disabled = true; $('archLog').textContent = '';
+      try {
+        collected = await SeasonArchive.collect(S.leagueId, S, m => logTo('archLog', m));
+        const c = SeasonArchive.countByKind(collected);
+        countsTable('archCounts', c);
+        logTo('archLog', 'Totale documenti da copiare: ' + collected.length);
+        $('archBtn').disabled = false;
+      } catch (e) { logTo('archLog', '❌ ' + (e.code || e.message)); }
+      finally { $('previewBtn').disabled = false; }
+    };
+    $('archBtn').onclick = async () => {
+      if (!confirm('Copiare la stagione ' + S.label + ' nell\'archivio? Non cancella niente.')) return;
+      $('archBtn').disabled = true;
+      try {
+        const r = await SeasonArchive.archiveSeason(S.leagueId, S, m => logTo('archLog', m));
+        logTo('archLog', r.ok ? '✅ Archivio VERIFICATO: ' + r.total + ' documenti, tutti presenti.' : '⚠️ Archivio incompleto: ' + r.problems.join('; '));
+        refreshArchive();
+      } catch (e) { logTo('archLog', '❌ ' + (e.code || e.message) + (e.code === 'permission-denied' ? ' — manca la regola dell\'archivio su Firebase (vedi firestore.rules, D087).' : '')); }
+    };
+
+    // ---------- Nuova stagione ----------
+    let archiveOk = false, planned = false;
+    async function refreshReq() {
+      try {
+        const d = await SeasonArchive.archiveRef(S.leagueId, S.id).get();
+        archiveOk = d.exists && d.data().stato === 'verificato';
+      } catch (e) { archiveOk = false; }
+      $('reqArch').innerHTML = 'Archivio verificato della stagione ' + esc(S.label) + ': ' + (archiveOk ? '<span class="state verificato">sì</span>' : '<span class="state incompleto">no — prima archivia</span>');
+      updNew();
+    }
+    function updNew() { $('newBtn').disabled = !(archiveOk && planned && $('confirmText').value.trim() === 'NUOVA STAGIONE' && $('nextLabel').value.trim()); }
+    $('confirmText').addEventListener('input', updNew); $('nextLabel').addEventListener('input', updNew);
+    $('planBtn').onclick = async () => {
+      $('planBtn').disabled = true; $('newLog').textContent = '';
+      try {
+        const all = await SeasonArchive.collect(S.leagueId, S, m => logTo('newLog', m));
+        const p = SeasonArchive.resetPlan(all);
+        $('resetCounts').innerHTML = p.delete.map(x => '<tr><td>Cancella: ' + esc(KIND[x.kind] || x.kind) + '</td><td>' + x.n + '</td></tr>').join('') +
+          '<tr><td>Svuota la rosa di</td><td>' + p.emptyRosters + ' squadre</td></tr>';
+        planned = true; updNew();
+      } catch (e) { logTo('newLog', '❌ ' + (e.code || e.message)); }
+      finally { $('planBtn').disabled = false; }
+    };
+    $('newBtn').onclick = async () => {
+      const label = $('nextLabel').value.trim();
+      if (!confirm('ULTIMA CONFERMA: azzerare la stagione ' + S.label + ' e aprire la ' + label + '? Non si torna indietro (resta solo l\'archivio).')) return;
+      $('newBtn').disabled = true;
+      const id = idFromLabel(label);
+      const next = Season.merge(Season.DEFAULTS, { id, label, stato: 'preparazione', numSquadre: S.numSquadre, modalita: S.modalita,
+        h2h: Object.assign({}, S.h2h, { key: id }), contest: S.contest });
+      try {
+        await SeasonArchive.startNewSeason(S.leagueId, S, next, m => logTo('newLog', m));
+        S = await Season.load(true); fill(S);
+        logTo('newLog', '✅ Fatto. Ora: calendario Athletic, lista giocatori, asta.');
+      } catch (e) { logTo('newLog', '❌ ' + (e.code || e.message)); }
+    };
+
+    // ---------- Percorso guidato ----------
+    function goTab(p) { document.querySelector('#tabs button[data-p="' + p + '"]').click(); }
+    async function refreshPath() {
+      const db = window.__LEGACY_DB__, L = db.collection('leagues').doc(S.leagueId);
+      const size = async q => { try { return (await q.get()).size; } catch (e) { return null; } };
+      S = await Season.load(true);
+      const isNew = !!S.previous;
+      const prevId = S.previous || S.id;   // prima dell'azzeramento: l'archivio della stagione in corso
+      let prevOk = false;
+      if (prevId) { try { const d = await SeasonArchive.archiveRef(S.leagueId, prevId).get(); prevOk = d.exists && d.data().stato === 'verificato'; } catch (e) {} }
+      const teamsSnap = await L.collection('teams').get().catch(() => null);
+      const teams = teamsSnap ? teamsSnap.docs.map(d => d.data()) : [];
+      const withRoster = teams.filter(t => Array.isArray(t.roster) && t.roster.length).length;
+      const withFaction = teams.filter(t => t.fazione).length;
+      const [cal, pl, ru, sched] = await Promise.all([
+        size(db.collection('athletic_calendar')), size(L.collection('players')), size(L.collection('rules')),
+        size(L.collection('h2h_schedule').doc(S.h2h.key).collection('giornate'))
+      ]);
+      const h2hOn = S.modalita !== 'classica';
+      const steps = [
+        { ok: prevOk, t: 'Archivia la stagione passata', d: 'Archivio ' + prevId + (prevOk ? ' verificato ✓ (consultabile nell\'Albo d\'oro)' : ' non ancora fatto o non verificato'), tab: prevOk ? null : 'arch' },
+        { ok: isNew, t: 'Apri la stagione nuova (azzera la vecchia)', d: isNew ? 'Stagione ' + S.label + ' aperta' : 'Cancella giornate, risultati, formazioni, mini-gioco, calendario; svuota le rose.', tab: isNew ? null : 'nuova' },
+        { ok: isNew && S.saved, t: 'Impostazioni della stagione', d: 'Modalità: ' + S.modalita + ' • squadre: ' + S.numSquadre + ' • mini-gioco: ' + S.contest.punti + ' punti', tab: 'param' },
+        { ok: isNew && cal > 0, t: 'Calendario Athletic', d: (cal || 0) + ' partite inserite', href: 'admin-calendario.html' },
+        { ok: isNew && teams.length === Number(S.numSquadre), t: 'Squadre: nomi, allenatori, proprietari', d: teams.length + ' squadre (previste ' + S.numSquadre + ')', href: 'admin-teams.html' },
+        { ok: isNew && withFaction === teams.length && teams.length > 0, t: 'Fazioni Curva Morello / Piana', d: withFaction + ' di ' + teams.length + ' squadre con fazione', href: 'admin-fazioni.html' },
+        { ok: isNew && pl > 0, t: 'Lista giocatori aggiornata', d: (pl || 0) + ' giocatori (cessioni e nuovi ingressi)', href: 'admin-players.html' },
+        { ok: isNew && ru > 0, t: 'Regole bonus/malus', d: (ru || 0) + ' regole: controlla valori e presenze', href: 'admin-rules.html' },
+        { ok: isNew && withRoster === teams.length && teams.length > 0, t: 'Asta', d: withRoster + ' di ' + teams.length + ' squadre con la rosa', href: 'asta.html' },
+        { ok: !h2hOn || (isNew && sched > 0), skip: !h2hOn, t: 'Calendario scontri diretti', d: h2hOn ? (sched || 0) + ' giornate generate' : 'Non serve: modalità classica', href: 'calendario.html' },
+        { ok: isNew && S.stato === 'in_corso', t: 'Avvia la stagione', d: 'Metti lo stato su "In corso" nelle Impostazioni', tab: 'param' }
+      ];
+      $('path').innerHTML = steps.map(x => '<li class="' + (x.skip ? 'skip ok' : x.ok ? 'ok' : 'todo') + '"><div class="t">' + esc(x.t) + '</div><div class="d">' + esc(x.d) + '</div>' +
+        (x.ok ? '' : x.href ? '<a class="go" href="' + x.href + '">Apri →</a>' : x.tab ? '<a class="go" href="#" data-tab="' + x.tab + '">Vai →</a>' : '') + '</li>').join('');
+      $('path').querySelectorAll('a[data-tab]').forEach(a => a.onclick = e => { e.preventDefault(); goTab(a.dataset.tab); });
+    }
+    $('refreshPath').onclick = refreshPath;
+
+    async function init() {
+      let r = 0; while ((!window.auth || !window.db) && r++ < 50) await new Promise(x => setTimeout(x, 100));
+      window.auth.onAuthStateChanged(async (user) => {
+        if (!user) { location.href = 'auth.html?redirect=' + encodeURIComponent(location.href); return; }
+        let ok = false;
+        try { ok = (await window.__LEGACY_DB__.collection('admins').doc(user.uid).get()).exists; } catch (e) {}
+        if (!ok) { $('denied').style.display = 'block'; return; }
+        S = await Season.load(true);
+        if (!S.leagueId) { $('denied').style.display = 'block'; $('denied').innerHTML = '<h2>Lega non trovata</h2>'; return; }
+        $('content').style.display = 'block';
+        fill(S);
+        const h = location.hash.slice(1); if (['param','arch','nuova','percorso'].includes(h)) goTab(h);
+      });
+    }
+    init();
+  </script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+</body>
+</html>

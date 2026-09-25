@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Debug & Monitor - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <style>
     .debug-container { max-width: 1200px; margin: 0 auto; }
     .debug-section { background: var(--card); border-radius: 12px; padding: 20px; margin: 20px 0; }
@@ -18,7 +20,7 @@
     .error-timestamp { color: #a0aec0; font-size: 0.9em; }
     .btn { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
     .btn:hover { background: #2980b9; }
-    .btn-danger { background: #e53e3e; }
+    .btn-danger { background: #920100; }
     .btn-danger:hover { background: #c53030; }
     .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
     .status-ok { background: #48bb78; }
@@ -32,7 +34,7 @@
     <a class="logo-home" href="index.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>🔍 Debug & Monitor</h1>
+    <h1>Debug & Monitor</h1>
   </header>
 
   <main class="debug-container">
@@ -43,18 +45,18 @@
 
     <!-- Error Logs -->
     <div class="debug-section">
-      <h3>📋 Error Logs</h3>
+      <h3>Error Logs</h3>
       <p>Errori JavaScript, Firebase e di rete catturati dall'applicazione.</p>
       <div id="errorCount" class="status-indicator status-ok"></div>
       <span id="errorCountText">0 errori</span>
-      <button class="btn" onclick="refreshErrorLogs()">🔄 Aggiorna</button>
-      <button class="btn btn-danger" onclick="clearErrorLogs()">🗑️ Pulisci Log</button>
+      <button class="btn" onclick="refreshErrorLogs()">Aggiorna</button>
+      <button class="btn btn-danger" onclick="clearErrorLogs()">Pulisci Log</button>
       <div id="errorLogs" class="error-log"></div>
     </div>
 
     <!-- System Status -->
     <div class="debug-section">
-      <h3>⚙️ System Status</h3>
+      <h3>System Status</h3>
       <div id="systemStatus">
         <div><span class="status-indicator status-ok"></span>Firebase: <span id="firebaseStatus">Checking...</span></div>
         <div><span class="status-indicator status-ok"></span>Auth: <span id="authStatus">Checking...</span></div>
@@ -65,7 +67,7 @@
 
     <!-- Performance -->
     <div class="debug-section">
-      <h3>📊 Performance</h3>
+      <h3>Performance</h3>
       <div id="performanceInfo">
         <div>Load Time: <span id="loadTime">-</span>ms</div>
         <div>Memory Usage: <span id="memoryUsage">-</span>MB</div>
@@ -75,23 +77,23 @@
 
     <!-- Firebase Data -->
     <div class="debug-section">
-      <h3>🔥 Firebase Data</h3>
+      <h3>Firebase Data</h3>
       <button class="btn" onclick="checkFirebaseData()">Verifica Dati</button>
       <div id="firebaseData"></div>
     </div>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
   </script>
-  <script src="resources/error-logger.js?v=20251018"></script>
+  <script src="resources/error-logger.js?v=20260920-final"></script>
   <script>
     // Inizializza variabili globali PRIMA di tutto
     let startTime = performance.now();
@@ -101,7 +103,7 @@
     }
     const db = firebase.firestore();
   </script>
-  <script src="resources/app-init.js"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script>
     // Verifica admin
     firebase.auth().onAuthStateChanged(async (user) => {
@@ -271,7 +273,7 @@
           </div>
         `;
       } catch (e) {
-        firebaseDataEl.innerHTML = `<div style="color: #e53e3e;">Errore: ${e.message}</div>`;
+        firebaseDataEl.innerHTML = `<div style="color: #920100;">Errore: ${e.message}</div>`;
       }
     }
 
@@ -281,5 +283,6 @@
       checkSystemStatus();
     }, 30000);
   </script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="archivio"></script>
 </body>
 </html>

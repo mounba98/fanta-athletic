@@ -2,6 +2,9 @@
 // Version: 20251107
 (function() {
   'use strict';
+  // Caricato sia dalla pagina sia da app-init.js: il secondo avvio si ferma qui (D099)
+  if (window.__FA_MOBILE_HEADER_FIX_ON) return;
+  window.__FA_MOBILE_HEADER_FIX_ON = true;
   
   // Solo su mobile
   if (window.innerWidth > 768) {

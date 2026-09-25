@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -11,8 +11,9 @@
   <meta name="description" content="Gestisci il tuo profilo utente" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
-  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .profile-container { max-width: 800px; margin: 0 auto; }
     .profile-header {
@@ -85,7 +86,7 @@
     .form-group input:focus, .form-group textarea:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      box-shadow: 0 0 0 3px rgba(12, 15, 109, 0.1);
     }
     .form-group textarea { resize: vertical; min-height: 100px; }
     .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -112,9 +113,9 @@
       font-weight: bold;
       margin: 5px;
     }
-    .badge-admin { background: #e74c3c; color: white; }
-    .badge-user { background: #3498db; color: white; }
-    .badge-premium { background: #f39c12; color: white; }
+    .badge-admin { background: #920100; color: white; }
+    .badge-user { background: #0c0f6d; color: white; }
+    .badge-premium { background: #d97706; color: white; }
     @media (max-width: 640px) {
       .profile-container { padding: 10px; }
       .profile-section { padding: 16px; }
@@ -144,7 +145,7 @@
 
     <!-- Statistiche Rapide -->
     <div class="profile-section">
-      <h3>📊 Le Tue Statistiche</h3>
+      <h3>Le Tue Statistiche</h3>
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-value" id="statPosts">0</div>
@@ -167,7 +168,7 @@
 
     <!-- Informazioni Personali -->
     <div class="profile-section">
-      <h3>👤 Informazioni Personali</h3>
+      <h3>Informazioni Personali</h3>
       <form id="personalInfoForm">
         <div class="form-group">
           <label for="firstName">Nome</label>
@@ -194,28 +195,28 @@
           <input type="text" id="city" placeholder="La tua città" />
         </div>
         <div class="btn-group">
-          <button type="submit" class="btn">💾 Salva Modifiche</button>
-          <button type="button" class="btn btn-secondary" id="cancelBtn">❌ Annulla</button>
+          <button type="submit" class="btn">Salva Modifiche</button>
+          <button type="button" class="btn btn-secondary" id="cancelBtn">Annulla</button>
         </div>
       </form>
     </div>
 
     <!-- Sicurezza Account -->
     <div class="profile-section">
-      <h3>🔒 Sicurezza Account</h3>
+      <h3>Sicurezza Account</h3>
       <div class="form-group">
         <label for="currentEmail">Email Attuale</label>
         <input type="email" id="currentEmail" disabled />
       </div>
       <div class="btn-group">
-        <button class="btn btn-secondary" id="changeEmailBtn">📧 Cambia Email</button>
-        <button class="btn btn-secondary" id="changePasswordBtn">🔑 Cambia Password</button>
+        <button class="btn btn-secondary" id="changeEmailBtn">Cambia Email</button>
+        <button class="btn btn-secondary" id="changePasswordBtn">Cambia Password</button>
       </div>
     </div>
 
     <!-- Preferenze -->
     <div class="profile-section">
-      <h3>⚙️ Preferenze</h3>
+      <h3>Preferenze</h3>
       <div class="form-group">
         <label style="display:flex; align-items:center; gap:10px;">
           <input type="checkbox" id="notificationsEnabled" style="width:18px; height:18px;" />
@@ -234,35 +235,32 @@
           <span>Modalità scura</span>
         </label>
       </div>
-      <button class="btn" id="savePreferencesBtn">💾 Salva Preferenze</button>
+      <button class="btn" id="savePreferencesBtn">Salva Preferenze</button>
     </div>
 
     <!-- Zona Pericolosa -->
-    <div class="profile-section" style="border: 2px solid #e74c3c;">
-      <h3 style="color: #e74c3c;">⚠️ Zona Pericolosa</h3>
+    <div class="profile-section" style="border: 2px solid #920100;">
+      <h3 style="color: #920100;">Zona Pericolosa</h3>
       <p style="color: #666;">Queste azioni sono irreversibili. Procedi con cautela.</p>
       <div class="form-group" style="margin: 12px 0;">
-        <label for="deleteConfirmInput" style="display:block; font-size:14px; color:#e74c3c; margin-bottom:4px;">
+        <label for="deleteConfirmInput" style="display:block; font-size:14px; color:#920100; margin-bottom:4px;">
           Per eliminare definitivamente l'account, scrivi <strong>DELETE</strong> in maiuscolo:
         </label>
         <input type="text" id="deleteConfirmInput" placeholder="Digita DELETE per abilitare il pulsante" style="max-width:260px;">
       </div>
       <div class="btn-group">
-        <button class="btn btn-danger" id="deleteAccountBtn">🗑️ Elimina Account</button>
-        <button class="btn btn-secondary" id="logoutBtn">🚪 Logout</button>
+        <button class="btn btn-danger" id="deleteAccountBtn">Elimina Account</button>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
       </div>
     </div>
   </main>
 
-  <footer class="footer">
-    <small>&copy; <span id="year"></span> Nicola Mocci</small>
-  </footer>
 
   <script src="resources/firebase-app-compat.js"></script>
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-storage-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-fix"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase IMMEDIATAMENTE
     if (!firebase.apps.length) {
@@ -272,10 +270,9 @@
     window.auth = firebase.auth();
     window.storage = firebase.storage();
   </script>
-  <script src="resources/firebase.js"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
 
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -766,17 +763,20 @@
       }
     }
   </script>
-    <script src="resources/error-logger.js?v=20251018"></script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/lazy-load.js?v=20251020"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
+    <script src="resources/error-logger.js?v=20260920-final"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+    <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/lazy-load.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+  <script src="resources/footer.js?v=20260920-final3"></script>
 </body>
 </html>

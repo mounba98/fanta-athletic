@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js?v=2025110701"></script>
+  <script src="resources/theme-preload.js?v=20260920-final"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin • Regole Bonus/Malus</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; }
@@ -36,7 +39,7 @@
     .toggle input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 30px; transition: 0.3s; }
     .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    input:checked + .slider { background: #28a745; }
+    input:checked + .slider { background: #16a34a; }
     input:checked + .slider:before { transform: translateX(30px); }
     .rule-actions { display: flex; gap: 8px; align-items: center; }
     .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
@@ -45,10 +48,11 @@
     .status-visible { background: #d1ecf1; color: #0c5460; }
     .status-hidden { background: #e2e3e5; color: #6c757d; }
     
-    /* Toast */
+    /* Toast (stile unificato con admin-leghe.html/bacheca.html, D065) */
     .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
-    .toast { background: #2ecc71; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
-    .toast.error { background: #e74c3c; }
+    .toast { background: #16a34a; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
+    .toast.error { background: #920100; }
+    .toast.info { background: #0c0f6d; }
     @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
     /* Dark mode adjustments */
@@ -62,7 +66,7 @@
     :root.dark .toggle input + .slider { background: #1e293b; }
     :root.dark .slider:before { background: #e2e8f0; }
     :root.dark .toast { background: #1e293b; color: #e2e8f0; }
-    :root.dark .toast.error { background: #7f1d1d; }
+    :root.dark .toast.error { background: #5c0000; }
     :root.dark .status-badge { opacity: 0.9; }
   </style>
 </head>
@@ -72,7 +76,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>📋 Regole Bonus/Malus</h1>
+    <h1>Regole Bonus/Malus</h1>
   </header>
 
   <main class="container">
@@ -87,7 +91,17 @@
           <option value="toggle">✓ Toggle (on/off)</option>
           <option value="counter">🔢 Moltiplicatore</option>
         </select>
-        <button class="btn" id="addRuleBtn" style="white-space:nowrap;">➕ Aggiungi</button>
+        <select id="ruleAssegnazione" class="input" style="width:260px;" title="Come si assegna in Calcolo giornata">
+          <option value="globale">🌍 Globale (uguale per tutte le squadre)</option>
+          <option value="squadra:comune">🏟️ Per squadra (tutte le fazioni)</option>
+          <option value="squadra:comune:casa">🏠 Presenza IN CASA (si spunta solo "presente")</option>
+          <option value="squadra:comune:trasferta">🚌 Presenza IN TRASFERTA (si spunta solo "presente")</option>
+          <option value="squadra:curva">🏟️ Per squadra – solo Curva Morello</option>
+          <option value="squadra:piana">🏟️ Per squadra – solo Piana</option>
+          <option value="fazione:curva">📣 Evento Curva Morello (una volta, vale per la fazione)</option>
+          <option value="fazione:piana">📣 Evento Piana (una volta, vale per la fazione)</option>
+        </select>
+        <button class="btn" id="addRuleBtn" style="white-space:nowrap;">Aggiungi</button>
       </div>
       <p style="margin-top:10px;font-size:13px;color:var(--muted);">
         💡 <strong>Toggle</strong> applica la regola una sola volta. <strong>Moltiplicatore</strong> consente di conteggiare quante volte la regola si verifica (es. cori ripetuti).
@@ -105,11 +119,11 @@
           <option value="Allenatore">👔 Allenatori</option>
           <option value="Curva">📣 Curva</option>
         </select>
-          <button class="btn btn-sm" onclick="exportRules()">📥 Export JSON</button>
-        <button class="btn btn-sm" type="button" onclick="manualSyncRules()" title="Aggiorna cache Firestore">🔄 Sync cache</button>
+          <button class="btn btn-sm" onclick="exportRules()">Export JSON</button>
+        <button class="btn btn-sm" type="button" onclick="manualSyncRules()" title="Aggiorna cache Firestore">Sync cache</button>
         </div>
       </div>
-      <h2 style="margin-bottom: 10px;">📋 Gestione Regole Bonus/Malus</h2>
+      <h2 style="margin-bottom: 10px;">Gestione Regole Bonus/Malus</h2>
       <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">
         💡 <strong>Tip:</strong> Clicca su descrizione o valore per modificare direttamente. 
         <strong>Attivo</strong> = regola applicata nel calcolo. <strong>Visibile</strong> = mostrata in matchday (puoi nascondere regole interne).
@@ -135,7 +149,7 @@
   <!-- EDIT MODAL -->
   <div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10000;align-items:center;justify-content:center;">
     <div style="background:var(--card);border-radius:16px;padding:30px;max-width:500px;width:90%;">
-      <h3 style="margin-bottom:20px;">✏️ Modifica Regola</h3>
+      <h3 style="margin-bottom:20px;">Modifica Regola</h3>
       <div style="margin-bottom:15px;">
         <label style="display:block;margin-bottom:5px;font-weight:600;">Descrizione</label>
         <input id="editDesc" class="input" style="width:100%;" />
@@ -157,39 +171,37 @@
         </p>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button class="btn" onclick="closeEditModal()" style="background:#6c757d;">❌ Annulla</button>
-        <button class="btn" onclick="confirmEdit()" style="background:#28a745;color:white;">✅ Conferma</button>
+        <button class="btn" onclick="closeEditModal()" style="background:#6c757d;">Annulla</button>
+        <button class="btn" onclick="confirmEdit()" style="background:#16a34a;color:white;">Conferma</button>
       </div>
     </div>
   </div>
-
-  <script src="resources/firebase-cdn-loader.js?v=2025110701"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="resources/firebase-app-compat.js"></script>
   <script>
     if (!window.firebase) {
-      document.write('<script src="resources/firebase-app-compat.js?v=2025110701"><\\/script>');
+      document.write('<script src="resources/firebase-app-compat.js?v=20260920-final"><\\/script>');
     }
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
   <script>
     if (!(window.firebase && firebase.auth)) {
-      document.write('<script src="resources/firebase-auth-compat.js?v=2025110701"><\\/script>');
+      document.write('<script src="resources/firebase-auth-compat.js?v=20260920-final"><\\/script>');
     }
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script>
     if (!(window.firebase && firebase.firestore)) {
-      document.write('<script src="resources/firebase-firestore-compat.js?v=2025110701"><\\/script>');
+      document.write('<script src="resources/firebase-firestore-compat.js?v=20260920-final"><\\/script>');
     }
   </script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
     const db = firebase.firestore();
   </script>
-  <script src="resources/app-init.js?v=2025110701"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
   <script>
 
     firebase.auth().onAuthStateChanged(async (user)=>{
@@ -241,6 +253,16 @@
         if (inputType && inputType !== 'auto') {
           payload.input_type = inputType;
           payload.input = inputType;
+        }
+
+        // Assegnazione (D080): globale (come sempre) | per squadra | evento di fazione
+        const asg = (document.getElementById('ruleAssegnazione')?.value || 'globale');
+        if (asg !== 'globale') {
+          const [ambito, fazione, luogo] = asg.split(':');
+          payload.ambito = ambito;
+          payload.fazione = fazione;
+          if (luogo) payload.luogo = luogo;
+          payload.soggetto = 'Curva';
         }
 
         await db.collection('rules').add(payload);
@@ -312,6 +334,7 @@
               <option value="Allenatore" ${soggetto==='Allenatore'?'selected':''}>👔 Allenatore</option>
               <option value="Curva" ${soggetto==='Curva'?'selected':''}>📣 Curva</option>
             </select>
+            ${soggetto==='Curva' ? assegnazioneSelect(r) : ''}
           </td>
           <td style="text-align:center;">
             <select onchange="updateRule('${r.id}','input_type',this.value)" style="padding:8px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;">
@@ -342,12 +365,50 @@
           </td>
           <td style="text-align:center;">
             <div class="rule-actions">
-              <button class="btn btn-sm" onclick="editRule('${r.id}')" style="padding:6px 12px;background:#3490dc;color:white;">✏️ Modifica</button>
-              <button class="btn btn-sm btn-secondary" onclick="delRule('${r.id}')" style="padding:6px 12px;">🗑️ Elimina</button>
+              <button class="btn btn-sm" onclick="editRule('${r.id}')" style="padding:6px 12px;background:#3490dc;color:white;">Modifica</button>
+              <button class="btn btn-sm btn-secondary" onclick="delRule('${r.id}')" style="padding:6px 12px;">Elimina</button>
             </div>
           </td>
         </tr>`;
       }).join('');
+    }
+
+    // Come si assegna una regola in Calcolo giornata (D080)
+    const ASSEGNAZIONI = [
+      ['globale', '🌍 Globale (tutte le squadre)'],
+      ['squadra:comune', '🏟️ Per squadra (tutte le fazioni)'],
+      ['squadra:comune:casa', '🏠 Presenza IN CASA'],
+      ['squadra:comune:trasferta', '🚌 Presenza IN TRASFERTA'],
+      ['squadra:curva', '🏟️ Per squadra – solo Curva Morello'],
+      ['squadra:piana', '🏟️ Per squadra – solo Piana'],
+      ['fazione:curva', '📣 Evento Curva Morello'],
+      ['fazione:piana', '📣 Evento Piana']
+    ];
+    function assegnazioneOf(r) { return r.ambito ? (r.ambito + ':' + (r.fazione || 'comune') + (r.luogo ? ':' + r.luogo : '')) : 'globale'; }
+    function assegnazioneSelect(r) {
+      const cur = assegnazioneOf(r);
+      return '<select onchange="setAssegnazione(\'' + r.id + '\',this.value)" style="margin-top:6px;padding:6px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;font-size:12px;max-width:190px;">' +
+        ASSEGNAZIONI.map(o => '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
+    }
+    async function setAssegnazione(id, val) {
+      const data = {};
+      if (val === 'globale') {
+        data.ambito = firebase.firestore.FieldValue.delete();
+        data.fazione = firebase.firestore.FieldValue.delete();
+        data.luogo = firebase.firestore.FieldValue.delete();
+      } else {
+        const parts = val.split(':');
+        data.ambito = parts[0];
+        data.fazione = parts[1];
+        data.luogo = parts[2] ? parts[2] : firebase.firestore.FieldValue.delete();
+      }
+      try {
+        await db.collection('rules').doc(id).update(data);
+        showToast('Assegnazione aggiornata', 'success');
+        requestRulesSync('update');
+      } catch (e) {
+        showToast('Errore: ' + (e.message || 'impossibile salvare'), 'error');
+      }
     }
 
     async function updateRule(id, field, val){ 
@@ -487,6 +548,9 @@
           descrizione: rule.descrizione || rule.nome_bonus || '',
           valore: Number(rule.valore || 0),
           soggetto: rule.soggetto || 'Giocatore',
+          ambito: rule.ambito || null,
+          fazione: rule.fazione || null,
+          luogo: rule.luogo || null,
           attivo: rule.attivo !== false,
           visible: rule.visible !== false,
           ordine: rule.ordine || 0,
@@ -540,7 +604,7 @@
       const container = document.getElementById('toastContainer') || createToastContainer();
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
-      const icon = type === 'success' ? '✓' : '✕';
+      const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
       toast.innerHTML = `<span style="font-size:20px;">${icon}</span><span>${message}</span>`;
       container.appendChild(toast);
       setTimeout(() => {
@@ -570,12 +634,12 @@
       showToast('Export completato!', 'success');
     }
   </script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="regole"></script>
 </body>
 </html>

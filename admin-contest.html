@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Contest Pronostici</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
+  <style>
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; }
+    .row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid rgba(148,163,184,.2); flex-wrap:wrap; }
+    .row:last-child { border-bottom:none; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .btn { padding: 10px 18px; border-radius: 999px; font-weight: 600; cursor: pointer; border: none; }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .team-box { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .team-tile { border-radius:12px; padding:16px; text-align:center; color:#fff; }
+    .team-tile.curva { background:#920100; }
+    .team-tile.piana { background:#0c0f6d; }
+    .team-tile .pts { font-size:32px; font-weight:800; }
+    #log { font-size:13px; white-space:pre-wrap; background:rgba(148,163,184,.12); border-radius:10px; padding:12px; min-height:40px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Admin Contest</h1>
+  </header>
+
+  <main class="container">
+    <section class="card" id="denied" style="display:none;">
+      <h2>Accesso riservato</h2>
+      <p>Questa pagina è solo per gli amministratori.</p>
+    </section>
+
+    <div id="adminContent" style="display:none;">
+      <section class="card">
+        <h2>Classifica per team</h2>
+        <div class="team-box" id="teamBox"></div>
+        <p class="muted" id="standingsInfo" style="margin-top:12px;"></p>
+        <button class="btn" id="btnRecalc" style="background:var(--primary);color:#fff;">Ricalcola classifica</button>
+      </section>
+
+      <section class="card">
+        <h2>Partite e punteggi</h2>
+        <p class="muted">Il risultato si inserisce da <a href="admin-calendario.html">Gestione Calendario</a>. Poi qui premi "Calcola punti" per assegnare i punti ai pronostici di quella giornata (si può rifare in sicurezza: ricalcola sempre da zero).</p>
+        <div id="matchList">Caricamento…</div>
+      </section>
+
+      <section class="card">
+        <h2>Messaggio per il gruppo WhatsApp</h2>
+        <p class="muted">Testo pronto per la prossima partita: copialo e incollalo nel gruppo quando si aprono le votazioni.</p>
+        <textarea id="waText" rows="7" style="width:100%;box-sizing:border-box;padding:12px;border-radius:12px;font-family:inherit;font-size:14px;"></textarea>
+        <button class="btn" id="btnCopy" style="background:var(--primary);color:#fff;margin-top:10px;">Copia messaggio</button>
+        <span class="muted" id="copyInfo" style="margin-left:8px;"></span>
+      </section>
+
+      <section class="card">
+        <h2>Registro operazioni</h2>
+        <div id="log">—</div>
+      </section>
+    </div>
+  </main>
+
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/contest-scoring.js?v=20260925"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script>
+    const CS = window.ContestScoring;
+    let matches = {};      // G1 -> {giornata, homeTeam, awayTeam, result}
+    let predCount = {};    // G1 -> numero pronostici
+    let scoredCount = {};  // G1 -> numero già valutati
+
+    function log(msg) {
+      const el = document.getElementById('log');
+      el.textContent = (el.textContent === '—' ? '' : el.textContent + '\n') + msg;
+    }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    async function init() {
+      if (window.Season) { try { await window.Season.load(); } catch (e) {} }
+      let retries = 0;
+      while ((!window.auth || !window.db) && retries < 50) { await new Promise(r => setTimeout(r, 100)); retries++; }
+      if (!window.auth || !window.db) { document.getElementById('denied').style.display = 'block'; return; }
+
+      window.auth.onAuthStateChanged(async (user) => {
+        if (!user) { window.location.href = 'auth.html?redirect=' + encodeURIComponent(location.href); return; }
+        let isAdmin = false;
+        try { isAdmin = (await window.db.collection('admins').doc(user.uid).get()).exists; } catch (e) { console.warn('[admin-contest] check admin', e); }
+        if (!isAdmin) { document.getElementById('denied').style.display = 'block'; return; }
+        document.getElementById('adminContent').style.display = 'block';
+        await refresh();
+      });
+    }
+
+    async function refresh() {
+      try {
+        const cal = await window.db.collection('athletic_calendar').get();
+        matches = {};
+        cal.docs.forEach(d => {
+          const c = d.data(); const n = parseInt(c.giornata, 10);
+          if (isNaN(n)) return;
+          matches['G' + n] = { giornata: n, homeTeam: c.homeTeam, awayTeam: c.awayTeam, result: CS.resultOf(c), postponed: !!c.postponed, start: CS.matchStart(c, CS.seasonStartYear()) };
+        });
+
+        predCount = {}; scoredCount = {};
+        try {
+          const preds = await window.db.collection('contest_predictions').get();
+          preds.docs.forEach(d => {
+            const p = d.data();
+            predCount[p.matchKey] = (predCount[p.matchKey] || 0) + 1;
+            if (typeof p.points === 'number') scoredCount[p.matchKey] = (scoredCount[p.matchKey] || 0) + 1;
+          });
+        } catch (e) {
+          log(e.code === 'permission-denied'
+            ? '\u274C Permesso negato: mancano le regole Firestore per contest_predictions / contest_standings (vedi docs/FIRESTORE_RULES_CONTEST.md).'
+            : '\u274C Errore di lettura pronostici: ' + (e.code || e.message));
+        }
+
+        renderMatches();
+        renderWhatsapp();
+        await renderStandings();
+      } catch (e) {
+        console.error(e);
+        log(e.code === 'permission-denied'
+          ? '❌ Permesso negato: mancano le regole Firestore per contest_predictions / contest_standings (vedi DECISION_LOG D069).'
+          : '❌ Errore di lettura: ' + (e.code || e.message));
+      }
+    }
+
+    function renderWhatsapp() {
+      const now = new Date();
+      const next = Object.values(matches)
+        .filter(m => m.start && !m.result && !m.postponed && now < CS.deadlineOf(m.start))
+        .sort((a, b) => a.start - b.start)[0];
+      const box = document.getElementById('waText');
+      if (!next) { box.value = 'Nessuna partita futura nel calendario: aggiorna Gestione Calendario.'; return; }
+      const f = d => d.toLocaleString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+      box.value =
+        '\uD83D\uDDF3\uFE0F VOTO APERTO - Giornata ' + next.giornata + '\n' +
+        next.homeTeam + ' - ' + next.awayTeam + ' (' + f(next.start) + ')\n\n' +
+        'Vota 1, X o 2: se azzecchi l\'esito sono ' + CS.POINTS.correct + ' punti per la tua fazione (Curva Morello vs Piana).\n' +
+        'Si vota da ' + f(CS.opensOf(next.start)) + ' fino alle ' + CS.deadlineOf(next.start).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + ' del giorno della partita.\n\n' +
+        'https://fanta-athletic.web.app/contest.html';
+    }
+
+    function renderMatches() {
+      const keys = Object.keys(matches).sort((a, b) => matches[a].giornata - matches[b].giornata);
+      if (!keys.length) { document.getElementById('matchList').textContent = 'Nessuna partita nel calendario.'; return; }
+      document.getElementById('matchList').innerHTML = keys.map(k => {
+        const m = matches[k];
+        const res = m.result ? `${m.result.home}-${m.result.away}` : 'risultato non ancora inserito';
+        const n = predCount[k] || 0, s = scoredCount[k] || 0;
+        return `<div class="row">
+          <div><strong>G${m.giornata}</strong> ${esc(m.homeTeam)} - ${esc(m.awayTeam)}<br>
+          <span class="muted">${res} • ${n} pronostici • ${s} valutati</span></div>
+          <button class="btn" data-k="${k}" ${m.result && n ? '' : 'disabled'} style="background:#16a34a;color:#fff;">Calcola punti</button>
+        </div>`;
+      }).join('');
+      document.querySelectorAll('#matchList button[data-k]').forEach(b => b.addEventListener('click', () => scoreMatch(b.getAttribute('data-k'), b)));
+    }
+
+    async function scoreMatch(key, btn) {
+      const m = matches[key];
+      if (!m || !m.result) return;
+      btn.disabled = true;
+      try {
+        log(`▶ ${key}: leggo i pronostici…`);
+        const snap = await window.db.collection('contest_predictions').where('matchKey', '==', key).get();
+        let batch = window.db.batch(), ops = 0, done = 0;
+        for (const d of snap.docs) {
+          const pts = CS.scorePrediction(d.data(), m.result);
+          if (pts === null) { log(`  ⚠ ${d.id}: pronostico non valido, saltato`); continue; }
+          batch.update(d.ref, { points: pts, scoredAt: new Date().toISOString() });
+          done++;
+          if (++ops === 400) { await batch.commit(); batch = window.db.batch(); ops = 0; }
+        }
+        if (ops) await batch.commit();
+        log(`✅ ${key}: valutati ${done} pronostici (risultato ${m.result.home}-${m.result.away})`);
+        await rebuildStandings();
+        await refresh();
+      } catch (e) {
+        console.error(e);
+        log(`❌ ${key}: ${e.code || e.message}`);
+        btn.disabled = false;
+      }
+    }
+
+    async function rebuildStandings() {
+      const snap = await window.db.collection('contest_predictions').get();
+      const all = snap.docs.map(d => d.data());
+      const st = CS.buildStandings(all);
+      await window.db.collection('contest_standings').doc('current').set({
+        users: st.users, teams: st.teams, byMatch: st.byMatch, updatedAt: new Date().toISOString()
+      });
+      log('✅ Classifica ricalcolata da ' + all.filter(p => typeof p.points === 'number').length + ' pronostici valutati');
+    }
+
+    async function renderStandings() {
+      let st = null;
+      try { const d = await window.db.collection('contest_standings').doc('current').get(); st = d.exists ? d.data() : null; } catch (e) { console.warn(e); }
+      const t = (st && st.teams) || { curva: { points: 0, players: 0 }, piana: { points: 0, players: 0 } };
+      document.getElementById('teamBox').innerHTML = ['curva', 'piana'].map(id =>
+        `<div class="team-tile ${id}"><div>${CS.FACTIONS[id].name}</div><div class="pts">${t[id].points}</div><div>${t[id].players} giocatori</div></div>`).join('');
+      document.getElementById('standingsInfo').textContent = st ? 'Ultimo ricalcolo: ' + new Date(st.updatedAt).toLocaleString('it-IT') : 'Classifica non ancora calcolata.';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btnCopy').addEventListener('click', async () => {
+        const t = document.getElementById('waText'); t.select();
+        try { await navigator.clipboard.writeText(t.value); document.getElementById('copyInfo').textContent = 'Copiato!'; }
+        catch (e) { document.execCommand('copy'); document.getElementById('copyInfo').textContent = 'Copiato!'; }
+      });
+      document.getElementById('btnRecalc').addEventListener('click', async function() {
+        this.disabled = true;
+        try { await rebuildStandings(); await renderStandings(); } catch (e) { log('❌ ' + (e.code || e.message)); }
+        this.disabled = false;
+      });
+    });
+
+    init();
+  </script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="minigioco"></script>
+</body>
+</html>

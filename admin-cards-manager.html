@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cards Manager - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <!-- Cropper.js CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <style>
     .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
     .header { margin-bottom: 24px; text-align: center; }
-    .header h1 { font-size: 32px; margin-bottom: 8px; }
+    .header h1 { font-size: clamp(26px, 5vw, 36px); margin-bottom: 8px; }
     .header p { color: var(--muted); font-size: 16px; }
     
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
@@ -29,17 +31,17 @@
     .player-header { display: flex; align-items: center; gap: 20px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 3px solid var(--primary); }
     .player-photo-preview { width: 140px; height: 140px; border-radius: 50%; overflow: hidden; border: 5px solid var(--primary); background: linear-gradient(135deg, #f0f0f0, #e0e0e0); display: flex; align-items: center; justify-content: center; font-size: 56px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .player-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .player-photo-preview.has-photo { border-color: #22c55e; }
-    .player-info h2 { font-size: 28px; margin-bottom: 8px; }
+    .player-photo-preview.has-photo { border-color: #16a34a; }
+    .player-info h2 { font-size: clamp(19px, 2.2vw, 23px); margin-bottom: 8px; }
     .player-info .role { font-size: 14px; color: var(--muted); background: rgba(0,0,0,0.05); display: inline-block; padding: 4px 12px; border-radius: 999px; }
     
-    .upload-section { background: linear-gradient(135deg, rgba(220,20,60,0.1), rgba(220,20,60,0.05)); border: 2px dashed var(--primary); border-radius: 12px; padding: 32px; text-align: center; margin: 24px 0; transition: all 0.3s; }
-    .upload-section:hover { border-color: #22c55e; background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05)); }
+    .upload-section { background: linear-gradient(135deg, rgba(146,1,0,0.1), rgba(146,1,0,0.05)); border: 2px dashed var(--primary); border-radius: 12px; padding: 32px; text-align: center; margin: 24px 0; transition: all 0.3s; }
+    .upload-section:hover { border-color: #16a34a; background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05)); }
     .upload-section h3 { margin-bottom: 12px; }
     .upload-section p { color: var(--muted); margin-bottom: 20px; }
     .upload-section input[type="file"] { display: none; }
     .btn-upload { background: var(--primary); color: white; padding: 16px 32px; border-radius: 8px; border: none; font-weight: 700; font-size: 18px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-upload:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(220,20,60,0.5); }
+    .btn-upload:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(146,1,0,0.5); }
     
     /* Crop Section */
     .crop-section { background: #fff; border-radius: 12px; padding: 24px; margin-top: 24px; display: none; }
@@ -48,22 +50,22 @@
     .crop-container { max-width: 600px; max-height: 600px; margin: 0 auto 20px; }
     .crop-container img { max-width: 100%; display: block; }
     .crop-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .crop-info { background: rgba(34,197,94,0.1); border: 2px solid #22c55e; border-radius: 8px; padding: 12px; margin: 16px 0; font-size: 13px; text-align: center; }
+    .crop-info { background: rgba(34,197,94,0.1); border: 2px solid #16a34a; border-radius: 8px; padding: 12px; margin: 16px 0; font-size: 13px; text-align: center; }
     
     .preview-section { background: #fff; border-radius: 12px; padding: 24px; margin-top: 24px; display: none; }
     .preview-section.active { display: block; }
     .preview-section h3 { margin-bottom: 16px; }
     .preview-container { display: flex; align-items: center; gap: 24px; }
-    .preview-img-wrapper { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 4px solid #22c55e; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .preview-img-wrapper { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 4px solid #16a34a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .preview-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
     .preview-info { flex: 1; }
     .preview-info p { margin-bottom: 8px; }
     .preview-actions { display: flex; gap: 12px; margin-top: 16px; }
     .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.2s; }
-    .btn-success { background: #22c55e; color: white; }
-    .btn-danger { background: #dc3545; color: white; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-danger { background: #920100; color: white; }
     .btn-secondary { background: #6c757d; color: white; }
-    .btn-info { background: #3b82f6; color: white; }
+    .btn-info { background: #0c0f6d; color: white; }
     .btn:hover { transform: translateY(-2px); opacity: 0.9; }
     
     .current-photo { background: #fff; border-radius: 12px; padding: 24px; margin-top: 24px; display: none; }
@@ -89,7 +91,7 @@
     .spinner { border: 4px solid rgba(0,0,0,0.1); border-left-color: var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    .compression-info { background: rgba(34,197,94,0.1); border: 2px solid #22c55e; border-radius: 8px; padding: 12px; margin: 16px 0; font-size: 13px; }
+    .compression-info { background: rgba(34,197,94,0.1); border: 2px solid #16a34a; border-radius: 8px; padding: 12px; margin: 16px 0; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -97,7 +99,7 @@
     <a class="logo-home" href="admin.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>🃏 Cards Manager</h1>
+    <h1>Cards Manager</h1>
   </header>
 
   <main class="container">
@@ -132,7 +134,7 @@
 
       <!-- Current Photo -->
       <div class="current-photo" id="currentPhotoSection">
-        <h3>📸 Foto Attuale</h3>
+        <h3>Foto Attuale</h3>
         <div class="current-photo-display">
           <img class="current-photo-img" id="currentPhotoImg" src="" alt="Foto attuale" />
           <div class="current-photo-info">
@@ -140,8 +142,8 @@
             <p style="font-size: 13px; color: var(--muted);">Visibile in: Formazioni, Squadre, Statistiche</p>
             <div class="photo-url" id="currentPhotoUrl">-</div>
             <div class="current-photo-actions">
-              <button class="btn btn-secondary" onclick="changePhoto()">🔄 Cambia Foto</button>
-              <button class="btn btn-danger" onclick="removePhoto()">🗑️ Rimuovi</button>
+              <button class="btn btn-secondary" onclick="changePhoto()">Cambia Foto</button>
+              <button class="btn btn-danger" onclick="removePhoto()">Rimuovi</button>
             </div>
           </div>
         </div>
@@ -149,7 +151,7 @@
 
       <!-- Upload Section -->
       <div class="upload-section" id="uploadSection">
-        <h3>📤 Carica Nuova Foto</h3>
+        <h3>Carica Nuova Foto</h3>
         <p>Seleziona un'immagine dal tuo computer (JPG, PNG, WEBP - max 20MB)</p>
         <div class="compression-info">
           ✨ <strong>Con selettore di ritaglio</strong>: Scegli la porzione di foto che vuoi usare, poi viene compressa automaticamente
@@ -162,7 +164,7 @@
 
       <!-- Crop Section -->
       <div class="crop-section" id="cropSection">
-        <h3>✂️ Ritaglia la Foto</h3>
+        <h3>Ritaglia la Foto</h3>
         <div class="crop-info">
           📐 <strong>Trascina e ridimensiona</strong> il riquadro per selezionare la porzione desiderata. La foto sarà ritagliata in formato quadrato.
         </div>
@@ -170,14 +172,14 @@
           <img id="cropImage" src="" alt="Immagine da ritagliare" />
         </div>
         <div class="crop-actions">
-          <button class="btn btn-success" onclick="cropAndPreview()">✅ Conferma Ritaglio</button>
-          <button class="btn btn-secondary" onclick="cancelCrop()">❌ Annulla</button>
+          <button class="btn btn-success" onclick="cropAndPreview()">Conferma Ritaglio</button>
+          <button class="btn btn-secondary" onclick="cancelCrop()">Annulla</button>
         </div>
       </div>
 
       <!-- Preview before upload -->
       <div class="preview-section" id="previewSection">
-        <h3>👁️ Anteprima Finale</h3>
+        <h3>Anteprima Finale</h3>
         <div class="preview-container">
           <div class="preview-img-wrapper">
             <img id="previewImg" src="" alt="Preview" />
@@ -185,11 +187,11 @@
           <div class="preview-info">
             <p><strong>File:</strong> <span id="fileName">-</span></p>
             <p><strong>Dimensione compressa:</strong> <span id="compressedSize">-</span></p>
-            <p style="color: #22c55e; font-weight: 600;">✅ Pronto per il caricamento</p>
+            <p style="color: #16a34a; font-weight: 600;">✅ Pronto per il caricamento</p>
             <div class="preview-actions">
-              <button class="btn btn-success" onclick="uploadPhoto()">🚀 Carica e Salva</button>
-              <button class="btn btn-info" onclick="backToCrop()">↩️ Ritaglia Diverso</button>
-              <button class="btn btn-secondary" onclick="cancelAll()">❌ Annulla Tutto</button>
+              <button class="btn btn-success" onclick="uploadPhoto()">Carica e Salva</button>
+              <button class="btn btn-info" onclick="backToCrop()">Ritaglia Diverso</button>
+              <button class="btn btn-secondary" onclick="cancelAll()">Annulla Tutto</button>
             </div>
           </div>
         </div>
@@ -205,10 +207,10 @@
   </main>
 
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
   <script>
     if (!firebase.apps.length) {
@@ -220,7 +222,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
   <script src="resources/theme.js"></script>
-  <script src="resources/navbar.js"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
   
   <script>
     let players = [];
@@ -257,11 +259,11 @@
           <div class="stat-label">Totale Giocatori</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" style="color: #22c55e;">${playersWithPhotos}</div>
+          <div class="stat-value" style="color: #16a34a;">${playersWithPhotos}</div>
           <div class="stat-label">Con Foto</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" style="color: #dc3545;">${playersWithoutPhotos}</div>
+          <div class="stat-value" style="color: #920100;">${playersWithoutPhotos}</div>
           <div class="stat-label">Senza Foto</div>
         </div>
         <div class="stat-card">

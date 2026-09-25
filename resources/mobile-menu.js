@@ -13,8 +13,11 @@
     { href: 'squadre.html', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', priority: 2 },
     { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', priority: 3 },
     { href: 'calendario.html', label: 'Calendario', icon: '<img src="resources/icons/calendario.png" alt="Calendario" />', priority: 4 },
+    { href: 'contest.html', label: 'Mini-gioco', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h9"/></svg>', priority: 5 },
+    { href: 'calendario-athletic.html', label: 'Partite Athletic', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>', priority: 5 },
     { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', priority: 5 },
     { href: 'matchday.html', label: 'Calcolo', icon: '<img src="resources/icons/calcolo.png" alt="Calcolo" />', priority: 6 },
+    { href: 'archivio.html', label: 'Albo d\'oro', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3"/></svg>', priority: 7 },
     { href: 'statistiche.html', label: 'Statistiche', icon: '<img src="resources/icons/statistiche.png" alt="Statistiche" />', priority: 7 },
     { href: 'bacheca.html', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', priority: 8 },
     { href: 'profile.html', label: 'Profilo', icon: '<img src="resources/icons/profilo.png" alt="Profilo" />', priority: 9 },
@@ -54,8 +57,8 @@
     
     menu.innerHTML = `
       <div class="mobile-menu-header">
-        <h2>Menu</h2>
-        <button class="close-btn" onclick="window.closeMobileMenu()">✕</button>
+        <h2><span class="menu-eyebrow">Fanta Athletic</span>Menu</h2>
+        <button class="close-btn" onclick="window.closeMobileMenu()" aria-label="Chiudi menu">&times;</button>
       </div>
       <nav class="mobile-menu-nav">
         ${menuItems.map(item => {
@@ -70,7 +73,12 @@
         <div id="adminMenuSlot"></div>
         <div class="menu-separator"></div>
         <button class="mobile-menu-item" onclick="window.toggleThemeFromMenu()">
-          <span class="menu-icon">🌓</span>
+          <!-- Icona "night shift" disegnata (luna), al posto dell'emoji 🌓 -->
+          <span class="menu-icon" style="color: var(--gold);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>
+            </svg>
+          </span>
           <span class="menu-label" id="themeToggleLabel">Tema Scuro</span>
         </button>
         <button class="mobile-menu-item logout-btn" onclick="window.handleMobileLogout()">

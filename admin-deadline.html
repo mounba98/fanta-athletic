@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestione Deadline - Fanta Athletic</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .deadline-container { max-width: 800px; margin: 0 auto; }
     .deadline-card { background: var(--card); border-radius: 12px; padding: 24px; margin: 20px 0; box-shadow: var(--shadow); }
@@ -27,7 +30,7 @@
     .form-control:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+      box-shadow: 0 0 0 3px rgba(146, 1, 0, 0.1);
     }
     
     .datetime-grid {
@@ -37,7 +40,7 @@
     }
     
     .current-deadline {
-      background: linear-gradient(135deg, rgba(220, 20, 60, 0.1), rgba(220, 20, 60, 0.05));
+      background: linear-gradient(135deg, rgba(146, 1, 0, 0.1), rgba(146, 1, 0, 0.05));
       border-left: 4px solid var(--primary);
       padding: 16px;
       border-radius: 8px;
@@ -73,7 +76,7 @@
     
     .alert-warning {
       background: #fff3cd;
-      border-left: 4px solid #ffc107;
+      border-left: 4px solid #facc15;
       color: #856404;
     }
     
@@ -97,7 +100,7 @@
     
     .preset-btn:hover {
       border-color: var(--primary);
-      background: rgba(220, 20, 60, 0.05);
+      background: rgba(146, 1, 0, 0.05);
     }
     
     .history-list {
@@ -123,19 +126,19 @@
     <a class="logo-home" href="index.html">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>? Gestione Deadline Giornate</h1>
+    <h1>Gestione Deadline Giornate</h1>
   </header>
 
   <main class="deadline-container">
     <div class="section">
       <h2>Imposta Deadline Flessibile</h2>
-      <p>Definisci quando bloccare le formazioni per ogni giornata (domenica, mercoledÏ, giovedÏ, etc.)</p>
+      <p>Definisci quando bloccare le formazioni per ogni giornata (domenica, mercoled√¨, gioved√¨, etc.)</p>
     </div>
 
     <!-- Current Deadline -->
     <div class="deadline-card">
       <div id="currentDeadlineInfo" class="current-deadline">
-        <h3>?? Deadline Corrente</h3>
+        <h3>Deadline Corrente</h3>
         <div class="deadline-time" id="currentDeadlineTime">Caricamento...</div>
         <div style="color: var(--muted); font-size: 14px;" id="currentDeadlineRelative"></div>
       </div>
@@ -156,7 +159,7 @@
       </div>
 
       <div class="alert alert-warning">
-        <strong>?? Attenzione:</strong> La deadline blocca automaticamente la possibilit‡ di modificare le formazioni. 
+        <strong>Attenzione:</strong> La deadline blocca automaticamente la possibilit√† di modificare le formazioni. 
         Gli utenti vedranno un messaggio se tentano di salvare dopo la deadline.
       </div>
 
@@ -167,13 +170,13 @@
             ??? Domenica<br>15:00
           </button>
           <button class="preset-btn" onclick="setPreset('wednesday')">
-            ?? MercoledÏ<br>20:45
+            ?? Mercoled√¨<br>20:45
           </button>
           <button class="preset-btn" onclick="setPreset('thursday')">
-            ?? GiovedÏ<br>20:45
+            ?? Gioved√¨<br>20:45
           </button>
           <button class="preset-btn" onclick="setPreset('monday')">
-            ? LunedÏ<br>20:45
+            ? Luned√¨<br>20:45
           </button>
         </div>
       </div>
@@ -190,7 +193,7 @@
 
     <!-- History -->
     <div class="deadline-card">
-      <h3>?? Storico Deadline</h3>
+      <h3>Storico Deadline</h3>
       <div id="historyList" class="history-list">
         <div style="text-align: center; color: var(--muted); padding: 20px;">
           Caricamento...
@@ -199,24 +202,23 @@
     </div>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
   </script>
-  <script src="resources/app-init.js"></script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/navbar-scroll-hide.js?v=2025102002"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025102002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/navbar-scroll-hide.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
 
   <script>
     let currentLeagueId = null;
@@ -336,10 +338,10 @@
         relativeText += `${minutes}m rimanenti`;
         
         document.getElementById('currentDeadlineRelative').textContent = relativeText;
-        document.getElementById('currentDeadlineRelative').style.color = '#28a745';
+        document.getElementById('currentDeadlineRelative').style.color = '#16a34a';
       } else {
         document.getElementById('currentDeadlineRelative').textContent = 'Scaduta';
-        document.getElementById('currentDeadlineRelative').style.color = '#dc3545';
+        document.getElementById('currentDeadlineRelative').style.color = '#920100';
       }
     }
 
@@ -352,13 +354,13 @@
           targetDate = getNextDayOfWeek(0, 15, 0); // Domenica 15:00
           break;
         case 'wednesday':
-          targetDate = getNextDayOfWeek(3, 20, 45); // MercoledÏ 20:45
+          targetDate = getNextDayOfWeek(3, 20, 45); // Mercoled√¨ 20:45
           break;
         case 'thursday':
-          targetDate = getNextDayOfWeek(4, 20, 45); // GiovedÏ 20:45
+          targetDate = getNextDayOfWeek(4, 20, 45); // Gioved√¨ 20:45
           break;
         case 'monday':
-          targetDate = getNextDayOfWeek(1, 20, 45); // LunedÏ 20:45
+          targetDate = getNextDayOfWeek(1, 20, 45); // Luned√¨ 20:45
           break;
       }
       
@@ -373,7 +375,7 @@
       result.setDate(now.getDate() + (dayOfWeek + 7 - now.getDay()) % 7);
       result.setHours(hour, minute, 0, 0);
       
-      // Se Ë gi‡ passato questa settimana, vai alla prossima
+      // Se √® gi√† passato questa settimana, vai alla prossima
       if (result <= now) {
         result.setDate(result.getDate() + 7);
       }
@@ -393,7 +395,7 @@
       const deadline = new Date(`${dateVal}T${timeVal}`);
       
       if (deadline < new Date()) {
-        if (!confirm('La deadline Ë nel passato. Confermi comunque?')) return;
+        if (!confirm('La deadline √® nel passato. Confermi comunque?')) return;
       }
       
       try {
@@ -473,7 +475,7 @@
               </span>
             </div>
             <div style="text-align: right;">
-              <span style="color: ${isPast ? '#dc3545' : '#28a745'}; font-weight: 600;">
+              <span style="color: ${isPast ? '#920100' : '#16a34a'}; font-weight: 600;">
                 ${isPast ? '?? Scaduta' : '? Attiva'}
               </span>
             </div>
@@ -482,5 +484,6 @@
       }).join('');
     }
   </script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="live"></script>
 </body>
 </html>

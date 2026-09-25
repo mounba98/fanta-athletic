@@ -9,6 +9,9 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
 
 (function() {
   'use strict';
+  // Caricato sia dalla pagina sia da app-init.js: il secondo avvio si ferma qui (D099)
+  if (window.__FA_LEAGUE_SELECTOR_ON) return;
+  window.__FA_LEAGUE_SELECTOR_ON = true;
   
   let currentLeague = null;
   let userLeagues = [];
@@ -17,7 +20,7 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
   let initialized = false;
   let bootstrapScheduled = false;
   const MAX_ATTACH_RETRIES = 15;
-  const INVITE_SCRIPT_SRC = window.LEAGUE_INVITE_SCRIPT_SRC || 'resources/league-invite-modal.js?v=2025102403';
+  const INVITE_SCRIPT_SRC = window.LEAGUE_INVITE_SCRIPT_SRC || 'resources/league-invite-modal.js?v=20260920-final';
   let inviteModalPromise = null;
   
   // Esponi globalmente
@@ -566,7 +569,7 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
         <button class="league-dropdown-action league-join-action" type="button">
           <span>🔍</span> Unisciti
         </button>
-        <button class="league-dropdown-action league-invite-action" type="button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <button class="league-dropdown-action league-invite-action" type="button" style="background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%); color: white;">
           <span>📤</span> Invita Amici
         </button>
       </div>
@@ -928,7 +931,7 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
         padding: 6px 14px;
         background: rgba(255,255,255,0.15);
         border: 2px solid rgba(255,255,255,0.3);
-        border-radius: 8px;
+        border-radius: 999px;
         color: white;
         font-weight: 600;
         font-size: 13px;
@@ -1124,14 +1127,15 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
         background: #334155;
       }
       
-      /* League selector mobile: riga sotto navbar NON sticky */
+      /* League selector mobile: riga sotto navbar NON sticky.
+         Il contenitore è solo layout: niente sfondo/bordo/ombra propri,
+         altrimenti si vede un "alone" tra questo box e il tab dentro
+         (segnalato 2026-09-20) — il colore visibile del tab lo dà solo
+         il pulsante stesso, qui sotto. */
       .league-selector-mobile {
         width: 100%;
         margin: 0;
-        background: #f8f9fa;
         padding: 6px 12px;
-        border-bottom: 1px solid #dee2e6;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -1151,14 +1155,11 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
       
-      /* Dark mode mobile */
-      :root.dark .league-selector-mobile {
-        background: #1e293b;
-        border-bottom-color: #334155;
-      }
-      
+      /* Dark mode mobile: il contenitore resta senza sfondo proprio
+         (vedi commento sopra su .league-selector-mobile) — qui si
+         colora solo il tab vero e proprio. */
       :root.dark .league-selector-mobile .league-selector-btn {
-        background: #0f172a;
+        background: #1e293b;
         border-color: #334155;
         color: #e2e8f0;
       }
@@ -1237,7 +1238,10 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
         position: relative;
         z-index: 900;
         padding: 0 16px;
-        margin: -8px 0 18px;
+        /* Spaziatura affidata al gap del flex layout del body (sheet.css),
+           non a un margine proprio: evita di sommare due distanze diverse
+           tra header/tab-lega e tab-lega/contenuto (2026-09-20). */
+        margin: 0;
       }
     `;
     

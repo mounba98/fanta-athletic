@@ -20,7 +20,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     button {
-      background: #dc143c;
+      background: #920100;
       color: white;
       border: none;
       padding: 12px 24px;
@@ -32,10 +32,10 @@
       width: 100%;
     }
     button:hover {
-      background: #b91846;
+      background: #740100;
     }
     .success {
-      background: #10b981;
+      background: #16a34a;
       padding: 12px;
       border-radius: 8px;
       margin: 12px 0;
@@ -45,7 +45,7 @@
       display: block;
     }
     .info {
-      background: #3b82f6;
+      background: #0c0f6d;
       padding: 12px;
       border-radius: 8px;
       margin: 12px 0;
@@ -62,7 +62,7 @@
 </head>
 <body>
   <div class="card">
-    <h1>🧹 Clear Cache & Service Worker</h1>
+    <h1>Clear Cache & Service Worker</h1>
     <p>Se hai problemi con file vecchi o errori infiniti, usa questi strumenti:</p>
     
     <div class="info">
@@ -73,9 +73,9 @@
       • Foto non appaiono anche se caricate
     </div>
     
-    <button onclick="clearAll()">🗑️ PULISCI TUTTO (Consigliato)</button>
-    <button onclick="unregisterSW()">❌ Disabilita Service Worker</button>
-    <button onclick="clearCache()">🧹 Svuota Cache Browser</button>
+    <button onclick="clearAll()">PULISCI TUTTO (Consigliato)</button>
+    <button onclick="unregisterSW()">Disabilita Service Worker</button>
+    <button onclick="clearCache()">Svuota Cache Browser</button>
     
     <div id="success" class="success">
       ✅ Operazione completata! Ricarica la pagina (F5)
@@ -83,7 +83,7 @@
     
     <hr style="border-color: #334155; margin: 24px 0;">
     
-    <h3>🔧 Istruzioni Manuali</h3>
+    <h3>Istruzioni Manuali</h3>
     <ol>
       <li>Premi <strong>CTRL + SHIFT + F5</strong> (hard refresh)</li>
       <li>Apri DevTools (F12) → Application → Service Workers</li>
@@ -127,5 +127,6 @@
       }
     }
   </script>
+  <script src="resources/admin-back.js?v=20260925b" data-block="archivio"></script>
 </body>
 </html>

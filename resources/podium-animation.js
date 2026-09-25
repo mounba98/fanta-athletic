@@ -148,7 +148,7 @@
         
         .podium-points {
           font-size: 12px;
-          color: #ffd700;
+          color: #facc15;
           margin-bottom: 10px;
         }
         
@@ -181,8 +181,8 @@
         
         .podium-box.first {
           height: 140px;
-          --color1: #ffd700;
-          --color2: #f39c12;
+          --color1: #facc15;
+          --color2: #d97706;
         }
         
         .podium-box.second {
@@ -321,7 +321,7 @@
     }
     
     function createParticles(x, y) {
-      const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
+      const colors = ['#ff0000', '#00ff00', '#0000ff', '#facc15', '#ff00ff', '#00ffff', '#ffffff'];
       const particleCount = 30;
       
       for (let i = 0; i < particleCount; i++) {

@@ -129,7 +129,7 @@ class NotificationManager {
     await this.showNotification('📊 Classifica Aggiornata!', {
       body: 'La classifica è stata aggiornata. Controlla la tua posizione!',
       tag: 'classifica',
-      data: { url: '/standings.html' }
+      data: { url: '/classifiche.html' }
     });
   }
 
@@ -162,7 +162,7 @@ class NotificationManager {
     await this.showNotification('🏆 HAI VINTO!', {
       body: `Complimenti! Hai vinto ${giornata}!`,
       tag: 'vittoria-' + giornata,
-      data: { url: '/standings.html' },
+      data: { url: '/classifiche.html' },
       requireInteraction: true
     });
   }

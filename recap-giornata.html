@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Recap Giornata - Fanta Athletic</title>
-  <link rel="stylesheet" href="resources/sheet.css?v=202510181020" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .recap-container {
       max-width: 1200px;
@@ -22,7 +25,7 @@
     }
     
     .recap-header h1 {
-      font-size: 48px;
+      font-size: clamp(26px, 5vw, 36px);
       margin: 0 0 10px 0;
     }
     
@@ -100,7 +103,7 @@
     }
     
     @media (max-width: 768px) {
-      .recap-header h1 { font-size: 32px; }
+      .recap-header h1 { font-size: clamp(26px, 5vw, 36px); }
       .team-row {
         grid-template-columns: 40px 1fr 80px;
         gap: 10px;
@@ -119,12 +122,12 @@
 
   <main class="recap-container">
     <div class="recap-header">
-      <h1 id="giornataTitle">📊 Giornata 1</h1>
+      <h1 id="giornataTitle">Giornata 1</h1>
       <p id="giornataSubtitle">Classifica della giornata</p>
     </div>
 
     <div class="classifica-giornata">
-      <h2>🏆 Classifica Giornata</h2>
+      <h2>Classifica Giornata</h2>
       <div id="classificaList">
         <div style="text-align: center; padding: 40px; color: var(--muted);">
           Caricamento...
@@ -133,10 +136,10 @@
     </div>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-2"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script>
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
@@ -205,7 +208,7 @@
       } catch (error) {
         console.error('Errore caricamento recap:', error);
         document.getElementById('classificaList').innerHTML = `
-          <div style="text-align: center; padding: 40px; color: #e53e3e;">
+          <div style="text-align: center; padding: 40px; color: #920100;">
             ❌ Errore caricamento dati
           </div>
         `;
@@ -215,10 +218,12 @@
     loadRecap();
   </script>
   
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
 </body>
 </html>

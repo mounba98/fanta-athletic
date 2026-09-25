@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Classifica Contest | Athletic Brescia</title>
   <link rel="icon" href="resources/favicon.ico">
-  <link rel="stylesheet" href="resources/theme.css">
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <!-- Questa pagina usava var(--bg)/var(--text)/var(--card) senza mai
+       caricare il foglio di stile che le definisce: colori e font
+       restavano fuori dal tema dell'app. Collegato theme-tokens.css
+       (2026-09-20). -->
+  <link rel="stylesheet" href="resources/theme-tokens.css?v=20260920-final">
   <style>
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg);
       color: var(--text);
       margin: 0;
@@ -16,14 +21,14 @@
     }
     
     .hero {
-      background: linear-gradient(135deg, #dc2626 0%, #2d6cdf 100%);
+      background: linear-gradient(135deg, #920100 0%, #0c0f6d 100%);
       color: white;
       padding: 40px 20px;
       text-align: center;
     }
     
     .hero h1 {
-      font-size: 2rem;
+      font-size: clamp(26px, 5vw, 36px);
       margin: 0 0 10px;
       font-weight: 900;
     }
@@ -48,15 +53,15 @@
     }
     
     .leaderboard-table thead {
-      background: #f9fafb;
-      border-bottom: 2px solid #e5e7eb;
+      background: rgba(148,163,184,0.12);
+      border-bottom: 1px solid rgba(148,163,184,0.3);
     }
     
     .leaderboard-table th {
       padding: 15px;
       text-align: left;
       font-weight: 700;
-      color: #6b7280;
+      color: var(--muted);
       font-size: 0.9rem;
       text-transform: uppercase;
     }
@@ -74,11 +79,11 @@
     }
     
     .position.gold {
-      color: #fbbf24;
+      color: #facc15;
     }
     
     .position.silver {
-      color: #9ca3af;
+      color: var(--muted);
     }
     
     .position.bronze {
@@ -91,33 +96,65 @@
     }
     
     .player-email {
-      color: #6b7280;
+      color: var(--muted);
       font-size: 0.85rem;
     }
     
     .points {
       font-size: 1.8rem;
       font-weight: 900;
-      color: #2d6cdf;
+      color: #0c0f6d;
       text-align: right;
     }
     
     .my-row {
-      background: #eff6ff;
-      border: 2px solid #2d6cdf;
+      background: rgba(12,15,109,0.12);
+      border: 1px solid rgba(12,15,109,0.45);
     }
     
     .back-btn {
       display: inline-block;
       padding: 12px 24px;
-      background: #2d6cdf;
+      background: #0c0f6d;
       color: white;
       text-decoration: none;
       border-radius: 10px;
       font-weight: 700;
       margin-bottom: 20px;
     }
+
+    /* Questa pagina non carica sheet.css (D050), quindi non ha il menu
+       condiviso: una barra minima e autosufficiente per non restare
+       "bloccati" qui dentro (navigabilità, D067). */
+    .mini-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #0c0f6d;
+    }
+    .mini-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .mini-nav img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
     
+    .team-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .team-tile { border-radius:12px; padding:18px 10px; text-align:center; color:#fff; font-weight:700; }
+    .team-tile.curva { background:#920100; }
+    .team-tile.piana { background:#0c0f6d; }
+    .team-pts { font-size:2.2rem; font-weight:900; margin:6px 0; }
+    .team-sub { font-size:.8rem; font-weight:500; opacity:.9; }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -126,7 +163,7 @@
     }
     
     .stat-box {
-      background: #f9fafb;
+      background: rgba(148,163,184,0.12);
       padding: 20px;
       border-radius: 12px;
       text-align: center;
@@ -135,11 +172,11 @@
     .stat-value {
       font-size: 2rem;
       font-weight: 900;
-      color: #2d6cdf;
+      color: #0c0f6d;
     }
     
     .stat-label {
-      color: #6b7280;
+      color: var(--muted);
       font-size: 0.9rem;
       margin-top: 5px;
     }
@@ -166,20 +203,34 @@
   </style>
 </head>
 <body>
-  <div id="navbar-container"></div>
+  <div class="mini-nav">
+    <a href="index.html">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+      Home
+    </a>
+  </div>
   <!-- Hero -->
   <div class="hero">
-    <h1>📊 Classifica Contest</h1>
+    <h1>Classifica Contest</h1>
     <p>Indovina il Risultato - Stagione 2024/25</p>
   </div>
 
   <!-- Container -->
   <div class="container">
-    <a href="contest.html" class="back-btn">← Torna al Contest</a>
+    <a href="contest.html" class="back-btn">Torna al Contest</a>
+
+    <!-- Classifica per team -->
+    <div class="card">
+      <h2 style="margin-top:0;">Curva Morello vs Piana</h2>
+      <div class="team-grid" id="teamGrid">
+        <div class="team-tile curva"><div>Curva Morello</div><div class="team-pts" id="curvaPts">-</div><div class="team-sub" id="curvaSub"></div></div>
+        <div class="team-tile piana"><div>Piana</div><div class="team-pts" id="pianaPts">-</div><div class="team-sub" id="pianaSub"></div></div>
+      </div>
+    </div>
 
     <!-- Stats -->
     <div class="card">
-      <h2 style="margin-top:0;">📈 Statistiche</h2>
+      <h2 style="margin-top:0;">Statistiche</h2>
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-value" id="totalPlayers">-</div>
@@ -198,7 +249,7 @@
 
     <!-- Leaderboard -->
     <div class="card">
-      <h2 style="margin-top:0;">🏆 Classifica Generale</h2>
+      <h2 style="margin-top:0;">Classifica Generale</h2>
       <table class="leaderboard-table">
         <thead>
           <tr>
@@ -219,13 +270,14 @@
   </div>
 
   <!-- Firebase SDKs -->
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
 
   <script>
+    function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
     let state = {
       user: null,
       scores: []
@@ -252,9 +304,10 @@
 
     async function loadScores() {
       try {
-        const scoresSnap = await window.db.collection('contest').doc('scores').get();
-        
-        if (!scoresSnap.exists) {
+        // Classifica calcolata da admin-contest.html: contest_standings/current
+        const snap = await window.db.collection('contest_standings').doc('current').get();
+
+        if (!snap.exists) {
           document.getElementById('leaderboardBody').innerHTML = `
             <tr>
               <td colspan="3" style="text-align:center;padding:40px;color:#6b7280;">
@@ -262,32 +315,38 @@
               </td>
             </tr>
           `;
+          renderTeams(null);
           return;
         }
 
-        const scoresData = scoresSnap.data();
-        const scoresArray = [];
+        const data = snap.data();
+        const scoresArray = Object.entries(data.users || {}).map(([userId, u]) => ({
+          userId,
+          name: u.name || 'Anonimo',
+          faction: u.faction || '',
+          totalPoints: u.points || 0,
+          predictions: u.predictions || 0
+        }));
 
-        // Convert object to array
-        for (const [userId, userData] of Object.entries(scoresData)) {
-          scoresArray.push({
-            userId,
-            name: userData.name || userData.email || 'Anonimo',
-            email: userData.email || '',
-            totalPoints: userData.totalPoints || 0,
-            predictions: userData.predictions || 0
-          });
-        }
-
-        // Sort by points
         scoresArray.sort((a, b) => b.totalPoints - a.totalPoints);
-        
+
         state.scores = scoresArray;
+        renderTeams(data.teams);
         renderLeaderboard();
         renderStats();
       } catch (e) {
         console.error('Load error:', e);
       }
+    }
+
+    function renderTeams(teams) {
+      const t = teams || { curva: { points: 0, players: 0 }, piana: { points: 0, players: 0 } };
+      ['curva', 'piana'].forEach(id => {
+        const x = t[id] || { points: 0, players: 0 };
+        document.getElementById(id + 'Pts').textContent = x.points;
+        const avg = x.players ? (x.points / x.players).toFixed(1) : '0';
+        document.getElementById(id + 'Sub').textContent = x.players + ' giocatori • media ' + avg;
+      });
     }
 
     function renderLeaderboard() {
@@ -326,8 +385,8 @@
             <tr class="${rowClass}">
               <td class="position ${positionClass}">${positionIcon}</td>
               <td>
-                <div class="player-name">${player.name}${isMe ? ' (Tu)' : ''}</div>
-                <div class="player-email">${player.email}</div>
+                <div class="player-name">${esc(player.name)}${isMe ? ' (Tu)' : ''}</div>
+                <div class="player-email">${player.faction === 'curva' ? 'Curva Morello' : (player.faction === 'piana' ? 'Piana' : '')}</div>
               </td>
               <td class="points">${player.totalPoints}</td>
             </tr>

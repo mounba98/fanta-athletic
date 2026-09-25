@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <script src="resources/theme-preload.js"></script>
+  <script src="resources/theme-preload.js?v=20260925"></script>
   <meta charset="UTF-8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -11,8 +11,9 @@
   <meta name="description" content="Statistiche aggregate su giocatori, allenatori e curva dalle giornate salvate (locale)." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
-  <link rel="stylesheet" href="resources/tablet-support.css?v=2025102002" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 16px; }
     .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
@@ -89,8 +90,8 @@
       cursor: pointer;
     }
     #playersGrid > *:nth-child(odd) { 
-      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
-      border-left: 4px solid #dc143c; 
+      background: linear-gradient(135deg, rgba(146,1,0,0.15), rgba(146,1,0,0.25)); 
+      border-left: 4px solid #920100; 
     }
     #playersGrid > *:nth-child(even) { 
       background: linear-gradient(135deg, rgba(30,58,138,0.15), rgba(30,58,138,0.25)); 
@@ -101,20 +102,20 @@
       border-left: 4px solid #1e3a8a; 
     }
     #coachesGrid > *:nth-child(even) { 
-      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
-      border-left: 4px solid #dc143c; 
+      background: linear-gradient(135deg, rgba(146,1,0,0.15), rgba(146,1,0,0.25)); 
+      border-left: 4px solid #920100; 
     }
     #curvaGrid > *:nth-child(odd) { 
-      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
-      border-left: 4px solid #dc143c; 
+      background: linear-gradient(135deg, rgba(146,1,0,0.15), rgba(146,1,0,0.25)); 
+      border-left: 4px solid #920100; 
     }
     #curvaGrid > *:nth-child(even) { 
       background: linear-gradient(135deg, rgba(30,58,138,0.15), rgba(30,58,138,0.25)); 
       border-left: 4px solid #1e3a8a; 
     }
     #teamsGrid > *:nth-child(odd) { 
-      background: linear-gradient(135deg, rgba(220,20,60,0.15), rgba(220,20,60,0.25)); 
-      border-left: 4px solid #dc143c; 
+      background: linear-gradient(135deg, rgba(146,1,0,0.15), rgba(146,1,0,0.25)); 
+      border-left: 4px solid #920100; 
     }
     #teamsGrid > *:nth-child(even) { 
       background: linear-gradient(135deg, rgba(30,58,138,0.15), rgba(30,58,138,0.25)); 
@@ -174,12 +175,8 @@
     <aside class="card" id="detailPanel" style="position:sticky; top:12px;" hidden></aside>
   </main>
 
-  <footer class="footer">
-    <small>&copy; <span id="year"></span> Nicola Mocci</small>
-  </footer>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
     const $ = (s)=>document.querySelector(s);
     const $$ = (s)=>Array.from(document.querySelectorAll(s));
 
@@ -554,19 +551,19 @@
 
     // boot disabilitato: nuova logica definita nello script successivo
   </script>
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="resources/firebase-config.js?v=20251021-fix"></script>
-  <script src="resources/rules-loader.js?v=2025110301"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/league-helper.js?v=20260920-final"></script>
+  <script src="resources/rules-loader.js?v=20260920-final"></script>
   <script>
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
     window.db = firebase.firestore();
   </script>
-  <script src="resources/firebase.js"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
   <script>
     const $stats = (selector) => document.querySelector(selector);
     const $$stats = (selector) => Array.from(document.querySelectorAll(selector));
@@ -1298,17 +1295,20 @@
         .replace(/'/g, '&#039;');
     }
   </script>
-    <script src="resources/error-logger.js?v=20251018"></script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-    <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/lazy-load.js?v=20251020"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
-  <script src="resources/league-selector.js?v=2025101905"></script>
-  <script src="resources/auth-ui.js?v=202510172227"></script>
+    <script src="resources/error-logger.js?v=20260920-final"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+    <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/lazy-load.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+  <script src="resources/footer.js?v=20260920-final3"></script>
 </body>
 </html>

@@ -99,7 +99,7 @@
       if (leagueId) return;
       
       const banner = document.createElement('div');
-      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff9800;color:white;padding:12px;text-align:center;z-index:9999;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#d97706;color:white;padding:12px;text-align:center;z-index:9999;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
       banner.innerHTML = `
         ⚠️ Nessuna lega selezionata. 
         <a href="admin-leghe.html" style="color:white;text-decoration:underline;margin-left:8px;">Seleziona una lega</a>

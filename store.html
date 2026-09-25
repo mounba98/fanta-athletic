@@ -8,8 +8,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Store Ufficiale - Athletic 2018</title>
   <meta name="description" content="Felpe, maglie, sticker e merchandising ufficiale Athletic 2018." />
-  <script src="resources/theme-preload.js"></script>
-  <link rel="stylesheet" href="resources/sheet.css?v=202510172227" />
+  <script src="resources/theme-preload.js?v=20260925"></script>
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     body { background: var(--bg, #f4f4f4); transition: background 0.3s ease; }
     :root.dark body { background: #0f172a; }
@@ -19,7 +22,7 @@
     :root:not(.dark) .store-hero { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); color: #1e293b; box-shadow: 0 18px 42px rgba(0, 0, 0, 0.08); }
     .store-hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 55%); pointer-events: none; }
     :root:not(.dark) .store-hero::after { background: radial-gradient(circle at 20% 20%, rgba(0,0,0,0.03), transparent 55%); }
-    .store-hero h1 { font-size: 42px; margin: 0 0 12px; transition: color 0.3s ease; }
+    .store-hero h1 { font-size: clamp(26px, 5vw, 36px); margin: 0 0 12px; transition: color 0.3s ease; }
     :root:not(.dark) .store-hero h1 { color: #1e293b; }
     .store-hero p { font-size: 18px; margin: 0 0 20px; color: rgba(226, 232, 240, 0.85); max-width: 720px; transition: color 0.3s ease; }
     :root:not(.dark) .store-hero p { color: #475569; }
@@ -43,18 +46,18 @@
     .product-meta { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
     .product-price { font-size: 22px; font-weight: 800; color: var(--primary); }
     .product-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-    .product-tag { background: rgba(99,102,241,0.14); color: #312e81; font-weight: 600; border-radius: 999px; padding: 5px 12px; font-size: 12px; }
+    .product-tag { background: rgba(12,15,109,0.14); color: #312e81; font-weight: 600; border-radius: 999px; padding: 5px 12px; font-size: 12px; }
     .product-actions { display: flex; gap: 12px; margin-top: 20px; }
     .product-actions button { flex: 1; border-radius: 12px; padding: 12px 16px; font-weight: 700; border: none; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-    .btn-primary { background: linear-gradient(135deg, #6366f1, #ec4899); color: white; box-shadow: 0 12px 24px rgba(99,102,241,0.25); }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(99,102,241,0.35); }
+    .btn-primary { background: linear-gradient(135deg, #0c0f6d, #920100); color: white; box-shadow: 0 12px 24px rgba(12,15,109,0.25); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(12,15,109,0.35); }
     .btn-outline { background: transparent; border: 1px solid rgba(148,163,184,0.3); color: var(--text, #2c3e50); transition: border 0.3s ease, color 0.3s ease; }
     :root.dark .btn-outline { border: 1px solid rgba(148,163,184,0.3); color: #e2e8f0; }
     :root:not(.dark) .btn-outline { border: 1px solid rgba(0,0,0,0.2); color: #1e293b; }
     .store-empty { background: var(--card); border-radius: 16px; padding: 28px; text-align: center; color: var(--muted); font-size: 16px; }
-    .store-alert { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); color: #1e293b; border-radius: 14px; padding: 14px 18px; font-size: 14px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start; }
+    .store-alert { background: rgba(12,15,109,0.12); border: 1px solid rgba(12,15,109,0.25); color: #1e293b; border-radius: 14px; padding: 14px 18px; font-size: 14px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start; }
     .store-alert strong { display: block; }
-    @media (max-width: 720px) { .store-hero h1 { font-size: 32px; } }
+    @media (max-width: 720px) { .store-hero h1 { font-size: clamp(26px, 5vw, 36px); } }
   </style>
 </head>
 <body>
@@ -89,23 +92,19 @@
     </div>
   </main>
 
-  <footer class="footer">
-    <small>&copy; <span id="year"></span> Nicola Mocci – Tutti i diritti riservati.</small>
-  </footer>
 
   <!-- Firebase SDKs -->
-  <script src="resources/firebase-cdn-loader.js?v=20251105"></script>
-  <script data-original="firebase-app-compat.js" data-fallback="resources/firebase-app-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-auth-compat.js" data-fallback="resources/firebase-auth-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script data-original="firebase-firestore-compat.js" data-fallback="resources/firebase-firestore-compat.js" src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" onerror="window.__loadFirebaseFallback(this)"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-  <script src="resources/firebase-config.js?v=20251021-fix"></script>
-  <script src="resources/firebase.js"></script>
-  <script src="resources/app-init.js"></script>
-  <script src="resources/theme.js?v=202510172227"></script>
-  <script src="resources/navbar.js?v=2025110701"></script>
-  <script src="resources/navbar-profile-icon.js?v=2025102001"></script>
-  <script src="resources/notifications-dropdown.js?v=2025111002"></script>
+<script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/firebase.js?v=20260925"></script>
+  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
   <script>
     // Prevent other scripts from loading on store page
     if (window.location.pathname.includes('store.html')) {
@@ -116,7 +115,6 @@
       }
     }
     
-    document.getElementById('year').textContent = new Date().getFullYear();
 
     const FALLBACK_PRODUCTS = [
       {
@@ -256,10 +254,13 @@
 
     document.addEventListener('DOMContentLoaded', loadProducts);
   </script>
-  <script src="resources/mobile-detect.js?v=2025101801"></script>
-  <script src="resources/mobile-menu.js?v=2025101803"></script>
-  <script src="resources/bottom-nav.js?v=2025101802"></script>
-  <script src="resources/navbar-autohide.js?v=2025101805"></script>
-  <script src="resources/lazy-load.js?v=20251020"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/navbar-autohide.js?v=20260920-final"></script>
+  <script src="resources/lazy-load.js?v=20260920-final"></script>
+  <script src="resources/footer.js?v=20260920-final3"></script>
 </body>
 </html>

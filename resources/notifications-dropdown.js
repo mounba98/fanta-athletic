@@ -109,7 +109,7 @@
         position: absolute;
         top: -2px;
         right: -2px;
-        background: #e53e3e;
+        background: #920100;
         color: white;
         border-radius: 10px;
         padding: 2px 6px;
@@ -184,7 +184,7 @@
         </div>
       </div>
       <div style="padding: 12px 20px; border-top: 1px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-        <button id="markAllNotifDropdown" style="background: rgba(99,102,241,0.12); color: var(--primary); border: 1px solid rgba(99,102,241,0.3); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Segna tutte lette</button>
+        <button id="markAllNotifDropdown" style="background: rgba(12,15,109,0.12); color: var(--primary); border: 1px solid rgba(12,15,109,0.3); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Segna tutte lette</button>
         <a href="notifications.html" style="color: var(--primary); text-decoration: none; font-weight: 600; font-size: 14px;">Vedi tutte</a>
       </div>
     `;
@@ -407,8 +407,8 @@
       const leagueBadge = notif.leagueId
         ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">🏅 ${leagueName}</div>`
         : '';
-      const bgDefault = isUnread ? 'rgba(99,102,241,0.18)' : 'rgba(0,0,0,0.03)';
-      const hoverBg = isUnread ? 'rgba(99,102,241,0.26)' : 'rgba(0,0,0,0.08)';
+      const bgDefault = isUnread ? 'rgba(12,15,109,0.18)' : 'rgba(0,0,0,0.03)';
+      const hoverBg = isUnread ? 'rgba(12,15,109,0.26)' : 'rgba(0,0,0,0.08)';
       const borderColor = isUnread ? 'var(--primary)' : 'rgba(148,163,184,0.45)';
       const titlePrefix = isUnread ? `<span style="color: var(--primary); margin-right: 6px;">•</span>` : '';
       const body = notif.body || notif.message || '';

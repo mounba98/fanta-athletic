@@ -4,11 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scegli Squadra - Fanta Athletic</title>
-  <link rel="stylesheet" href="resources/sheet.css">
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header">
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%);
       min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    .scegli-squadra-wrap {
       display: flex;
       align-items: flex-start;
       justify-content: center;
@@ -25,7 +31,7 @@
     h1 {
       text-align: center;
       margin-bottom: 12px;
-      font-size: 32px;
+      font-size: clamp(26px, 5vw, 36px);
     }
     .subtitle {
       text-align: center;
@@ -50,18 +56,18 @@
       gap: 16px;
     }
     .team-card:hover {
-      border-color: #d91847;
+      border-color: #920100;
       transform: translateX(4px);
     }
     .team-card.selected {
-      border-color: #d91847;
+      border-color: #920100;
       background: linear-gradient(135deg, rgba(217,24,71,0.1), rgba(217,24,71,0.05));
     }
     .team-icon {
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #d91847, #b91846);
+      background: linear-gradient(135deg, #920100, #740100);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -83,7 +89,7 @@
     .btn {
       width: 100%;
       padding: 16px;
-      background: linear-gradient(135deg, #d91847, #b91846);
+      background: linear-gradient(135deg, #920100, #740100);
       border: none;
       border-radius: 8px;
       color: white;
@@ -110,22 +116,30 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>⚽ Scegli la Tua Squadra</h1>
-    <p class="subtitle">Seleziona una delle squadre disponibili per iniziare a giocare</p>
-    
-    <div id="teamsContainer" class="loading">
-      <p>⏳ Caricamento squadre...</p>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Scegli Squadra</h1>
+  </header>
+  <div class="scegli-squadra-wrap">
+    <div class="container">
+      <h1>Scegli la Tua Squadra</h1>
+      <p class="subtitle">Seleziona una delle squadre disponibili per iniziare a giocare</p>
+
+      <div id="teamsContainer" class="loading">
+        <p>⏳ Caricamento squadre...</p>
+      </div>
+
+      <button id="confirmBtn" class="btn" onclick="confirmTeam()" disabled>
+        Conferma Squadra
+      </button>
     </div>
-    
-    <button id="confirmBtn" class="btn" onclick="confirmTeam()" disabled>
-      Conferma Squadra
-    </button>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
   
   <script>
@@ -218,7 +232,7 @@
 
         if (teams.length === 0) {
           document.getElementById('teamsContainer').innerHTML = `
-            <p style="color:#ef4444;">❌ Nessuna squadra disponibile.</p>
+            <p style="color:#920100;">❌ Nessuna squadra disponibile.</p>
             <p style="color:#94a3b8;font-size:14px;margin-top:8px;">Contatta l'amministratore.</p>
           `;
           return;
@@ -228,7 +242,7 @@
       } catch (error) {
         console.error('Error loading teams:', error);
         document.getElementById('teamsContainer').innerHTML = `
-          <p style="color:#ef4444;">❌ Errore caricamento squadre: ${error.message}</p>
+          <p style="color:#920100;">❌ Errore caricamento squadre: ${error.message}</p>
         `;
       }
     }
@@ -238,7 +252,7 @@
       
       if (teams.length === 0) {
         container.innerHTML = `
-          <p style="color:#ef4444;">❌ Nessuna squadra disponibile.</p>
+          <p style="color:#920100;">❌ Nessuna squadra disponibile.</p>
         `;
         return;
       }
@@ -318,5 +332,10 @@
       }
     }
   </script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260920-final"></script>
 </body>
 </html>
