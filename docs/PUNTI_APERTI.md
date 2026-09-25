@@ -1,4 +1,4 @@
-Allineato a: D106
+Allineato a: D107
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
@@ -12,6 +12,10 @@ Allineato a: D106
 - [ ] **Calcolo giornata con i bonus di fazione** (D080) — mai salvato davvero.
 - [ ] **Account non admin**: scelta fazione/nome, tentativo di cambio fazione (deve fallire), eredità della fazione di squadra, voto nel mini-gioco.
 - [ ] **Swipe dal bordo** su un telefono vero (D067).
+
+**Da fare, nuova richiesta (D107):**
+- [ ] **Scelta allenatore obbligatoria al primo accesso della stagione**, insieme alla tifoseria (Curva/Piana), come `faction-gate.js`. Oggi gli allenatori 2025/26 sono rimasti sulle squadre (l'azzeramento non li tocca) e la scelta in `squadre.html` compare solo per squadre senza allenatore. Decidere: azzerarli per la 2026/27 (+ aggiungerli all'azzeramento futuro), schermata obbligatoria, chi può cambiarlo dopo. Poi commit + pubblicazione.
+- [x] Correzione D107 (admin → propria squadra in Formazioni/Squadre) committata e pubblicata il 25/09/2026.
 
 **Da fare nell'app (dati, non codice):**
 - [ ] Creare le 4 regole bonus (presenza in casa +1, in trasferta +2, coro contro la Piana +2 Curva Morello, offese ai giocatori +2 Piana) da `admin-rules.html`.

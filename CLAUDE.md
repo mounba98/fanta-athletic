@@ -1,4 +1,4 @@
-Allineato a: D106
+Allineato a: D107
 
 # Fanta Athletic — contesto per Claude
 
@@ -57,7 +57,7 @@ fanta-athletic` (con conferma). Etichette `?v=` da cambiare a ogni modifica
 di un file condiviso (il service worker tiene i file etichettati, D099).
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).
-Prossimi passi: supporto agli admin mentre compilano; prova Partita live con
+Prossimi passi: **scelta allenatore + tifoseria al primo accesso (D107, da decidere e costruire)**; supporto agli admin mentre compilano; prova Partita live con
 due admin alla prima giornata; account non admin; decisioni scontri diretti
 (tutte modificabili dagli admin in Impostazioni); restyling/velocità in coda.
 Lista completa in cima a `docs/PUNTI_APERTI.md`. Backup: indice in

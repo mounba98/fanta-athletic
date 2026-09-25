@@ -1364,7 +1364,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
             const ud = await window.db.collection('users').doc(user.uid).get();
             if (ud.exists) {
               state.userTeamIdx = ud.data().team_index;
-              if (!state.isAdmin && typeof state.userTeamIdx === 'number') {
+              if (typeof state.userTeamIdx === 'number') {   // anche gli admin partono dalla PROPRIA squadra (D107), poi possono cambiarla
                 state.selectedTeamIdx = state.userTeamIdx;
               }
             }

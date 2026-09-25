@@ -1732,7 +1732,7 @@
               return;
             }
 
-            if (!state.isAdmin && typeof state.userTeamIdx === 'number') {
+            if (typeof state.userTeamIdx === 'number') {   // anche gli admin partono dalla PROPRIA squadra (D107), poi possono cambiarla
               state.selectedTeamIdx = state.userTeamIdx;
             }
           } else {
