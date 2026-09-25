@@ -14,6 +14,12 @@
     .tab-btn { padding: 12px 20px; border-radius: 8px; background: transparent; color: var(--text); border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 15px; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; }
     .tab-btn:hover { background: rgba(146, 1, 0, 0.1); }
     .tab-btn.active { background: var(--primary); color: white; }
+    /* D109: schede distribuite su tutto lo spazio; scheda attiva visibile anche nel tema scuro
+       (la regola generale di sheet.css ricolora tutti i pulsanti, D084) */
+    .tabs .tab-btn { flex: 1 1 0; justify-content: center; min-width: max-content; }
+    :root.dark .tabs .tab-btn.tab-btn { background: transparent; color: var(--text); border: none; }
+    :root.dark .tabs .tab-btn.tab-btn:hover { background: rgba(255,255,255,.06); }
+    :root .tabs .tab-btn.active, :root.dark .tabs .tab-btn.tab-btn.active { background: var(--primary); color: #fff; }
     .tab-label-short { display: none; }
     @media (max-width: 480px) {
       .tab-label-full { display: none; }
@@ -570,7 +576,7 @@
 
   </script>
   <script src="resources/firebase.js?v=20260925"></script>
-  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/app-init.js?v=20260925h"></script>
   <script src="resources/standings-export.js?v=20260920-final"></script>
   <script src="resources/podium-animation.js?v=20260920-final"></script>
   <script>
@@ -2308,9 +2314,9 @@
   </script>
   <input type="file" id="playerPhotoInput" accept="image/*" style="display:none" />
   <script src="resources/players-leaderboard-classifiche.js?v=20260921-final"></script>
-  <script src="resources/mobile-menu.js?v=20260925b"></script>
+  <script src="resources/mobile-menu.js?v=20260925c"></script>
   <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
-  <script src="resources/faction.js?v=20260924b"></script>
+  <script src="resources/faction.js?v=20260925f"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
   <script src="resources/navbar-autohide.js?v=20260920-final"></script>
@@ -2320,7 +2326,7 @@
   <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
   <script src="resources/auth-guard.js?v=20260925c"></script>
-  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/league-selector.js?v=20260925h"></script>
   <script src="resources/auth-ui.js?v=20260920-final"></script>
 
   <script>

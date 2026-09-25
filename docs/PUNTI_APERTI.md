@@ -1,4 +1,4 @@
-Allineato a: D107
+Allineato a: D111
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
@@ -13,8 +13,12 @@ Allineato a: D107
 - [ ] **Account non admin**: scelta fazione/nome, tentativo di cambio fazione (deve fallire), eredità della fazione di squadra, voto nel mini-gioco.
 - [ ] **Swipe dal bordo** su un telefono vero (D067).
 
+**Fatto (D108–D111), pubblicato il 25/09 sera:** finestra allenatore, nuova Home, Archivio Athletic, selettore di lega nell'intestazione (cerchietto), titoli accorciati, glossario leghe.
+- [ ] Home: la fascia "Adesso" è stata provata solo in simulazione; verificarla alla prima partita vera inserita nel Calendario Athletic.
+- [ ] Archivio Athletic: il bilancio V-N-P compare solo quando gli admin inseriscono i risultati delle partite (2025/26: 1 su 21).
+
 **Da fare, nuova richiesta (D107):**
-- [ ] **Scelta allenatore obbligatoria al primo accesso della stagione**, insieme alla tifoseria (Curva/Piana), come `faction-gate.js`. Oggi gli allenatori 2025/26 sono rimasti sulle squadre (l'azzeramento non li tocca) e la scelta in `squadre.html` compare solo per squadre senza allenatore. Decidere: azzerarli per la 2026/27 (+ aggiungerli all'azzeramento futuro), schermata obbligatoria, chi può cambiarlo dopo. Poi commit + pubblicazione.
+- [x] **Scelta allenatore obbligatoria per squadre senza allenatore (D108)**, regole e sito pubblicati., insieme alla tifoseria (Curva/Piana), come `faction-gate.js`. Oggi gli allenatori 2025/26 sono rimasti sulle squadre (l'azzeramento non li tocca) e la scelta in `squadre.html` compare solo per squadre senza allenatore. Decidere: azzerarli per la 2026/27 (+ aggiungerli all'azzeramento futuro), schermata obbligatoria, chi può cambiarlo dopo. Poi commit + pubblicazione.
 - [x] Correzione D107 (admin → propria squadra in Formazioni/Squadre) committata e pubblicata il 25/09/2026.
 
 **Da fare nell'app (dati, non codice):**

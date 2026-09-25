@@ -1,4 +1,4 @@
-Allineato a: D107
+Allineato a: D111
 
 # Fanta Athletic — contesto per Claude
 
@@ -55,9 +55,14 @@ Modifica → prova in locale → commit+push (con conferma) → pubblicazione de
 sito, passo SEPARATO: `~/.local/bin/firebase deploy --only hosting --project
 fanta-athletic` (con conferma). Etichette `?v=` da cambiare a ogni modifica
 di un file condiviso (il service worker tiene i file etichettati, D099).
+**Ultimo giro (D108–D111, 25/09 sera)**: scelta allenatore obbligatoria per
+squadre senza allenatore; nuova Home "centro di controllo" (`resources/home-dashboard.js`);
+**Archivio Athletic** (`archivio-athletic.html` + `resources/athletic-stats.js`);
+selettore di lega come cerchietto 🏆 nell'intestazione; titoli lunghi accorciati;
+glossario **Lega → Stagione → Competizioni → Giornate** (`docs/GLOSSARIO_LEGHE.md`).
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).
-Prossimi passi: **scelta allenatore + tifoseria al primo accesso (D107, da decidere e costruire)**; supporto agli admin mentre compilano; prova Partita live con
+Prossimi passi: **scelta allenatore al primo accesso (D108: fatta in locale, da pubblicare regole Firestore + sito)**; supporto agli admin mentre compilano; prova Partita live con
 due admin alla prima giornata; account non admin; decisioni scontri diretti
 (tutte modificabili dagli admin in Impostazioni); restyling/velocità in coda.
 Lista completa in cima a `docs/PUNTI_APERTI.md`. Backup: indice in
@@ -425,6 +430,7 @@ vedi [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md) D005.
 - [`docs/AUDIT_INIZIALE_2026-09-19.md`](docs/AUDIT_INIZIALE_2026-09-19.md) — dettaglio tecnico completo dell'analisi (architettura, sicurezza, inventario dei 103 file HTML, storia del progetto).
 - [`docs/MAPPA_PAGINE.md`](docs/MAPPA_PAGINE.md) — a cosa serve ciascuno dei 74 file HTML attivi, senza doverli aprire uno per uno. Non abbiamo spostato le pagine in sottocartelle (troppo rischioso senza un router, vedi D011 e l'episodio D021): questa mappa è la soluzione scelta per l'ordine "a colpo d'occhio".
 - [`docs/FIREBASE_ALLINEAMENTO.md`](docs/FIREBASE_ALLINEAMENTO.md) + [`firestore.rules`](firestore.rules) — **regola fissa (D077): tutto ciò che si fa su Firebase (regole, indici, struttura dati) si scrive prima qui in locale e poi si applica; ogni modifica fatta in Console va riportata subito.** Le regole vere sono in `firestore.rules`.
+- [`docs/GLOSSARIO_LEGHE.md`](docs/GLOSSARIO_LEGHE.md) — **le parole giuste: Lega → Stagione → Competizioni → Giornate** (D111), regole e debiti per il multilega futuro. Usarle sempre così nel codice e nell'interfaccia.
 - [`docs/PUNTI_APERTI.md`](docs/PUNTI_APERTI.md) — checklist viva di cosa resta da fare/decidere/chiedere, aggiornarla quando un punto si chiude o se ne apre uno nuovo.
 - Documenti originali dell'amico (root del progetto) — raccontano piani e stato passato, **non sempre coincidono con lo stato reale del codice**, usarli come contesto storico non come fonte di verità: `STATO_SITO.md`, `ARCHITETTURA_SISTEMA_V2.md` (sostituisce `ARCHITETTURA_SISTEMA_COMPLETA.md`, la V1), `ANALISI_MIGRAZIONE_MULTILEGHE.md`, `MULTILEGA-PLAN.md`, `CONSIGLIO_MIGRAZIONE.md`, `REQUISITI_STORE_E_ADMIN.md`, `STRUTTURA_FIRESTORE_POST_MIGRAZIONE.md`, `GUIDA_TEST_MIGRAZIONE.md`, `BACKUP_FIRESTORE.md`, `docs/catalogo/TASSONOMIE.md`, `docs/catalogo/ROSTER_ATHLETIC_2018.md`.
 

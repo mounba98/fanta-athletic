@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script src="resources/theme-preload.js?v=20260925b"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Archivio Athletic - Fanta Athletic</title>
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
+  <style>
+    body { padding-bottom: 90px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .seasons { display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; scrollbar-width:none; }
+    .seasons button { flex:0 0 auto; padding:9px 16px; border-radius:999px; border:1px solid rgba(148,163,184,.35) !important; background:var(--card) !important; color:var(--text) !important; font-weight:700; font-family:inherit; cursor:pointer; }
+    .seasons button.on { background:#0c0f6d !important; border-color:#0c0f6d !important; color:#fff !important; }
+    .hero { padding:18px; border-radius:18px; background:linear-gradient(135deg,#920100,#0c0f6d); color:#fff; box-shadow:var(--shadow); margin-bottom:14px; }
+    .hero .k { font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.85; }
+    .hero .t { font-size:24px; font-weight:800; margin-top:4px; }
+    .kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:12px; }
+    .kpis div { background:rgba(255,255,255,.12); border-radius:12px; padding:8px 4px; text-align:center; }
+    .kpis b { display:block; font-size:20px; } .kpis small { font-size:11px; opacity:.9; }
+    .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
+    .card h2 { font-size:18px; margin:0 0 10px; display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+    .card h2 small { font-size:12px; font-weight:600; color:var(--muted); }
+    .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+    .grid2 .card { margin-bottom:0; }
+    .rank { width:100%; border-collapse:collapse; font-size:14px; }
+    .rank td { padding:8px 6px; border-top:1px solid rgba(148,163,184,.18); }
+    .rank td.pos { width:30px; font-weight:800; text-align:center; color:var(--muted); }
+    .rank td.n { text-align:right; font-weight:800; white-space:nowrap; }
+    .rank tr.p1 td.pos { color:#facc15; } .rank tr.p2 td.pos { color:#cbd5e1; } .rank tr.p3 td.pos { color:#d97706; }
+    .rank tr[data-p] { cursor:pointer; }
+    .rank tr[data-p]:hover td { background:rgba(148,163,184,.08); }
+    .muted { color:var(--muted); font-size:13px; }
+    .scroll { overflow-x:auto; }
+    .full { border-collapse:collapse; font-size:13px; white-space:nowrap; width:100%; }
+    .full th, .full td { padding:7px 8px; border-top:1px solid rgba(148,163,184,.18); text-align:right; }
+    .full th { font-size:12px; color:var(--muted); font-weight:700; cursor:pointer; }
+    .full th:first-child, .full td:first-child { text-align:left; position:sticky; left:0; background:var(--card); }
+    .full tr[data-p] { cursor:pointer; }
+    .cur { display:grid; gap:8px; }
+    .cur div { display:flex; justify-content:space-between; gap:10px; font-size:14px; padding:8px 0; border-top:1px solid rgba(148,163,184,.18); }
+    .cur span:last-child { font-weight:700; text-align:right; }
+    .match { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; font-size:14px; padding:9px 0; border-top:1px solid rgba(148,163,184,.18); }
+    .match .s { font-weight:800; font-size:16px; padding:0 8px; }
+    .match span:last-child { text-align:right; }
+    .empty { text-align:center; padding:40px 16px; color:var(--muted); }
+    .sheet-bg { position:fixed; inset:0; background:rgba(2,6,23,.75); z-index:9000; display:flex; align-items:flex-end; justify-content:center; }
+    .sheet { background:var(--card); color:var(--text); width:100%; max-width:560px; max-height:85vh; overflow:auto; border-radius:20px 20px 0 0; padding:18px 16px 28px; }
+    .sheet h3 { margin:0 0 4px; font-size:20px; }
+    .sheet .close { float:right; background:transparent !important; border:none !important; color:var(--muted) !important; font-size:22px; cursor:pointer; }
+    @media (min-width: 700px) { .sheet-bg { align-items:center; } .sheet { border-radius:20px; } }
+  </style>
+  <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/resources/app-icons/favicon-48.png" />
+  <link rel="apple-touch-icon" href="/resources/app-icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
+</head>
+<body>
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home"><img src="resources/logo.png" alt="Fanta Athletic" /></a>
+    <h1>Archivio Athletic</h1>
+  </header>
+
+  <main class="container">
+    <p class="muted" style="margin:0 0 12px;">I numeri veri dell'Athletic 2018, dai referti che gli admin compilano a ogni partita.</p>
+    <div class="seasons" id="seasons"></div>
+    <div id="view"><p class="empty">Caricamento…</p></div>
+  </main>
+
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/season-archive.js?v=20260925b"></script>
+  <script src="resources/athletic-stats.js?v=20260925"></script>
+  <script>
+    // Archivio Athletic (D109): statistiche dei giocatori veri, stagione per stagione.
+    const $ = id => document.getElementById(id);
+    const AS = window.AthleticStats;
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function fmt(n) { return String(Math.round(n * 10) / 10).replace('.', ','); }
+    const raw = () => window.__LEGACY_DB__ || firebase.firestore();
+    let lid = null, seasons = [], cache = {}, current = 'all';
+
+    // Dati di una stagione: corrente dalle raccolte vive, passate dall'archivio
+    async function load(s) {
+      if (cache[s.id]) return cache[s.id];
+      const db = raw(), L = db.collection('leagues').doc(lid);
+      let days, rules, players = {}, calendar;
+      if (s.live) {
+        const [d, r, p, c] = await Promise.all([L.collection('days').get(), L.collection('rules').get(), L.collection('players').get(), db.collection('athletic_calendar').get()]);
+        days = d.docs.map(x => Object.assign({ id: x.id }, x.data()));
+        rules = r.docs.map(x => Object.assign({ rule_id: x.id }, x.data()));
+        p.docs.forEach(x => { players[x.id] = x.data(); });
+        calendar = c.docs.map(x => x.data());
+      } else {
+        const I = SeasonArchive.archiveRef(lid, s.id).collection('items');
+        const get = async k => (await I.where('kind', '==', k).get()).docs.map(x => x.data());
+        const [d, r, p, c] = await Promise.all([get('days'), get('rules'), get('players'), get('athletic_calendar')]);
+        days = d.map(x => Object.assign({ id: x.path.split('/').pop() }, x.data));
+        rules = r.map(x => Object.assign({ rule_id: x.path.split('/').pop() }, x.data));
+        p.forEach(x => { players[x.path.split('/').pop()] = x.data; });
+        calendar = c.map(x => x.data);
+      }
+      const stats = AS.compute(days, rules, players);
+      return (cache[s.id] = { stats, rec: AS.record(calendar), calendar });
+    }
+
+    function rankCard(title, stats, cat, note) {
+      const rows = AS.top(stats, cat, 10);
+      if (!rows.length) return '';
+      return '<div class="card"><h2>' + esc(title) + (note ? ' <small>' + esc(note) + '</small>' : '') + '</h2><table class="rank">' +
+        rows.map((p, i) => '<tr data-p="' + esc(p.id) + '" class="p' + (i + 1) + '"><td class="pos">' + (i + 1) + '</td><td>' + esc(p.name) + '</td><td class="n">' + fmt(p[cat]) + '</td></tr>').join('') +
+        '</table></div>';
+    }
+
+    function cardsCard(stats) {
+      const rows = Object.values(stats.players).filter(p => p.gialli || p.rossi)
+        .sort((a, b) => (b.rossi * 3 + b.gialli) - (a.rossi * 3 + a.gialli)).slice(0, 10);
+      if (!rows.length) return '';
+      return '<div class="card"><h2>Cartellini <small>gialli · rossi</small></h2><table class="rank">' +
+        rows.map((p, i) => '<tr data-p="' + esc(p.id) + '"><td class="pos">' + (i + 1) + '</td><td>' + esc(p.name) + '</td><td class="n">' + fmt(p.gialli) + ' · ' + fmt(p.rossi) + '</td></tr>').join('') + '</table></div>';
+    }
+
+    function keepersCard(stats) {
+      const rows = Object.values(stats.players).filter(p => p.inviolata || p.parate || p.golSubiti || p.rigoriParati)
+        .sort((a, b) => (b.inviolata - a.inviolata) || (b.parate - a.parate));
+      if (!rows.length) return '';
+      return '<div class="card"><h2>Portieri <small>inviolate · parate · gol subiti</small></h2><table class="rank">' +
+        rows.map(p => '<tr data-p="' + esc(p.id) + '"><td>' + esc(p.name) + '</td><td class="n">' + fmt(p.inviolata) + ' · ' + fmt(p.parate + p.rigoriParati) + ' · ' + fmt(p.golSubiti) + '</td></tr>').join('') + '</table></div>';
+    }
+
+    const COLS = [['presenze', 'Pres.'], ['gol', 'Gol'], ['assist', 'Ass.'], ['mvp', 'MVP'], ['gialli', 'Gialli'], ['rossi', 'Rossi']];
+    let sortCol = 'presenze';
+    function fullTable(stats) {
+      const rows = Object.values(stats.players).sort((a, b) => (b[sortCol] - a[sortCol]) || a.name.localeCompare(b.name, 'it'));
+      return '<div class="card"><h2>Tutta la rosa <small>tocca un nome per la sua storia</small></h2><div class="scroll"><table class="full"><thead><tr><th>Giocatore</th>' +
+        COLS.map(c => '<th data-sort="' + c[0] + '">' + c[1] + (sortCol === c[0] ? ' ▾' : '') + '</th>').join('') + '</tr></thead><tbody>' +
+        rows.map(p => '<tr data-p="' + esc(p.id) + '"><td>' + esc(p.name) + '</td>' + COLS.map(c => '<td>' + fmt(p[c[0]] || 0) + '</td>').join('') + '</tr>').join('') +
+        '</tbody></table></div></div>';
+    }
+
+    function curiosCard(stats) {
+      const list = AS.curiosities(stats).slice(0, 12);
+      if (!list.length) return '';
+      return '<div class="card"><h2>Curiosità <small>chi l\'ha fatto di più</small></h2><div class="cur">' +
+        list.map(c => '<div><span>' + esc(c.voce) + '</span><span>' + esc(c.players.join(', ')) + ' · ' + fmt(c.n) + '</span></div>').join('') + '</div></div>';
+    }
+
+    function matchesCard(calendar) {
+      const list = (calendar || []).filter(c => typeof c.homeScore === 'number' && typeof c.awayScore === 'number')
+        .sort((a, b) => (parseInt(a.giornata, 10) || 0) - (parseInt(b.giornata, 10) || 0));
+      if (!list.length) return '';
+      return '<div class="card"><h2>Partite <small>' + list.length + ' con risultato</small></h2>' +
+        list.map(c => '<div class="match"><span>' + esc(c.homeTeam) + '</span><span class="s">' + c.homeScore + ' – ' + c.awayScore + '</span><span>' + esc(c.awayTeam) + '</span></div>').join('') + '</div>';
+    }
+
+    async function show(id) {
+      current = id;
+      document.querySelectorAll('#seasons button').forEach(b => b.classList.toggle('on', b.dataset.id === id));
+      $('view').innerHTML = '<p class="empty">Caricamento…</p>';
+      let data, label;
+      try {
+        if (id === 'all') {
+          const all = await Promise.all(seasons.map(load));
+          const rec = all.reduce((r, x) => { ['giocate', 'v', 'n', 'p', 'gf', 'gs'].forEach(k => r[k] += x.rec[k]); return r; }, { giocate: 0, v: 0, n: 0, p: 0, gf: 0, gs: 0 });
+          data = { stats: AS.merge(all.map(x => x.stats)), rec, calendar: [] };
+          label = 'Tutte le stagioni';
+        } else {
+          const s = seasons.find(x => x.id === id);
+          data = await load(s); label = 'Stagione ' + s.label;
+        }
+      } catch (e) {
+        console.warn('[archivio-athletic]', e && (e.code || e.message));
+        $('view').innerHTML = '<p class="empty">Dati non disponibili al momento.</p>'; return;
+      }
+      const st = data.stats, r = data.rec;
+      if (!Object.keys(st.players).length) {
+        $('view').innerHTML = '<div class="hero"><div class="k">Athletic 2018</div><div class="t">' + esc(label) + '</div></div>' +
+          '<p class="empty">Ancora nessun numero: compariranno dopo la prima giornata.</p>'; return;
+      }
+      const golTot = Object.values(st.players).reduce((s, p) => s + p.gol, 0);
+      $('view').innerHTML =
+        '<div class="hero"><div class="k">Athletic 2018</div><div class="t">' + esc(label) + '</div>' +
+        '<div class="kpis"><div><b>' + st.giornate + '</b><small>giornate</small></div>' +
+        '<div><b>' + fmt(golTot) + '</b><small>gol segnati</small></div>' +
+        // bilancio V-N-P solo se i risultati inseriti coprono almeno metà delle giornate (2025/26: 1 su 21)
+        (r.giocate >= Math.max(3, st.giornate / 2) ? '<div><b>' + r.v + '-' + r.n + '-' + r.p + '</b><small>V-N-P</small></div><div><b>' + r.gf + ':' + r.gs + '</b><small>gol f:s</small></div>'
+          : '<div><b>' + Object.keys(st.players).length + '</b><small>giocatori</small></div><div><b>' + fmt(Object.values(st.players).reduce((s, p) => s + p.assist, 0)) + '</b><small>assist</small></div>') +
+        '</div></div>' +
+        '<div class="grid2">' + rankCard('Marcatori', st, 'gol') + rankCard('Assist', st, 'assist') + rankCard('Presenze', st, 'presenze') +
+        rankCard('MVP', st, 'mvp') + cardsCard(st) + keepersCard(st) + '</div><div style="height:14px"></div>' +
+        fullTable(st) + curiosCard(st) + matchesCard(data.calendar);
+      bind();
+    }
+
+    function bind() {
+      document.querySelectorAll('[data-p]').forEach(tr => tr.onclick = () => sheet(tr.dataset.p));
+      document.querySelectorAll('.full th[data-sort]').forEach(th => th.onclick = () => { sortCol = th.dataset.sort; show(current); });
+    }
+
+    // Scheda giocatore: la sua storia stagione per stagione
+    async function sheet(pid) {
+      const all = await Promise.all(seasons.map(async s => ({ s, d: await load(s) })));
+      const rows = all.map(x => ({ label: x.s.label, p: x.d.stats.players[pid] })).filter(x => x.p);
+      if (!rows.length) return;
+      const tot = AS.merge(rows.map(x => ({ players: { [pid]: x.p }, giornate: 0 }))).players[pid];
+      const name = rows[0].p.name;
+      const cur = Object.keys(tot.curiosita).sort((a, b) => tot.curiosita[b] - tot.curiosita[a]).slice(0, 8);
+      const bg = document.createElement('div');
+      bg.className = 'sheet-bg';
+      bg.innerHTML = '<div class="sheet" role="dialog" aria-modal="true"><button class="close" aria-label="Chiudi">×</button>' +
+        '<h3>' + esc(name) + '</h3><p class="muted" style="margin:0 0 12px;">' + esc(rows[0].p.role || '') + (rows.length > 1 ? ' · ' + rows.length + ' stagioni' : '') + '</p>' +
+        '<div class="scroll"><table class="full"><thead><tr><th>Stagione</th>' + COLS.map(c => '<th>' + c[1] + '</th>').join('') + '</tr></thead><tbody>' +
+        rows.map(x => '<tr><td>' + esc(x.label) + '</td>' + COLS.map(c => '<td>' + fmt(x.p[c[0]] || 0) + '</td>').join('') + '</tr>').join('') +
+        (rows.length > 1 ? '<tr><td><b>Totale</b></td>' + COLS.map(c => '<td><b>' + fmt(tot[c[0]] || 0) + '</b></td>').join('') + '</tr>' : '') +
+        '</tbody></table></div>' +
+        (cur.length ? '<h4 style="margin:16px 0 6px;">Curiosità</h4><div class="cur">' + cur.map(k => '<div><span>' + esc(k) + '</span><span>' + fmt(tot.curiosita[k]) + '</span></div>').join('') + '</div>' : '') +
+        '</div>';
+      const close = () => bg.remove();
+      bg.onclick = e => { if (e.target === bg) close(); };
+      bg.querySelector('.close').onclick = close;
+      document.body.appendChild(bg);
+    }
+
+    async function init() {
+      let r = 0; while ((!window.auth || !window.db) && r++ < 50) await new Promise(x => setTimeout(x, 100));
+      window.auth.onAuthStateChanged(async (user) => {
+        if (!user) { location.href = 'auth.html?redirect=' + encodeURIComponent(location.href); return; }
+        try {
+          lid = await Season.leagueId();
+          const S = await Season.load();
+          const archived = (await SeasonArchive.list(lid)).filter(a => a.stato === 'verificato' || a.stato === 'copiato')
+            .sort((a, b) => String(b.id).localeCompare(String(a.id)));
+          seasons = [{ id: S.id, label: S.label, live: true }].concat(archived.filter(a => a.id !== S.id).map(a => ({ id: a.id, label: a.label || a.id })));
+        } catch (e) {
+          console.warn('[archivio-athletic]', e && (e.code || e.message));
+          $('view').innerHTML = '<p class="empty">Archivio non disponibile al momento.</p>'; return;
+        }
+        $('seasons').innerHTML = seasons.map(s => '<button data-id="' + esc(s.id) + '">' + esc(s.label) + '</button>').join('') +
+          (seasons.length > 1 ? '<button data-id="all">Tutte le stagioni</button>' : '');
+        document.querySelectorAll('#seasons button').forEach(b => b.onclick = () => show(b.dataset.id));
+        // Si apre sulla stagione in corso se ha già dati, altrimenti sull'ultima archiviata
+        let start = seasons[0].id;
+        try { const d = await load(seasons[0]); if (!Object.keys(d.stats.players).length && seasons[1]) start = seasons[1].id; } catch (e) {}
+        const want = new URLSearchParams(location.search).get('stagione');
+        show(want && (want === 'all' || seasons.some(s => s.id === want)) ? want : start);
+      });
+    }
+    init();
+  </script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/mobile-menu.js?v=20260925c"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/theme.js?v=20260925b"></script>
+</body>
+</html>

@@ -64,7 +64,7 @@ document.head.appendChild(authGuardScript);
 
 // Load league-selector (dropdown navbar)
 const leagueSelectorScript = document.createElement('script');
-leagueSelectorScript.src = 'resources/league-selector.js?v=20260925c';
+leagueSelectorScript.src = 'resources/league-selector.js?v=20260925h';
 document.head.appendChild(leagueSelectorScript);
 
 // Load mobile-header-fix (forza header identico a home su tutte le pagine mobile)

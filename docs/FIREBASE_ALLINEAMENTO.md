@@ -1,6 +1,6 @@
 # Firebase ↔ locale: cosa vive dove e come si tiene allineato
 
-Allineato a: D107
+Allineato a: D111
 
 **Regola (decisa dall'utente il 24/09/2026)**: tutto ciò che si fa su
 Firebase deve avere la sua copia in questo progetto. Si scrive PRIMA qui,
@@ -11,7 +11,7 @@ va riportato qui subito.
 
 | Cosa | Su Firebase | Copia locale (fonte) | Stato |
 |---|---|---|---|
-| Regole di sicurezza Firestore | Console → Firestore → Regole | `firestore.rules` | **allineato**: ultima pubblicazione 25/09/2026 (blocco "Partita live", D095) |
+| Regole di sicurezza Firestore | Console → Firestore → Regole | `firestore.rules` | **allineato**: pubblicate dall'utente il 25/09/2026 sera (scelta allenatore + `coachLocked`, D108) |
 | Indici Firestore | Console → Firestore → Indici | *(manca; copia storica nov. 2025 in `docs/firebase-storico/`)* | da esportare; noto 1: `notifications` (userId ↑ + createdAt ↓, D037) |
 | Catalogo bonus/malus | `leagues/{lega}/rules` | `resources/rules.json` (seme per leghe nuove) | allineato al seme; le leghe esistenti si modificano da `admin-rules.html` |
 | Giocatori / allenatori | `leagues/{lega}/players`, `coaches` | `resources/players.json`, `coaches.json` | seme locale |

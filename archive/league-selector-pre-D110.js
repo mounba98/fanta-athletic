@@ -376,20 +376,6 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
   /**
    * Renderizza selettore in navbar
    */
-  // D110: su telefono il selettore va NELL'intestazione, tra il titolo e il
-  // badge della stagione (#currentLeagueBadge, creato da navbar.js magari dopo):
-  // si riprova per qualche secondo, altrimenti resta sotto l'intestazione come prima.
-  function placeInHeader(host, tries) {
-    tries = tries || 0;
-    const badge = document.querySelector('header h1 #currentLeagueBadge');
-    if (badge && badge.parentNode) {
-      badge.parentNode.insertBefore(host, badge);
-      host.classList.add('in-header');
-      return;
-    }
-    if (tries < 30) setTimeout(function() { placeInHeader(host, tries + 1); }, 150);
-  }
-
   function renderLeagueSelector() {
     // Anche senza permessi, mostra selettore in modalità disabled
     const hasPermissionDenied = window.__LEAGUE_PERMISSION_DENIED__;
@@ -410,7 +396,6 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
           } else {
             document.body.insertBefore(host, document.body.firstChild);
           }
-          placeInHeader(host);
         }
         host.innerHTML = '<div style="padding:8px 12px;background:rgba(148,163,184,0.1);border-radius:8px;color:var(--muted);font-size:13px;text-align:center;">Modalità legacy (nessuna lega selezionata)</div>';
         return;
@@ -451,7 +436,6 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
         } else {
           document.body.insertBefore(host, document.body.firstChild);
         }
-        placeInHeader(host);
       }
       targetContainer = host;
     } else {
@@ -554,15 +538,14 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
         const isActive = currentLeague && league.id === currentLeague.id;
         const teamCount = league.stats?.teamCount || league.teamCount || 0;
         const isMulti = teamCount > 1;
-        // D111: lega → stagione → competizioni (docs/GLOSSARIO_LEGHE.md): qui si mostra la stagione
-        const typeLabel = isMulti ? 'Stagione non impostata' : 'Squadra unica';
+        const typeLabel = isMulti ? '🏆 Campionato' : '👤 Squadra unica';
         
         leaguesHTML += `
           <div class="league-dropdown-item ${isActive ? 'active' : ''}" data-league-id="${league.id}">
             <span class="league-item-icon">${getLeagueIcon(league)}</span>
             <div class="league-item-info">
               <div class="league-item-name">${league.name}</div>
-              <div class="league-item-meta">${league.season ? `Stagione ${league.season}` : typeLabel}</div>
+              <div class="league-item-meta">${typeLabel}${league.season ? ` • ${league.season}` : ''}</div>
             </div>
             ${isActive ? '<span class="league-item-check">✓</span>' : ''}
           </div>
@@ -660,21 +643,6 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
       }
       const selector = btn.closest('.league-selector');
       if (!selector) return;
-      // D110: selettore nell'intestazione → la tendina esce dall'intestazione (che
-      // "intrappola" gli elementi fissi) e si apre a tutta larghezza sotto di essa
-      if (btn.closest('.league-selector-mobile-host.in-header')) {
-        if (dropdown.parentNode !== document.body) document.body.appendChild(dropdown);
-        const hb = document.querySelector('header') ? document.querySelector('header').getBoundingClientRect().bottom : 60;
-        dropdown.style.position = 'fixed';
-        dropdown.style.left = '12px';
-        dropdown.style.right = '12px';
-        dropdown.style.top = Math.round(hb + 6) + 'px';
-        dropdown.style.width = 'auto';
-        dropdown.style.maxWidth = 'none';
-        dropdown.style.maxHeight = '70vh';
-        dropdown.style.zIndex = '10050';
-        return;
-      }
       dropdown.style.position = 'absolute';
       dropdown.style.left = '0';
       dropdown.style.right = '0';
@@ -792,8 +760,6 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
   function updateLeagueSelectorContent() {
     const selector = document.getElementById('leagueSelector');
     if (!selector) return;
-    // tendina spostata nella pagina (D110): si toglie prima di ricrearla, niente doppioni
-    document.querySelectorAll('body > .league-dropdown').forEach(n => n.remove());
     
     const leagueName = currentLeague ? currentLeague.name : 'Nessuna lega';
     const leagueIcon = currentLeague ? getLeagueIcon(currentLeague) : '📋';
@@ -1279,19 +1245,6 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
       }
     `;
     
-    // D110: pillola compatta nell'intestazione (stile del badge stagione)
-    styles.textContent += `
-      .league-selector-mobile-host.in-header { flex: 0 0 auto !important; width: auto !important; max-width: none !important; margin: 0 6px 0 4px !important; padding: 0 !important; display: inline-flex !important; align-items: center; }
-      .league-selector-mobile-host.in-header .league-selector-mobile { width: auto; padding: 0; margin: 0; z-index: 1200; }
-      /* D110b: solo la coppa in un cerchietto (il nome della lega è nella tendina) */
-      :root .league-selector-mobile-host.in-header .league-selector-btn.league-selector-btn {
-        width: 26px; height: 26px; min-width: 26px; padding: 0; gap: 0; justify-content: center; align-items: center;
-        border-radius: 50%; background: rgba(255,255,255,.14); border: 1px solid rgba(250,204,21,.55); box-shadow: none;
-      }
-      .league-selector-mobile-host.in-header .league-icon { font-size: 13px; line-height: 1; margin: 0; }
-      .league-selector-mobile-host.in-header .league-name,
-      .league-selector-mobile-host.in-header .dropdown-arrow { display: none !important; }
-    `;
     document.head.appendChild(styles);
   }
   

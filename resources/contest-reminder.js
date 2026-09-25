@@ -62,12 +62,14 @@
     const a = document.createElement('a');
     a.id = 'contestReminder';
     a.href = state === 'open' || state === 'voted' ? 'contest.html' : 'classifiche.html#fazioni';
-    a.style.cssText = 'display:block;margin:12px 0;padding:16px;border-radius:16px;' +
-      'background:linear-gradient(135deg,#920100,#0c0f6d);color:#fff;text-decoration:none;' +
-      'box-shadow:0 4px 14px rgba(0,0,0,.3);';
+    // D109: stesso stile della card "La Mia Squadra" (margini, colori, ombra) se siamo in Home
+    if (document.getElementById('myTeamCard')) a.className = 'home-highlight-card';
+    else a.style.cssText = 'margin:12px 0;padding:16px;border-radius:16px;' +
+      'background:linear-gradient(135deg,#920100,#0c0f6d);box-shadow:0 4px 14px rgba(0,0,0,.3);';
+    a.style.display = 'block'; a.style.color = '#fff'; a.style.textDecoration = 'none';
     const score = pts.curva === null ? '' :
-      '<div style="display:flex;justify-content:space-between;margin:10px 0 2px;font-weight:800;font-size:22px;">' +
-      '<span>' + pts.curva + '</span><span style="font-size:12px;font-weight:600;opacity:.8;align-self:center;">punti mini-gioco</span><span>' + pts.piana + '</span></div>';
+      '<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin:10px 0 2px;font-weight:800;font-size:22px;">' +
+      '<span>' + pts.curva + '</span><span style="font-size:12px;font-weight:600;opacity:.8;">punti mini-gioco</span><span style="text-align:right;">' + pts.piana + '</span></div>';
     let line = 'Il mini-gioco parte con la prossima partita • tocca per la classifica';
     if (next) {
       const opp = esc((next.cal.homeTeam || '') + ' - ' + (next.cal.awayTeam || ''));
@@ -81,8 +83,9 @@
         line = 'Prossima: ' + opp + ' • si vota da ' + esc(hh);
       }
     }
-    a.innerHTML = '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;">' +
-      '<span>Curva Morello</span><span>vs</span><span>Piana</span></div>' + score +
+    // "VS" esattamente al centro anche se i due nomi hanno lunghezze diverse (D109)
+    a.innerHTML = '<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;">' +
+      '<span>Curva Morello</span><span style="padding:0 10px;">vs</span><span style="text-align:right;">Piana</span></div>' + score +
       '<div style="font-size:13px;opacity:.95;margin-top:8px;">' + line + '</div>';
     const anchor = document.getElementById('myTeamCard');
     if (anchor) anchor.insertAdjacentElement('afterend', a);

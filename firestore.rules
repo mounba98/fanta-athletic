@@ -37,6 +37,12 @@ service cloud.firestore {
              request.resource.data.get('fazione', null) != resource.data.fazione;
     }
 
+    // Vero se si tenta di cambiare l'allenatore già scelto (D108: solo admin)
+    function coachLocked() {
+      return ('coach_ids' in resource.data) && resource.data.coach_ids.size() > 0 &&
+             request.resource.data.get('coach_ids', null) != resource.data.coach_ids;
+    }
+
     // Vero se la fazione, quando presente, è un valore valido
     function factionValid() {
       return !('fazione' in request.resource.data) ||
@@ -65,7 +71,7 @@ service cloud.firestore {
         allow update: if isSignedIn() && (
           request.auth.uid in get(/databases/$(database)/documents/leagues/$(leagueId)).data.admins ||
           isAdmin() ||
-          (!factionLocked() && factionValid() && (
+          (!factionLocked() && !coachLocked() && factionValid() && (
             request.auth.uid == resource.data.owner ||
             ((!('owner' in resource.data) || resource.data.owner == null || resource.data.owner == '') &&
              request.resource.data.owner == request.auth.uid)
@@ -74,6 +80,13 @@ service cloud.firestore {
           (!('fazione' in resource.data) &&
            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fazione']) &&
            request.resource.data.fazione in ['curva', 'piana'] &&
+           isLeagueMember(leagueId) &&
+           string(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.team_index) == teamId) ||
+          // un membro della squadra può scegliere l'allenatore UNA volta, se non c'è ancora (D108)
+          ((!('coach_ids' in resource.data) || resource.data.coach_ids.size() == 0) &&
+           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coach_ids']) &&
+           request.resource.data.coach_ids is list &&
+           request.resource.data.coach_ids.size() == 1 &&
            isLeagueMember(leagueId) &&
            string(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.team_index) == teamId)
         );

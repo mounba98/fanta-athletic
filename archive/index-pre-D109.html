@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanta Athletic - Home</title>
+  <script src="resources/theme-preload.js?v=20260925b"></script>
+  <meta name="description" content="Gestisci giocatori, allenatori e tifosi della tua Fanta Athletic." />
+  <meta name="theme-color" content="#920100" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Athletic 2018" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
+  <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
+  <script src="resources/mobile-detect.js?v=20260920-final"></script>
+  <link rel="apple-touch-startup-image" href="resources/logo.png" />
+  <style>
+    @media (max-width: 640px){ .nav a.m-hide { display: none; } }
+    .grid { 
+      display: grid; 
+      width: 100%;
+      gap: clamp(18px, 2.8vw, 28px);
+      padding: clamp(18px, 3.2vw, 36px);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: stretch;
+    }
+    @media (min-width: 1600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: clamp(22px, 2.6vw, 34px);
+      }
+    }
+    @media (max-width: 640px) { 
+      .grid { 
+        padding: 18px 12px;
+        gap: 14px;
+      } 
+    }
+    
+    .section { 
+      background: var(--card); 
+      padding: clamp(22px, 2.2vw, 30px);
+      border-radius: 16px; 
+      box-shadow: var(--shadow); 
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-align: center;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .section:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(15,23,42,0.16); }
+    .section h2 { color: var(--primary); margin-top: 0; font-size: clamp(20px, 1.6vw, 24px); }
+    .section p { font-size: clamp(13px, 1.2vw, 15px); color: var(--muted); margin: 10px 0; }
+    .home-main { 
+      padding: clamp(12px, 2.4vw, 28px) clamp(10px, 3vw, 28px) 80px; 
+      margin-top: 0; 
+      width: min(100%, var(--layout-max-wide)); 
+    }
+    @media (max-width: 768px) {
+      .home-main { padding: 14px 14px 80px; }
+    }
+    
+    /* Fix card squadra nascosta sotto navbar */
+    #myTeamCard {
+      position: relative;
+      z-index: 1;
+    }
+    #myTeamCard { width: 100%; }
+    @media (max-width: 600px) {
+      #myTeamCard { padding: 18px !important; }
+      #myTeamName { font-size: 20px !important; }
+    .page-with-ads { display: flex; flex-direction: column; gap: 24px; }
+    .home-content { display: flex; flex-direction: column; gap: 24px; }
+    .ad-slot { display: none; }
+    @media (min-width: 1200px) {
+      .page-with-ads { display: grid; grid-template-columns: 220px minmax(0, 1fr) 220px; gap: 32px; align-items: start; }
+      .home-content { order: 2; }
+      .ad-slot { display: flex; position: sticky; top: 120px; justify-content: center; align-items: center; background: var(--card); border-radius: 20px; min-height: 420px; padding: 24px; box-shadow: var(--shadow); color: var(--muted); font-weight: 600; text-align: center; }
+      .ad-slot-left { order: 1; }
+      .ad-slot-right { order: 3; }
+    }
+    }
+    .recent-results-card {
+      max-width: 820px;
+      margin: 0 auto 20px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .recent-results-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .recent-results-header h2 {
+      text-align: center;
+      width: 100%;
+    }
+    .recent-results-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    .recent-result-item {
+      border-radius: 14px;
+      padding: 16px;
+      background: linear-gradient(145deg, rgba(12,15,109,0.12), rgba(146,1,0,0.1));
+      border: 1px solid rgba(12,15,109,0.18);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .recent-result-round {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(30,41,59,0.65);
+    }
+    .recent-result-points {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .recent-result-meta {
+      font-size: 12px;
+      color: rgba(30,41,59,0.6);
+    }
+    .recent-results-placeholder {
+      text-align: center;
+      padding: 18px;
+      font-size: 13px;
+      color: rgba(30,41,59,0.55);
+      background: rgba(148,163,184,0.15);
+      border-radius: 12px;
+    }
+    @media (max-width: 768px) {
+      .recent-results-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      .recent-result-item {
+        padding: 10px 8px;
+        border-radius: 10px;
+        gap: 4px;
+      }
+      .recent-result-round {
+        font-size: 11px;
+      }
+      .recent-result-points {
+        font-size: 20px;
+      }
+      .recent-result-meta {
+        display: none !important;
+      }
+      .recent-results-card { 
+        padding: 12px; 
+      }
+    }
+    @media (max-width: 480px) {
+      .recent-results-grid {
+        gap: 6px;
+      }
+      .recent-result-item {
+        padding: 8px 6px;
+        border-radius: 8px;
+      }
+      .recent-result-round {
+        font-size: 10px;
+      }
+      .recent-result-points {
+        font-size: 18px;
+      }
+    }
+    @media (max-width: 360px) {
+      .recent-result-item {
+        padding: 6px 4px;
+      }
+      .recent-result-round {
+        font-size: 9px;
+      }
+      .recent-result-points {
+        font-size: 16px;
+      }
+    }
+    :root.dark .recent-results-card {
+      background: rgba(15,23,42,0.75);
+      box-shadow: 0 12px 32px rgba(2,6,23,0.6);
+      border: 1px solid rgba(12,15,109,0.25);
+    }
+    :root.dark .recent-result-item {
+      background: linear-gradient(155deg, rgba(12,15,109,0.28), rgba(146,1,0,0.24));
+      border-color: rgba(129,140,248,0.32);
+    }
+    :root.dark .recent-result-round {
+      color: rgba(226,232,240,0.7);
+    }
+    :root.dark .recent-result-points {
+      color: #f8fafc;
+    }
+    :root.dark .recent-result-meta {
+      color: rgba(203,213,225,0.75);
+    }
+    :root.dark .recent-results-placeholder {
+      background: rgba(12,15,109,0.18);
+      color: rgba(226,232,240,0.75);
+    }
+    .top-players-section {
+      max-width: 820px;
+      margin: 0 auto 20px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .top-players-section h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+    .top-players-subtitle {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .top-players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .top-player-card-home {
+      border-radius: 14px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(148,163,184,0.15), rgba(12,15,109,0.12));
+      border: 1px solid rgba(12,15,109,0.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .top-player-card-home.rank-1 {
+      background: linear-gradient(135deg,#fde047 0%,#facc15 45%,#facc15 100%);
+      border: none;
+      color: #1f2937;
+    }
+    .top-player-card-home.rank-2 {
+      background: linear-gradient(135deg,#e2e8f0 0%,#cbd5f5 100%);
+      border: none;
+      color: #0f172a;
+    }
+    .top-player-card-home.rank-3 {
+      background: linear-gradient(135deg,#fecaca 0%,#fca5a5 100%);
+      border: none;
+      color: #111827;
+    }
+    .top-player-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .top-player-rank-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      background: rgba(15,23,42,0.15);
+      color: inherit;
+      flex-shrink: 0;
+    }
+    .top-player-card-home.rank-1 .top-player-rank-badge,
+    .top-player-card-home.rank-2 .top-player-rank-badge,
+    .top-player-card-home.rank-3 .top-player-rank-badge {
+      background: rgba(255,255,255,0.25);
+    }
+    .top-player-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(15,23,42,0.18);
+      border: 2px solid rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .top-player-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .top-player-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+    .top-player-name {
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .top-player-meta {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(15,23,42,0.65);
+    }
+    .top-player-card-home.rank-1 .top-player-meta,
+    .top-player-card-home.rank-2 .top-player-meta,
+    .top-player-card-home.rank-3 .top-player-meta {
+      color: rgba(15,23,42,0.75);
+    }
+    .top-player-points {
+      font-size: 28px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .top-players-placeholder {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 12px;
+      background: rgba(148,163,184,0.12);
+      border-radius: 12px;
+      width: 100%;
+    }
+    :root.dark .top-players-section {
+      background: rgba(15,23,42,0.82);
+      box-shadow: 0 20px 40px rgba(2,6,23,0.55);
+      border: 1px solid rgba(12,15,109,0.28);
+    }
+    :root.dark .top-players-placeholder {
+      background: rgba(12,15,109,0.18);
+      color: rgba(226,232,240,0.75);
+    }
+    /* Solo le card SENZA podio (dal 4° posto in poi) prendono lo sfondo
+       scuro neutro — le prime 3 mantengono lo sfondo oro/argento/bronzo
+       con testo scuro sopra, altrimenti in tema scuro lo sfondo veniva
+       sovrascritto lasciando il testo scuro illeggibile (2026-09-20). */
+    :root.dark .top-player-card-home:not(.rank-1):not(.rank-2):not(.rank-3) {
+      background: linear-gradient(135deg, rgba(148,163,184,0.22), rgba(12,15,109,0.18));
+      border-color: rgba(148,163,184,0.25);
+      color: #f8fafc;
+    }
+    :root.dark .top-player-card-home:not(.rank-1):not(.rank-2):not(.rank-3) .top-player-meta {
+      color: rgba(203,213,225,0.75);
+    }
+    .match-summary-card {
+      background: linear-gradient(145deg, rgba(12, 15, 109, 0.12), rgba(146, 1, 0, 0.12));
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+      margin: 0 auto 24px;
+      max-width: 960px;
+      border: 1px solid rgba(12, 15, 109, 0.16);
+    }
+    .match-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .match-summary-header h2 {
+      margin: 0;
+      font-size: 22px;
+      color: #1e293b;
+    }
+    #lastMatchLabel {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(30,41,59,0.7);
+    }
+    #lastMatchLabel .match-summary-team {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111827;
+    }
+    #lastMatchLabel .match-summary-giornata {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(12,15,109,0.15);
+      color: #312e81;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .match-summary-body {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(280px, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .match-summary-total {
+      background: linear-gradient(145deg, rgba(12,15,109,0.18), rgba(146,1,0,0.14));
+      border-radius: 20px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #0f172a;
+      border: 1px solid rgba(12,15,109,0.18);
+      min-height: 190px;
+    }
+    .match-summary-total-label {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,0.6);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .match-summary-total-value {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .match-summary-total-meta {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .match-summary-total-meta .meta-label {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(15,23,42,0.55);
+    }
+    .match-summary-total-meta .meta-text {
+      font-size: 13px;
+      color: rgba(15,23,42,0.75);
+      line-height: 1.45;
+    }
+    .match-summary-breakdown {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(150px, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+    .match-pill {
+      background: rgba(255,255,255,0.72);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      color: #1e293b;
+      border: 1px solid rgba(12,15,109,0.08);
+    }
+    .match-pill span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(30,41,59,0.65);
+    }
+    .match-pill strong {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .match-summary-footer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .match-summary-footer button {
+      background: linear-gradient(135deg, #0c0f6d, #920100);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(12,15,109,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .match-summary-footer button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 28px rgba(12,15,109,0.35);
+    }
+    .match-summary-empty {
+      color: rgba(30,41,59,0.7);
+      font-size: 14px;
+    }
+    .home-highlight-card {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      /* D109: rosso a sinistra, blu a destra, come la card Curva vs Piana sotto */
+      background: linear-gradient(135deg, rgba(146,1,0,1) 0%, rgba(12,15,109,1) 100%);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .home-highlight-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+    }
+    :root.dark .home-highlight-card {
+      background: linear-gradient(135deg, rgba(146,1,0,0.9) 0%, rgba(12,15,109,0.9) 100%);
+      box-shadow: 0 18px 36px rgba(2,6,23,0.55);
+    }
+    @media (max-width: 600px) {
+      .home-highlight-card { padding: 18px; }
+    }
+    @media (max-width: 768px) {
+      .match-summary-card {
+        margin: 0 0 20px;
+        padding: 24px 20px;
+      }
+      .match-summary-body {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .match-summary-breakdown {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+      }
+      .match-summary-footer {
+        justify-content: center;
+      }
+      .match-summary-footer button {
+        width: 100%;
+      }
+    }
+    :root.dark .match-summary-card {
+      background: linear-gradient(160deg, rgba(12,18,33,0.95), rgba(30,41,59,0.9));
+      border: 1px solid rgba(12,15,109,0.32);
+      box-shadow: 0 26px 55px rgba(2,6,23,0.65);
+    }
+    :root.dark .match-summary-header h2 {
+      color: #e2e8f0;
+    }
+    :root.dark #lastMatchLabel {
+      color: rgba(226,232,240,0.75);
+    }
+    :root.dark #lastMatchLabel .match-summary-team {
+      color: #f8fafc;
+    }
+    :root.dark #lastMatchLabel {
+      color: rgba(226,232,240,0.85);
+    }
+    :root.dark #lastMatchLabel .match-summary-giornata {
+      background: rgba(12,15,109,0.35);
+      color: #f8fafc;
+    }
+    :root.dark .match-summary-total {
+      background: linear-gradient(165deg, rgba(12,15,109,0.35), rgba(146,1,0,0.28));
+      color: #f8fafc;
+      border: 1px solid rgba(129,140,248,0.35);
+    }
+    :root.dark .match-summary-total-label {
+      color: rgba(226,232,240,0.7);
+    }
+    :root.dark .match-summary-total-meta .meta-label {
+      color: rgba(226,232,240,0.78);
+    }
+    :root.dark .match-summary-total-meta .meta-text {
+      color: rgba(203,213,225,0.8);
+    }
+    :root.dark .match-pill {
+      background: rgba(15,23,42,0.6);
+      color: #e2e8f0;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: none;
+    }
+    :root.dark .match-pill span {
+      color: rgba(148,163,184,0.85);
+    }
+    :root.dark .match-summary-footer button {
+      box-shadow: 0 16px 34px rgba(12,15,109,0.45);
+    }
+    /* PWA install prompt gestito da pwa-install.js */
+  </style>
+  <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/resources/app-icons/favicon-48.png" />
+  <link rel="apple-touch-icon" href="/resources/app-icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
+</head>
+<body class="page-home" data-disable-mobile-dashboard="true">
+  <header>
+    <a class="logo-home" href="index.html" aria-label="Home">
+      <img src="resources/logo.png" alt="Fanta Athletic" />
+    </a>
+    <h1>Home</h1>
+  </header>
+
+  <main class="home-main">
+    <!-- La Mia Squadra Card -->
+    <div id="myTeamCard" class="home-highlight-card" onclick="window.location.href='formazioni.html'">
+      <div style="display: flex; align-items: center; justify-content: space-between; color: white;">
+        <div>
+          <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">La Mia Squadra</div>
+          <div id="myTeamName" style="font-size: 24px; font-weight: 800;">Caricamento...</div>
+        </div>
+        <div style="font-size: 48px;">⚽</div>
+      </div>
+    </div>
+
+    <!-- Ultimo Risultato -->
+    <section id="lastMatchCard" class="match-summary-card" aria-live="polite">
+      <div class="match-summary-header">
+        <h2>Ultimo Risultato</h2>
+        <div id="lastMatchLabel" style="font-size:14px;font-weight:600;color:rgba(30,41,59,0.65);">Caricamento…</div>
+      </div>
+      <div id="lastMatchContent" class="match-summary-body">
+        <div class="match-pill">
+          <span>Stato</span>
+          <strong class="match-summary-empty">In attesa dati</strong>
+        </div>
+      </div>
+      <div class="match-summary-footer" style="display:none;" id="lastMatchAction">
+        <button type="button" id="lastMatchDetailBtn">Dettaglio giornata</button>
+      </div>
+    </section>
+
+    <section class="recent-results-card" aria-live="polite">
+      <div class="recent-results-header">
+        <h2>Ultimi 3 risultati</h2>
+      </div>
+      <div id="recentResults" class="recent-results-grid">
+        <div class="recent-results-placeholder">Caricamento…</div>
+      </div>
+    </section>
+    
+    <section class="top-players-section" id="topPlayersCard" aria-live="polite">
+      <div style="display:flex; align-items:center; justify-content: space-between; gap: 12px;">
+        <h2>Top giocatori settimana</h2>
+        <button type="button" class="btn btn-secondary" id="refreshTopPlayersBtn" style="padding:8px 12px; font-size:13px;">Aggiorna</button>
+      </div>
+      <p class="top-players-subtitle" id="topPlayersSubtitle">Caricamento…</p>
+      <div id="topPlayersList" class="top-players-grid">
+        <div class="top-players-placeholder">Caricamento…</div>
+      </div>
+    </section>
+    
+    <!-- Classifiche: blocco centrale unico -->
+    <section class="section" style="max-width: 800px; margin: 0 auto 20px; min-height: 480px; display: flex; flex-direction: column;">
+      <h2>Classifica</h2>
+      <p style="margin-bottom: 16px;">TOP 5 della tua lega</p>
+      <div id="classifichePreview" style="flex: 1; margin: 0 0 16px; font-size: 14px; overflow-y: auto;">
+        <div style="text-align: center; color: var(--muted); padding: 20px;">⏳ Caricamento...</div>
+      </div>
+      <a href="classifiche.html" class="btn" style="margin-top: auto;">Vai alle Classifiche</a>
+    </section>
+    
+    <!-- Grid card secondarie: 3 colonne fisse -->
+    <!-- Sezioni rapide -->
+    <div class="home-cards">
+      <style>
+        .home-cards {
+          max-width: 1400px;
+          margin: 20px auto 0;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          grid-auto-rows: 1fr;
+        }
+        .home-cards .section {
+          display: flex;
+          flex-direction: column;
+          min-height: 100%;
+        }
+        .home-cards .section .btn {
+          margin-top: auto;
+        }
+        @media (max-width: 1024px) {
+          .home-cards { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        }
+        @media (max-width: 640px) {
+          .home-cards { grid-template-columns: 1fr; gap: 16px; }
+        }
+      </style>
+
+      <section class="section">
+        <h2>Store Ufficiale</h2>
+        <p>Felpe, magliette, sticker e gadget ufficiali Athletic 2018.</p>
+        <a href="store.html" class="btn">Visita lo Store</a>
+      </section>
+
+      <section class="section">
+        <h2>Formazioni</h2>
+        <p>Gestisci la formazione della tua squadra.</p>
+        <a href="formazioni.html" class="btn">Vai alle Formazioni</a>
+      </section>
+
+      <section class="section">
+        <h2>Squadre</h2>
+        <p>Visualizza info e statistiche delle squadre.</p>
+        <a href="squadre.html" class="btn">Vai alle Squadre</a>
+      </section>
+
+      <section class="section">
+        <h2>Giornate</h2>
+        <p>Inserisci i punteggi delle giornate.</p>
+        <a href="matchday.html" class="btn">Vai alle Giornate</a>
+      </section>
+
+      <section class="section">
+        <h2>Asta</h2>
+        <p>Partecipa all'asta per acquistare giocatori.</p>
+        <a href="asta.html" class="btn">Vai all'Asta</a>
+      </section>
+
+      <section class="section">
+        <h2>Bacheca</h2>
+        <p>Trash talk, meme e goliardate varie.</p>
+        <a href="bacheca.html" class="btn">Vai alla Bacheca</a>
+      </section>
+
+      <section class="section">
+        <h2>Profilo</h2>
+        <p>Gestisci il tuo profilo e le impostazioni.</p>
+        <a href="profile.html" class="btn">Vai al Profilo</a>
+      </section>
+
+      <section class="section">
+        <h2>Statistiche</h2>
+        <p>Analizza le statistiche avanzate.</p>
+        <a href="statistiche.html" class="btn">Vai alle Statistiche</a>
+      </section>
+
+      <section class="section">
+        <h2>Calendario</h2>
+        <p>Visualizza calendario partite e scontri.</p>
+        <a href="calendario.html" class="btn">Vai al Calendario</a>
+      </section>
+    </div>
+  </main>
+
+  <!-- Install Prompt gestito da pwa-install.js -->
+
+
+  <script src="resources/firebase-app-compat.js"></script>
+  <script src="resources/firebase-auth-compat.js"></script>
+  <script src="resources/firebase-firestore-compat.js"></script>
+  <script src="resources/firebase-storage-compat.js"></script>
+  <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script>
+    // Verifica che Firebase sia caricato prima di inizializzare
+    if (typeof firebase === 'undefined') {
+      console.error('❌ Firebase SDK non caricato! Verifica connessione internet.');
+      // Mostra messaggio all'utente
+      document.addEventListener('DOMContentLoaded', function() {
+        const errorMsg = document.createElement('div');
+        errorMsg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#920100;color:white;padding:12px;text-align:center;z-index:10000;font-weight:bold;';
+        errorMsg.textContent = '⚠️ Errore caricamento Firebase. Verifica connessione internet e ricarica la pagina.';
+        document.body.appendChild(errorMsg);
+      });
+    } else {
+    // Init Firebase IMMEDIATAMENTE
+      try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(window.firebaseConfig);
+    }
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    window.storage = firebase.storage();
+        console.log('✅ Firebase inizializzato correttamente');
+      } catch (e) {
+        console.error('❌ Errore inizializzazione Firebase:', e);
+        if (window.errorLogger) {
+          window.errorLogger.log('firebase_init_error', e);
+        }
+      }
+    }
+  </script>
+  <script src="resources/firebase.js?v=20260925"></script>
+  <script src="resources/feature-flags.js?v=20260920-final"></script>
+
+  <script>
+
+    // PWA Install gestito da pwa-install.js
+
+    // Registra Service Worker solo fuori da localhost
+    (function manageServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+      const unregisterAll = async () => {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          regs.forEach(reg => reg.unregister());
+        } catch (err) {
+          console.warn('Errore deregistrazione Service Worker:', err);
+        }
+      };
+      if (isLocalhost) {
+        unregisterAll();
+        return;
+      }
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registrato'))
+        .catch(err => console.log('Errore Service Worker:', err));
+    })();
+
+    // Il login/menù utente è gestito da navbar.js e auth-ui.js
+  </script>
+  <script src="resources/app-init.js?v=20260925c"></script>
+  <script src="resources/matchday-summary.js?v=20260920-final"></script>
+  <!-- dashboard-widgets.js RIMOSSO - causava duplicati -->
+  <script src="resources/push-notifications.js"></script>
+  <script src="resources/pwa-install.js?v=20260920-final"></script>
+  <script src="resources/error-logger.js?v=20260920-final"></script>
+  <script src="resources/mobile-menu.js?v=20260925c"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/contest-scoring.js?v=20260925"></script>
+  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/provisional-badge.js?v=20260925"></script>
+  <script src="resources/faction.js?v=20260925f"></script>
+  <script src="resources/faction-gate.js?v=20260924"></script>
+  <script src="resources/contest-reminder.js?v=20260925g"></script>
+  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/mobile-dashboard.js?v=20260920-final"></script>
+  <script src="resources/navbar-scroll-hide.js?v=20260920-final"></script>
+  <script src="resources/mobile-header-fix.js?v=20260925c"></script>
+  <script src="resources/theme.js?v=20260925b"></script>
+  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
+  <script src="resources/auth-ui.js?v=20260920-final"></script>
+  <script src="resources/league-invite-modal.js?v=20260920-final"></script>
+  <script src="resources/league-selector.js?v=20260925c"></script>
+  <script src="resources/league-context.js?v=20260920-final"></script>
+  <script src="resources/notifications.js?v=20260925"></script>
+  <script src="resources/classifiche-preview.js?v=20260920-final"></script>
+  <script>
+    const leagueHelper = window.LeagueHelper || null;
+    const primaryDb = window.db || firebase.firestore();
+    // Mancava: usata più sotto come fallback quando il percorso multilega
+    // fallisce, ma non era mai stata dichiarata (ReferenceError silenzioso
+    // che interrompeva la ricerca della squadra dell'utente, 2026-09-20).
+    const legacyDb = window.__LEGACY_DB__ || firebase.firestore();
+
+    async function resolveLeagueId(timeoutMs = 7000) {
+      if (leagueHelper && typeof leagueHelper.waitForLeague === 'function') {
+        try {
+          const info = await leagueHelper.waitForLeague(timeoutMs);
+          if (info && info.id) return info.id;
+        } catch (err) {
+          console.warn('[home] Timeout attesa lega:', err?.message || err);
+        }
+      }
+      if (window.currentLeague && window.currentLeague.id) {
+        return window.currentLeague.id;
+      }
+      try {
+        const stored = localStorage.getItem('last_league_id');
+        if (stored) return stored;
+      } catch (_) {}
+      return null;
+    }
+
+    function getTeamDocRef(teamIndex, leagueId) {
+      if (leagueHelper && typeof leagueHelper.getLeagueDoc === 'function') {
+        const ref = leagueHelper.getLeagueDoc('teams', String(teamIndex), leagueId);
+        if (ref) return ref;
+      }
+      // ✅ USA SEMPRE MULTILEGA: leagues/{leagueId}/teams
+      if (leagueId) {
+        return primaryDb.collection(`leagues/${leagueId}/teams`).doc(String(teamIndex));
+      }
+      console.warn('[home] Nessun leagueId disponibile per getTeamDocRef');
+      return null;
+    }
+
+    let topPlayersLoading = false;
+    let lastTopPlayersState = { leagueId: null, giornataId: null };
+    let playersCatalogPromise = null;
+
+    function getPlayerDisplayName(info = {}) {
+      if (!info) return 'Giocatore';
+      if (info.nickname) return info.nickname;
+      if (info.nome_completo) return info.nome_completo;
+      if (info.name) return info.name;
+      if (info.cognome) return info.cognome;
+      if (info.player_id) return String(info.player_id);
+      return 'Giocatore';
+    }
+
+    function getInitials(name = '') {
+      const matches = String(name).trim().match(/\b\w/g) || [];
+      return matches.slice(0, 2).join('').toUpperCase() || 'NA';
+    }
+
+    function buildFallbackAvatar(initials, size = 60) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${Math.round(size * 0.18)}" fill="#1e3a8a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f8fafc" font-family="Arial, sans-serif" font-size="${Math.round(size * 0.38)}" font-weight="700">${initials}</text></svg>`;
+      return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    }
+
+    function resolvePlayerPhoto(info, fallbackInitials) {
+      let photo = info?.photo_url || info?.photoUrl || info?.photo || info?.image_url || info?.imageUrl || info?.avatar || info?.avatar_url || '';
+      if (photo && photo.includes('firebasestorage.googleapis.com') && !photo.includes('token=')) {
+        photo = '';
+      }
+      if (!photo) {
+        photo = buildFallbackAvatar(fallbackInitials);
+      }
+      return photo;
+    }
+
+    async function loadPlayersCatalog() {
+      if (!playersCatalogPromise) {
+        playersCatalogPromise = fetch('resources/players.json', { cache: 'no-store' })
+          .then(response => response.ok ? response.json() : { players: [] })
+          .then(data => {
+            const map = new Map();
+            (data.players || []).forEach(player => {
+              const id = String(player.player_id || player.id || '').trim();
+              if (id) {
+                map.set(id, player);
+              }
+            });
+            return map;
+          })
+          .catch(err => {
+            console.warn('[home] Impossibile caricare players.json', err);
+            return new Map();
+          });
+      }
+      return playersCatalogPromise;
+    }
+
+  let playerRulesMapPromise = null;
+
+  async function loadPlayerRulesMap() {
+    if (!playerRulesMapPromise) {
+      playerRulesMapPromise = (typeof window.loadRulesJSON === 'function'
+        ? window.loadRulesJSON()
+        : fetch('resources/rules.json', { cache: 'no-store' }).then(res => res.ok ? res.json() : { rules: [] })
+      ).then(data => {
+        const map = new Map();
+        (data.rules || []).forEach(rule => {
+          if (!rule || rule.soggetto !== 'Giocatore') return;
+          const id = String(rule.rule_id || rule.id || '').trim();
+          if (!id) return;
+          const valore = Number(rule.valore);
+          if (!Number.isFinite(valore)) return;
+          const input = (rule.input_type || rule.input || '').toLowerCase();
+          map.set(id, {
+            valore,
+            input: input === 'counter' ? 'counter' : 'toggle'
+          });
+        });
+        return map;
+      }).catch(err => {
+        console.warn('[home] Impossibile caricare rules.json', err);
+        return new Map();
+      });
+    }
+    return playerRulesMapPromise;
+  }
+
+  function normalizeSelectionValue(raw) {
+    if (raw === undefined || raw === null) return 0;
+    if (typeof raw === 'object') {
+      if (raw.value !== undefined) return raw.value;
+      if (raw.count !== undefined) return raw.count;
+      if (raw.qty !== undefined) return raw.qty;
+    }
+    return raw;
+  }
+
+  function getConvocatoBonus(raw) {
+    if (raw === undefined || raw === null) return 0;
+    if (typeof raw === 'number') return raw;
+    if (typeof raw === 'string') {
+      const numeric = Number(raw);
+      if (!Number.isNaN(numeric)) return numeric;
+      return raw === 'true' ? 1 : 0;
+    }
+    return raw ? 1 : 0;
+  }
+
+  function computePlayerPointsFromSelections(selections = {}, rulesMap = new Map()) {
+    let total = 0;
+    Object.entries(selections || {}).forEach(([rid, raw]) => {
+      if (rid === '__convocato') return;
+      const rule = rulesMap.get(rid);
+      if (!rule) return;
+      const value = normalizeSelectionValue(raw);
+      const inputType = rule.input || 'toggle';
+      let count = 0;
+      if (inputType === 'counter') {
+        count = Number(value) || 0;
+      } else {
+        if (typeof value === 'number') {
+          count = value ? 1 : 0;
+        } else {
+          count = value ? 1 : 0;
+        }
+      }
+      if (!Number.isFinite(count) || count === 0) return;
+      total += count * rule.valore;
+    });
+    total += getConvocatoBonus(selections.__convocato);
+    return total;
+  }
+
+    async function fetchLatestComputedDay(leagueId) {
+      const results = [];
+      const path = leagueId ? `leagues/${leagueId}/days` : 'days';
+      let snap = null;
+      try {
+        snap = await primaryDb.collection(path).get();
+      } catch (error) {
+        console.warn('[home] impossibile leggere days multilega:', error);
+        if (leagueId) {
+          try {
+            snap = await legacyDb.collection('days').get();
+          } catch (legacyErr) {
+            console.warn('[home] impossibile leggere days legacy:', legacyErr);
+          }
+        }
+      }
+
+      if (!snap || snap.empty) {
+        return null;
+      }
+
+      snap.docs.forEach(doc => {
+        const data = doc.data() || {};
+        const computed = data.status === 'computed' || data.computed === true;
+        if (!computed) return;
+        const num = Number(String(doc.id).replace(/[^0-9]/g, '')) || 0;
+        const updatedAt = (data.updatedAt && typeof data.updatedAt.toMillis === 'function')
+          ? data.updatedAt.toMillis()
+          : (doc.updateTime && typeof doc.updateTime.toMillis === 'function')
+            ? doc.updateTime.toMillis()
+            : 0;
+        results.push({ id: doc.id, num, updatedAt });
+      });
+
+      if (!results.length) {
+        return null;
+      }
+
+      results.sort((a, b) => (b.num - a.num) || (b.updatedAt - a.updatedAt));
+      const latest = results[0];
+      const label = Number.isFinite(latest.num) && latest.num > 0 ? `Giornata ${latest.num}` : latest.id;
+      return { id: latest.id, label };
+    }
+
+    async function fetchTopPlayersData(leagueId, giornataId) {
+      const map = new Map();
+      const path = leagueId ? `leagues/${leagueId}/results` : 'results';
+      let snap = null;
+      try {
+        snap = await primaryDb.collection(path).doc(giornataId).collection('teams').get();
+      } catch (error) {
+        console.warn('[home] impossibile leggere risultati multilega:', error);
+        try {
+          snap = await legacyDb.collection('results').doc(giornataId).collection('teams').get();
+        } catch (legacyErr) {
+          console.warn('[home] impossibile leggere risultati legacy:', legacyErr);
+        }
+      }
+
+      if (!snap || snap.empty) {
+        return [];
+      }
+
+      snap.docs.forEach(doc => {
+        const payload = doc.data() || {};
+        const captainId = payload.captain || payload.captainId || payload.captain_id || null;
+        const players = Array.isArray(payload.players) ? payload.players : [];
+        players.forEach(entry => {
+          const playerId = entry.playerId || entry.player_id;
+          if (!playerId) return;
+          const numericId = String(playerId).trim();
+          const points = Number(entry.points || entry.total || 0);
+          if (!Number.isFinite(points)) return;
+          const selections = (entry.breakdown && typeof entry.breakdown === 'object')
+            ? JSON.parse(JSON.stringify(entry.breakdown))
+            : {};
+          const existing = map.get(numericId);
+          if (!existing || points > existing.points) {
+            map.set(numericId, {
+              playerId: numericId,
+              points,
+              teamId: doc.id,
+              selections,
+              captainId: captainId ? String(captainId) : null
+            });
+          }
+        });
+      });
+
+      return Array.from(map.values()).sort((a, b) => b.points - a.points);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderTopPlayerCard({ rank, displayName, role, points, photo }) {
+      const rankClass = `rank-${rank}`;
+      const safeName = escapeHtml(displayName || 'Giocatore');
+      const safeRole = escapeHtml(role || '—');
+      const pointsLabel = Number.isFinite(points) ? points.toFixed(2) : '0.00';
+      return `
+        <div class="top-player-card-home ${rankClass}">
+          <div class="top-player-header">
+            <div class="top-player-rank-badge">${rank}</div>
+            <div class="top-player-avatar">
+              <img src="${photo}" alt="${safeName}" onerror="this.src='${buildFallbackAvatar(getInitials(displayName || ''))}'" />
+            </div>
+            <div class="top-player-info">
+              <div class="top-player-name">${safeName}</div>
+              <div class="top-player-meta">${safeRole}</div>
+            </div>
+          </div>
+          <div class="top-player-points">${pointsLabel}<span style="font-size:14px; font-weight:600;">pt</span></div>
+        </div>
+      `;
+    }
+
+    async function loadTopPlayersCard(forcedLeagueId = null, options = {}) {
+      const card = document.getElementById('topPlayersCard');
+      const listEl = document.getElementById('topPlayersList');
+      const subtitleEl = document.getElementById('topPlayersSubtitle');
+      if (!card || !listEl || !subtitleEl) return;
+      if (topPlayersLoading) return;
+      topPlayersLoading = true;
+      const force = options.force === true;
+
+      try {
+        subtitleEl.textContent = 'Caricamento…';
+        listEl.innerHTML = '<div class="top-players-placeholder">Caricamento…</div>';
+
+        const leagueId = forcedLeagueId || await resolveLeagueId();
+        if (!leagueId) {
+          subtitleEl.textContent = 'Seleziona una lega per vedere i top giocatori';
+          listEl.innerHTML = '<div class="top-players-placeholder">Nessun dato disponibile</div>';
+          lastTopPlayersState = { leagueId: null, giornataId: null };
+          return;
+        }
+
+        const latestDay = await fetchLatestComputedDay(leagueId);
+        if (!latestDay) {
+          subtitleEl.textContent = 'Nessuna giornata calcolata';
+          listEl.innerHTML = '<div class="top-players-placeholder">Calcola una giornata per vedere i migliori giocatori</div>';
+          lastTopPlayersState = { leagueId, giornataId: null };
+          return;
+        }
+
+        if (!force && lastTopPlayersState.leagueId === leagueId && lastTopPlayersState.giornataId === latestDay.id) {
+          subtitleEl.textContent = latestDay.label;
+          return;
+        }
+
+      const playersData = await fetchTopPlayersData(leagueId, latestDay.id);
+        if (!playersData.length) {
+          subtitleEl.textContent = latestDay.label;
+          listEl.innerHTML = '<div class="top-players-placeholder">Nessun giocatore disponibile per questa giornata</div>';
+          lastTopPlayersState = { leagueId, giornataId: latestDay.id };
+          return;
+        }
+
+      const [catalog, rulesMap] = await Promise.all([
+        loadPlayersCatalog(),
+        loadPlayerRulesMap()
+      ]);
+
+      const rankedEntries = playersData.map(player => {
+        const info = catalog.get(player.playerId) || {};
+        const basePoints = computePlayerPointsFromSelections(player.selections, rulesMap);
+        const computedPoints = Number.isFinite(basePoints) ? basePoints : Number(player.points || 0);
+        return {
+          ...player,
+          info,
+          computedPoints
+        };
+      }).sort((a, b) => b.computedPoints - a.computedPoints).slice(0, 3);
+
+      if (!rankedEntries.length) {
+        subtitleEl.textContent = latestDay.label;
+        listEl.innerHTML = '<div class="top-players-placeholder">Nessun giocatore disponibile per questa giornata</div>';
+        lastTopPlayersState = { leagueId, giornataId: latestDay.id };
+        return;
+      }
+
+      const cardsHtml = rankedEntries.map((entry, index) => {
+        const info = entry.info;
+        const displayName = getPlayerDisplayName(info);
+        const initials = getInitials(displayName);
+        const photo = resolvePlayerPhoto(info, initials);
+        const role = (info.role || info.ruolo || info.position || '').toUpperCase();
+        return renderTopPlayerCard({
+          rank: index + 1,
+          displayName,
+          role,
+          points: entry.computedPoints,
+          photo
+        });
+      }).join('');
+
+        subtitleEl.textContent = latestDay.label;
+        listEl.innerHTML = cardsHtml;
+        lastTopPlayersState = { leagueId, giornataId: latestDay.id };
+      } catch (error) {
+        console.error('[home] Impossibile caricare i top giocatori:', error);
+        subtitleEl.textContent = 'Errore durante il caricamento';
+        listEl.innerHTML = '<div class="top-players-placeholder">Riprova più tardi</div>';
+      } finally {
+        topPlayersLoading = false;
+      }
+    }
+
+    // Carica nome squadra utente - usa team_index da users collection
+    async function loadMyTeamName() {
+      const user = firebase.auth().currentUser;
+      const myTeamCard = document.getElementById('myTeamCard');
+      const myTeamName = document.getElementById('myTeamName');
+      
+      if (!user) {
+        if (myTeamName) {
+          myTeamName.textContent = 'Accedi per vedere la tua squadra';
+        }
+        if (myTeamCard) {
+          myTeamCard.style.cursor = 'pointer';
+          myTeamCard.onclick = () => window.location.href = 'auth.html';
+        }
+        // Mostra messaggi per altri elementi
+        updateUnauthenticatedMessages();
+        updateHomeFormazioniCardForNoTeam();
+        return;
+      }
+      
+      try {
+        // Leggi team_index da /users/{uid}
+        const userDoc = await primaryDb.collection('users').doc(user.uid).get();
+        
+        if (!userDoc.exists) {
+          if (myTeamName) myTeamName.textContent = 'Nessuna squadra assegnata';
+          updateUnauthenticatedMessages('Nessuna squadra assegnata');
+          updateHomeFormazioniCardForNoTeam();
+          return;
+        }
+        
+        const userData = userDoc.data();
+        const teamIndex = userData.team_index;
+        
+        if (teamIndex === null || teamIndex === undefined) {
+          if (myTeamName) myTeamName.textContent = 'Nessuna squadra assegnata';
+          updateUnauthenticatedMessages('Unisciti a una competizione per vedere la tua squadra');
+          updateHomeFormazioniCardForNoTeam();
+          return;
+        }
+        
+        const leagueId = await resolveLeagueId();
+        if (!leagueId) {
+          if (myTeamName) myTeamName.textContent = 'Seleziona una lega';
+          updateUnauthenticatedMessages('Seleziona una lega per vedere i dati');
+          return;
+        }
+        
+        // Leggi squadra da percorso lega
+        let teamDoc = null;
+        try {
+          teamDoc = await getTeamDocRef(teamIndex, leagueId).get();
+        } catch (err) {
+          console.warn('[home] errore lettura team multi-lega', err);
+        }
+        
+        if (!teamDoc || !teamDoc.exists) {
+          try {
+            const legacyDoc = await legacyDb.collection('teams').doc(String(teamIndex)).get();
+            if (legacyDoc.exists) {
+              teamDoc = legacyDoc;
+            }
+          } catch (legacyErr) {
+            console.warn('[home] errore lettura team legacy', legacyErr);
+          }
+        }
+
+        if (!teamDoc || !teamDoc.exists) {
+          if (myTeamName) myTeamName.textContent = 'Squadra non trovata';
+          updateUnauthenticatedMessages('Squadra non trovata nella competizione');
+          updateHomeFormazioniCardForNoTeam();
+          return;
+        }
+        
+        const teamData = teamDoc.data();
+        if (myTeamName) myTeamName.textContent = teamData.name || 'La Mia Squadra';
+        
+        // Reset click handler se tutto ok
+        if (myTeamCard) {
+          myTeamCard.onclick = () => window.location.href = 'formazioni.html';
+        }
+        updateHomeFormazioniCardForHasTeam();
+        await loadTopPlayersCard(leagueId);
+        
+      } catch (error) {
+        console.error('❌ Dashboard error:', error);
+        if (myTeamName) myTeamName.textContent = 'Errore nel caricamento';
+        updateUnauthenticatedMessages('Errore nel caricamento dei dati');
+        updateHomeFormazioniCardForNoTeam();
+      }
+    }
+    
+    function updateUnauthenticatedMessages(customMessage) {
+      // Aggiorna Ultimo Risultato
+      const lastMatchContent = document.getElementById('lastMatchContent');
+      if (lastMatchContent) {
+        const message = customMessage || 'Accedi per vedere i tuoi risultati';
+        lastMatchContent.innerHTML = `
+          <div class="match-pill">
+            <span>Stato</span>
+            <strong class="match-summary-empty" style="color: var(--muted);">${message}</strong>
+          </div>
+        `;
+      }
+      
+      // Aggiorna Classifiche
+      const classifichePreview = document.getElementById('classifichePreview');
+      if (classifichePreview) {
+        const message = customMessage || 'Accedi per vedere la classifica';
+        classifichePreview.innerHTML = `
+          <div style="text-align: center; color: var(--muted); padding: 20px;">
+            🔒 ${message}
+          </div>
+        `;
+      }
+      
+      // Aggiorna Ultimi Risultati
+      const recentResults = document.getElementById('recentResults');
+      if (recentResults) {
+        const message = customMessage || 'Accedi per vedere i tuoi risultati';
+        recentResults.innerHTML = `
+          <div class="recent-results-placeholder" style="color: var(--muted);">🔒 ${message}</div>
+        `;
+      }
+    }
+
+    function updateHomeFormazioniCardForNoTeam() {
+      const cardsContainer = document.querySelector('.home-cards');
+      if (!cardsContainer) return;
+      const sections = cardsContainer.querySelectorAll('.section');
+      if (sections.length < 2) return;
+      const card = sections[1]; // seconda card: Formazioni
+      const title = card.querySelector('h2');
+      const desc = card.querySelector('p');
+      const btn = card.querySelector('a.btn');
+      if (title) title.textContent = 'Scegli la tua Squadra';
+      if (desc) desc.textContent = 'Per gestire le formazioni devi prima scegliere una squadra disponibile nella tua lega.';
+      if (btn) {
+        btn.textContent = 'Scegli Squadra';
+        btn.href = 'scegli-squadra.html';
+      }
+    }
+
+    function updateHomeFormazioniCardForHasTeam() {
+      const cardsContainer = document.querySelector('.home-cards');
+      if (!cardsContainer) return;
+      const sections = cardsContainer.querySelectorAll('.section');
+      if (sections.length < 2) return;
+      const card = sections[1];
+      const title = card.querySelector('h2');
+      const desc = card.querySelector('p');
+      const btn = card.querySelector('a.btn');
+      if (title) title.textContent = 'Formazioni';
+      if (desc) desc.textContent = 'Gestisci la formazione della tua squadra.';
+      if (btn) {
+        btn.textContent = 'Vai alle Formazioni';
+        btn.href = 'formazioni.html';
+      }
+    }
+    
+    // Esegui quando auth è pronta
+    const refreshTopPlayersBtn = document.getElementById('refreshTopPlayersBtn');
+    if (refreshTopPlayersBtn) {
+      refreshTopPlayersBtn.addEventListener('click', () => loadTopPlayersCard(null, { force: true }));
+    }
+
+    window.addEventListener('league-changed', () => loadTopPlayersCard(null, { force: true }));
+    window.addEventListener('results-updated', () => loadTopPlayersCard(null, { force: true }));
+
+    setTimeout(() => loadTopPlayersCard(), 500);
+
+    firebase.auth().onAuthStateChanged((user) => {
+      loadMyTeamName();
+      if (!user) {
+        // Se non loggato, mostra messaggi dopo un breve delay per permettere al DOM di essere pronto
+        setTimeout(updateUnauthenticatedMessages, 500);
+      }
+    });
+  </script>
+  
+  <script src="resources/footer.js?v=20260920-final3"></script>
+  <script src="resources/cookie-consent.js?v=20260920-final"></script>
+</body>
+</html>
+
+
+
