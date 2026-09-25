@@ -1,4 +1,4 @@
-Allineato a: D102
+Allineato a: D106
 
 # Mappa delle pagine — a cosa serve ogni file
 

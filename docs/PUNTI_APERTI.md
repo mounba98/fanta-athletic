@@ -1,11 +1,11 @@
-Allineato a: D102
+Allineato a: D106
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
 **⚠️ SICUREZZA, URGENTE (D101)**
 - [ ] Nel ramo GitHub `feature/uniform-pitch-bench` c'è `fanta-athletic-firebase-adminsdk.json` (chiave di servizio admin di Firebase, dal nome). **Mocci** (o chi ha i permessi sul progetto) deve **revocarla** in Google Cloud Console → IAM e amministrazione → Account di servizio → `firebase-adminsdk…` → Chiavi → elimina quella chiave (se qualche script la usa, crearne una nuova e tenerla SOLO in locale). Poi togliere il file dalla repository. Revocare è ciò che conta: il file resta comunque nella storia di Git.
 
-**Fatto il 25/09 (D095–D096):** regola "Partita live" pubblicata e verificata; prova completa della Partita live con un solo admin superata; **stagione 2025/26 azzerata e 2026/27 aperta vuota** (backup pre-azzeramento su disco). Ora tocca agli admin compilarla dal percorso guidato.
+**Fatto il 25/09 (D095–D106):** app 2026/27 online e su GitHub (D106). regola "Partita live" pubblicata e verificata; prova completa della Partita live con un solo admin superata; **stagione 2025/26 azzerata e 2026/27 aperta vuota** (backup pre-azzeramento su disco). Ora tocca agli admin compilarla dal percorso guidato.
 
 **Prove ancora da fare (niente è stato provato "a metà": queste parti non sono mai state eseguite sul database vero):**
 - [ ] **Partita live con DUE admin** (il percorso con un admin solo è provato, D095): serve la prima giornata della 2026/27 o una giornata di prova, poi pulizia (ora l'azzeramento non c'è più a pulire: togliere a mano `days`, `results`, `matchday_temp`, `live` della giornata di prova).
@@ -26,7 +26,7 @@ Allineato a: D102
 **Da fare a fine Fase 3:**
 - [x] ~~Recuperare `firebase.json` / `.firebaserc`~~ **ricreati (D101)**; per pubblicare serve la Firebase CLI (Node.js non installato: da decidere). Vecchio: (configurazione Hosting, non presenti nella cartella, D099): servono per pubblicare. Chiederli all'amico o ricrearli; valutare lì intestazioni di cache lunghe per i file etichettati `?v=`.
 - [~] **Tutorial PDF per gli admin (D090)**: versione testuale fatta (D098, `~/Claude/fanta-athletic-backups/03-documenti-admin/`); da aggiornare con gli screenshot a schermate definitive.
-- [ ] Pubblicazione del sito (Hosting) + commit Git: solo dopo che tutto sopra è verificato (D002). La copia del 19/09 è già fuori dal progetto (D101); `backups-firestore/` è escluso da Git e da `firebase.json`.
+- [x] **Pubblicazione del sito + GitHub fatte il 25/09/2026 (D103, D106).** Da qui: commit e deploy separati, su conferma. La copia del 19/09 è già fuori dal progetto (D101); `backups-firestore/` è escluso da Git e da `firebase.json`.
 
 **Note tecniche emerse (non urgenti):**
 - [ ] Restyling: `admin-calendario.html` su telefono a due colonne strette; ovale "Campionato H2H" in `calendario.html` (D102).

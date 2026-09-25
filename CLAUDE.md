@@ -1,4 +1,4 @@
-Allineato a: D102
+Allineato a: D106
 
 # Fanta Athletic — contesto per Claude
 
@@ -44,25 +44,24 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D096, 25/09/2026)**
-Fase 3 quasi finita, obiettivo: pronti prima dell'asta di ottobre 2026.
-**Fatto il 25/09**: regola "Partita live" pubblicata e verificata (D095);
-prova completa della Partita live con un admin solo, superata (D095);
-**stagione 2025/26 AZZERATA e 2026/27 APERTA VUOTA** (D096), dopo backup
-completo (`backups-firestore/backup-completo-pre-azzeramento-…json` + copia
-in `~/Claude/fanta-athletic-backups/02-database/`). La 2025/26 vive solo
-nell'archivio (albo d'oro). La compilazione della 2026/27 la fanno gli
-admin dal percorso guidato (`admin-stagione.html#percorso`).
-**Attenzione**: il database è uno solo → il sito online mostra già la
-stagione vuota, ma **online l'albo d'oro e le pagine nuove non ci sono
-ancora**: la pubblicazione del sito è diventata più urgente.
-Codice ancora **solo in locale** (sito online e GitHub non toccati).
-Prossimi passi: Partita live con due admin, account non admin, 4 regole
-bonus e fazioni (con gli admin), dettagli scontri diretti, tutorial PDF
-(D090), poi pubblicazione. Lista ordinata in cima a `docs/PUNTI_APERTI.md`.
-Lezioni: la console si legge **una parola alla volta** (D094); nel
-pannello di test le conferme del browser (`confirm`) si chiudono da sole
-→ per provarle vanno fatte rispondere "OK" via script (D095).
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D106, 25/09/2026)**
+**L'app 2026/27 è ONLINE** (`https://fanta-athletic.web.app`, pubblicata il
+25/09/2026 alle 09:11, D106) e su GitHub (`mounba98/fanta-athletic`, `main`).
+La stagione 2025/26 è archiviata (Albo d'oro), la 2026/27 è aperta e vuota:
+**la compilano gli admin** dal percorso guidato, con la guida PDF
+(`~/Claude/fanta-athletic-backups/03-documenti-admin/`).
+**Come si lavora ora** (D103/D106): la cartella del progetto È la copia Git.
+Modifica → prova in locale → commit+push (con conferma) → pubblicazione del
+sito, passo SEPARATO: `~/.local/bin/firebase deploy --only hosting --project
+fanta-athletic` (con conferma). Etichette `?v=` da cambiare a ogni modifica
+di un file condiviso (il service worker tiene i file etichettati, D099).
+**Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
+`feature/uniform-pitch-bench` (D101).
+Prossimi passi: supporto agli admin mentre compilano; prova Partita live con
+due admin alla prima giornata; account non admin; decisioni scontri diretti
+(tutte modificabili dagli admin in Impostazioni); restyling/velocità in coda.
+Lista completa in cima a `docs/PUNTI_APERTI.md`. Backup: indice in
+`~/Claude/fanta-athletic-backups/LEGGIMI.md`.
 
 1. **Fase 1 chiusa al 100% (D037). Fase 2 (redesign) fatta in gran parte
    il 2026-09-20 (D039-D051)**: font, colori, forme, tipografia, menu,
