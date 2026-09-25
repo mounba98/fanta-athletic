@@ -4154,3 +4154,4 @@ restano come rete di sicurezza per chi non attiva le notifiche.
   - Verificato: dati veri → solo "Campionato ✓"; simulazione con 3 competizioni → Campionato/Scontri/Coppa, scelta Scontri salvata e Classifiche aperta; con scontri spenti resta su Squadre. Cache `league-selector.js?v=20260925l`, `app-init.js?v=20260925m`, `competitions.js?v=20260925`.
   - Da fare quando ci saranno più competizioni accese: la Home ("Il mio fanta") mostra posizione e punti del Campionato; valutare di seguire la competizione scelta.
 - **Deciso dall'utente**: la card "La mia squadra" in Home che segue la competizione scelta si decide quando gli admin impostano la modalità "Scontri diretti". Per ora: commit e push.
+- **Pubblicato** (25/09/2026 23:23): commit `8bc3d14` → sito (193 file). Verificato sul sito vero: freccia "indietro", velo della tendina, `competitions.js`, `auth-guard.js` nuovi online; `.git`, backup e documenti → 404.
