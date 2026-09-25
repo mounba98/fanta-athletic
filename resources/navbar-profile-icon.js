@@ -100,8 +100,15 @@
 
       try {
         // Prova a leggere foto da Firestore users/{uid}
-        const db = firebase.firestore();
-        const userDoc = await db.collection('users').doc(user.uid).get();
+        // D113: il profilo vero sta in users/{uid} alla radice. firebase.firestore() su alcune
+        // pagine devia la lettura dentro la lega (copia ridotta, senza team_index) e faceva
+        // comparire "Nessuna squadra" a chi la squadra ce l'ha.
+        // Lettura dal server: se un altro script sta salvando il nome utente in quello stesso
+        // istante, la copia locale contiene solo quei campi (senza team_index). Offline → copia locale.
+        const db = window.__LEGACY_DB__ || firebase.firestore();
+        const ref = db.collection('users').doc(user.uid);
+        let userDoc;
+        try { userDoc = await ref.get({ source: 'server' }); } catch (_) { userDoc = await ref.get(); }
         const userData = userDoc.exists ? userDoc.data() : {};
         
         const photoURL = userData.photoURL || user.photoURL || null;

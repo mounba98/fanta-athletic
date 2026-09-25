@@ -298,6 +298,7 @@
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/season.js?v=20260925e"></script>
   <script src="resources/h2h.js?v=20260925e"></script>
+  <script src="resources/competitions.js?v=20260925"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -317,7 +318,7 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
   </script>
-  <script src="resources/app-init.js?v=20260925h"></script>
+  <script src="resources/app-init.js?v=20260925m"></script>
   <script>
     let SEASON = '2024-25'; // cartella scontri diretti: dal 25/09/2026 la decide la Stagione (D087)
     async function seasonKey() {
@@ -345,7 +346,7 @@
       cupSettings: null,
       hasH2H: false,
       hasCupSchedule: false,
-      selectedView: 'h2h',
+      selectedView: location.hash === '#coppa' ? 'cup' : 'h2h',   // D113: #coppa dalla tendina 🏆
       loading: true
     };
     let isAdmin = false;
@@ -890,17 +891,17 @@
     }
   </script>
   
-  <script src="resources/mobile-menu.js?v=20260925c"></script>
-  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/mobile-menu.js?v=20260925f"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/faction.js?v=20260925f"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
     <script src="resources/navbar-autohide.js?v=20260920-final"></script>
   <script src="resources/theme.js?v=20260925b"></script>
   <script src="resources/navbar.js?v=20260925"></script>
-  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
-  <script src="resources/league-selector.js?v=20260925h"></script>
+  <script src="resources/league-selector.js?v=20260925l"></script>
   <script src="resources/auth-ui.js?v=20260920-final"></script>
 </body>
 </html>

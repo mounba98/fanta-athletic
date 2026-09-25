@@ -625,18 +625,6 @@ function detectExistingUsername(data = {}, user = null) {
       }
       
       const storedUsername = detectExistingUsername(userData, user);
-      // D113: se nel profilo è già tutto salvato uguale, non si riscrive nulla. Prima lo
-      // riscriveva a ogni pagina: scritture inutili, e chi leggeva il profilo in quello
-      // stesso istante vedeva solo il nome utente (senza squadra) → "Nessuna squadra".
-      if (isStoredUsernameValid(storedUsername)) {
-        const norm = normalizeUsername(storedUsername);
-        const want = Array.from(buildUsernameVariants(norm)).sort().join('|');
-        const have = Array.isArray(userData.usernameVariants) ? userData.usernameVariants.slice().sort().join('|') : '';
-        if (userData.username === norm && userData.usernameLower === norm && (usernameMappingDisabled || have === want)) {
-          window.currentUsername = norm;
-          return norm;
-        }
-      }
       if (isStoredUsernameValid(storedUsername)) {
         if (usernameMappingDisabled) {
           const normalized = normalizeUsername(storedUsername);

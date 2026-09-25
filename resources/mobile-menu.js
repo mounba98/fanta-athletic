@@ -42,6 +42,37 @@
     
     // Inserisci hamburger come PRIMO elemento del header
     header.insertBefore(hamburger, header.firstChild);
+
+    // D113: freccia "indietro" sulle pagine secondarie (tutte tranne le 5 della barra in basso),
+    // come nelle app: torna alla pagina precedente dell'app, altrimenti alla Home.
+    const pageName = window.location.pathname.split('/').pop() || 'index.html';
+    const ROOT_PAGES = ['index.html', 'formazioni.html', 'squadre.html', 'classifiche.html', 'bacheca.html'];
+    if (ROOT_PAGES.indexOf(pageName) === -1 && !document.getElementById('appBackBtn')) {
+      const back = document.createElement('button');
+      back.id = 'appBackBtn';
+      back.className = 'app-back-btn';
+      back.type = 'button';
+      back.setAttribute('aria-label', 'Indietro');
+      back.innerHTML = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+      back.onclick = function() {
+        let fromApp = false;
+        try { fromApp = !!document.referrer && new URL(document.referrer).origin === window.location.origin; } catch (e) {}
+        if (fromApp && window.history.length > 1) window.history.back();
+        else window.location.href = 'index.html';
+      };
+      header.insertBefore(back, hamburger.nextSibling);
+      header.classList.add('has-back');
+      if (!document.getElementById('appBackBtnCss')) {
+        const st = document.createElement('style');
+        st.id = 'appBackBtnCss';
+        st.textContent = '.app-back-btn{display:none;background:transparent!important;border:none!important;box-shadow:none!important;color:#fff!important;padding:4px 2px;margin:0 2px 0 -6px;cursor:pointer;align-items:center;justify-content:center;flex:none}' +
+          '@media (max-width:820px){.app-back-btn{display:flex}' +
+          'header.has-back .hamburger-btn{padding:6px 4px!important;margin-right:0!important}' +
+          'header.has-back h1{gap:6px}header.has-back .header-title-text{font-size:18px!important}' +
+          'header.has-back .league-selector-mobile-host.in-header{margin:0 2px!important}}';
+        document.head.appendChild(st);
+      }
+    }
     
     // Crea overlay
     const overlay = document.createElement('div');

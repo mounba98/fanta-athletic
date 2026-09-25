@@ -59,12 +59,12 @@ if (document.readyState === 'loading') {
 
 // Load auth-guard (login obbligatorio)
 const authGuardScript = document.createElement('script');
-authGuardScript.src = 'resources/auth-guard.js?v=20260925c';
+authGuardScript.src = 'resources/auth-guard.js?v=20260925d';
 document.head.appendChild(authGuardScript);
 
 // Load league-selector (dropdown navbar)
 const leagueSelectorScript = document.createElement('script');
-leagueSelectorScript.src = 'resources/league-selector.js?v=20260925h';
+leagueSelectorScript.src = 'resources/league-selector.js?v=20260925l';
 document.head.appendChild(leagueSelectorScript);
 
 // Load mobile-header-fix (forza header identico a home su tutte le pagine mobile)

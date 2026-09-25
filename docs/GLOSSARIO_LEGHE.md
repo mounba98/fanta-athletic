@@ -1,4 +1,4 @@
-Allineato a: D111
+Allineato a: D112
 
 # Lega, stagione, competizioni — le parole giuste (per il multilega futuro)
 
@@ -10,8 +10,9 @@ documenti: usare sempre queste parole, con questo significato.
 ```
 LEGA            Fanta Athletic                     chi gioca insieme
  └─ STAGIONE    2026/27 (in corso) · 2025/26 (archiviata)    quando
-     └─ COMPETIZIONI   Campionato · Scontri diretti · Coppa · Curva vs Piana    a cosa si gioca
-         └─ GIORNATE   G1, G2, …                    ogni partita dell'Athletic
+     ├─ COMPETIZIONI   Campionato · Scontri diretti · Coppa    tornei tra le squadre del fanta
+     ├─ GIOCHI COLLATERALI   Curva vs Piana    tra le tifoserie, con i voti dei singoli utenti
+     └─ GIORNATE   G1, G2, …                    ogni partita dell'Athletic
 ```
 
 Nel fantacalcio "classico" (es. Leghe Fantacalcio) si parla di **Lega** e dentro di
@@ -19,17 +20,18 @@ Nel fantacalcio "classico" (es. Leghe Fantacalcio) si parla di **Lega** e dentro
 (asta, rose nuove) e la stagione passata va nell'Albo d'oro. Le competizioni vivono
 **dentro** una stagione: finita la stagione, finiscono anche loro.
 
-## Le quattro parole
+## Le parole
 
 | Parola | Cos'è | Esempio | Dove vive (database) | Dove si vede (app) |
 |---|---|---|---|---|
 | **Lega** | Il gruppo di persone e squadre che giocano insieme, con i suoi admin, il codice invito, la lista giocatori, le regole bonus/malus | Fanta Athletic | `leagues/{idLega}` (+ `teams`, `players`, `rules`, `admins`, `members`) | Selettore 🏆 nell'intestazione (D110); in futuro più leghe per utente |
 | **Stagione** | Il periodo di gioco di una lega: si apre, si gioca, si archivia. Una sola "in corso" per lega | 2026/27 | `leagues/{idLega}/config/season` (impostazioni), `archive/{idStagione}` (stagioni passate) | Badge "2026/2027" nell'intestazione; Pannello › Stagione; Albo d'oro |
-| **Competizione** | Un torneo giocato dentro la stagione, con le stesse squadre e le stesse giornate | Campionato (classifica a punti), Scontri diretti, Coppa, Curva vs Piana (mini-gioco) | Campionato: `results/{G}/teams`; Scontri: `h2h_schedule`/`h2h_results/{chiaveStagione}`; Coppa: `cups`/`cup_*`; Curva vs Piana: `contest_*` | Schede di Classifiche (Squadre = Campionato, Scontri, Fazioni); Pannello › Stagione › "Modalità di gioco" |
+| **Competizione** | Un torneo **tra le squadre del fanta**, giocato dentro la stagione con le stesse squadre e le stesse giornate | Campionato (classifica a punti), Scontri diretti, Coppa | Campionato: `results/{G}/teams`; Scontri: `h2h_schedule`/`h2h_results/{chiaveStagione}`; Coppa: `cups`/`cup_*` | Oggi sparse: Classifiche › Squadre (Campionato), › Scontri (se accesi), Calendario (scontri e coppa); Pannello › Stagione › "Modalità di gioco". Proposta D112: sezione "Competizioni" nella tendina 🏆 |
+| **Gioco collaterale** | Un gioco della stagione che non mette in sfida le squadre del fanta | Curva vs Piana (tifoserie; voti 1-X-2 dei singoli utenti + bonus di fazione) | `contest_*`, `results/{G}.faction_bonus` | Mini-gioco, Classifiche › Fazioni |
 | **Giornata** | Una partita dell'Athletic, su cui si calcolano i punti di tutte le competizioni | G3 | `days/{G}`, `results/{G}`, `live/{G}` | Calcolo giornata, Partita live, Formazioni |
 
-**Oggi**: una lega (Fanta Athletic), una stagione in corso, e come competizioni il
-**Campionato** (modalità "classica") + **Curva vs Piana**; gli **Scontri diretti** si
+**Oggi**: una lega (Fanta Athletic), una stagione in corso, una competizione — il
+**Campionato** (modalità "classica") — più il gioco collaterale **Curva vs Piana**; gli **Scontri diretti** si
 accendono dalle Impostazioni della stagione ("Scontri" o "Entrambe"); la **Coppa**
 esiste nel codice ma è spenta.
 
@@ -37,7 +39,7 @@ esiste nel codice ma è spenta.
 
 1. **Tutto ciò che appartiene a una lega sta sotto `leagues/{idLega}/…`.** Niente dati di gioco in raccolte "globali".
 2. **Ciò che appartiene a una stagione porta la chiave della stagione** (come già `h2h_*/{chiaveStagione}` e l'archivio) oppure viene azzerato/archiviato con la stagione.
-3. Nell'interfaccia: "Lega" = il gruppo; "Stagione" = l'anno; "Competizione" = il torneo. Non usare "Campionato" per dire "lega" né "Stagione" per dire "competizione".
+3. Nell'interfaccia: "Lega" = il gruppo; "Stagione" = l'anno; "Competizione" = il torneo tra le squadre; "Gioco collaterale" = Curva vs Piana e simili. Non usare "Campionato" per dire "lega" né "Stagione" per dire "competizione".
 
 ## Debiti da saldare prima di attivare davvero il multilega
 

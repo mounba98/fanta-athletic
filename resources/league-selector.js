@@ -390,6 +390,45 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
     if (tries < 30) setTimeout(function() { placeInHeader(host, tries + 1); }, 150);
   }
 
+  // D113: sezione "Competizioni" della stagione (Lega → Stagione → Competizioni).
+  // La competizione scelta guida Classifiche e Calendario (resources/competitions.js).
+  function loadCompetitionsLib() {
+    if (window.Competitions) return Promise.resolve(window.Competitions);
+    if (window.__competitionsLoading) return window.__competitionsLoading;
+    window.__competitionsLoading = new Promise(resolve => {
+      const sc = document.createElement('script');
+      sc.src = 'resources/competitions.js?v=20260925';
+      sc.onload = () => resolve(window.Competitions || null);
+      sc.onerror = () => resolve(null);
+      document.head.appendChild(sc);
+    });
+    return window.__competitionsLoading;
+  }
+
+  async function fillCompetitions(dropdown) {
+    const box = dropdown && dropdown.querySelector('#leagueDropdownComps');
+    if (!box) return;
+    const C = await loadCompetitionsLib();
+    if (!C || !currentLeague) { box.innerHTML = ''; return; }
+    const lid = currentLeague.id;
+    const list = await C.active(lid);
+    const cur = await C.current(lid);
+    const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    box.innerHTML = '<div class="league-sport-header">Competizioni' + (list.seasonLabel ? ' ' + esc(list.seasonLabel) : '') + '</div>' +
+      list.map(c => '<button type="button" class="league-comp-item' + (c.id === cur.id ? ' active' : '') + '" data-comp="' + c.id + '">' +
+        '<span class="league-comp-dot"></span><span class="league-comp-info"><b>' + esc(c.label) + '</b><small>' + esc(c.desc) + '</small></span>' +
+        (c.id === cur.id ? '<span class="league-item-check">✓</span>' : '') + '</button>').join('');
+    box.querySelectorAll('[data-comp]').forEach(b => b.addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation();
+      const comp = list.find(x => x.id === b.dataset.comp);
+      C.choose(lid, comp.id);
+      const [page, hash] = comp.page.split('#');
+      const here = (location.pathname.split('/').pop() || 'index.html') === page;
+      if (here) { location.hash = hash; location.reload(); }
+      else location.href = comp.page;
+    }));
+  }
+
   function renderLeagueSelector() {
     // Anche senza permessi, mostra selettore in modalità disabled
     const hasPermissionDenied = window.__LEAGUE_PERMISSION_DENIED__;
@@ -579,6 +618,7 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
       <div class="league-dropdown-list">
         ${leaguesHTML}
       </div>
+      <div class="league-dropdown-comps" id="leagueDropdownComps"></div>
       <div class="league-dropdown-actions">
         <a href="admin-leghe.html" class="league-dropdown-action">
           <span>➕</span> Crea Nuova
@@ -647,10 +687,23 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
       dropdown.style.zIndex = '';
     };
 
+    // D113: velo dietro la tendina — un tocco fuori la chiude e NON attiva ciò che c'è sotto
+    const removeVeil = () => { const v = document.getElementById('leagueDropdownVeil'); if (v) v.remove(); };
+    const addVeil = () => {
+      removeVeil();
+      const v = document.createElement('div');
+      v.id = 'leagueDropdownVeil';
+      v.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(2,6,23,.35);-webkit-tap-highlight-color:transparent;';
+      const swallow = ev => { ev.preventDefault(); ev.stopPropagation(); closeDropdown(); };
+      v.addEventListener('click', swallow);
+      v.addEventListener('touchend', swallow, { passive: false });
+      document.body.appendChild(v);
+    };
     const closeDropdown = () => {
       dropdown.classList.remove('show');
       resetDropdownStyles();
       btn.setAttribute('aria-expanded', 'false');
+      removeVeil();
     };
 
     const applyMobileDropdownPosition = () => {
@@ -698,6 +751,10 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
       });
       if (willShow) {
         applyMobileDropdownPosition();
+        fillCompetitions(dropdown);
+        // il velo solo se la tendina è stata spostata nella pagina (telefono, D110):
+        // su computer vive dentro la barra in alto e il velo la coprirebbe
+        if (dropdown.parentNode === document.body) addVeil();
         dropdown.classList.add('show');
         btn.setAttribute('aria-expanded', 'true');
       } else {
@@ -1291,6 +1348,16 @@ console.log('[league-selector] build debug-2025-11-19-01 caricata');
       .league-selector-mobile-host.in-header .league-icon { font-size: 13px; line-height: 1; margin: 0; }
       .league-selector-mobile-host.in-header .league-name,
       .league-selector-mobile-host.in-header .dropdown-arrow { display: none !important; }
+    `;
+    styles.textContent += `
+      .league-dropdown-comps { padding: 4px 8px 8px; border-top: 1px solid rgba(148,163,184,.25); }
+      .league-dropdown-comps:empty { display: none; }
+      .league-comp-item { display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:10px 12px; margin-top:6px; border-radius:12px; border:1px solid rgba(148,163,184,.25) !important; background:transparent !important; color:inherit !important; cursor:pointer; font-family:inherit; }
+      .league-comp-item.active { border-color: rgba(250,204,21,.6) !important; background: rgba(250,204,21,.08) !important; }
+      .league-comp-dot { width:12px; height:12px; border-radius:50%; border:2px solid rgba(148,163,184,.7); flex:none; }
+      .league-comp-item.active .league-comp-dot { border-color:#facc15; background:#facc15; }
+      .league-comp-info { flex:1; display:flex; flex-direction:column; line-height:1.25; }
+      .league-comp-info b { font-size:14px; } .league-comp-info small { font-size:12px; opacity:.7; }
     `;
     document.head.appendChild(styles);
   }

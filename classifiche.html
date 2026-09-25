@@ -561,6 +561,7 @@
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/competitions.js?v=20260925"></script>
   <script src="resources/provisional-badge.js?v=20260925"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
   <script src="resources/toast-with-fallback.js?v=20260920-final"></script>
@@ -576,7 +577,7 @@
 
   </script>
   <script src="resources/firebase.js?v=20260925"></script>
-  <script src="resources/app-init.js?v=20260925h"></script>
+  <script src="resources/app-init.js?v=20260925m"></script>
   <script src="resources/standings-export.js?v=20260920-final"></script>
   <script src="resources/podium-animation.js?v=20260920-final"></script>
   <script>
@@ -740,6 +741,22 @@
     }
 
     if (location.hash === '#fazioni') window.addEventListener('load', function(){ switchTab('fazioni'); loadFazioni(); });
+    // D113: la competizione scelta nella tendina 🏆 guida la scheda d'apertura
+    // (#h2h = Scontri diretti, #squadre = Campionato; senza indirizzo vale la scelta salvata)
+    window.addEventListener('load', async function() {
+      let want = location.hash === '#h2h' ? 'h2h' : location.hash === '#squadre' ? 'squadre' : null;
+      if (!want && !location.hash && window.Competitions) {
+        try { const c = await window.Competitions.current(); if (c && c.id === 'scontri') want = 'h2h'; } catch (e) {}
+      }
+      if (want !== 'h2h') { if (want) switchTab(want); return; }
+      // si aspetta che la pagina abbia caricato le squadre e deciso se gli scontri sono accesi
+      for (let i = 0; i < 50; i++) {
+        if (state.teams && state.teams.length) break;
+        await new Promise(r => setTimeout(r, 200));
+      }
+      if (state.hasH2H && document.getElementById('tab-h2h')) switchTab('h2h');
+      else switchTab('squadre');
+    });
 
     const state = {
       leagueId: null,
@@ -2314,8 +2331,8 @@
   </script>
   <input type="file" id="playerPhotoInput" accept="image/*" style="display:none" />
   <script src="resources/players-leaderboard-classifiche.js?v=20260921-final"></script>
-  <script src="resources/mobile-menu.js?v=20260925c"></script>
-  <script src="resources/edge-swipe-menu.js?v=20260923-final"></script>
+  <script src="resources/mobile-menu.js?v=20260925f"></script>
+  <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/faction.js?v=20260925f"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
@@ -2323,10 +2340,10 @@
   <script src="resources/lazy-load.js?v=20260920-final"></script>
   <script src="resources/theme.js?v=20260925b"></script>
   <script src="resources/navbar.js?v=20260925"></script>
-  <script src="resources/navbar-profile-icon.js?v=20260921-header"></script>
+  <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
-  <script src="resources/auth-guard.js?v=20260925c"></script>
-  <script src="resources/league-selector.js?v=20260925h"></script>
+  <script src="resources/auth-guard.js?v=20260925d"></script>
+  <script src="resources/league-selector.js?v=20260925l"></script>
   <script src="resources/auth-ui.js?v=20260920-final"></script>
 
   <script>
