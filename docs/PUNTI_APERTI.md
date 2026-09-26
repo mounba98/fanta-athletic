@@ -1,4 +1,4 @@
-Allineato a: D113
+Allineato a: D114
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
@@ -10,7 +10,7 @@ Allineato a: D113
 **Prove ancora da fare (niente è stato provato "a metà": queste parti non sono mai state eseguite sul database vero):**
 - [ ] **Partita live con DUE admin** (il percorso con un admin solo è provato, D095): serve la prima giornata della 2026/27 o una giornata di prova, poi pulizia (ora l'azzeramento non c'è più a pulire: togliere a mano `days`, `results`, `matchday_temp`, `live` della giornata di prova).
 - [ ] **Calcolo giornata con i bonus di fazione** (D080) — mai salvato davvero.
-- [ ] **Account non admin**: scelta fazione/nome, tentativo di cambio fazione (deve fallire), eredità della fazione di squadra, voto nel mini-gioco.
+- [ ] **Account non admin** (rimandato dall'utente, D114: serve un secondo telefono/account): scelta fazione/nome, tentativo di cambio fazione (deve fallire), eredità della fazione di squadra, voto nel mini-gioco.
 - [ ] **Swipe dal bordo** su un telefono vero (D067).
 
 **Fatto (D108–D111), pubblicato il 25/09 sera:** finestra allenatore, nuova Home, Archivio Athletic, selettore di lega nell'intestazione (cerchietto), titoli accorciati, glossario leghe.
@@ -28,7 +28,7 @@ Allineato a: D113
 - [ ] Creare le 4 regole bonus (presenza in casa +1, in trasferta +2, coro contro la Piana +2 Curva Morello, offese ai giocatori +2 Piana) da `admin-rules.html`.
 - [ ] Fazioni delle 18 squadre: nessuna ce l'ha ancora (le sceglieranno i giocatori o gli admin da `admin-fazioni.html`).
 - [ ] **Stagione 2026/27 (aperta vuota, D096)**: la compilano gli admin dal percorso guidato (`admin-stagione.html#percorso`): calendario Athletic, fazioni, controllo giocatori e regole, rose dopo l'asta (la pagina Asta **non** riempie le rose: si fanno da Squadre), stato "In corso".
-- [ ] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`, compare come codice): sistemarlo da `admin-players.html`.
+- [ ] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`, compare come codice): sistemarlo da `admin-players.html` — **in sospeso, si aspettano gli admin** (D114).
 - [ ] Dire agli admin: la "sconfitta a tavolino" degli scontri diretti ora funziona davvero (prima falliva sempre, D095).
 
 **Da decidere con gli admin:**
@@ -36,7 +36,7 @@ Allineato a: D113
 
 **Da fare a fine Fase 3:**
 - [x] ~~Recuperare `firebase.json` / `.firebaserc`~~ **ricreati (D101)**; per pubblicare serve la Firebase CLI (Node.js non installato: da decidere). Vecchio: (configurazione Hosting, non presenti nella cartella, D099): servono per pubblicare. Chiederli all'amico o ricrearli; valutare lì intestazioni di cache lunghe per i file etichettati `?v=`.
-- [~] **Tutorial PDF per gli admin (D090)**: versione testuale fatta (D098, `~/Claude/fanta-athletic-backups/03-documenti-admin/`); da aggiornare con gli screenshot a schermate definitive.
+- [x] **Guida PDF per gli admin**: versione 2 del 26/09 (D114, 12 pagine, con schemi disegnati di Home e tendina 🏆) in `~/Claude/fanta-athletic-backups/03-documenti-admin/`; la v1 in `versioni-precedenti/`. Screenshot veri dell'app: non fatti (servirebbero la cattura dello schermo, esclusa dalle regole di sicurezza, o foto dal telefono dell'utente).
 - [x] **Pubblicazione del sito + GitHub fatte il 25/09/2026 (D103, D106).** Da qui: commit e deploy separati, su conferma. La copia del 19/09 è già fuori dal progetto (D101); `backups-firestore/` è escluso da Git e da `firebase.json`.
 
 **Note tecniche emerse (non urgenti):**
@@ -52,7 +52,7 @@ Allineato a: D113
 - [x] Regola archivio pubblicata e **stagione 2025/26 archiviata e verificata** campo per campo (D089).
 - [x] Backup completo del database su disco (D088): `backups-firestore/` + `~/Claude/fanta-athletic-backups/02-database/`.
 
-**In coda (dopo la Fase 3):** restyling generale "da app" (D084), velocità (D066), sfarfallio banner (D063), notifiche push (D082).
+**In coda (dopo la Fase 3):** restyling generale "da app" (D084), notifiche push (D082). **Velocità (D066) e sfarfallio banner (D063): rimandati a fine stagione 2026/27** per scelta dell'utente (D114) — toccano file usati da tutte le pagine, meglio non farlo a stagione in corso.
 
 # Punti aperti — da riprendere
 

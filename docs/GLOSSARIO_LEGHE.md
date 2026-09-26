@@ -1,4 +1,4 @@
-Allineato a: D112
+Allineato a: D114
 
 # Lega, stagione, competizioni — le parole giuste (per il multilega futuro)
 
@@ -26,7 +26,7 @@ Nel fantacalcio "classico" (es. Leghe Fantacalcio) si parla di **Lega** e dentro
 |---|---|---|---|---|
 | **Lega** | Il gruppo di persone e squadre che giocano insieme, con i suoi admin, il codice invito, la lista giocatori, le regole bonus/malus | Fanta Athletic | `leagues/{idLega}` (+ `teams`, `players`, `rules`, `admins`, `members`) | Selettore 🏆 nell'intestazione (D110); in futuro più leghe per utente |
 | **Stagione** | Il periodo di gioco di una lega: si apre, si gioca, si archivia. Una sola "in corso" per lega | 2026/27 | `leagues/{idLega}/config/season` (impostazioni), `archive/{idStagione}` (stagioni passate) | Badge "2026/2027" nell'intestazione; Pannello › Stagione; Albo d'oro |
-| **Competizione** | Un torneo **tra le squadre del fanta**, giocato dentro la stagione con le stesse squadre e le stesse giornate | Campionato (classifica a punti), Scontri diretti, Coppa | Campionato: `results/{G}/teams`; Scontri: `h2h_schedule`/`h2h_results/{chiaveStagione}`; Coppa: `cups`/`cup_*` | Oggi sparse: Classifiche › Squadre (Campionato), › Scontri (se accesi), Calendario (scontri e coppa); Pannello › Stagione › "Modalità di gioco". Proposta D112: sezione "Competizioni" nella tendina 🏆 |
+| **Competizione** | Un torneo **tra le squadre del fanta**, giocato dentro la stagione con le stesse squadre e le stesse giornate | Campionato (classifica a punti), Scontri diretti, Coppa | Campionato: `results/{G}/teams`; Scontri: `h2h_schedule`/`h2h_results/{chiaveStagione}`; Coppa: `cups`/`cup_*` | Tendina 🏆 › "Competizioni 2026/27" (solo quelle accese, D113): la scelta guida Classifiche (Squadre / Scontri) e Calendario (Coppa); accese da Pannello › Stagione › "Modalità di gioco" e dalla Coppa della lega |
 | **Gioco collaterale** | Un gioco della stagione che non mette in sfida le squadre del fanta | Curva vs Piana (tifoserie; voti 1-X-2 dei singoli utenti + bonus di fazione) | `contest_*`, `results/{G}.faction_bonus` | Mini-gioco, Classifiche › Fazioni |
 | **Giornata** | Una partita dell'Athletic, su cui si calcolano i punti di tutte le competizioni | G3 | `days/{G}`, `results/{G}`, `live/{G}` | Calcolo giornata, Partita live, Formazioni |
 

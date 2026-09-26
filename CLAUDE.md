@@ -1,4 +1,4 @@
-Allineato a: D113
+Allineato a: D114
 
 # Fanta Athletic — contesto per Claude
 
@@ -44,7 +44,7 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D106, 25/09/2026)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D114, 26/09/2026)**
 **L'app 2026/27 è ONLINE** (`https://fanta-athletic.web.app`, pubblicata il
 25/09/2026 alle 09:11, D106) e su GitHub (`mounba98/fanta-athletic`, `main`).
 La stagione 2025/26 è archiviata (Albo d'oro), la 2026/27 è aperta e vuota:
@@ -55,16 +55,21 @@ Modifica → prova in locale → commit+push (con conferma) → pubblicazione de
 sito, passo SEPARATO: `~/.local/bin/firebase deploy --only hosting --project
 fanta-athletic` (con conferma). Etichette `?v=` da cambiare a ogni modifica
 di un file condiviso (il service worker tiene i file etichettati, D099).
-**Ultimo giro (D108–D111, 25/09 sera)**: scelta allenatore obbligatoria per
+**Ultimo giro (D108–D113, 25/09 sera, tutto pubblicato)**: scelta allenatore obbligatoria per
 squadre senza allenatore; nuova Home "centro di controllo" (`resources/home-dashboard.js`);
 **Archivio Athletic** (`archivio-athletic.html` + `resources/athletic-stats.js`);
 selettore di lega come cerchietto 🏆 nell'intestazione; titoli lunghi accorciati;
-glossario **Lega → Stagione → Competizioni → Giornate** (`docs/GLOSSARIO_LEGHE.md`).
+glossario **Lega → Stagione → Competizioni → Giornate** (`docs/GLOSSARIO_LEGHE.md`);
+sezione Competizioni nella tendina 🏆 (`resources/competitions.js`); freccia ‹ "indietro"
+su tutte le pagine secondarie; swipe dal bordo rifatto. Guida PDF admin v2 (D114).
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).
-Prossimi passi: **scelta allenatore al primo accesso (D108: fatta in locale, da pubblicare regole Firestore + sito)**; supporto agli admin mentre compilano; prova Partita live con
-due admin alla prima giornata; account non admin; decisioni scontri diretti
-(tutte modificabili dagli admin in Impostazioni); restyling/velocità in coda.
+Prossimi passi: supporto agli admin mentre compilano (l'utente segnala i bug che
+trova provando da admin); giocatore senza nome in attesa degli admin; prova
+Partita live con due admin alla prima giornata e prova con un secondo telefono /
+account non admin (rimandate, D114); decisioni scontri diretti (tutte modificabili
+dagli admin in Impostazioni). **Velocità e sfarfallio (D063/D066): rimandati a
+fine stagione** per scelta dell'utente (D114), non toccarli prima.
 Lista completa in cima a `docs/PUNTI_APERTI.md`. Backup: indice in
 `~/Claude/fanta-athletic-backups/LEGGIMI.md`.
 
@@ -287,17 +292,17 @@ locale ne è una copia.
 **Non modificare GitHub, non fare commit/push, finché l'utente non lo
 conferma esplicitamente dopo aver verificato e testato in locale.** La
 versione su GitHub è l'unica versione stabile su cui si appoggiano molti
-utenti — vedi [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md) D002. Questa
-cartella al momento **non è un repository git** (nessuna cartella `.git`):
-prima di inizializzarne uno, chiedere all'utente.
+utenti — vedi [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md) D002. Dal 25/09
+(D103) questa cartella **è** la copia Git di `main`: commit+push e pubblicazione
+del sito sono due passi separati, ciascuno con la conferma dell'utente.
 
 **Backup**: tutte le copie (codice, repository GitHub prima della sostituzione,
 database, documenti admin) sono in `~/Claude/fanta-athletic-backups/` (indice in `LEGGIMI.md`), fuori dal progetto (D101). La
 vecchia copia del 19/09 non è più dentro la cartella del progetto.
 
 **Repository GitHub**: `https://github.com/mounba98/fanta-athletic` (di Mocci,
-Iacopo collaboratore, accesso via Git del terminale). Il ramo `main` al 25/09/2026
-coincide con la copia di partenza del 19/09. Firebase Hosting si pubblica con
+Iacopo collaboratore, accesso via Git del terminale). Fino al 25/09/2026 il ramo `main`
+coincideva con la copia di partenza del 19/09; da lì in poi è aggiornato da noi. Firebase Hosting si pubblica con
 `firebase.json` ricreato il 25/09 (D101).
 
 ## Stack tecnico

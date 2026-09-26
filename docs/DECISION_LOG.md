@@ -4155,3 +4155,15 @@ restano come rete di sicurezza per chi non attiva le notifiche.
   - Da fare quando ci saranno più competizioni accese: la Home ("Il mio fanta") mostra posizione e punti del Campionato; valutare di seguire la competizione scelta.
 - **Deciso dall'utente**: la card "La mia squadra" in Home che segue la competizione scelta si decide quando gli admin impostano la modalità "Scontri diretti". Per ora: commit e push.
 - **Pubblicato** (25/09/2026 23:23): commit `8bc3d14` → sito (193 file). Verificato sul sito vero: freccia "indietro", velo della tendina, `competitions.js`, `auth-guard.js` nuovi online; `.git`, backup e documenti → 404.
+
+## D114 — Guida admin v2, documenti riallineati, cosa si rimanda (2026-09-26)
+**Decisioni dell'utente** (dopo aver provato tutto dal telefono, "tutto funzionante"; continuerà a provare da admin e segnalerà i bug):
+1. **Guida PDF per gli admin da aggiornare subito** con le novità D108–D113.
+2. **Giocatore senza nome** (`c4fyWntWj1mTj4fekijO`): in sospeso, si aspettano gli admin.
+3. **Velocità e sfarfallio** (D063/D066): **rimandati a fine stagione** — toccano file condivisi da tutte le pagine, meglio non rischiare a stagione in corso.
+4. **Prova con un secondo telefono / account non admin**: rimandata.
+**Fatto:**
+- **Guida admin versione 2** (`~/Claude/fanta-athletic-backups/03-documenti-admin/`, fuori da Git; v1 spostata in `versioni-precedenti/`): nuovo capitolo 2 "L'app che vedono tutti" con schemi disegnati (non screenshot) della Home a fasce e della tendina 🏆; lega/stagione/competizioni e le parole del glossario; Archivio Athletic vs Albo d'oro; scelta dell'allenatore (resta alla squadra, finestra obbligatoria solo se manca, poi la cambiano solo gli admin dalla pagina Squadre); freccia ‹; negli scontri diretti il campo "formazione mancante se i titolari sono meno di…" e il pulsante "Ricalcola tutti gli scontri"; tifoseria che resta alla squadra; nuove domande frequenti. Tolte le vecchie etichette "nuovo" della v1. PDF generato con Chrome invisibile (file locale, nessuna rete): 12 pagine. **Perché schemi e non screenshot**: le pagine vere mostrano i dati solo da loggati; catturarle servirebbe la registrazione dello schermo, esclusa dalle regole di sicurezza dell'utente.
+- **Documenti riallineati**: `CLAUDE.md` (diceva ancora che la cartella non è un repository Git e che le regole dell'allenatore erano da pubblicare), `docs/GLOSSARIO_LEGHE.md` (era fermo a D112: la sezione Competizioni nella 🏆 è ora descritta come fatta), `PUNTI_APERTI.md`, `FIREBASE_ALLINEAMENTO.md`, indice dei backup `LEGGIMI.md`.
+- Nessuna modifica al codice dell'app: niente da pubblicare sul sito; da committare solo i documenti (su conferma).
+
