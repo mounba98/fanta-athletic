@@ -50,12 +50,17 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D117, 26/09/2026)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D118, 26/09/2026)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
-`main`), ultima pubblicazione 26/09/2026 (D115–D117). Stagione 2026/27 aperta e
+`main`), ultima pubblicazione 26/09/2026 (D115–D118, commit `bf1a3e2`). Stagione 2026/27 aperta e
 vuota: **la compilano gli admin**, con la guida **in app** (Pannello › 📖 Guida,
 `guida-admin.html`) e in PDF (`~/Claude/fanta-athletic-backups/03-documenti-admin/`).
 **L'utente sta provando l'app da admin e segnalerà i bug**: partire da quelli.
+**A inizio sessione**: riavviare il server locale (`preview_start` "static-server");
+nel browser di prova il login è andato perso il 26/09 → rifarlo è compito
+dell'utente, non di Claude. Lanciare `python3 scripts/check-coerenza.py` per vedere
+subito se qualcosa è rimasto indietro. Nel Cestino del Mac c'è la copia doppia
+dei backup tolta in D118 (l'originale è in `~/Claude/fanta-athletic-backups/`).
 **Come si lavora** (D103/D106/D116): modifica → prova in locale (telefono e
 computer, chiaro/scuro) → **aggiorna le parti collegate** (Novità in
 `resources/news.json`, guida admin + PDF, mappa, `?v=`, etichette "New", documenti:
