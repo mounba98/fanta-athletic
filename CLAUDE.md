@@ -14,15 +14,11 @@ non si committa. Le Novità le scrive Claude, in linguaggio da giocatore.
 
 ## Il piano generale, in ordine (D034 — importante, leggere prima di tutto)
 
-**Non c'è una stagione in corso.** La stagione 2025/2026 non è ancora
-iniziata: tutti i dati visti finora testando l'app (squadra "Curva
-gonfi", giornata 21, punteggi, formazioni) sono **della stagione
-passata**, non della corrente. L'utente sta revisionando l'app in
-preparazione della stagione nuova. Questo non significa "si può fare
-tutto senza pensarci" (i dati restano reali e vanno trattati con
-rispetto), ma cambia la finestra di rischio: non c'è pericolo di rompere
-una giornata live o formazioni schierate questa settimana, perché nessuno
-sta giocando attivamente adesso.
+**Stagione 2025/26 archiviata (Albo d'oro, D089), 2026/27 aperta e vuota
+"in preparazione" (D096)**: la compilano gli admin; l'asta è a ottobre 2026.
+I dati 2025/26 restano reali (archivio) e vanno trattati con rispetto. Finché
+la 2026/27 non è "In corso" nessuno gioca: la finestra di rischio è bassa, ma
+l'app è ONLINE e usata dagli admin, quindi ogni pubblicazione va provata prima.
 
 Il piano dell'utente, in ordine:
 1. ✅ **Revisione/bugfix — CHIUSA DAVVERO AL 100%** il 2026-09-20 (D037):
@@ -54,37 +50,29 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D114, 26/09/2026)**
-**L'app 2026/27 è ONLINE** (`https://fanta-athletic.web.app`, pubblicata il
-25/09/2026 alle 09:11, D106) e su GitHub (`mounba98/fanta-athletic`, `main`).
-La stagione 2025/26 è archiviata (Albo d'oro), la 2026/27 è aperta e vuota:
-**la compilano gli admin** dal percorso guidato, con la guida PDF
-(`~/Claude/fanta-athletic-backups/03-documenti-admin/`).
-**Come si lavora ora** (D103/D106): la cartella del progetto È la copia Git.
-Modifica → prova in locale → commit+push (con conferma) → pubblicazione del
-sito, passo SEPARATO: `~/.local/bin/firebase deploy --only hosting --project
-fanta-athletic` (con conferma). Etichette `?v=` da cambiare a ogni modifica
-di un file condiviso (il service worker tiene i file etichettati, D099).
-**Ultimo giro (D108–D113, 25/09 sera, tutto pubblicato)**: scelta allenatore obbligatoria per
-squadre senza allenatore; nuova Home "centro di controllo" (`resources/home-dashboard.js`);
-**Archivio Athletic** (`archivio-athletic.html` + `resources/athletic-stats.js`);
-selettore di lega come cerchietto 🏆 nell'intestazione; titoli lunghi accorciati;
-glossario **Lega → Stagione → Competizioni → Giornate** (`docs/GLOSSARIO_LEGHE.md`);
-sezione Competizioni nella tendina 🏆 (`resources/competitions.js`); freccia ‹ "indietro"
-su tutte le pagine secondarie; swipe dal bordo rifatto. Guida admin v2 (D114), ora anche
-**in app** (`guida-admin.html`, Pannello › 📖 Guida, D115): è la fonte, il PDF si rigenera
-con `python3 scripts/guida-admin-pdf.py`. **Quando cambia una funzione admin, aggiornare
-anche la guida.**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D117, 26/09/2026)**
+**Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
+`main`), ultima pubblicazione 26/09/2026 (D115–D117). Stagione 2026/27 aperta e
+vuota: **la compilano gli admin**, con la guida **in app** (Pannello › 📖 Guida,
+`guida-admin.html`) e in PDF (`~/Claude/fanta-athletic-backups/03-documenti-admin/`).
+**L'utente sta provando l'app da admin e segnalerà i bug**: partire da quelli.
+**Come si lavora** (D103/D106/D116): modifica → prova in locale (telefono e
+computer, chiaro/scuro) → **aggiorna le parti collegate** (Novità in
+`resources/news.json`, guida admin + PDF, mappa, `?v=`, etichette "New", documenti:
+tabella in `docs/CHECKLIST_AGGIORNAMENTO.md`) → `python3 scripts/check-coerenza.py`
+→ commit+push (con conferma) → pubblicazione, passo SEPARATO:
+`~/.local/bin/firebase deploy --only hosting --project fanta-athletic` (con conferma).
+**Ultimo giro (D114–D117)**: guida admin v2 anche in app; Novità dell'app in
+Bacheca (scheda "Novità app", finestra all'apertura, casella in Home); bordo oro
+tenue sulle caselle (`resources/ui-kit.css`); etichette "New" a segnalibro (scadono
+il 10/10/2026); controllo di coerenza automatico; titolo "Pannello".
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).
-Prossimi passi: supporto agli admin mentre compilano (l'utente segnala i bug che
-trova provando da admin); giocatore senza nome in attesa degli admin; prova
-Partita live con due admin alla prima giornata e prova con un secondo telefono /
-account non admin (rimandate, D114); decisioni scontri diretti (tutte modificabili
-dagli admin in Impostazioni). **Velocità e sfarfallio (D063/D066): rimandati a
-fine stagione** per scelta dell'utente (D114), non toccarli prima.
-Lista completa in cima a `docs/PUNTI_APERTI.md`. Backup: indice in
-`~/Claude/fanta-athletic-backups/LEGGIMI.md`.
+**Prossimi passi**: bug segnalati dall'utente; rifiniture estetiche ("ancora un
+pelo grezza": valutare il bordo oro anche altrove); giocatore senza nome (attesa
+admin); decisioni scontri diretti (admin); prova Partita live con due admin e con
+un secondo telefono/account non admin (rimandate); notifiche push (dopo);
+**velocità/sfarfallio a fine stagione** (D114). Lista in `docs/PUNTI_APERTI.md`.
 
 1. **Fase 1 chiusa al 100% (D037). Fase 2 (redesign) fatta in gran parte
    il 2026-09-20 (D039-D051)**: font, colori, forme, tipografia, menu,
