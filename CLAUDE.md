@@ -1,4 +1,4 @@
-Allineato a: D117
+Allineato a: D118
 
 # Fanta Athletic — contesto per Claude
 
@@ -65,7 +65,8 @@ tabella in `docs/CHECKLIST_AGGIORNAMENTO.md`) → `python3 scripts/check-coerenz
 **Ultimo giro (D114–D117)**: guida admin v2 anche in app; Novità dell'app in
 Bacheca (scheda "Novità app", finestra all'apertura, casella in Home); bordo oro
 tenue sulle caselle (`resources/ui-kit.css`); etichette "New" a segnalibro (scadono
-il 10/10/2026); controllo di coerenza automatico; titolo "Pannello".
+il 10/10/2026); controllo di coerenza automatico; titolo "Pannello"; **cartella
+riordinata** (D118: struttura in `README.md`, il controllo segnala file fuori posto).
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).
 **Prossimi passi**: bug segnalati dall'utente; rifiniture estetiche ("ancora un
@@ -438,7 +439,7 @@ vedi [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md) D005.
 - [`docs/FIREBASE_ALLINEAMENTO.md`](docs/FIREBASE_ALLINEAMENTO.md) + [`firestore.rules`](firestore.rules) — **regola fissa (D077): tutto ciò che si fa su Firebase (regole, indici, struttura dati) si scrive prima qui in locale e poi si applica; ogni modifica fatta in Console va riportata subito.** Le regole vere sono in `firestore.rules`.
 - [`docs/GLOSSARIO_LEGHE.md`](docs/GLOSSARIO_LEGHE.md) — **le parole giuste: Lega → Stagione → Competizioni → Giornate** (D111), regole e debiti per il multilega futuro. Usarle sempre così nel codice e nell'interfaccia.
 - [`docs/PUNTI_APERTI.md`](docs/PUNTI_APERTI.md) — checklist viva di cosa resta da fare/decidere/chiedere, aggiornarla quando un punto si chiude o se ne apre uno nuovo.
-- Documenti originali dell'amico (root del progetto) — raccontano piani e stato passato, **non sempre coincidono con lo stato reale del codice**, usarli come contesto storico non come fonte di verità: `STATO_SITO.md`, `ARCHITETTURA_SISTEMA_V2.md` (sostituisce `ARCHITETTURA_SISTEMA_COMPLETA.md`, la V1), `ANALISI_MIGRAZIONE_MULTILEGHE.md`, `MULTILEGA-PLAN.md`, `CONSIGLIO_MIGRAZIONE.md`, `REQUISITI_STORE_E_ADMIN.md`, `STRUTTURA_FIRESTORE_POST_MIGRAZIONE.md`, `GUIDA_TEST_MIGRAZIONE.md`, `BACKUP_FIRESTORE.md`, `docs/catalogo/TASSONOMIE.md`, `docs/catalogo/ROSTER_ATHLETIC_2018.md`.
+- Documenti originali dell'amico (in `docs/storico-originali/`, spostati dalla cartella principale in D118) — raccontano piani e stato passato, **non sempre coincidono con lo stato reale del codice**, usarli come contesto storico non come fonte di verità: `docs/storico-originali/STATO_SITO.md`, `docs/storico-originali/ARCHITETTURA_SISTEMA_V2.md` (sostituisce `docs/storico-originali/ARCHITETTURA_SISTEMA_COMPLETA.md`, la V1), `docs/storico-originali/ANALISI_MIGRAZIONE_MULTILEGHE.md`, `docs/storico-originali/MULTILEGA-PLAN.md`, `docs/storico-originali/CONSIGLIO_MIGRAZIONE.md`, `docs/storico-originali/REQUISITI_STORE_E_ADMIN.md`, `docs/storico-originali/STRUTTURA_FIRESTORE_POST_MIGRAZIONE.md`, `docs/storico-originali/GUIDA_TEST_MIGRAZIONE.md`, `docs/storico-originali/BACKUP_FIRESTORE.md`, `docs/catalogo/TASSONOMIE.md`, `docs/catalogo/ROSTER_ATHLETIC_2018.md`.
 
 ## Regole generali di lavoro
 

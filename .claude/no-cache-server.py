@@ -22,7 +22,8 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     # Backup locale del database (D088): la pagina manda un JSON e il server lo
-    # salva in backups-firestore/. Solo richieste dal computer stesso.
+    # salva direttamente nella cartella dei backup FUORI dal progetto (D118):
+    # ~/Claude/fanta-athletic-backups/02-database/. Solo richieste dal computer stesso.
     def do_POST(self):
         if not self.path.startswith("/__backup__/") or self.client_address[0] not in ("127.0.0.1", "::1"):
             self.send_error(403)
@@ -30,7 +31,7 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
         name = re.sub(r"[^A-Za-z0-9._-]", "_", self.path[len("/__backup__/"):])[:120] or "backup.json"
         length = int(self.headers.get("Content-Length", 0))
         data = self.rfile.read(length)
-        folder = os.path.join(os.getcwd(), "backups-firestore")
+        folder = os.path.expanduser("~/Claude/fanta-athletic-backups/02-database")
         os.makedirs(folder, exist_ok=True)
         with open(os.path.join(folder, name), "wb") as f:
             f.write(data)

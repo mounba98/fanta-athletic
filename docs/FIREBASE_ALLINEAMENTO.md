@@ -1,6 +1,6 @@
 # Firebase ↔ locale: cosa vive dove e come si tiene allineato
 
-Allineato a: D117
+Allineato a: D118
 
 **Regola (decisa dall'utente il 24/09/2026)**: tutto ciò che si fa su
 Firebase deve avere la sua copia in questo progetto. Si scrive PRIMA qui,
@@ -51,7 +51,7 @@ va riportato qui subito.
 3. Apri `firestore.rules` di questo progetto, seleziona tutto, copia.
 4. Nell'editor della Console: seleziona tutto, incolla, **Pubblica**.
 5. Prima di pubblicare, prova col **Simulatore regole** (vedi
-   `docs/FIRESTORE_RULES_CONTEST.md`, sezione "Come provarle").
+   `docs/firebase-storico/FIRESTORE_RULES_CONTEST.md`, sezione "Come provarle").
 6. Segna qui sotto la data di pubblicazione e aggiorna lo stato in tabella.
 
 Pubblicazioni fatte:

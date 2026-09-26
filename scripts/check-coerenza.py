@@ -109,6 +109,29 @@ pdf = pathlib.Path.home() / 'Claude/fanta-athletic-backups/03-documenti-admin/Gu
 if pdf.exists() and pdf.stat().st_mtime < (ROOT / 'guida-admin.html').stat().st_mtime:
     warnings.append('PDF della guida più vecchio di guida-admin.html → python3 scripts/guida-admin-pdf.py')
 
+# 10) File richiamati dalle pagine che non esistono (D118)
+KNOWN_BROKEN = {'athletic-quiz.html', 'memory-game.html', 'penalty-shootout.html',
+                'wirc-deck-builder.html', 'wirc-game.html'}  # cluster giochi, mai esistite (PUNTI_APERTI)
+srcs = list(ROOT.glob('*.html')) + list((ROOT / 'resources').glob('*.js')) + list((ROOT / 'resources').glob('*.css'))
+for p in srcs:
+    t = p.read_text(encoding='utf-8', errors='ignore')
+    refs_local = re.findall(r"""["'(](/?(?:resources|assets|data)/[\w./-]+?\.(?:js|css|json|png|jpg|jpeg|svg|webp|ico|html))(?:\?[^"')]*)?["')]""", t)
+    if p.suffix == '.html':
+        refs_local += re.findall(r"""href=["']([\w-]+\.html)(?:[#?][^"']*)?["']""", t)
+    for m in set(refs_local):
+        if not (ROOT / m.lstrip('/')).exists():
+            (warnings if m in KNOWN_BROKEN else problems).append(f'{p.relative_to(ROOT)} richiama {m}, che non esiste')
+
+# 11) Cartella principale in ordine: solo ciò che deve stare lì (D118, README "Struttura")
+ALLOWED_ROOT = {'sw.js', 'manifest.json', 'favicon.ico', 'firebase.json', '.firebaserc', 'firestore.rules',
+                'README.md', 'CLAUDE.md', '.gitignore'}
+for p in ROOT.iterdir():
+    if p.is_file() and p.suffix != '.html' and p.name not in ALLOWED_ROOT and p.name != '.DS_Store' \
+            and p.name != 'firebase-debug.log':
+        problems.append(f'file fuori posto nella cartella principale: {p.name} (vedi README, "Struttura della cartella")')
+    if p.name == 'firebase-debug.log':
+        warnings.append('firebase-debug.log nella cartella principale: si può cancellare')
+
 print(f'Ultima decisione: {LAST}')
 for w in warnings:
     print('AVVISO   ', w)

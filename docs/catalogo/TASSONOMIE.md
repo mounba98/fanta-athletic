@@ -97,7 +97,7 @@ Questi campi permettono filtraggio coerente e import idempotente.
 ## ✅ Prossimi passi
 
 1. Validare tassonomie con i tre superadmin
-2. Integrare i codici in `ARCHITETTURA_SISTEMA_V2.md`
+2. Integrare i codici in `docs/storico-originali/ARCHITETTURA_SISTEMA_V2.md`
 3. Aggiornare script di import/export per usare i codici tassonomici
 4. Pianificare ampliamento catalogo (campionati UISP, FIGC, altre regioni)
 

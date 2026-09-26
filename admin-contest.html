@@ -127,7 +127,7 @@
           });
         } catch (e) {
           log(e.code === 'permission-denied'
-            ? '\u274C Permesso negato: mancano le regole Firestore per contest_predictions / contest_standings (vedi docs/FIRESTORE_RULES_CONTEST.md).'
+            ? '\u274C Permesso negato: mancano le regole Firestore per contest_predictions / contest_standings (vedi firestore.rules).'
             : '\u274C Errore di lettura pronostici: ' + (e.code || e.message));
         }
 

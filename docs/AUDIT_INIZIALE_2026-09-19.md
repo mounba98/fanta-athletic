@@ -208,14 +208,14 @@ per ora): `osm-manager.html`, `wirc-battle.html`, `wirc-card-maker.html`,
 ## 5. Storia del progetto (dai 14 documenti Markdown scritti dall'amico)
 
 - **Timeline**: novembre 2024 prima architettura (V1, in
-  `ARCHITETTURA_SISTEMA_COMPLETA.md`), sostituita a stretto giro da una V2
-  più matura (`ARCHITETTURA_SISTEMA_V2.md`, basata su una specifica
+  `docs/storico-originali/ARCHITETTURA_SISTEMA_COMPLETA.md`), sostituita a stretto giro da una V2
+  più matura (`docs/storico-originali/ARCHITETTURA_SISTEMA_V2.md`, basata su una specifica
   prodotta con ChatGPT). Dicembre 2024: bilancio più realistico dello
-  stato (`STATO_SITO.md`). Novembre 2025 (un anno dopo): ripreso il
+  stato (`docs/storico-originali/STATO_SITO.md`). Novembre 2025 (un anno dopo): ripreso il
   filone V2 con `docs/catalogo/TASSONOMIE.md` e
   `docs/catalogo/ROSTER_ATHLETIC_2018.md`, ancora allo stadio di piano.
 - **Migrazione multileghe: SOLO PIANIFICATA, mai completata.** Secondo la
-  checklist più affidabile (`STATO_SITO.md`): l'adapter di base è pronto
+  checklist più affidabile (`docs/storico-originali/STATO_SITO.md`): l'adapter di base è pronto
   al 100%, ma la migrazione delle query nelle pagine principali (formazioni,
   squadre, calcolo giornate, classifiche) è ferma a **0 pagine su 31**, le
   regole di sicurezza multilega sono allo **0%**, il sistema di ruoli
@@ -224,17 +224,17 @@ per ora): `osm-manager.html`, `wirc-battle.html`, `wirc-card-maker.html`,
   bene: l'infrastruttura c'è ma le pagine che usano i dati non sono state
   aggiornate.
 - **Contraddizioni tra documenti**: alcuni documenti di novembre 2024
-  (`STRUTTURA_FIRESTORE_POST_MIGRAZIONE.md`, `GUIDA_TEST_MIGRAZIONE.md`)
+  (`docs/storico-originali/STRUTTURA_FIRESTORE_POST_MIGRAZIONE.md`, `docs/storico-originali/GUIDA_TEST_MIGRAZIONE.md`)
   descrivono una migrazione di prova già eseguita su una lega, mentre
-  `STATO_SITO.md` (più recente) la elenca ancora come "da fare" — probabile
+  `docs/storico-originali/STATO_SITO.md` (più recente) la elenca ancora come "da fare" — probabile
   che quel test non sia stato consolidato. AdSense risulta implementato in
-  `ADSENSE_SETUP.md` ma poi rimosso su richiesta esplicita dell'utente
-  originale, secondo `STATO_SITO.md`.
+  `docs/storico-originali/ADSENSE_SETUP.md` ma poi rimosso su richiesta esplicita dell'utente
+  originale, secondo `docs/storico-originali/STATO_SITO.md`.
 - **Bug noto documentato**: durante una migrazione di prova, il campo
   `roster` di alcune squadre conteneva ID documento invece del codice
   giocatore corretto — fix proposto ma non confermato come applicato.
   Andrebbe verificato se questo dato è ancora così nel database reale.
-- **Backup**: gli script `backup-firestore.sh`/`.bat` sono reali e
+- **Backup**: gli script `scripts/backup-firestore.sh`/`.bat` sono reali e
   correttamente scritti (chiamano `firebase firestore:export` /
   `gcloud firestore export`), ma nei documenti non c'è traccia di backup
   effettivamente eseguiti e verificati di recente — da chiedere

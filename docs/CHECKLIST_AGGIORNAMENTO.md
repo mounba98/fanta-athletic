@@ -1,4 +1,4 @@
-Allineato a: D117
+Allineato a: D118
 
 # Checklist di ogni aggiornamento — cosa deve seguire una modifica
 
@@ -23,6 +23,7 @@ Niente deve restare indietro. Il collegamento è esplicito in due modi:
 | cambia **parole** (lega, stagione, competizione…) | `docs/GLOSSARIO_LEGHE.md` e la memoria di Claude | no: da ricordare |
 | cambia qualcosa di **visivo** | prova su telefono e computer, tema chiaro e scuro; caselle con il bordo oro `var(--tile-border)` (`resources/ui-kit.css`) | no: da verificare a occhio |
 | cambia i **backup** o i documenti fuori dal progetto | `~/Claude/fanta-athletic-backups/LEGGIMI.md` | no: da ricordare |
+| aggiunge un **file nuovo** o ne sposta uno | mettilo nella cartella giusta secondo `README.md` › "Struttura della cartella"; copie "prima della modifica" in `archive/versioni-precedenti/` col numero di decisione nel nome; mai dati personali o backup dentro il progetto | sì: file fuori posto nella cartella principale, file richiamati che non esistono |
 | va **online** | commit+push e pubblicazione sono due passi separati, ognuno su conferma dell'utente | — |
 
 ## Cose che non si scrivono nelle Novità

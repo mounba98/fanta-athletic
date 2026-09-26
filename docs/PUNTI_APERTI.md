@@ -1,4 +1,4 @@
-Allineato a: D117
+Allineato a: D118
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
@@ -54,7 +54,7 @@ Allineato a: D117
 
 **Chiusi in questa fase:**
 - [x] Regola archivio pubblicata e **stagione 2025/26 archiviata e verificata** campo per campo (D089).
-- [x] Backup completo del database su disco (D088): `backups-firestore/` + `~/Claude/fanta-athletic-backups/02-database/`.
+- [x] Backup completo del database su disco (D088): `~/Claude/fanta-athletic-backups/02-database/` (la copia doppia dentro il progetto è stata tolta in D118; il server locale salva i backup nuovi direttamente lì).
 
 **In coda (dopo la Fase 3):** restyling generale "da app" (D084), notifiche push (D082). **Velocità (D066) e sfarfallio banner (D063): rimandati a fine stagione 2026/27** per scelta dell'utente (D114) — toccano file usati da tutte le pagine, meglio non farlo a stagione in corso.
 
@@ -395,7 +395,7 @@ di aver completato le fasi 2-3.
 - **Multileghe**: l'amico dice "funziona ed era già testato" (D018), ma
   questo **non coincide** con quanto risultava dai documenti storici del
   progetto (migrazione query ferma a 0/31 pagine core secondo
-  `STATO_SITO.md`). Secondo caso in sessione (dopo `admin-leghe.html`,
+  `docs/storico-originali/STATO_SITO.md`). Secondo caso in sessione (dopo `admin-leghe.html`,
   D005) in cui il ricordo dell'amico e la documentazione/il codice non
   coincidono. Non prioritario, ma se si riprende: **verifica pratica
   prima di tutto** (creare una seconda lega di test), non fidarsi della
@@ -408,6 +408,10 @@ di aver completato le fasi 2-3.
   archiviarlo il 2026-09-20 annullato (D021): gli script di navigazione
   condivisi assumono che ogni pagina sia in root, spostarle romperebbe
   quei meccanismi. **Resta in root, invariato.**
+  In più (trovato nel riordino D118): 5 collegamenti a pagine mai esistite —
+  `games-hub.html` → `athletic-quiz.html`, `memory-game.html`, `penalty-shootout.html`;
+  `wirc-royale.html` → `wirc-deck-builder.html`, `wirc-game.html`. Da decidere se
+  e quando si riprende il cluster (togliere i link o costruire le pagine).
 
 ## Note raccolte dall'amico sviluppatore (2026-09-20, D018)
 
