@@ -1,0 +1,44 @@
+{
+  "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
+  "allineato": "D117",
+  "news": [
+    {
+      "id": "2026-09-26-admin",
+      "date": "2026-09-26",
+      "audience": "admin",
+      "icon": "🛠️",
+      "title": "Per gli admin: il pannello nuovo e la guida",
+      "intro": "La stagione 2026/27 è aperta e vuota: tocca a voi riempirla. Ecco cosa trovate di nuovo.",
+      "items": [
+        "<b>La guida è dentro l'app</b>: Pannello admin › <b>📖 Guida</b>. Si può anche salvare come PDF dal pulsante in copertina.",
+        "<b>Percorso guidato</b> per preparare la stagione: Pannello › 2 · Stagione › <b>Creazione nuova stagione</b>. Ogni passo dice da solo se è fatto e ha il pulsante per andare alla pagina giusta.",
+        "<b>Partita live</b>: ognuno dei due admin segna il suo foglio dal telefono durante la partita, poi l'app li confronta; punti provvisori subito, definitivi dopo la revisione (48 ore).",
+        "<b>Scontri diretti</b>: tutti i valori si decidono nelle Impostazioni della stagione (oggi sono provvisori). Nuovi: la soglia \"formazione mancante\" e il pulsante <b>Ricalcola tutti gli scontri</b>.",
+        "<b>Allenatore e tifoseria</b> restano alla squadra: da ora <b>li cambiate solo voi</b> (allenatore dalla pagina Squadre, tifoseria da Fazioni e nomi reali), di solito all'asta.",
+        "<b>Novità come questa</b>: arrivano con ogni aggiornamento dell'app; quelle segnate <b>Solo admin</b> le vedete solo voi. Per gli annunci della lega (asta, date, regole) continuate a usare la <b>Bacheca</b>.",
+        "In Home avete la fascia <b>Solo admin</b> (Partita live, Calcolo, Pannello) e in ogni pagina admin il pulsante <b>← Pannello admin</b>."
+      ],
+      "link": "guida-admin.html",
+      "linkLabel": "Apri la guida"
+    },
+    {
+      "id": "2026-09-26-app",
+      "date": "2026-09-26",
+      "audience": "all",
+      "icon": "📣",
+      "title": "L'app si rinnova per la stagione 2026/27",
+      "intro": "In attesa dell'asta di ottobre, ecco cosa cambia per te.",
+      "items": [
+        "<b>Nuova Home</b>: in un colpo d'occhio la prossima partita dell'Athletic, la formazione da consegnare, il mini-gioco, la tua squadra e l'ultimo messaggio in Bacheca.",
+        "<b>Archivio Athletic</b> (menu ☰): gol, assist, presenze, MVP e cartellini dei giocatori veri dell'Athletic 2018, stagione per stagione. Tocca un nome per vedere la sua scheda.",
+        "<b>Il cerchietto 🏆 in alto</b>: la tua lega, la stagione e le competizioni. Scegline una e la classifica si apre direttamente su quella.",
+        "<b>Freccia ‹ in alto</b> per tornare indietro da qualsiasi pagina; <b>trascinando il dito dal bordo sinistro</b> si apre il menu.",
+        "<b>Tema scuro</b> di serie (si cambia dal menu ☰) e <b>nuova icona</b> con il logo dell'Athletic 2018. Se hai l'app sulla schermata Home e vedi ancora la vecchia icona, toglila e rimettila.",
+        "<b>Allenatore e tifoseria restano alla tua squadra</b> anche nelle prossime stagioni. Per cambiarli, una volta l'anno all'asta, chiedi agli admin.",
+        "La stagione 2025/26 è nell'<b>Albo d'oro</b> (menu ☰): campione, podio e tutte le giornate.",
+        "Corretto: il bollino \"Nessuna squadra\" che a volte compariva per errore.",
+        "Da oggi <b>le novità dell'app le trovi in Bacheca</b>, nella scheda <b>Novità app</b>, accanto ai messaggi della lega."
+      ]
+    }
+  ]
+}

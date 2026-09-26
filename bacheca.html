@@ -11,6 +11,7 @@
   <title>Fanta Athletic - Bacheca</title>
   <meta name="description" content="Bacheca goliardica e trash talk" />
   <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/ui-kit.css?v=20260926c" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
       <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
@@ -536,6 +537,13 @@
   </header>
 
   <main class="container bacheca-container">
+    <!-- Schede Messaggi | Novità app (D116b) -->
+    <div class="fa-seg" role="tablist">
+      <button type="button" role="tab" id="segMsg" class="on" data-tab="msg">Messaggi</button>
+      <button type="button" role="tab" id="segNews" data-tab="novita">Novità app</button>
+    </div>
+    <div id="tabNews" hidden></div>
+    <div id="tabMsg">
     <!-- Post Form -->
     <div class="post-form">
       <textarea 
@@ -605,6 +613,7 @@
 
     <!-- Posts Feed -->
     <div id="postsFeed"></div>
+    </div>
   </main>
 
 
@@ -1755,7 +1764,26 @@
       return html.replace(/(@[a-z0-9._-]+)/gi, '<span class="mention-highlight">$1</span>');
     }
   </script>
-  <script src="resources/mobile-menu.js?v=20260925f"></script>
+  <script src="resources/news.js?v=20260926b"></script>
+  <script>
+    // Schede della Bacheca (D116b): #novita apre le Novità dell'app
+    (function () {
+      const segs = document.querySelectorAll('.fa-seg button');
+      const msg = document.getElementById('tabMsg'), news = document.getElementById('tabNews');
+      let loaded = false;
+      function show(tab) {
+        const isNews = tab === 'novita';
+        segs.forEach(b => b.classList.toggle('on', b.dataset.tab === (isNews ? 'novita' : 'msg')));
+        msg.hidden = isNews; news.hidden = !isNews;
+        if (isNews && !loaded) { loaded = true; FANews.renderList(news).then(() => { const d = document.querySelector('#segNews .fa-news-dot'); if (d) d.remove(); }); }
+        try { history.replaceState(null, '', isNews ? '#novita' : location.pathname + location.search); } catch (e) {}
+      }
+      segs.forEach(b => b.addEventListener('click', () => show(b.dataset.tab)));
+      FANews.unread().then(un => { if (un.length && !loaded) document.getElementById('segNews').insertAdjacentHTML('beforeend', '<span class="fa-news-dot">' + un.length + '</span>'); });
+      show(location.hash === '#novita' ? 'novita' : 'msg');
+    })();
+  </script>
+  <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/faction.js?v=20260925f"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>

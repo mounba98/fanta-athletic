@@ -1,6 +1,6 @@
 # Firebase ↔ locale: cosa vive dove e come si tiene allineato
 
-Allineato a: D114
+Allineato a: D117
 
 **Regola (decisa dall'utente il 24/09/2026)**: tutto ciò che si fa su
 Firebase deve avere la sua copia in questo progetto. Si scrive PRIMA qui,

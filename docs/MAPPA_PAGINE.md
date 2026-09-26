@@ -1,8 +1,8 @@
-Allineato a: D113
+Allineato a: D117
 
 # Mappa delle pagine — a cosa serve ogni file
 
-Indice rapido dei 79 file `.html` ancora attivi nella cartella principale,
+Indice rapido degli 80 file `.html` ancora attivi nella cartella principale,
 così non serve aprirli uno per uno per capire cosa fanno. Aggiornare
 questa mappa quando si aggiunge, rinomina o archivia una pagina.
 
@@ -24,7 +24,7 @@ nomi di classe generici che vanno in conflitto.
 |---|---|
 | `index.html` | Home page, dashboard con la propria squadra e ultimi risultati |
 | `auth.html` | Login e registrazione |
-| `bacheca.html` | Bacheca/news della lega |
+| `bacheca.html` | Bacheca della lega, con due schede: **Messaggi** (post della community) e **Novità app** (`#novita`: comunicati sugli aggiornamenti da `resources/news.json`, D116) |
 | `squadre.html` | Gestione della propria squadra |
 | `formazioni.html` | Composizione della formazione da schierare |
 | `lineup-summary.html` | Riepilogo dettagliato di una formazione schierata |
@@ -73,8 +73,10 @@ nomi di classe generici che vanno in conflitto.
 | `live.html` | Partita live: pannello a tasti per segnare bonus/malus durante la partita, doppio controllo tra admin, revisione 48h (D093) |
 | `admin-stagione.html` | Parametri della stagione, archiviazione, apertura stagione nuova (D087) |
 | `archivio.html` | Archivio stagioni / albo d'oro, per tutti (D087) |
+| `archivio-athletic.html` | Archivio Athletic: statistiche dei giocatori veri stagione per stagione, scheda giocatore (D109, motore `resources/athletic-stats.js`) |
 | `admin-contest.html` | Mini-gioco Curva vs Piana: calcolo punti, classifica, testo WhatsApp (D069) |
 | `admin-fazioni.html` | Fazione delle squadre e nomi reali dei giocatori (D073) |
+| `guida-admin.html` | Guida per gli admin dentro l'app, solo admin (Pannello › 📖 Guida). È la fonte del PDF: `scripts/guida-admin-pdf.py` (D115) |
 | `admin-calendario.html` | Gestione calendario reale Athletic |
 | `admin-deadline.html` | Gestione scadenze/deadline formazioni |
 | `admin-cards-manager.html` | Gestione card mostrate in home |

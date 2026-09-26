@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pannello admin - Fanta Athletic</title>
   <link rel="stylesheet" href="resources/sheet.css?v=20260921-header">
+  <link rel="stylesheet" href="resources/ui-kit.css?v=20260926c" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <script src="resources/mobile-detect.js?v=20260920-final"></script>
@@ -22,6 +23,7 @@
     .adm-jump::-webkit-scrollbar { display:none; }
     .adm-jump a { flex:0 0 auto; padding:8px 14px; border-radius:999px; border:1px solid rgba(148,163,184,.35); color:var(--text);
       text-decoration:none; font-weight:600; font-size:14px; background:var(--card); }
+    .adm-jump a.guide-chip { border-color:var(--tile-border-strong); font-weight:700; }
     .adm-jump a.on { background:#0c0f6d; color:#fff; border-color:#0c0f6d; }
     .adm-block { margin-top:18px; scroll-margin-top:70px; }
     .adm-block h2 { display:flex; align-items:center; gap:10px; font-size:20px; margin:0 0 4px; }
@@ -29,7 +31,7 @@
     .adm-block .desc { color:var(--muted); font-size:14px; margin:0 0 12px; }
     .adm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
     .tile { position:relative; display:block; padding:16px; border-radius:16px; background:var(--card); color:var(--text); text-decoration:none;
-      box-shadow:var(--shadow); border:1px solid rgba(148,163,184,.18); transition:transform .15s ease, border-color .15s ease; }
+      box-shadow:var(--shadow); border:1px solid var(--tile-border); transition:transform .15s ease, border-color .15s ease; }
     .tile:hover { transform:translateY(-2px); border-color:#0c0f6d; }
     .tile:active { transform:translateY(1px); }
     .tile .t { font-weight:700; font-size:16px; padding-right:60px; }
@@ -56,7 +58,7 @@
     <a class="logo-home" href="index.html" aria-label="Home">
       <img src="resources/logo.png" alt="Fanta Athletic" />
     </a>
-    <h1>Pannello admin</h1>
+    <h1>Pannello</h1>
   </header>
   
   <main class="adm" id="admRoot" style="display:none;">
@@ -69,6 +71,7 @@
     </div>
 
     <nav class="adm-jump" id="admJump">
+      <a href="guida-admin.html" class="guide-chip">📖 Guida</a>
       <a href="#live">⚡ Partita live</a>
       <a href="#stagione">📅 Stagione</a>
       <a href="#squadre">👥 Squadre e giocatori</a>
@@ -81,7 +84,7 @@
       <h2><span class="n">1</span> Partita live</h2>
       <p class="desc">Durante e dopo la partita: bonus e malus, presenze, calcolo della giornata.</p>
       <div class="adm-grid">
-        <a class="tile primary" href="live.html"><span class="tag new">Nuovo</span><div class="t">Partita live</div><div class="d">Pannello a tasti per segnare durante la partita. Doppio controllo tra i due admin, revisione entro 48 ore.</div></a>
+        <a class="tile primary" href="live.html"><span class="fa-new" data-new-until="2026-10-10">New</span><div class="t">Partita live</div><div class="d">Pannello a tasti per segnare durante la partita. Doppio controllo tra i due admin, revisione entro 48 ore.</div></a>
         <a class="tile" href="matchday.html"><div class="t">Calcolo giornata</div><div class="d">Controlla le spunte e calcola i punti (anche dopo la Partita live).</div></a>
         <a class="tile" href="admin-deadline.html"><div class="t">Scadenze formazioni</div><div class="d">Quando si chiude la consegna delle formazioni per ogni giornata.</div></a>
         <a class="tile" href="sblocca-formazioni-temp.html"><div class="t">Sblocco rapido formazioni</div><div class="d">Riapre la consegna fino alle 21:15 di oggi, per emergenze.</div></a>
@@ -92,7 +95,7 @@
       <h2><span class="n">2</span> Stagione</h2>
       <p class="desc">Parametri della stagione, calendari, chiusura e apertura della stagione nuova.</p>
       <div class="adm-grid">
-        <a class="tile primary" href="admin-stagione.html"><span class="tag new">Nuovo</span><div class="t">Impostazioni stagione</div><div class="d">Nome, squadre, giornate, modalità di gioco, punti, mini-gioco. Archivia e apri la stagione nuova.</div></a>
+        <a class="tile primary" href="admin-stagione.html"><span class="fa-new" data-new-until="2026-10-10">New</span><div class="t">Impostazioni stagione</div><div class="d">Nome, squadre, giornate, modalità di gioco, punti, mini-gioco. Archivia e apri la stagione nuova.</div></a>
         <a class="tile primary" href="admin-stagione.html#percorso"><span class="tag key">Ottobre</span><div class="t">Creazione nuova stagione</div><div class="d">Percorso guidato passo per passo: archivio, azzeramento, calendario, squadre, giocatori, asta.</div></a>
         <a class="tile" href="admin-calendario.html"><div class="t">Calendario Athletic</div><div class="d">Partite vere della squadra: date, avversari, risultati.</div></a>
         <a class="tile" href="calendario.html"><div class="t">Calendario scontri diretti</div><div class="d">Chi sfida chi, giornata per giornata (si genera quando ci sono le squadre).</div></a>
@@ -135,7 +138,7 @@
       <h2><span class="n">6</span> Archivio e sistema</h2>
       <p class="desc">Stagioni passate, utenti e strumenti tecnici.</p>
       <div class="adm-grid">
-        <a class="tile primary" href="archivio.html"><span class="tag new">Nuovo</span><div class="t">Archivio stagioni</div><div class="d">Classifiche e giornate delle stagioni passate.</div></a>
+        <a class="tile primary" href="archivio.html"><span class="fa-new" data-new-until="2026-10-10">New</span><div class="t">Archivio stagioni</div><div class="d">Classifiche e giornate delle stagioni passate.</div></a>
         <a class="tile" href="admin-users.html"><div class="t">Utenti</div><div class="d">Elenco iscritti e ruoli.</div></a>
         <a class="tile" href="admin-leghe.html"><div class="t">Lega</div><div class="d">Nome, codice invito, membri e admin della lega.</div></a>
       </div>
@@ -193,7 +196,7 @@
   <script src="resources/navbar.js?v=20260925"></script>
   <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
-  <script src="resources/mobile-menu.js?v=20260925f"></script>
+  <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
   <script src="resources/season.js?v=20260925e"></script>
@@ -224,5 +227,6 @@
       document.querySelectorAll('.adm-block').forEach(b => io.observe(b));
     })();
   </script>
+  <script src="resources/news.js?v=20260926b"></script>
 </body>
 </html>

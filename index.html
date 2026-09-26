@@ -15,6 +15,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Athletic 2018" />
   <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/ui-kit.css?v=20260926c" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <script src="resources/mobile-detect.js?v=20260920-final"></script>
@@ -635,7 +636,10 @@
     .hd-tile.ok .hd-mid { color: #22c55e; } .hd-tile.warn .hd-mid { color: #f59e0b; } .hd-tile.bad .hd-mid { color: #f87171; }
     .hd-mini { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 76px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); color: var(--text); text-decoration: none; font-size: 12px; font-weight: 700; text-align: center; padding: 8px 4px; border: 1px solid transparent; }
     .hd-mini img { width: 26px; height: 26px; object-fit: contain; }
-    .hd-mini.hd-new { border-color: rgba(250,204,21,.55); }
+    /* Bordo oro tenue su tutte le caselle (D116) */
+    .hd-card, .hd-tile, .hd-mini { border: 1px solid var(--tile-border); }
+    .hd-mini { position: relative; }
+    .hd-tile.ok { border-color: rgba(22,163,74,.45); } .hd-tile.warn { border-color: rgba(217,119,6,.5); } .hd-tile.bad { border-color: rgba(146,1,0,.55); } .hd-tile.accent { border-color: rgba(99,102,241,.55); }
     .hd-mini.hd-admin { border: 1px dashed rgba(148,163,184,.5); box-shadow: none; }
     .hd-ico-s { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
     .hd-go { font-size: 12px; font-weight: 700; color: var(--muted); }
@@ -668,6 +672,7 @@
   <main class="home-main" id="homeDash">
     <!-- Nuova Home "centro di controllo" (D109): riempita da resources/home-dashboard.js -->
     <div id="hdBanner"></div>
+    <a id="hdNews" class="fa-news-card" href="bacheca.html#novita" hidden></a>
 
     <p class="hd-label">Adesso</p>
     <div id="hdNext" class="hd-card hd-click"><div class="hd-k">Prossima partita</div><div class="hd-big">Caricamento…</div></div>
@@ -700,7 +705,7 @@
     <div id="hdLast" class="hd-card"><div class="hd-k">Athletic 2018</div><div class="hd-sub">Caricamento…</div></div>
     <div class="hd-grid4">
       <a class="hd-mini" href="calendario-athletic.html"><img src="resources/icons/calendario.png" alt="" aria-hidden="true"><span>Partite</span></a>
-      <a class="hd-mini hd-new" href="archivio-athletic.html"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color:var(--gold,#facc15)"><path d="M4 19V5a2 2 0 012-2h12a2 2 0 012 2v14"/><path d="M4 19a2 2 0 002 2h14M8 7h8M8 11h8M8 15h5"/></svg><span>Archivio</span></a>
+      <a class="hd-mini" href="archivio-athletic.html"><span class="fa-new" data-new-until="2026-10-10">New</span><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color:var(--gold,#facc15)"><path d="M4 19V5a2 2 0 012-2h12a2 2 0 012 2v14"/><path d="M4 19a2 2 0 002 2h14M8 7h8M8 11h8M8 15h5"/></svg><span>Archivio</span></a>
       <a class="hd-mini" href="archivio.html"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color:var(--gold,#facc15)"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3"/></svg><span>Albo d'oro</span></a>
       <a class="hd-mini" href="store.html"><img src="resources/icons/store.png" alt="" aria-hidden="true"><span>Store</span></a>
     </div>
@@ -787,13 +792,15 @@
   <script src="resources/push-notifications.js"></script>
   <script src="resources/pwa-install.js?v=20260920-final"></script>
   <script src="resources/error-logger.js?v=20260920-final"></script>
-  <script src="resources/mobile-menu.js?v=20260925f"></script>
+  <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/contest-scoring.js?v=20260925"></script>
   <script src="resources/season.js?v=20260925e"></script>
   <script src="resources/season-archive.js?v=20260925b"></script>
   <script src="resources/athletic-stats.js?v=20260925"></script>
   <script src="resources/home-dashboard.js?v=20260925"></script>
+  <script src="resources/news.js?v=20260926b"></script>
+  <script>FANews.homeCard(document.getElementById('hdNews')); FANews.popup();</script>
   <script src="resources/provisional-badge.js?v=20260925"></script>
   <script src="resources/faction.js?v=20260925f"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>

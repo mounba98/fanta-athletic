@@ -1,6 +1,16 @@
-Allineato a: D114
+Allineato a: D117
 
 # Fanta Athletic — contesto per Claude
+
+## ⚠️ Regola fissa: ogni modifica si porta dietro tutto il resto (D116)
+
+Ogni aggiornamento dell'app aggiorna **da solo, senza che l'utente lo chieda**, tutto
+ciò che lo racconta o ne dipende: **Novità** (`resources/news.json`, per giocatori
+e/o admin), **Guida admin** (`guida-admin.html` + PDF), mappa pagine, etichette
+`?v=`, etichette "New", documenti "Allineato a". Tabella completa in
+[`docs/CHECKLIST_AGGIORNAMENTO.md`](docs/CHECKLIST_AGGIORNAMENTO.md).
+**Prima di ogni commit: `python3 scripts/check-coerenza.py`** — se segnala PROBLEMI
+non si committa. Le Novità le scrive Claude, in linguaggio da giocatore.
 
 ## Il piano generale, in ordine (D034 — importante, leggere prima di tutto)
 
@@ -61,7 +71,10 @@ squadre senza allenatore; nuova Home "centro di controllo" (`resources/home-dash
 selettore di lega come cerchietto 🏆 nell'intestazione; titoli lunghi accorciati;
 glossario **Lega → Stagione → Competizioni → Giornate** (`docs/GLOSSARIO_LEGHE.md`);
 sezione Competizioni nella tendina 🏆 (`resources/competitions.js`); freccia ‹ "indietro"
-su tutte le pagine secondarie; swipe dal bordo rifatto. Guida PDF admin v2 (D114).
+su tutte le pagine secondarie; swipe dal bordo rifatto. Guida admin v2 (D114), ora anche
+**in app** (`guida-admin.html`, Pannello › 📖 Guida, D115): è la fonte, il PDF si rigenera
+con `python3 scripts/guida-admin-pdf.py`. **Quando cambia una funzione admin, aggiornare
+anche la guida.**
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).
 Prossimi passi: supporto agli admin mentre compilano (l'utente segnala i bug che

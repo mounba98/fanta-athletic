@@ -1,4 +1,4 @@
-Allineato a: D114
+Allineato a: D117
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
@@ -36,6 +36,10 @@ Allineato a: D114
 
 **Da fare a fine Fase 3:**
 - [x] ~~Recuperare `firebase.json` / `.firebaserc`~~ **ricreati (D101)**; per pubblicare serve la Firebase CLI (Node.js non installato: da decidere). Vecchio: (configurazione Hosting, non presenti nella cartella, D099): servono per pubblicare. Chiederli all'amico o ricrearli; valutare lì intestazioni di cache lunghe per i file etichettati `?v=`.
+- [x] **Novità dell'app** (D116, spostate in Bacheca D117): scheda **Novità app** in `bacheca.html#novita`, finestra all'apertura, casella in Home, collegamento da Notifiche; comunicati in `resources/news.json`, scritti da Claude a ogni aggiornamento.
+- [ ] **Notifiche push** (D082): rimandate, priorità dopo le Novità (serve Firebase Cloud Messaging; su iPhone solo con l'app installata sulla schermata Home).
+- [ ] Etichette "New" in scadenza il 10/10/2026 (2 settimane dalla pubblicazione): spariscono da sole, lo script poi le segnala per toglierle dal codice. Se la pubblicazione slitta, spostare la data.
+- [x] **Guida per gli admin anche in app** (D115, `guida-admin.html`, fonte del PDF). Da tenere aggiornata a ogni modifica di una funzione admin.
 - [x] **Guida PDF per gli admin**: versione 2 del 26/09 (D114, 12 pagine, con schemi disegnati di Home e tendina 🏆) in `~/Claude/fanta-athletic-backups/03-documenti-admin/`; la v1 in `versioni-precedenti/`. Screenshot veri dell'app: non fatti (servirebbero la cattura dello schermo, esclusa dalle regole di sicurezza, o foto dal telefono dell'utente).
 - [x] **Pubblicazione del sito + GitHub fatte il 25/09/2026 (D103, D106).** Da qui: commit e deploy separati, su conferma. La copia del 19/09 è già fuori dal progetto (D101); `backups-firestore/` è escluso da Git e da `firebase.json`.
 
