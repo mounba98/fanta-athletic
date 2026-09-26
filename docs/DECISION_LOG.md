@@ -4224,5 +4224,5 @@ restano come rete di sicurezza per chi non attiva le notifiche.
 - `README.md`: nuova sezione "Struttura della cartella" (cosa sta dove e perché).
 - `scripts/check-coerenza.py`: due controlli nuovi — **file fuori posto nella cartella principale** (provato con un file finto: segnalato) e **file richiamati dalle pagine che non esistono**. Il secondo ha trovato 5 collegamenti a pagine mai esistite nel cluster giochi (`games-hub.html`, `wirc-royale.html`): già rotti da prima (D020), annotati in `PUNTI_APERTI.md`, segnalati come avviso. Checklist aggiornata (riga "file nuovo o spostato").
 - Verificato: nessun file mancante per le 80 pagine e gli script/stili condivisi (controllo su 146 file); il server locale non registra richieste a file inesistenti; controllo di coerenza OK. Nessuna novità per giocatori o admin (riordino interno): alzati `allineato` di news.json e il meta della guida dopo averlo valutato.
-**Prossimo passo**: commit+push e pubblicazione (confermati dall'utente).
+- **Pubblicato** (26/09/2026): commit `bf1a3e2` su GitHub + sito. Verificato sul sito vero: pagine principali, guida, `news.json` (allineato D118) e immagine segnaposto rispondono; i file spostati non sono più online (`contest-reminder.js`, `cors.json` → 404) e documenti, script, archivio e `.git` restano irraggiungibili.
 
