@@ -50,12 +50,21 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D118, 26/09/2026)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D119, 28/09/2026)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
 `main`), ultima pubblicazione 26/09/2026 (D115–D118, commit `bf1a3e2`). Stagione 2026/27 aperta e
 vuota: **la compilano gli admin**, con la guida **in app** (Pannello › 📖 Guida,
 `guida-admin.html`) e in PDF (`~/Claude/fanta-athletic-backups/03-documenti-admin/`).
 **L'utente sta provando l'app da admin e segnalerà i bug**: partire da quelli.
+**Ultimo lavoro (D119, 28/09)**: presentazione per i partecipanti all'asta
+(`docs/presentazioni/asta-2026-27.html`, PDF in `~/Claude/fanta-athletic-backups/03-documenti-admin/`).
+**Da confermare con gli admin prima dell'asta**: creare in app i 4 bonus di fazione
+(la slide 5 li presenta) e se tenere la dicitura "Offese ai giocatori"; se cambia
+qualcosa, aggiornare la slide e ridare all'utente il comando del PDF.
+**Regole nuove (28/09)**: sicurezza più stretta — Claude non avvia Chrome (i PDF li
+crea l'utente) e non esce dalla cartella del progetto senza permesso; quando l'utente
+deve eseguire qualcosa, dargli blocchi di comandi pronti per "Esegui" che si chiudono
+da soli; `git commit`/`push` lanciati da soli dalla cartella del progetto.
 **A inizio sessione**: riavviare il server locale (`preview_start` "static-server");
 nel browser di prova il login è andato perso il 26/09 → rifarlo è compito
 dell'utente, non di Claude. Lanciare `python3 scripts/check-coerenza.py` per vedere
