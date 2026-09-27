@@ -57,7 +57,8 @@ valutato caso per caso.
   (`CHECKLIST_AGGIORNAMENTO.md`), mappa delle pagine, glossario, allineamento
   Firebase; `firebase-storico/` (configurazioni e regole vecchie, solo
   riferimento); `storico-originali/` (documenti di progettazione dello
-  sviluppatore originale, contesto storico); `catalogo/`.
+  sviluppatore originale, contesto storico); `presentazioni/` (presentazioni per i
+  partecipanti, es. quella dell'asta, con il comando per il PDF); `catalogo/`.
 - `archive/` — file tenuti per riferimento ma non più usati dall'app:
   `versioni-precedenti/` (copie prima di una modifica grossa, col numero di
   decisione nel nome), `resources-orfani/` (script e dati non più caricati),

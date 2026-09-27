@@ -106,7 +106,14 @@ for p in ROOT.glob('*.html'):
 
 # 9) PDF della guida più vecchio della pagina
 pdf = pathlib.Path.home() / 'Claude/fanta-athletic-backups/03-documenti-admin/Guida-admin-Fanta-Athletic-2026-27.pdf'
-if pdf.exists() and pdf.stat().st_mtime < (ROOT / 'guida-admin.html').stat().st_mtime:
+try:
+    pdf_ok = pdf.exists()
+except PermissionError:
+    pdf_ok = False
+if not pdf_ok:
+    warnings.append('PDF della guida non leggibile da qui (fuori dalla cartella del progetto): '
+                    'se la guida è cambiata, chiedi a Iacopo di rigenerarlo (comando in scripts/guida-admin-pdf.py)')
+elif pdf.stat().st_mtime < (ROOT / 'guida-admin.html').stat().st_mtime:
     warnings.append('PDF della guida più vecchio di guida-admin.html → python3 scripts/guida-admin-pdf.py')
 
 # 10) File richiamati dalle pagine che non esistono (D118)

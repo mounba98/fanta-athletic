@@ -1,4 +1,4 @@
-Allineato a: D118
+Allineato a: D119
 
 # Fanta Athletic — contesto per Claude
 

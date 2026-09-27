@@ -5,6 +5,9 @@ La pagina dell'app è la FONTE; il PDF da mandare agli admin resta FUORI dal
 progetto (~/Claude/fanta-athletic-backups/03-documenti-admin/). Usa Chrome
 "invisibile" (headless) su un file locale: nessuna connessione, nessun login.
 Uso:  python3 scripts/guida-admin-pdf.py
+
+Dal 28/09/2026 (D119) il sandbox di Claude blocca Chrome (dati del browser in ~/Library):
+lo lancia Iacopo dal terminale, oppure Claude gli passa il comando.
 """
 import os, re, subprocess, tempfile, pathlib
 

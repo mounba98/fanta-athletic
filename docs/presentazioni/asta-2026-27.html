@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Fanta Athletic 2026/27 — Presentazione all'asta</title>
+<!-- Presentazione per i partecipanti, da proiettare all'asta di ottobre 2026 (D119).
+     Slide 16:9. PDF: Chrome invisibile, vedi docs/presentazioni/LEGGIMI.md.
+     Ogni dato qui è verificato su app/diario: se cambia una regola, aggiornare anche questa. -->
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  :root { --red:#920100; --red2:#c81e1e; --navy:#0c0f6d; --gold:#facc15; --ink:#e8ecf3; --muted:#9aa6b8; --card:#16222b; --line:#22303a; --bg:#0c1318; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; background: #000; }
+  body { font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--ink); }
+  .slide { width: 1280px; height: 720px; position: relative; overflow: hidden; background: var(--bg); padding: 56px 72px; break-after: page; }
+  .slide:last-child { break-after: auto; }
+  .slide::before { content: ""; position: absolute; inset: 0; background:
+      radial-gradient(900px 500px at 110% -10%, rgba(146,1,0,.35), transparent 60%),
+      radial-gradient(800px 500px at -10% 120%, rgba(12,15,109,.55), transparent 60%); pointer-events: none; }
+  .slide > * { position: relative; }
+  .kicker { font-size: 15px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  h1 { font-size: 64px; line-height: 1.02; margin: 0 0 18px; letter-spacing: -1.5px; }
+  h2 { font-size: 44px; line-height: 1.08; margin: 0 0 10px; letter-spacing: -1px; }
+  .lead { font-size: 22px; line-height: 1.45; color: #cfd6e2; max-width: 900px; margin: 0 0 26px; }
+  .gold { color: var(--gold); }
+  .red { color: #ff6b61; }
+  .foot { position: absolute; left: 72px; right: 72px; bottom: 26px; display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+  .grid { display: grid; gap: 18px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3,1fr); } .g4 { grid-template-columns: repeat(4,1fr); }
+  .card { background: var(--card); border: 1px solid rgba(250,204,21,.26); border-radius: 22px; padding: 22px 24px; }
+  .card .ic { font-size: 34px; line-height: 1; margin-bottom: 10px; }
+  .card b { display: block; font-size: 21px; margin-bottom: 6px; color: #fff; }
+  .card p { margin: 0; font-size: 16px; line-height: 1.45; color: #c6cfdc; }
+  .big { font-size: 76px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
+  .stat { text-align: center; padding: 26px 16px; }
+  .stat small { display: block; margin-top: 8px; font-size: 16px; color: var(--muted); font-weight: 600; }
+  .row { display: flex; gap: 48px; align-items: center; }
+  .pill { display: inline-block; padding: 6px 16px; border-radius: 999px; font-weight: 800; font-size: 15px; }
+  .pill.red { background: var(--red); color: #fff; } .pill.navy { background: var(--navy); color: #fff; } .pill.gold { background: var(--gold); color: #1b1b1b; }
+  ul.tick { list-style: none; padding: 0; margin: 0; }
+  ul.tick li { position: relative; padding-left: 38px; margin: 0 0 16px; font-size: 21px; line-height: 1.4; color: #dbe1ea; }
+  ul.tick li::before { content: "✓"; position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: #fff; font-size: 15px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+  ul.tick li b { color: #fff; }
+  .new { display: inline-block; vertical-align: 6px; margin-left: 8px; padding: 3px 9px 4px; font-size: 12px; font-weight: 900; letter-spacing: .08em; background: linear-gradient(180deg,var(--red2),var(--red)); color: #fff; border-radius: 4px; }
+  /* telefono disegnato */
+  .phone { width: 300px; flex: none; border: 8px solid #222c36; border-radius: 34px; background: var(--bg); overflow: hidden; font-size: 12px; box-shadow: 0 30px 60px rgba(0,0,0,.5); }
+  .phone .hdr { display: flex; align-items: center; gap: 8px; padding: 12px 12px; background: linear-gradient(90deg,#6e0a0a,#15187a); }
+  .phone .t { flex: 1; font-weight: 900; font-size: 15px; }
+  .phone .cup { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--gold); display: grid; place-items: center; font-size: 11px; }
+  .phone .season { border: 1.5px solid var(--gold); border-radius: 999px; padding: 2px 8px; font-size: 10px; color: var(--gold); font-weight: 800; }
+  .phone .k { text-transform: uppercase; letter-spacing: 1.2px; font-size: 9px; color: var(--muted); font-weight: 800; margin: 10px 12px 4px; }
+  .phone .c { background: var(--card); border: 1px solid rgba(250,204,21,.26); border-radius: 12px; padding: 8px 10px; margin: 0 12px 6px; }
+  .phone .c b { color: #fff; }
+  .phone .r { display: flex; gap: 6px; margin: 0 12px 6px; }
+  .phone .r .c { flex: 1; margin: 0; text-align: center; }
+  .phone .team { margin: 0 12px 6px; border-radius: 12px; padding: 10px 12px; background: linear-gradient(135deg,var(--red),var(--navy)); color: #fff; font-weight: 800; }
+  .vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: stretch; }
+  .fac { border-radius: 26px; padding: 30px; color: #fff; }
+  .fac.curva { background: linear-gradient(135deg,#b01212,#5a0000); }
+  .fac.piana { background: linear-gradient(135deg,#1c22a8,#070a45); }
+  .fac h3 { font-size: 38px; margin: 0 0 8px; }
+  .fac p { font-size: 18px; line-height: 1.45; margin: 0; opacity: .92; }
+  .vsb { align-self: center; font-size: 48px; font-weight: 900; color: var(--gold); }
+  .bonus { display: flex; align-items: center; gap: 18px; background: var(--card); border: 1px solid rgba(250,204,21,.26); border-radius: 20px; padding: 18px 22px; }
+  .bonus .pts { flex: none; width: 82px; height: 82px; border-radius: 50%; display: grid; place-items: center; font-size: 30px; font-weight: 900; background: rgba(250,204,21,.14); color: var(--gold); border: 2px solid rgba(250,204,21,.5); }
+  .bonus b { display: block; font-size: 22px; color: #fff; }
+  .bonus span { font-size: 16px; color: var(--muted); }
+  .flow { display: flex; align-items: center; gap: 14px; margin: 22px 0 28px; flex-wrap: wrap; }
+  .flow .st { background: var(--card); border: 1px solid rgba(250,204,21,.26); border-radius: 18px; padding: 16px 18px; min-width: 190px; }
+  .flow .st b { display: block; font-size: 19px; color: #fff; }
+  .flow .st span { font-size: 15px; color: var(--muted); }
+  .flow .ar { font-size: 30px; color: var(--gold); font-weight: 900; }
+  .num { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--gold); color: #1b1b1b; font-weight: 900; font-size: 22px; flex: none; }
+  .step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+  .step div { font-size: 20px; line-height: 1.4; color: #dbe1ea; }
+  .step div b { color: #fff; }
+  .url { font-size: 34px; font-weight: 900; color: var(--gold); letter-spacing: -.5px; }
+</style>
+</head>
+<body>
+
+<!-- 1 · Copertina -->
+<section class="slide" style="display:flex;align-items:center;">
+  <div class="row" style="width:100%;justify-content:space-between;">
+    <div style="max-width:700px">
+      <div class="kicker">Asta · Ottobre 2026</div>
+      <h1>Fanta Athletic<br><span class="gold">2026/27</span><br>si riparte.</h1>
+      <p class="lead">Rose nuove, un'app rinnovata e più modi per fare punti — anche dagli spalti. Ecco cosa cambia per te.</p>
+      <span class="pill red">Stagione 2026/27</span> &nbsp; <span class="pill navy">fanta-athletic.web.app</span>
+    </div>
+    <img src="../../resources/app-icons/icon-512.png" alt="Athletic 2018" style="width:360px;height:360px;border-radius:64px;box-shadow:0 30px 80px rgba(0,0,0,.6);">
+  </div>
+  <div class="foot"><span>Fanta Athletic · la lega dell'Athletic 2018</span><span>1</span></div>
+</section>
+
+<!-- 2 · La stagione passata -->
+<section class="slide">
+  <div class="kicker">Com'è andata · 2025/26</div>
+  <h2>Una stagione da ricordare. <span class="gold">E da battere.</span></h2>
+  <p class="lead">Tutto è al sicuro nell'<b>Albo d'oro</b>: classifica finale, podio e punti di ogni giornata.</p>
+  <div class="grid g4" style="margin-top:14px">
+    <div class="card stat"><div class="big gold">🏆</div><small style="font-size:22px;color:#fff;font-weight:900;margin-top:14px">Pettecivi</small><small>campione con 558 punti</small></div>
+    <div class="card stat"><div class="big">21</div><small>giornate giocate</small></div>
+    <div class="card stat"><div class="big">32</div><small>gol dell'Athletic 2018</small></div>
+    <div class="card stat"><div class="big">9</div><small>gol di "momo" Fantechi,<br>capocannoniere</small></div>
+  </div>
+  <p class="lead" style="margin-top:30px;font-size:20px">Chi sarà il prossimo nome sull'Albo d'oro? <b class="gold">Si decide da stasera.</b></p>
+  <div class="foot"><span>Dati dall'Albo d'oro e dall'Archivio Athletic</span><span>2</span></div>
+</section>
+
+<!-- 3 · Panoramica -->
+<section class="slide">
+  <div class="kicker">In un colpo d'occhio</div>
+  <h2>Cosa c'è di nuovo quest'anno</h2>
+  <div class="grid g4" style="margin-top:26px">
+    <div class="card"><div class="ic">🔥</div><b>Curva vs Piana</b><p>Scegli la tua tifoseria e sfida l'altra metà della lega.</p></div>
+    <div class="card"><div class="ic">🏟️</div><b>Bonus dagli spalti</b><p>Vieni alla partita dell'Athletic: la tua squadra fa punti.</p></div>
+    <div class="card"><div class="ic">🗳️</div><b>Mini-gioco 1-X-2</b><p>Pronostica ogni partita: 10 punti per te e la tua fazione.</p></div>
+    <div class="card"><div class="ic">⚡</div><b>Punti più veloci</b><p>Provvisori subito dopo la partita, definitivi entro 48 ore.</p></div>
+    <div class="card"><div class="ic">🏠</div><b>Nuova Home</b><p>Tutto quello che ti serve adesso, in una schermata.</p></div>
+    <div class="card"><div class="ic">📊</div><b>Archivio Athletic</b><p>Gol, assist, MVP dei giocatori veri, stagione per stagione.</p></div>
+    <div class="card"><div class="ic">🏆</div><b>Competizioni</b><p>Campionato, e pronti Scontri diretti e Coppa.</p></div>
+    <div class="card"><div class="ic">📣</div><b>App più comoda</b><p>Freccia indietro, tema scuro, Novità in Bacheca.</p></div>
+  </div>
+  <div class="foot"><span>Le pagine che seguono, una per una</span><span>3</span></div>
+</section>
+
+<!-- 4 · Curva vs Piana -->
+<section class="slide">
+  <div class="kicker">Il gioco nel gioco</div>
+  <h2>Curva Morello <span class="gold">vs</span> Piana</h2>
+  <p class="lead">Ogni squadra appartiene a una tifoseria. Oltre al campionato c'è una seconda sfida: <b>quale fazione fa più punti</b> in tutta la stagione.</p>
+  <div class="vs">
+    <div class="fac curva"><h3>Curva Morello</h3><p>Il cuore caldo del tifo. Cori, presenza, passione: ogni punto conta per la Curva.</p></div>
+    <div class="vsb">VS</div>
+    <div class="fac piana"><h3>Piana</h3><p>L'altra metà della lega. Stessa voglia di vincere, stessa classifica da scalare.</p></div>
+  </div>
+  <ul class="tick" style="margin-top:26px">
+    <li>La tifoseria la sceglie <b>il primo della squadra che entra nell'app</b>; i compagni la ereditano.</li>
+    <li>Resta alla squadra anche le stagioni dopo: per cambiarla, <b>una volta l'anno all'asta</b>, si chiede agli admin.</li>
+    <li>La sfida si segue in <b>Classifiche › Curva vs Piana</b>.</li>
+  </ul>
+  <div class="foot"><span>Curva vs Piana è un gioco collaterale: non cambia la classifica del Campionato</span><span>4</span></div>
+</section>
+
+<!-- 5 · Bonus di fazione -->
+<section class="slide">
+  <div class="kicker">Vieni allo stadio</div>
+  <h2>I punti si fanno <span class="gold">anche dagli spalti</span></h2>
+  <p class="lead">I bonus di fazione premiano chi c'è davvero. Gli admin li segnano a ogni partita, <b>una presenza per squadra</b>.</p>
+  <div class="grid g2">
+    <div class="bonus"><div class="pts">+1</div><div><b>Presenza in casa</b><span>quando l'Athletic gioca in casa · tutte le squadre</span></div></div>
+    <div class="bonus"><div class="pts">+2</div><div><b>Presenza in trasferta</b><span>vale doppio seguire la squadra fuori casa · tutte le squadre</span></div></div>
+    <div class="bonus"><div class="pts">+2</div><div><b>Coro contro la Piana</b><span>solo per le squadre della Curva Morello</span></div></div>
+    <div class="bonus"><div class="pts">+2</div><div><b>Offese ai giocatori</b><span>solo per le squadre della Piana</span></div></div>
+  </div>
+  <p class="lead" style="margin-top:26px;font-size:19px">Più siete sugli spalti, più la vostra squadra — e la vostra fazione — sale in classifica.</p>
+  <div class="foot"><span>Valori concordati con gli admin per la stagione 2026/27</span><span>5</span></div>
+</section>
+
+<!-- 6 · Mini-gioco -->
+<section class="slide">
+  <div class="kicker">Ogni partita, un pronostico</div>
+  <h2>Il mini-gioco <span class="gold">1 · X · 2</span></h2>
+  <p class="lead">Prima di ogni partita dell'Athletic 2018 dici come finisce. Se indovini, fai punti <b>per te e per la tua fazione</b>.</p>
+  <div class="flow">
+    <div class="st"><b>24 ore prima</b><span>si apre il voto</span></div><div class="ar">→</div>
+    <div class="st"><b>Voti 1, X o 2</b><span>dal menu ☰ › Mini-gioco</span></div><div class="ar">→</div>
+    <div class="st"><b>30 minuti prima</b><span>si chiude il voto</span></div><div class="ar">→</div>
+    <div class="st" style="border-color:var(--gold)"><b class="gold">+10 punti</b><span>se indovini l'esito</span></div>
+  </div>
+  <ul class="tick">
+    <li>La Home ti ricorda quando il voto è <b>aperto</b> e se hai già votato.</li>
+    <li>Classifica dei pronostici tutta sua, e i punti contano anche nella sfida <b>Curva vs Piana</b>.</li>
+  </ul>
+  <div class="foot"><span>Gratis, veloce, ogni settimana: nessuna scusa per non giocarlo</span><span>6</span></div>
+</section>
+
+<!-- 7 · Punti più veloci -->
+<section class="slide">
+  <div class="kicker">Niente più attese</div>
+  <h2>I punti arrivano <span class="gold">subito dopo la partita</span></h2>
+  <p class="lead">Con la nuova <b>Partita live</b> due admin segnano bonus e malus dal telefono, a bordo campo, ognuno per conto suo. Poi l'app confronta i due fogli.</p>
+  <div class="flow">
+    <div class="st"><b>Fischio finale</b><span>i due fogli si incrociano</span></div><div class="ar">→</div>
+    <div class="st" style="border-color:#d97706"><b style="color:#f59e0b">Punti provvisori</b><span>li vedi subito, con l'avviso</span></div><div class="ar">→</div>
+    <div class="st"><b>48 ore di revisione</b><span>segnalazioni e correzioni</span></div><div class="ar">→</div>
+    <div class="st" style="border-color:#16a34a"><b style="color:#22c55e">Punti definitivi</b><span>l'avviso sparisce</span></div>
+  </div>
+  <ul class="tick">
+    <li><b>Doppio controllo</b>: quello che i due admin non segnano uguale viene deciso in revisione.</li>
+    <li>Qualcosa non torna? <b>Segnalalo agli admin entro 48 ore</b>: ogni correzione resta registrata.</li>
+  </ul>
+  <div class="foot"><span>Più veloci, più trasparenti, più giusti</span><span>7</span></div>
+</section>
+
+<!-- 8 · Nuova Home -->
+<section class="slide">
+  <div class="row">
+    <div class="phone">
+      <div class="hdr"><span>☰</span><span class="t">Home</span><span class="cup">🏆</span><span class="season">2026/2027</span></div>
+      <div class="k">Adesso</div>
+      <div class="c" style="border-left:3px solid var(--red)">Prossima partita · 1ª giornata<br><b>Athletic 2018 – Avversario</b><br>tra 3 giorni · in casa</div>
+      <div class="r"><div class="c">Formazione<br><b>da consegnare</b></div><div class="c">Mini-gioco<br><b>voto aperto</b></div></div>
+      <div class="k">Il mio fanta</div>
+      <div class="team">La mia squadra<br><span style="font-size:15px">allenatore · tifoseria · posizione</span></div>
+      <div class="r"><div class="c">Classifica</div><div class="c">Squadre</div><div class="c">Statistiche</div></div>
+      <div class="c">Bacheca · ultimo messaggio</div>
+      <div class="k">Athletic 2018</div>
+      <div class="c" style="margin-bottom:12px">Ultima partita · marcatori</div>
+    </div>
+    <div>
+      <div class="kicker">Apri l'app e sai già cosa fare</div>
+      <h2>La nuova <span class="gold">Home</span></h2>
+      <ul class="tick" style="margin-top:22px">
+        <li><b>Adesso</b>: la prossima partita dell'Athletic, la formazione da consegnare con la scadenza, il voto del mini-gioco.</li>
+        <li><b>Il mio fanta</b>: la tua squadra con allenatore, tifoseria e posizione, e l'ultimo messaggio della Bacheca.</li>
+        <li><b>Athletic 2018</b>: l'ultima partita con il risultato e i marcatori della stagione.</li>
+        <li>Cambia da sola con il momento: punti provvisori, asta aperta, novità.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Schema indicativo: i testi veri dipendono dai dati della stagione</span><span>8</span></div>
+</section>
+
+<!-- 9 · Archivio e competizioni -->
+<section class="slide">
+  <div class="kicker">La memoria della lega</div>
+  <h2>Archivio Athletic, Albo d'oro, <span class="gold">competizioni</span></h2>
+  <div class="grid g3" style="margin-top:26px">
+    <div class="card"><div class="ic">📊</div><b>Archivio Athletic <span class="new">NEW</span></b><p>Le statistiche dei <b style="display:inline;font-size:16px">giocatori veri</b> dell'Athletic 2018: gol, assist, presenze, MVP, cartellini, portieri e tante curiosità. Stagione per stagione o di sempre; tocca un nome per la sua scheda. Utilissimo per preparare l'asta!</p></div>
+    <div class="card"><div class="ic">🏆</div><b>Albo d'oro</b><p>Campione, podio, classifica finale e punti giornata per giornata di ogni stagione archiviata. Il tuo nome può finire qui.</p></div>
+    <div class="card"><div class="ic">🎯</div><b>Il cerchietto 🏆 in alto</b><p>La tua lega, la stagione e le competizioni attive: <b style="display:inline;font-size:16px">Campionato</b> e, quando gli admin li accendono, <b style="display:inline;font-size:16px">Scontri diretti</b> e <b style="display:inline;font-size:16px">Coppa</b>. Scegline una e la classifica si apre su quella.</p></div>
+  </div>
+  <div class="foot"><span>Menu ☰ › Archivio Athletic · Albo d'oro</span><span>9</span></div>
+</section>
+
+<!-- 10 · App più comoda -->
+<section class="slide">
+  <div class="kicker">Un'app, non un sito</div>
+  <h2>Più comoda, più bella, <span class="gold">sempre in tasca</span></h2>
+  <div class="grid g2" style="margin-top:22px;gap:40px">
+    <ul class="tick">
+      <li><b>Freccia ‹ in alto</b> per tornare indietro da ogni pagina.</li>
+      <li><b>Trascina il dito dal bordo sinistro</b> e si apre il menu.</li>
+      <li><b>Tema scuro</b> di serie (si cambia dal menu ☰) e <b>nuova icona</b> con il logo Athletic 2018.</li>
+      <li><b>Novità dell'app</b> in Bacheca: ogni aggiornamento spiegato in due righe.</li>
+    </ul>
+    <div class="card">
+      <b>📲 Installala sulla schermata Home</b>
+      <div class="step" style="margin-top:14px"><span class="num">1</span><div>Apri <b class="gold">fanta-athletic.web.app</b></div></div>
+      <div class="step"><span class="num">2</span><div><b>iPhone</b> (Safari): Condividi 📤 → "Aggiungi alla schermata Home"</div></div>
+      <div class="step"><span class="num">3</span><div><b>Android</b> (Chrome): menu ⋮ → "Aggiungi alla schermata Home"</div></div>
+      <p style="margin-top:6px">Si apre a tutto schermo, come un'app vera. Hai già la vecchia icona? Toglila e rimettila.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Funziona su qualsiasi telefono, senza store</span><span>10</span></div>
+</section>
+
+<!-- 11 · Da sapere per l'asta -->
+<section class="slide">
+  <div class="kicker">Prima di alzare la mano</div>
+  <h2>Da sapere <span class="gold">per l'asta</span></h2>
+  <ul class="tick" style="margin-top:26px;max-width:1080px">
+    <li><b>Rose nuove ogni anno</b>: le squadre ripartono da zero. Dopo l'asta gli admin inseriscono i giocatori nella tua rosa.</li>
+    <li><b>Allenatore e tifoseria restano alla tua squadra</b>. Vuoi cambiarli? È il momento: chiedilo agli admin qui, all'asta.</li>
+    <li><b>Squadra nuova?</b> Al primo accesso l'app ti chiede di scegliere <b>allenatore</b> e <b>tifoseria</b>.</li>
+    <li>Al primo accesso ti chiediamo anche il <b>nome reale</b>: così tutti sanno chi c'è dietro ogni squadra.</li>
+    <li><b>Formazione</b>: si consegna dall'app entro la scadenza di ogni giornata; la Home ti ricorda quando manca.</li>
+  </ul>
+  <div class="foot"><span>Dubbi? Chiedi agli admin o scrivi in Bacheca</span><span>11</span></div>
+</section>
+
+<!-- 12 · Chiusura -->
+<section class="slide" style="display:flex;align-items:center;">
+  <div class="row" style="width:100%;justify-content:space-between;">
+    <div style="max-width:720px">
+      <div class="kicker">Da stasera</div>
+      <h1 style="font-size:56px">Più ci sei,<br><span class="gold">più fai punti.</span></h1>
+      <div class="step"><span class="num">1</span><div><b>Entra nell'app</b> e scegli la tua tifoseria</div></div>
+      <div class="step"><span class="num">2</span><div><b>Consegna la formazione</b> ogni giornata</div></div>
+      <div class="step"><span class="num">3</span><div><b>Vota il mini-gioco</b> prima di ogni partita</div></div>
+      <div class="step"><span class="num">4</span><div><b>Vieni allo stadio</b> e fai punti per la tua squadra</div></div>
+      <div class="step"><span class="num">5</span><div><b>Fatti sentire in Bacheca</b></div></div>
+    </div>
+    <div style="text-align:center">
+      <img src="../../resources/app-icons/icon-512.png" alt="" style="width:240px;height:240px;border-radius:48px;box-shadow:0 30px 80px rgba(0,0,0,.6);">
+      <div class="url" style="margin-top:22px">fanta-athletic.web.app</div>
+      <div style="color:var(--muted);font-size:17px;margin-top:6px">Buona asta a tutti! 🔨</div>
+    </div>
+  </div>
+  <div class="foot"><span>Fanta Athletic · Stagione 2026/27</span><span>12</span></div>
+</section>
+
+</body>
+</html>
