@@ -61,6 +61,11 @@ nel browser di prova il login è andato perso il 26/09 → rifarlo è compito
 dell'utente, non di Claude. Lanciare `python3 scripts/check-coerenza.py` per vedere
 subito se qualcosa è rimasto indietro. Nel Cestino del Mac c'è la copia doppia
 dei backup tolta in D118 (l'originale è in `~/Claude/fanta-athletic-backups/`).
+**Cartella backup = parte del progetto** (autorizzata dall'utente il 28/09, D119):
+`~/Claude/fanta-athletic-backups/` (database, guida PDF, presentazioni). Con le regole
+di sicurezza è fuori dal recinto: a inizio sessione, se serve, proporre
+`/add-dir ~/Claude/fanta-athletic-backups`. I PDF (Chrome) li crea l'utente:
+comandi in `docs/presentazioni/LEGGIMI.md` e `scripts/guida-admin-pdf.py`.
 **Come si lavora** (D103/D106/D116): modifica → prova in locale (telefono e
 computer, chiaro/scuro) → **aggiorna le parti collegate** (Novità in
 `resources/news.json`, guida admin + PDF, mappa, `?v=`, etichette "New", documenti:

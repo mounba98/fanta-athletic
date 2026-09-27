@@ -74,6 +74,9 @@
   .step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
   .step div { font-size: 20px; line-height: 1.4; color: #dbe1ea; }
   .step div b { color: #fff; }
+  /* In stampa (PDF) le ombre diventano rettangoli neri: niente ombre, al loro posto un bordo sottile (D119) */
+  @media print { * { box-shadow: none !important; filter: none !important; } .logo { border: 2px solid rgba(250,204,21,.35); } .phone { border-color: #2c3a47; } }
+  .logo { display: block; }
   .url { font-size: 34px; font-weight: 900; color: var(--gold); letter-spacing: -.5px; }
 </style>
 </head>
@@ -82,13 +85,13 @@
 <!-- 1 · Copertina -->
 <section class="slide" style="display:flex;align-items:center;">
   <div class="row" style="width:100%;justify-content:space-between;">
-    <div style="max-width:700px">
+    <div style="max-width:640px">
       <div class="kicker">Asta · Ottobre 2026</div>
       <h1>Fanta Athletic<br><span class="gold">2026/27</span><br>si riparte.</h1>
       <p class="lead">Rose nuove, un'app rinnovata e più modi per fare punti — anche dagli spalti. Ecco cosa cambia per te.</p>
       <span class="pill red">Stagione 2026/27</span> &nbsp; <span class="pill navy">fanta-athletic.web.app</span>
     </div>
-    <img src="../../resources/app-icons/icon-512.png" alt="Athletic 2018" style="width:360px;height:360px;border-radius:64px;box-shadow:0 30px 80px rgba(0,0,0,.6);">
+    <img class="logo" src="../../resources/app-icons/icon-512.png" alt="Athletic 2018" style="width:340px;height:340px;border-radius:64px;flex:none;">
   </div>
   <div class="foot"><span>Fanta Athletic · la lega dell'Athletic 2018</span><span>1</span></div>
 </section>
@@ -284,7 +287,7 @@
       <div class="step"><span class="num">5</span><div><b>Fatti sentire in Bacheca</b></div></div>
     </div>
     <div style="text-align:center">
-      <img src="../../resources/app-icons/icon-512.png" alt="" style="width:240px;height:240px;border-radius:48px;box-shadow:0 30px 80px rgba(0,0,0,.6);">
+      <img class="logo" src="../../resources/app-icons/icon-512.png" alt="" style="width:240px;height:240px;border-radius:48px;margin:0 auto;">
       <div class="url" style="margin-top:22px">fanta-athletic.web.app</div>
       <div style="color:var(--muted);font-size:17px;margin-top:6px">Buona asta a tutti! 🔨</div>
     </div>
