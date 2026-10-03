@@ -178,9 +178,11 @@
 
   async function renderBoard() {
     const el = $('hdBoard');
-    // come bacheca.html: prima i post della lega, se vuoti quelli nella posizione vecchia (radice)
+    // come bacheca.html: prima i post della lega; se vuoti, quelli nella posizione
+    // vecchia (radice), ma solo nella lega storica che li possiede (D120)
     let snap = await safe(window.db.collection('posts').orderBy('timestamp', 'desc').limit(1).get(), null);
-    if (!snap || snap.empty) snap = await safe(raw().collection('posts').orderBy('timestamp', 'desc').limit(1).get(), null);
+    const leagueId = await safe(window.Season.leagueId(), null);
+    if ((!snap || snap.empty) && leagueId === '4rq1Rr0TquRfuPLmqQTn') snap = await safe(raw().collection('posts').orderBy('timestamp', 'desc').limit(1).get(), null);
     const p = snap && !snap.empty ? snap.docs[0].data() : null;
     if (!p) { el.querySelector('.hd-sub').textContent = 'Nessun messaggio: scrivi il primo'; return; }
     const txt = String(p.content || (p.imageUrl || p.image ? '[foto]' : p.videoUrl ? '[video]' : '')).replace(/\s+/g, ' ');

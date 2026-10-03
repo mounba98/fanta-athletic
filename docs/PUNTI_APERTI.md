@@ -1,4 +1,4 @@
-Allineato a: D119
+Allineato a: D120
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
@@ -25,7 +25,10 @@ Allineato a: D119
 - [x] Correzione D107 (admin → propria squadra in Formazioni/Squadre) committata e pubblicata il 25/09/2026.
 
 **Da fare nell'app (dati, non codice):**
-- [ ] Creare le 4 regole bonus (presenza in casa +1, in trasferta +2, coro contro la Piana +2 Curva Morello, offese ai giocatori +2 Piana) da `admin-rules.html`.
+- [x] Create le 4 regole bonus (D120, 04/10): R100 presenza in casa +1, R101 in trasferta +2, R102 coro contro la Piana +2 (evento Curva Morello), R103 offese ai giocatori +2 (evento Piana). Viste nel Calcolo giornata › Fazioni.
+- [ ] Regole doppie di vecchia data: **R098** "Che cazzo fischi" e **R099** "Convocazione" esistono due volte ciascuna (stesso testo e valore). Lasciate così (toccarle può cambiare i conti delle giornate passate); `live-core.js` ne tiene già una sola. Da decidere con gli admin quale tenere.
+- [ ] Bacheca: provare in una lega di prova (di Mocci) che si vedano solo i suoi messaggi (D120; nella lega vera i 3 storici ci sono ancora, verificato).
+- [ ] Aggiornamento automatico alla riapertura (D120, `resources/app-fresh.js`): attivo solo dalla **prossima** pubblicazione in poi — la volta dopo, verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
 - [ ] Fazioni delle 18 squadre: nessuna ce l'ha ancora (le sceglieranno i giocatori o gli admin da `admin-fazioni.html`).
 - [ ] **Stagione 2026/27 (aperta vuota, D096)**: la compilano gli admin dal percorso guidato (`admin-stagione.html#percorso`): calendario Athletic, fazioni, controllo giocatori e regole, rose dopo l'asta (la pagina Asta **non** riempie le rose: si fanno da Squadre), stato "In corso".
 - [ ] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`, compare come codice): sistemarlo da `admin-players.html` — **in sospeso, si aspettano gli admin** (D114).
@@ -38,7 +41,7 @@ Allineato a: D119
 - [x] ~~Recuperare `firebase.json` / `.firebaserc`~~ **ricreati (D101)**; per pubblicare serve la Firebase CLI (Node.js non installato: da decidere). Vecchio: (configurazione Hosting, non presenti nella cartella, D099): servono per pubblicare. Chiederli all'amico o ricrearli; valutare lì intestazioni di cache lunghe per i file etichettati `?v=`.
 - [x] **Novità dell'app** (D116, spostate in Bacheca D117): scheda **Novità app** in `bacheca.html#novita`, finestra all'apertura, casella in Home, collegamento da Notifiche; comunicati in `resources/news.json`, scritti da Claude a ogni aggiornamento.
 - [ ] **Notifiche push** (D082): rimandate, priorità dopo le Novità (serve Firebase Cloud Messaging; su iPhone solo con l'app installata sulla schermata Home).
-- [ ] Etichette "New" in scadenza il 10/10/2026 (2 settimane dalla pubblicazione): spariscono da sole, lo script poi le segnala per toglierle dal codice. Se la pubblicazione slitta, spostare la data.
+- [ ] Etichette "New" in scadenza il **13/10/2026** (7 giorni dopo l'asta del 6/10, decisione dell'utente D120): spariscono da sole, lo script poi le segnala per toglierle dal codice.
 - [x] **Guida per gli admin anche in app** (D115, `guida-admin.html`, fonte del PDF). Da tenere aggiornata a ogni modifica di una funzione admin.
 - [x] **Guida PDF per gli admin**: versione 2 del 26/09 (D114, 12 pagine, con schemi disegnati di Home e tendina 🏆) in `~/Claude/fanta-athletic-backups/03-documenti-admin/`; la v1 in `versioni-precedenti/`. Screenshot veri dell'app: non fatti (servirebbero la cattura dello schermo, esclusa dalle regole di sicurezza, o foto dal telefono dell'utente).
 - [x] **Pubblicazione del sito + GitHub fatte il 25/09/2026 (D103, D106).** Da qui: commit e deploy separati, su conferma. La copia del 19/09 è già fuori dal progetto (D101); `backups-firestore/` è escluso da Git e da `firebase.json`.

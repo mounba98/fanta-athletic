@@ -1,4 +1,4 @@
-Allineato a: D119
+Allineato a: D120
 
 # Fanta Athletic — contesto per Claude
 
@@ -58,9 +58,7 @@ vuota: **la compilano gli admin**, con la guida **in app** (Pannello › 📖 Gu
 **L'utente sta provando l'app da admin e segnalerà i bug**: partire da quelli.
 **Ultimo lavoro (D119, 28/09)**: presentazione per i partecipanti all'asta
 (`docs/presentazioni/asta-2026-27.html`, PDF in `~/Claude/fanta-athletic-backups/03-documenti-admin/`).
-**Da confermare con gli admin prima dell'asta**: creare in app i 4 bonus di fazione
-(la slide 5 li presenta) e se tenere la dicitura "Offese ai giocatori"; se cambia
-qualcosa, aggiornare la slide e ridare all'utente il comando del PDF.
+**Fatto il 04/10 (D120)**: Bacheca separata per lega; 4 bonus di fazione creati in app (R100–R103, "Offese" va bene); app che si ricarica da sola alla riapertura se è uscita una versione nuova (`resources/app-fresh.js`, attivo dalla prossima pubblicazione); "New" fino al 13/10 (asta il 6/10). **Da pubblicare** (commit + deploy, con conferma); il PDF della guida va rifatto dall'utente.
 **Regole nuove (28/09)**: sicurezza più stretta — Claude non avvia Chrome (i PDF li
 crea l'utente) e non esce dalla cartella del progetto senza permesso; quando l'utente
 deve eseguire qualcosa, dargli blocchi di comandi pronti per "Esegui" che si chiudono
@@ -84,7 +82,7 @@ tabella in `docs/CHECKLIST_AGGIORNAMENTO.md`) → `python3 scripts/check-coerenz
 **Ultimo giro (D114–D117)**: guida admin v2 anche in app; Novità dell'app in
 Bacheca (scheda "Novità app", finestra all'apertura, casella in Home); bordo oro
 tenue sulle caselle (`resources/ui-kit.css`); etichette "New" a segnalibro (scadono
-il 10/10/2026); controllo di coerenza automatico; titolo "Pannello"; **cartella
+il 13/10/2026, D120); controllo di coerenza automatico; titolo "Pannello"; **cartella
 riordinata** (D118: struttura in `README.md`, il controllo segnala file fuori posto).
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).

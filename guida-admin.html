@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Guida</title>
   <!-- Alzare a ogni decisione dopo aver verificato se la guida va aggiornata (scripts/check-coerenza.py) -->
-  <meta name="guida-allineata" content="D119" />
+  <meta name="guida-allineata" content="D120" />
   <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
@@ -279,7 +279,7 @@ Nel blocco 6 c'è una tendina "Strumenti tecnici (solo se sai cosa fai)". Sono s
   <li><b>Squadre</b>: nomi, allenatori, chi le gestisce. Le squadre nuove senza allenatore lo sceglieranno da sole al primo accesso (capitolo 2). Una squadra si aggiunge in <i>Squadre e rose</i> scrivendo il nome e premendo <b>+ Aggiungi</b>. Toccando una squadra la aprite e potete aggiungere o togliere utenti.</li>
   <li><b>Fazioni Curva Morello / Piana</b> <span class="todo">· da fare</span>: ogni squadra deve avere la sua (capitolo 8). Oggi 0 su 18.</li>
   <li><b>Lista giocatori</b>: nuovi ingressi, cessioni, ruoli (<i>Giocatori</i> &rsaquo; <i>Nuovo giocatore</i>, oppure modifica/elimina su quelli esistenti).</li>
-  <li><b>Regole bonus/malus</b>: ricontrollate valori e regole attive (capitolo 8 per quelle di fazione).</li>
+  <li><b>Regole bonus/malus</b>: ricontrollate valori e regole attive. Le 4 di fazione sono già create (capitolo 8).</li>
   <li><b>Asta</b> <span class="todo">· da fare</span>: 0 su 18 squadre hanno la rosa. <b>Attenzione:</b> la pagina Asta <b>non</b> mette da sola i giocatori nelle rose. Finita l'asta, le rose si compilano dalla pagina <b>Squadre</b> (aprendo la squadra da admin e aggiungendo i giocatori, fino a 11).</li>
   <li><b>Calendario scontri diretti</b>: serve solo se scegliete la modalità "Scontri diretti" o "Entrambe". Con la classica il passo risulta "non serve".</li>
   <li><b>Avvia la stagione</b>: quando è tutto pronto, nelle Impostazioni mettete lo stato su <b>In corso</b>.</li>
@@ -384,7 +384,7 @@ Pubblicare i provvisori, decidere le differenze e pubblicare i definitivi lo pu�
   <tr><td>Per squadra, solo Curva Morello</td><td>Si può dare solo alle squadre della Curva.</td></tr>
   <tr><td>Per squadra, solo Piana</td><td>Si può dare solo alle squadre della Piana.</td></tr>
 </table>
-<div class="box"><b class="t">Da creare prima di iniziare: le 4 regole concordate</b>
+<div class="box"><b class="t">Le 4 regole concordate: già create (4 ottobre 2026, codici R100–R103)</b>
 <b>Presenza in casa</b> +1 (Presenza IN CASA) &middot; <b>Presenza in trasferta</b> +2 (Presenza IN TRASFERTA) &middot; <b>Coro contro la Piana</b> +2 (solo Curva Morello) &middot; <b>Offese ai giocatori</b> +2 (solo Piana).
 </div>
 <p>Durante la giornata le presenze e i bonus di fazione si segnano nella scheda <b>Fazioni</b> (nella Partita live o nel Calcolo giornata): <b>una sola presenza per squadra</b>. La sfida tra le due fazioni si vede in <b>Classifiche</b> &rsaquo; scheda <b>Fazioni</b> ("Curva vs Piana").</p>
@@ -471,6 +471,7 @@ Meglio una domanda in più che un dato cancellato: per qualsiasi cosa non chiara
     })();
   </script>
   <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/app-fresh.js?v=20261004"></script>
   <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>

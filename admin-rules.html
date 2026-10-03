@@ -233,12 +233,12 @@
         try {
         // Genera codice automatico: trova primo slot libero R001, R002, etc
         const existingCodes = rulesData.map(r=> r.rule_id).filter(id=> /^R\d+$/.test(id));
-        const numbers = existingCodes.map(id=> parseInt(id.substring(1))).sort((a,b)=> a-b);
-        let nextNum = 1;
-        for (let i = 0; i < numbers.length; i++) {
-          if (numbers[i] !== nextNum) break;
-          nextNum++;
-        }
+        // Sempre il più alto + 1 (D120): cercare il primo "buco" dava lo stesso
+        // codice a più regole quando nel database c'erano doppioni (R098, R099),
+        // e riusare il codice di una regola cancellata la confonderebbe con
+        // quella vecchia nelle giornate già salvate (il calcolo usa rule_id).
+        const numbers = existingCodes.map(id=> parseInt(id.substring(1)));
+        const nextNum = (numbers.length ? Math.max(...numbers) : 0) + 1;
         const rule_id = `R${String(nextNum).padStart(3, '0')}`;
         
         const maxOrder = rulesData.length ? Math.max(...rulesData.map(r=>r.ordine||0)) : 0;
@@ -638,6 +638,7 @@
     }
   </script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/app-fresh.js?v=20261004"></script>
   <script src="resources/navbar-autohide.js?v=20260920-final"></script>
   <script src="resources/theme.js?v=20260925b"></script>
   <script src="resources/navbar.js?v=20260925"></script>

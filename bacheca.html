@@ -1394,7 +1394,7 @@
       if (lower.includes('epic') || lower.includes('leggend') || lower.includes('god')) {
         return 'epic';
       }
-      if (lower.includes('ðŸ˜‚') || lower.includes('ðŸ¤£') || lower.includes('lol')) {
+      if (lower.includes('😂') || lower.includes('🤣') || lower.includes('lol')) {
         return 'meme';
       }
       return 'general';
@@ -1431,9 +1431,15 @@
       return posts;
     }
 
+    // I post nella posizione vecchia (radice) sono della lega Fanta Athletic
+    // storica: si mostrano solo lì, non nelle altre leghe (D120).
+    // Stesso valore in resources/home-dashboard.js.
+    const LEGACY_POSTS_LEAGUE_ID = '4rq1Rr0TquRfuPLmqQTn';
+
     async function loadPosts() {
       await ensureLeagueReady();
       if (postsUnsubscribe) postsUnsubscribe();
+      const showLegacy = !!rawDb && (await resolveCurrentLeagueId()) === LEGACY_POSTS_LEAGUE_ID;
 
       let query = db.collection('posts').orderBy('timestamp', 'desc').limit(50);
       
@@ -1446,7 +1452,7 @@
         const postsMap = new Map();
         primaryPosts.forEach(post => postsMap.set(post.id, post));
 
-        if (rawDb) {
+        if (showLegacy) {
           try {
             const legacySnap = await rawDb.collection('posts').orderBy('timestamp', 'desc').limit(50).get();
             const legacyPosts = await buildPostsList(legacySnap.docs);
@@ -1464,7 +1470,7 @@
         renderPosts(merged);
       }, async (error) => {
         console.error('Errore ascolto posts:', error);
-        if (error?.code === 'permission-denied' && rawDb) {
+        if (error?.code === 'permission-denied' && showLegacy) {
           try {
             const legacySnap = await rawDb.collection('posts').orderBy('timestamp', 'desc').limit(50).get();
             const legacyPosts = await buildPostsList(legacySnap.docs);
@@ -1490,8 +1496,8 @@
       feed.innerHTML = posts.map(post => {
         const timeSource = post.timestamp ? (typeof post.timestamp.toDate === 'function' ? post.timestamp.toDate() : new Date(post.timestamp)) : null;
         const time = timeSource ? formatTime(timeSource) : 'Ora';
-        const badge = post.type === 'trash' ? '<span class="badge-trash">ðŸ”¥ TRASH</span>' :
-                      post.type === 'epic' ? '<span class="badge-epic">ðŸ‘‘ EPIC</span>' : '';
+        const badge = post.type === 'trash' ? '<span class="badge-trash">🔥 TRASH</span>' :
+                      post.type === 'epic' ? '<span class="badge-epic">👑 EPIC</span>' : '';
         const contentHtml = highlightMentions(fixEmoji(escapeHtml(post.content || '')));
         
         return `
@@ -1788,6 +1794,7 @@
   <script src="resources/faction.js?v=20260925f"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/app-fresh.js?v=20261004"></script>
     <script src="resources/navbar-autohide.js?v=20260920-final"></script>
   <script src="resources/lazy-load.js?v=20260920-final"></script>
   <script src="resources/theme.js?v=20260925b"></script>

@@ -1,4 +1,4 @@
-Allineato a: D119
+Allineato a: D120
 
 # Checklist di ogni aggiornamento — cosa deve seguire una modifica
 
@@ -17,7 +17,7 @@ Niente deve restare indietro. Il collegamento è esplicito in due modi:
 | cambia qualcosa che **vedono i giocatori** | una novità `audience: "all"` in `resources/news.json`, scritta per chi gioca (cosa cambia per te, dove si trova); compare in finestra all'apertura, nella casella in Home e in Bacheca › Novità app | sì: `allineato` di news.json = ultima decisione |
 | cambia qualcosa che **usano gli admin** (pannello, calcolo, stagione, live, regole) | una novità `audience: "admin"` in news.json **e** la guida `guida-admin.html` (testo + `meta guida-allineata`), poi il PDF con `python3 scripts/guida-admin-pdf.py` (**lo lancia Iacopo**: dal 28/09 il sandbox blocca Chrome a Claude, D119) | sì: meta della guida, caselle del pannello citate, PDF più vecchio della pagina |
 | aggiunge una **funzione nuova** visibile | etichetta `<span class="fa-new" data-new-until="AAAA-MM-GG">New</span>` sulla sua casella, con scadenza **2 settimane dalla pubblicazione** dell'aggiornamento | sì: "New" senza scadenza / scaduta |
-| aggiunge, rinomina o archivia una **pagina** | `docs/MAPPA_PAGINE.md` (e il conteggio in cima); menu ☰ (`resources/mobile-menu.js`) se è per tutti; casella in `admin.html` + guida se è per admin; `admin-back.js` sulle pagine admin | sì: pagine mancanti nella mappa, caselle admin nella guida |
+| aggiunge, rinomina o archivia una **pagina** | `docs/MAPPA_PAGINE.md` (e il conteggio in cima); menu ☰ (`resources/mobile-menu.js`) se è per tutti; casella in `admin.html` + guida se è per admin; `admin-back.js` sulle pagine admin; `resources/app-fresh.js` (si ricarica da sola alla riapertura se è uscita una versione nuova, D120) — tranne pagine con dati di partita non salvati come `live.html`/`matchday.html` | sì: pagine mancanti nella mappa, caselle admin nella guida |
 | modifica un **file condiviso** in `resources/` (.js/.css) | nuova etichetta `?v=` in **tutte** le pagine che lo usano (il service worker tiene i file etichettati) | sì: file cambiato senza etichetta nuova; etichette diverse tra pagine |
 | tocca **Firebase** (regole, indici, struttura dati) | `firestore.rules` + `docs/FIREBASE_ALLINEAMENTO.md` prima; l'utente pubblica in Console | no: da ricordare |
 | cambia **parole** (lega, stagione, competizione…) | `docs/GLOSSARIO_LEGHE.md` e la memoria di Claude | no: da ricordare |

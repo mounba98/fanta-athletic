@@ -1,6 +1,6 @@
 # Firebase ↔ locale: cosa vive dove e come si tiene allineato
 
-Allineato a: D119
+Allineato a: D120
 
 **Regola (decisa dall'utente il 24/09/2026)**: tutto ciò che si fa su
 Firebase deve avere la sua copia in questo progetto. Si scrive PRIMA qui,
@@ -16,7 +16,7 @@ va riportato qui subito.
 | Catalogo bonus/malus | `leagues/{lega}/rules` | `resources/rules.json` (seme per leghe nuove) | allineato al seme; le leghe esistenti si modificano da `admin-rules.html` |
 | Giocatori / allenatori | `leagues/{lega}/players`, `coaches` | `resources/players.json`, `coaches.json` | seme locale |
 | Calendario Athletic | `athletic_calendar` | *(solo online)* | fonte partite del contest; **vuoto dal 25/09/2026** (azzeramento D096), lo ricompilano gli admin |
-| Configurazione Hosting | — | `firebase.json` + `.firebaserc` (ricreati D101) | cosa si pubblica e cosa no, cache |
+| Configurazione Hosting | — | `firebase.json` + `.firebaserc` (ricreati D101) | cosa si pubblica e cosa no, cache (D120: anche l'indirizzo principale `/` senza cache, prima restava fino a 1 ora) |
 | Regole Storage | Console → Storage → Regole | *(copia storica nov. 2025 in `docs/firebase-storico/`, da confrontare)* | non collegate a `firebase.json` |
 | Hosting (i file del sito) | Firebase Hosting (pubblicato 25/09/2026 09:11, commit `9e3b8fd`, D106) | questa cartella | **allineato** al commit `9e3b8fd`; si ripubblica solo su conferma (D106) |
 | Dati utenti (email, nomi) | `users` | *non si copia* | dati personali: restano solo su Firebase |

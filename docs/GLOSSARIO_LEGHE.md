@@ -1,4 +1,4 @@
-Allineato a: D119
+Allineato a: D120
 
 # Lega, stagione, competizioni — le parole giuste (per il multilega futuro)
 
@@ -46,7 +46,7 @@ esiste nel codice ma è spenta.
 Raccolte oggi **globali** (valgono per tutti, non per lega) che con due leghe si mescolerebbero:
 - `athletic_calendar` — il calendario della squadra vera (se più leghe seguono la stessa squadra potrebbe restare condiviso: da decidere);
 - `contest_predictions`, `contest_standings` — il mini-gioco Curva vs Piana;
-- `posts` nella posizione vecchia (radice) — la Bacheca li legge ancora da lì come piano B;
+- `posts` nella posizione vecchia (radice) — dal D120 la Bacheca (e la casella in Home) li mostra **solo nella lega storica** `4rq1Rr0TquRfuPLmqQTn`; soluzione definitiva: spostarli dentro quella lega e togliere il piano B;
 - `auction/current` — l'asta;
 - `admins` globali accanto agli admin di lega (`leagues/{id}.admins`).
 
