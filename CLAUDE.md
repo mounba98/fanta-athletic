@@ -50,22 +50,32 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D119, 28/09/2026)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D120, 04/10/2026)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
-`main`), ultima pubblicazione 26/09/2026 (D115–D118, commit `bf1a3e2`). Stagione 2026/27 aperta e
-vuota: **la compilano gli admin**, con la guida **in app** (Pannello › 📖 Guida,
+`main`), ultima pubblicazione **04/10/2026** (D120, commit `b97a39a`). Stagione 2026/27
+aperta e vuota: **la compilano gli admin**, con la guida **in app** (Pannello › 📖 Guida,
 `guida-admin.html`) e in PDF (`~/Claude/fanta-athletic-backups/03-documenti-admin/`).
-**L'utente sta provando l'app da admin e segnalerà i bug**: partire da quelli.
-**Ultimo lavoro (D119, 28/09)**: presentazione per i partecipanti all'asta
-(`docs/presentazioni/asta-2026-27.html`, PDF in `~/Claude/fanta-athletic-backups/03-documenti-admin/`).
-**Fatto il 04/10 (D120)**: Bacheca separata per lega; 4 bonus di fazione creati in app (R100–R103, "Offese" va bene); app che si ricarica da sola alla riapertura se è uscita una versione nuova (`resources/app-fresh.js`, attivo dalla prossima pubblicazione); "New" fino al 13/10 (asta il 6/10). **Da pubblicare** (commit + deploy, con conferma); il PDF della guida va rifatto dall'utente.
+**Asta il 6/10/2026.** L'utente continua a provare l'app da admin e segnala i bug:
+partire da quelli.
+**Ultimo lavoro (D120, 04/10)**: Bacheca separata per lega (i post vecchi in radice solo
+nella lega storica); 4 bonus di fazione creati in app (R100–R103) e corretta la
+generazione dei codici regola in `admin-rules.html`; `resources/app-fresh.js` (l'app si
+ricarica da sola alla riapertura se è uscita una versione nuova); "New" fino al 13/10.
+**Da verificare alla prossima pubblicazione**: su iPhone e Android, riaprendo l'app si
+deve vedere subito la versione nuova (il controllo è sui telefoni solo da questa
+pubblicazione). **Da provare**: Bacheca in una lega di prova di Mocci (solo i suoi
+messaggi). **Utente**: rifare il PDF della guida admin (comando in
+`scripts/guida-admin-pdf.py`). **Con gli admin**: regole doppie R098/R099 di vecchia data.
+**Pubblicazione**: commit/push li fa Claude; il deploy lo lancia l'utente con un blocco
+"Esegui" (il sandbox blocca a Claude `~/.local/bin/firebase`):
+`cd ~/Claude/fanta-athletic-code && ~/.local/bin/firebase deploy --only hosting --project fanta-athletic; echo "--- FINITO (codice $?) ---"`
 **Regole nuove (28/09)**: sicurezza più stretta — Claude non avvia Chrome (i PDF li
 crea l'utente) e non esce dalla cartella del progetto senza permesso; quando l'utente
 deve eseguire qualcosa, dargli blocchi di comandi pronti per "Esegui" che si chiudono
 da soli; `git commit`/`push` lanciati da soli dalla cartella del progetto.
 **A inizio sessione**: riavviare il server locale (`preview_start` "static-server");
-nel browser di prova il login è andato perso il 26/09 → rifarlo è compito
-dell'utente, non di Claude. Lanciare `python3 scripts/check-coerenza.py` per vedere
+nel browser di prova (porta 8912) l'utente è collegato dal 04/10; se il login si perde,
+rifarlo è compito dell'utente, non di Claude. Lanciare `python3 scripts/check-coerenza.py` per vedere
 subito se qualcosa è rimasto indietro. Nel Cestino del Mac c'è la copia doppia
 dei backup tolta in D118 (l'originale è in `~/Claude/fanta-athletic-backups/`).
 **Cartella backup = parte del progetto** (autorizzata dall'utente il 28/09, D119):

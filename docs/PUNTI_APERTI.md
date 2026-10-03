@@ -28,6 +28,7 @@ Allineato a: D120
 - [x] Create le 4 regole bonus (D120, 04/10): R100 presenza in casa +1, R101 in trasferta +2, R102 coro contro la Piana +2 (evento Curva Morello), R103 offese ai giocatori +2 (evento Piana). Viste nel Calcolo giornata › Fazioni.
 - [ ] Regole doppie di vecchia data: **R098** "Che cazzo fischi" e **R099** "Convocazione" esistono due volte ciascuna (stesso testo e valore). Lasciate così (toccarle può cambiare i conti delle giornate passate); `live-core.js` ne tiene già una sola. Da decidere con gli admin quale tenere.
 - [ ] Bacheca: provare in una lega di prova (di Mocci) che si vedano solo i suoi messaggi (D120; nella lega vera i 3 storici ci sono ancora, verificato).
+- [ ] **PDF della guida admin da rifare** (utente, D120: la guida dice ora che i 4 bonus sono creati): `python3 scripts/guida-admin-pdf.py`.
 - [ ] Aggiornamento automatico alla riapertura (D120, `resources/app-fresh.js`): attivo solo dalla **prossima** pubblicazione in poi — la volta dopo, verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
 - [ ] Fazioni delle 18 squadre: nessuna ce l'ha ancora (le sceglieranno i giocatori o gli admin da `admin-fazioni.html`).
 - [ ] **Stagione 2026/27 (aperta vuota, D096)**: la compilano gli admin dal percorso guidato (`admin-stagione.html#percorso`): calendario Athletic, fazioni, controllo giocatori e regole, rose dopo l'asta (la pagina Asta **non** riempie le rose: si fanno da Squadre), stato "In corso".
