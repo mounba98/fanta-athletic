@@ -50,23 +50,25 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ ULTIMO LAVORO (D121, 23/10/2026, sera dell'asta)**: richieste admin fatte e committate — "Tifo" nelle Regole, giocatori "fuori rosa", Imbattibilità +1 automatica (dal risultato salvato nella Partita live o nel Calendario), moduli 1-2-2/2-2-1/2-1-2/3-1-1 con caselle per ruolo in Formazioni, R099 Convocazione ripristinata, R043 Porta inviolata +1. Da verificare dopo l'asta: Formazioni con una rosa vera dal telefono; i fogli live G1 di prova (mounba, marta) spariscono quando loro riaprono la live. PDF guida e presentazione da rifare (utente). Dettaglio in `docs/DECISION_LOG.md` D121.
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D120, 04/10/2026)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D121, 23/10/2026)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
-`main`), ultima pubblicazione **04/10/2026** (D120, commit `b97a39a`). Stagione 2026/27
-aperta e vuota: **la compilano gli admin**, con la guida **in app** (Pannello › 📖 Guida,
-`guida-admin.html`) e in PDF (`~/Claude/fanta-athletic-backups/03-documenti-admin/`).
-**Asta il 6/10/2026.** L'utente continua a provare l'app da admin e segnala i bug:
-partire da quelli.
-**Ultimo lavoro (D120, 04/10)**: Bacheca separata per lega (i post vecchi in radice solo
-nella lega storica); 4 bonus di fazione creati in app (R100–R103) e corretta la
-generazione dei codici regola in `admin-rules.html`; `resources/app-fresh.js` (l'app si
-ricarica da sola alla riapertura se è uscita una versione nuova); "New" fino al 13/10.
-**Da verificare alla prossima pubblicazione**: su iPhone e Android, riaprendo l'app si
-deve vedere subito la versione nuova (il controllo è sui telefoni solo da questa
-pubblicazione). **Da provare**: Bacheca in una lega di prova di Mocci (solo i suoi
-messaggi). **Utente**: rifare il PDF della guida admin (comando in
-`scripts/guida-admin-pdf.py`). **Con gli admin**: regole doppie R098/R099 di vecchia data.
+`main`), ultima pubblicazione **23/10/2026** (D121, commit `661721d`), sera dell'asta
+2026/27 (rimandata dal 6/10). Stagione 2026/27 "in preparazione": gli admin la finiscono
+(rose dopo l'asta, da Squadre). Guida admin in app (Pannello › 📖 Guida) e PDF rifatto
+il 23/10 in `~/Claude/fanta-athletic-backups/03-documenti-admin/`.
+**Ultimo lavoro (D121, 23/10)** — richieste degli admin: moduli 1-2-2 / 2-2-1 / 2-1-2 /
+3-1-1 con menu e caselle per ruolo in `formazioni.html` (controllo anche in
+`squadre.html`); **Imbattibilità** +1 automatica a portieri e difensori se l'Athletic
+non subisce gol (risultato salvato nella Partita live → bonus alla pubblicazione;
+anche nel Calcolo giornata), regola R104; R043 Porta inviolata +1; R099 Convocazione
+rimessa "Giocatore" (serve alla live); giocatori **fuori rosa** (campo `fuori_rosa`,
+mai eliminarli); "Tifo" al posto di "Curva" nelle Regole (solo scritta); fogli live
+senza partita svuotati all'apertura. Regola Firebase dei fogli live **invariata** per
+scelta dell'utente.
+**Da fare per primi** (lista in `docs/PUNTI_APERTI.md`, sezione "Dopo l'asta"):
+Formazioni con una rosa vera dal telefono; bug che l'utente trova provando online;
+app che si aggiorna da sola alla riapertura (iPhone e Android); prima giornata vera
+con Partita live + Imbattibilità; "New" da togliere dopo il 30/10.
 **Pubblicazione**: commit/push li fa Claude; il deploy lo lancia l'utente con un blocco
 "Esegui" (il sandbox blocca a Claude `~/.local/bin/firebase`):
 `cd ~/Claude/fanta-athletic-code && ~/.local/bin/firebase deploy --only hosting --project fanta-athletic; echo "--- FINITO (codice $?) ---"`
@@ -75,7 +77,7 @@ crea l'utente) e non esce dalla cartella del progetto senza permesso; quando l'u
 deve eseguire qualcosa, dargli blocchi di comandi pronti per "Esegui" che si chiudono
 da soli; `git commit`/`push` lanciati da soli dalla cartella del progetto.
 **A inizio sessione**: riavviare il server locale (`preview_start` "static-server");
-nel browser di prova (porta 8912) l'utente è collegato dal 04/10; se il login si perde,
+nel browser di prova (porta 8912) l'utente è collegato (rifatto il 23/10); se il login si perde,
 rifarlo è compito dell'utente, non di Claude. Lanciare `python3 scripts/check-coerenza.py` per vedere
 subito se qualcosa è rimasto indietro. Nel Cestino del Mac c'è la copia doppia
 dei backup tolta in D118 (l'originale è in `~/Claude/fanta-athletic-backups/`).

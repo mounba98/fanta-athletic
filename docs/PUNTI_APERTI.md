@@ -1,6 +1,6 @@
 Allineato a: D121
 
-# FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
+# FASE 3 — cosa manca, in ordine (stato al 23/10/2026, D121)
 
 **⚠️ SICUREZZA, URGENTE (D101)**
 - [ ] Nel ramo GitHub `feature/uniform-pitch-bench` c'è `fanta-athletic-firebase-adminsdk.json` (chiave di servizio admin di Firebase, dal nome). **Mocci** (o chi ha i permessi sul progetto) deve **revocarla** in Google Cloud Console → IAM e amministrazione → Account di servizio → `firebase-adminsdk…` → Chiavi → elimina quella chiave (se qualche script la usa, crearne una nuova e tenerla SOLO in locale). Poi togliere il file dalla repository. Revocare è ciò che conta: il file resta comunque nella storia di Git.
@@ -36,14 +36,27 @@ Allineato a: D121
 - [x] Fogli live di prova G1: partita cancellata; i fogli si svuotano quando mounba e marta riaprono la live. Regola del database invariata (decisione dell'utente: le pulizie le facciamo noi dal codice).
 - [x] PDF rifatti dall'utente il 23/10 alle 20:29 (guida admin 563.848 byte, presentazione 935.313 byte).
 
+**▶ Dopo l'asta del 23/10 — da fare per primi (D121):**
+- [ ] **Formazioni con una rosa vera, dal telefono** (moduli e caselle per ruolo provati solo con una rosa finta): scegliere il modulo, schierare con tocco/trascinamento/popup, cambiare modulo, salvare; anche dalla pagina Squadre.
+- [ ] **Prove online dell'utente** delle funzioni nuove non legate all'asta (riquadro risultato nella Partita live, Regole, fuori rosa, menu Modulo): raccogliere i bug segnalati.
+- [ ] **Aggiornamento automatico alla riapertura** (D120, `app-fresh.js`): la pubblicazione del 23/10 è la prima con il controllo già sui telefoni → verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
+- [ ] **Prima giornata vera con la Partita live**: salvare il risultato prima di pubblicare e controllare che l'Imbattibilità arrivi ai giocatori (provata solo con risultati finti). Controllare anche che i fogli di prova di mounba e marta si siano svuotati alla loro riapertura.
+- [ ] Etichette "New" scadono il **30/10**: dopo, toglierle dal codice (`index.html`, `admin.html`; lo segnala `check-coerenza.py`).
+
+**Piccole cose notate il 23/10, non urgenti (D121):**
+- [ ] Decidere se scrivere "Tifo" anche in Calcolo giornata, Partita live, Classifiche (oggi solo nella pagina Regole; nel database resta `Curva`).
+- [ ] Nel Calcolo giornata aperto a mano "Convocazione" (R099) compare tra i bonus dei giocatori **e** c'è il tasto Convocati (+1): se un admin li spunta entrambi il giocatore prende +2 (era così anche a ottobre). Valutare di nascondere R099 nel Calcolo giornata o avvisare.
+- [ ] I giocatori **fuori rosa** compaiono ancora nella griglia Convocati della Partita live (non sono in nessuna rosa, quindi non danno punti a nessuno: è solo ingombro).
+- [ ] La pagina Squadre salva la formazione senza il campo `modulo` (Formazioni lo ricava dai giocatori): va bene, ma se si usa Squadre per schierare il modulo scelto potrebbe non essere ricordato.
+- [ ] `admin-rules.html`: al primo caricamento una volta ha mostrato 0 regole (ricaricando 97): probabile caricamento lento della lega, da osservare.
+
 **Da fare nell'app (dati, non codice):**
 - [x] Create le 4 regole bonus (D120, 04/10): R100 presenza in casa +1, R101 in trasferta +2, R102 coro contro la Piana +2 (evento Curva Morello), R103 offese ai giocatori +2 (evento Piana). Viste nel Calcolo giornata › Fazioni.
-- [ ] Regole doppie di vecchia data: **R098** "Che cazzo fischi" e **R099** "Convocazione" esistono due volte ciascuna (stesso testo e valore). Lasciate così (toccarle può cambiare i conti delle giornate passate); `live-core.js` ne tiene già una sola. Da decidere con gli admin quale tenere.
+- [x] Regole doppie R098/R099: al 23/10 ce n'è una sola per codice (sistemate dagli admin); R099 rimessa "Giocatore" (D121).
 - [ ] Bacheca: provare in una lega di prova (di Mocci) che si vedano solo i suoi messaggi (D120; nella lega vera i 3 storici ci sono ancora, verificato).
-- [ ] **PDF della guida admin da rifare** (utente, D120: la guida dice ora che i 4 bonus sono creati): `python3 scripts/guida-admin-pdf.py`.
-- [ ] Aggiornamento automatico alla riapertura (D120, `resources/app-fresh.js`): attivo solo dalla **prossima** pubblicazione in poi — la volta dopo, verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
-- [ ] Fazioni delle 18 squadre: nessuna ce l'ha ancora (le sceglieranno i giocatori o gli admin da `admin-fazioni.html`).
-- [ ] **Stagione 2026/27 (aperta vuota, D096)**: la compilano gli admin dal percorso guidato (`admin-stagione.html#percorso`): calendario Athletic, fazioni, controllo giocatori e regole, rose dopo l'asta (la pagina Asta **non** riempie le rose: si fanno da Squadre), stato "In corso".
+- [x] PDF della guida admin rifatto (23/10, D121).
+- [ ] Fazioni delle 18 squadre: **7 su 18** ce l'hanno (23/10); le altre le sceglieranno i giocatori o gli admin da `admin-fazioni.html`.
+- [ ] **Stagione 2026/27** (al 23/10: "in preparazione", modalità classica, 18 squadre, 4 partite nel Calendario Athletic, nessuna rosa): gli admin finiscono dal percorso guidato (`admin-stagione.html#percorso`): rose dopo l'asta (la pagina Asta **non** riempie le rose: si fanno da Squadre), resto del calendario, fazioni, stato "In corso".
 - [x] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`): sistemato dagli admin, ora è Guglielmo Cesari (verificato il 23/10, D121).
 - [ ] Dire agli admin: la "sconfitta a tavolino" degli scontri diretti ora funziona davvero (prima falliva sempre, D095).
 
