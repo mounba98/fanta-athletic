@@ -33,8 +33,8 @@ Allineato a: D121
 - [x] **Moduli 1-2-2, 2-2-1, 2-1-2, 3-1-1 con menu a tendina** in Formazioni (controllo anche in Squadre). Da riprovare con una rosa vera dopo l'asta, su telefono.
 - [x] Risultato della partita inseribile dalla Partita live (serve per l'Imbattibilità).
 - [x] R099 "Convocazione" rimessa tipologia Giocatore (serve alla live); R043 "Porta inviolata" ora +1.
-- [ ] Chiedere agli admin: fogli live già presenti nella G1 (mounba 98, marta serretti) — prove da cancellare?
-- [ ] PDF da rifare (utente): guida admin e presentazione dell'asta.
+- [x] Fogli live di prova G1: partita cancellata; i fogli si svuotano quando mounba e marta riaprono la live. Regola del database invariata (decisione dell'utente: le pulizie le facciamo noi dal codice).
+- [x] PDF rifatti dall'utente il 23/10 alle 20:29 (guida admin 563.848 byte, presentazione 935.313 byte).
 
 **Da fare nell'app (dati, non codice):**
 - [x] Create le 4 regole bonus (D120, 04/10): R100 presenza in casa +1, R101 in trasferta +2, R102 coro contro la Piana +2 (evento Curva Morello), R103 offese ai giocatori +2 (evento Piana). Viste nel Calcolo giornata › Fazioni.
