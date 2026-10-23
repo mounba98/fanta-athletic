@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Guida</title>
   <!-- Alzare a ogni decisione dopo aver verificato se la guida va aggiornata (scripts/check-coerenza.py) -->
-  <meta name="guida-allineata" content="D120" />
+  <meta name="guida-allineata" content="D121" />
   <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
@@ -278,7 +278,7 @@ Nel blocco 6 c'è una tendina "Strumenti tecnici (solo se sai cosa fai)". Sono s
   <li><b>Calendario Athletic</b> <span class="todo">· da fare</span>: inserite le partite vere della squadra (giornata, data, ora, avversario, casa/trasferta). Da qui dipendono il mini-gioco, il "casa/trasferta" dei bonus di fazione e il numero di giornate.</li>
   <li><b>Squadre</b>: nomi, allenatori, chi le gestisce. Le squadre nuove senza allenatore lo sceglieranno da sole al primo accesso (capitolo 2). Una squadra si aggiunge in <i>Squadre e rose</i> scrivendo il nome e premendo <b>+ Aggiungi</b>. Toccando una squadra la aprite e potete aggiungere o togliere utenti.</li>
   <li><b>Fazioni Curva Morello / Piana</b> <span class="todo">· da fare</span>: ogni squadra deve avere la sua (capitolo 8). Oggi 0 su 18.</li>
-  <li><b>Lista giocatori</b>: nuovi ingressi, cessioni, ruoli (<i>Giocatori</i> &rsaquo; <i>Nuovo giocatore</i>, oppure modifica/elimina su quelli esistenti).</li>
+  <li><b>Lista giocatori</b>: nuovi ingressi, cessioni, ruoli (<i>Giocatori</i> &rsaquo; <i>Nuovo giocatore</i>, oppure modifica su quelli esistenti). L'elenco è in ordine di ruolo e cognome. <span class="new">NUOVO</span> Chi è fermo o non gioca per un po' <b>non va eliminato</b>: premete <b>Fuori rosa</b>. Resta nello storico ma non si può mettere in nessuna rosa; quando rientra premete <b>Rimetti in rosa</b> e torna acquistabile.</li>
   <li><b>Regole bonus/malus</b>: ricontrollate valori e regole attive. Le 4 di fazione sono già create (capitolo 8).</li>
   <li><b>Asta</b> <span class="todo">· da fare</span>: 0 su 18 squadre hanno la rosa. <b>Attenzione:</b> la pagina Asta <b>non</b> mette da sola i giocatori nelle rose. Finita l'asta, le rose si compilano dalla pagina <b>Squadre</b> (aprendo la squadra da admin e aggiungendo i giocatori, fino a 11).</li>
   <li><b>Calendario scontri diretti</b>: serve solo se scegliete la modalità "Scontri diretti" o "Entrambe". Con la classica il passo risulta "non serve".</li>
@@ -333,6 +333,7 @@ I valori scritti oggi negli scontri diretti sono <b>provvisori</b>, presi dal fa
 </div>
 <ol class="steps">
   <li><b>Fischio finale</b>: chiude il vostro foglio (dopo non si modifica più: le correzioni si fanno in revisione).</li>
+  <li><span class="new">NUOVO</span> <b>Risultato della partita</b>: dopo il fischio finale compare il riquadro <i>Risultato della partita</i>. Scrivete i gol e premete <b>Salva risultato</b> (finisce nel Calendario Athletic) <b>prima</b> di pubblicare: serve per l'<b>Imbattibilità</b> (capitolo 7). Se pubblicate senza, l'app vi avvisa. Si può correggere anche durante la revisione.</li>
   <li><b>Incrocio</b>: quando entrambi hanno fischiato, l'app confronta i fogli. Le voci uguali valgono subito, quelle diverse vanno in revisione. <b>Se ha segnato un solo admin, vale il suo foglio così com'è.</b></li>
   <li><b>Pubblica punti provvisori</b>: si apre il <b>Calcolo giornata</b> già compilato, con il banner arancione <i>"Dati dalla Partita live &mdash; PROVVISORI"</i>. Controllate e premete <b>Salva giornata</b>. I giocatori vedono i punti con l'avviso <i>"Punti provvisori &mdash; definitivi entro&hellip;"</i>.</li>
   <li><b>Revisione (48 ore)</b>: per ogni differenza tra i fogli scegliete <b>Vale A</b>, <b>Vale B</b> o <b>0</b>. Se arriva una segnalazione (es. "il gol era di un altro") usate <b>Correzioni da segnalazioni</b>: scegliete chi, la voce, il valore giusto (0 = togli) e scrivete una nota. La correzione resta registrata con il vostro nome.</li>
@@ -352,6 +353,13 @@ Pubblicare i provvisori, decidere le differenze e pubblicare i definitivi lo pu�
   <li><b>Aprendola dal pannello</b> funziona come prima: scegliete la giornata, spuntate a mano e salvate. Utile se la live non è stata usata.</li>
   <li>Scheda <b>Fazioni</b>: presenze e bonus di Curva Morello / Piana (capitolo 8).</li>
 </ul>
+<div class="box"><b class="t">🧤 Imbattibilità: si spunta da sola <span class="new">NUOVO</span></b>
+Se l'Athletic <b>non subisce gol</b>, ogni portiere e difensore schierato vale <b>+1</b> (il capitano raddoppia, come per tutti i bonus): 1 portiere + 3 difensori = +4. Non dovete spuntare giocatore per giocatore: con la <b>Partita live</b> basta salvare il risultato (riquadro <i>Risultato della partita</i>) prima di <b>Pubblica punti</b>: il bonus entra subito nei punti pubblicati. Senza live, inserite il risultato nel <b>Calendario Athletic</b> (pulsante <i>Risultato</i>) prima di aprire il Calcolo giornata: aprendolo, l'app spunta "Imbattibilità" su tutti i portieri e difensori e lo segnala con un messaggio; controllate e premete <b>Salva giornata</b>. Se ne avete già spuntato anche uno solo a mano, l'app non tocca niente.<br>
+La regola deve esistere in <b>Regole</b> (tipologia <b>Giocatore</b>, valore 1) e il nome deve contenere la parola <b>Imbattibilità</b>: accanto compare "🧤 si spunta da sola". Già creata: <b>R104 Imbattibilità +1</b>. Esiste anche <b>R043 Porta inviolata</b>, ora <b>+1</b>: se la spuntate anche al portiere, il portiere prende +2 in tutto.
+</div>
+<div class="box"><b class="t">Moduli <span class="new">NUOVO</span></b>
+I giocatori scelgono il <b>modulo</b> dal menu sopra il campo, in Formazioni: <b>1-2-2, 2-2-1, 2-1-2, 3-1-1</b> (difesa-centrocampo-attacco; il portiere conta in difesa, non è obbligatorio). Le caselle del campo si dispongono secondo il modulo (attacco in alto, difesa vicino alla porta) e ognuna accetta solo il suo ruolo; l'app non salva una formazione fuori modulo. Le formazioni salvate prima prendono da sole il primo modulo che le contiene.
+</div>
 <div class="box warn"><b class="t">Attenzione ai pulsanti di reset</b>
 <b>Reset Giornata</b> e soprattutto <b>Reset TUTTO</b> cancellano dati. Usateli solo se sapete esattamente cosa state facendo. In caso di dubbio chiedete prima.
 </div>
@@ -374,18 +382,18 @@ Pubblicare i provvisori, decidere le differenze e pubblicare i definitivi lo pu�
 </ul>
 
 <h3>I bonus di fazione</h3>
-<p>Si creano come le altre regole, da Pannello &rsaquo; <b>4 · Regole</b> &rsaquo; <b>Bonus e malus</b>. La differenza è il campo <b>Assegnazione</b>:</p>
+<p>Si creano come le altre regole, da Pannello &rsaquo; <b>4 · Regole</b> &rsaquo; <b>Bonus e malus</b>. Come tipologia scegliete <b>📣 Tifo</b> (vale per Curva Morello e Piana; nel Calcolo giornata e nella Partita live la scheda si chiama ancora "Curva"). La differenza è il campo <b>Assegnazione</b>, che compare accanto:</p>
 <table>
   <tr><th>Assegnazione</th><th>Come funziona</th></tr>
   <tr><td>Globale</td><td>Uguale per tutte le squadre (le regole di sempre).</td></tr>
   <tr><td>Per squadra (tutte le fazioni)</td><td>Si segna squadra per squadra.</td></tr>
   <tr><td>Presenza IN CASA</td><td>Si spunta solo "presente". Vale solo quando l'Athletic gioca in casa (lo prende dal calendario).</td></tr>
   <tr><td>Presenza IN TRASFERTA</td><td>Come sopra, per le partite in trasferta.</td></tr>
-  <tr><td>Per squadra, solo Curva Morello</td><td>Si può dare solo alle squadre della Curva.</td></tr>
-  <tr><td>Per squadra, solo Piana</td><td>Si può dare solo alle squadre della Piana.</td></tr>
+  <tr><td>Evento Curva Morello</td><td>Si spunta <b>una volta</b> e vale per <b>tutte</b> le squadre della Curva.</td></tr>
+  <tr><td>Evento Piana</td><td>Si spunta <b>una volta</b> e vale per <b>tutte</b> le squadre della Piana.</td></tr>
 </table>
 <div class="box"><b class="t">Le 4 regole concordate: già create (4 ottobre 2026, codici R100–R103)</b>
-<b>Presenza in casa</b> +1 (Presenza IN CASA) &middot; <b>Presenza in trasferta</b> +2 (Presenza IN TRASFERTA) &middot; <b>Coro contro la Piana</b> +2 (solo Curva Morello) &middot; <b>Offese ai giocatori</b> +2 (solo Piana).
+<b>Presenza in casa</b> +1 (Presenza IN CASA) &middot; <b>Presenza in trasferta</b> +2 (Presenza IN TRASFERTA) &middot; <b>Coro contro la Piana</b> +2 (Evento Curva Morello) &middot; <b>Offese ai giocatori</b> +2 (Evento Piana).
 </div>
 <p>Durante la giornata le presenze e i bonus di fazione si segnano nella scheda <b>Fazioni</b> (nella Partita live o nel Calcolo giornata): <b>una sola presenza per squadra</b>. La sfida tra le due fazioni si vede in <b>Classifiche</b> &rsaquo; scheda <b>Fazioni</b> ("Curva vs Piana").</p>
 </div>

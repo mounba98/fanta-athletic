@@ -1,7 +1,37 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D120",
+  "allineato": "D121",
   "news": [
+    {
+      "id": "2026-10-23-app",
+      "date": "2026-10-23",
+      "audience": "all",
+      "icon": "⚽",
+      "title": "Moduli e imbattibilità",
+      "intro": "Due regole nuove per la stagione 2026/27.",
+      "items": [
+        "<b>Scegli il modulo</b> dal menu sopra il campo, in Formazioni: <b>1-2-2, 2-2-1, 2-1-2, 3-1-1</b> (difesa-centrocampo-attacco). Il portiere conta in difesa e non è obbligatorio. Prima scegli il modulo: le caselle del campo si dispongono da sole e ognuna accetta solo il suo ruolo.",
+        "<b>Imbattibilità</b>: se l'Athletic non subisce gol, ogni portiere e difensore che hai schierato vale <b>+1</b> (doppio se è il capitano)."
+      ],
+      "link": "formazioni.html",
+      "linkLabel": "Vai alle formazioni"
+    },
+    {
+      "id": "2026-10-23-admin",
+      "date": "2026-10-23",
+      "audience": "admin",
+      "icon": "📣",
+      "title": "Per gli admin: novità per la stagione",
+      "intro": "Ritocchi chiesti da voi per l'asta e la stagione.",
+      "items": [
+        "La tipologia <b>Curva</b> ora si chiama <b>Tifo</b>: vale sia per la Curva Morello sia per la Piana. Le regole già create non cambiano.",
+        "Nel campo <b>Assegnazione</b> tolte le voci \"Per squadra – solo Curva Morello / solo Piana\", che non usava nessun bonus. Per un bonus di una sola fazione usate <b>Evento Curva Morello</b> o <b>Evento Piana</b>.",
+        "<b>Imbattibilità</b> (R104, già creata): se l'Athletic non subisce gol, +1 per ogni portiere e difensore schierato. Inserite il risultato nella <b>Partita live</b> (dopo il fischio finale) o nel Calendario Athletic: il Calcolo giornata la spunta da solo. <b>Porta inviolata</b> ora vale +1.",
+        "<b>Giocatori fuori rosa</b>: in Pannello › Giocatori, chi è fermo si segna <b>Fuori rosa</b> invece di eliminarlo. Non si può mettere in una rosa finché non lo rimettete; lo storico resta. L'elenco ora è in ordine di ruolo e cognome."
+      ],
+      "link": "admin-rules.html",
+      "linkLabel": "Apri le regole"
+    },
     {
       "id": "2026-10-04-app",
       "date": "2026-10-04",

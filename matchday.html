@@ -1032,6 +1032,48 @@
           showLiveBanner(stato);
         } catch (e) { console.warn('[matchday] dati Partita live non caricati', e); }
       }
+
+      try { await applyImbattibilita(); } catch (e) { console.warn('[matchday] imbattibilità non applicata', e); }
+    }
+
+    // Imbattibilità (D121): se dal risultato nel Calendario Athletic l'Athletic non ha
+    // subito gol, la regola Giocatore "Imbattibilità" si spunta da sola su tutti i
+    // portieri e difensori. Solo se non è già spuntata a nessuno (una spunta tolta a
+    // mano non torna). Poi conta come ogni bonus giocatore: solo per chi li ha
+    // schierati, doppio al capitano. Non salva nulla: si salva con "Salva giornata".
+    function imbattibilitaRule(){
+      return normalizePlayersRules({ rules: state.rules })
+        .find(r => /imbattibil/i.test(r.nome_bonus || r.descrizione || ''));
+    }
+    function athleticGoalsConceded(m){
+      if (!m) return null;
+      const num = v => (v === null || v === undefined || v === '' || isNaN(Number(v))) ? null : Number(v);
+      const h = num(m.homeScore), a = num(m.awayScore);
+      if (h === null || a === null) return null;
+      const isAth = x => /athletic/i.test(x || '');
+      if (isAth(m.homeTeam)) return a;
+      if (isAth(m.awayTeam)) return h;
+      return null;
+    }
+    async function applyImbattibilita(){
+      const rule = imbattibilitaRule();
+      if (!rule) return;
+      await loadCalendar();
+      const conceded = athleticGoalsConceded(venueForGiornata(state.giornata).match);
+      const rid = rule.rule_id;
+      const already = Object.values(state.selPlayers || {}).some(s => s && Number(s[rid]) > 0);
+      if (conceded !== 0) {
+        if (already && conceded > 0) toast('⚠️ Imbattibilità spuntata, ma dal calendario l\'Athletic ha subito gol: controlla');
+        return;
+      }
+      if (already) return;
+      const ROLES = { Portiere: 1, Difensore: 1, P: 1, D: 1 };
+      const def = (state.players || []).filter(p => ROLES[p.role || p.ruolo] && !p.fuori_rosa);
+      def.forEach(p => {
+        const sel = state.selPlayers[p.player_id] || (state.selPlayers[p.player_id] = {});
+        sel[rid] = 1;
+      });
+      if (def.length) toast(`🧤 Athletic imbattuta: Imbattibilità spuntata a ${def.length} portieri e difensori. Controlla e salva la giornata.`);
     }
 
     function showLiveBanner(stato) {

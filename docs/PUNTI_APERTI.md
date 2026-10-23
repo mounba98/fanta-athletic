@@ -1,4 +1,4 @@
-Allineato a: D120
+Allineato a: D121
 
 # FASE 3 — cosa manca, in ordine (stato al 25/09/2026, D096)
 
@@ -24,6 +24,18 @@ Allineato a: D120
 - [x] **Scelta allenatore obbligatoria per squadre senza allenatore (D108)**, regole e sito pubblicati., insieme alla tifoseria (Curva/Piana), come `faction-gate.js`. Oggi gli allenatori 2025/26 sono rimasti sulle squadre (l'azzeramento non li tocca) e la scelta in `squadre.html` compare solo per squadre senza allenatore. Decidere: azzerarli per la 2026/27 (+ aggiungerli all'azzeramento futuro), schermata obbligatoria, chi può cambiarlo dopo. Poi commit + pubblicazione.
 - [x] Correzione D107 (admin → propria squadra in Formazioni/Squadre) committata e pubblicata il 25/09/2026.
 
+**Asta 23/10/2026 — richieste degli admin (D121):**
+- [x] "Curva" → "Tifo" nella pagina Regole (solo scritta; nel database resta `Curva`). Da decidere: "Tifo" anche in Calcolo giornata, Partita live, Classifiche.
+- [x] Nascoste le voci "Per squadra – solo Curva/Piana" (nessuna regola le usa, verificato).
+- [x] Giocatori "fuori rosa" (pulsante in Pannello › Giocatori; esclusi dall'elenco di Squadre). Fatti da Claude: Cecchi (chep), Roti (toti), Lupi Matteo (carlos), Nostri (Edo).
+- [x] Imbattibilità automatica nel Calcolo giornata dal risultato del Calendario Athletic. Regola R104 creata da Claude. Admin: inserire sempre il risultato (Partita live o Calendario).
+- [x] Doppione "jacopo_pinzauti" eliminato (mai usato; il vero è P002 "pinzo").
+- [x] **Moduli 1-2-2, 2-2-1, 2-1-2, 3-1-1 con menu a tendina** in Formazioni (controllo anche in Squadre). Da riprovare con una rosa vera dopo l'asta, su telefono.
+- [x] Risultato della partita inseribile dalla Partita live (serve per l'Imbattibilità).
+- [x] R099 "Convocazione" rimessa tipologia Giocatore (serve alla live); R043 "Porta inviolata" ora +1.
+- [ ] Chiedere agli admin: fogli live già presenti nella G1 (mounba 98, marta serretti) — prove da cancellare?
+- [ ] PDF da rifare (utente): guida admin e presentazione dell'asta.
+
 **Da fare nell'app (dati, non codice):**
 - [x] Create le 4 regole bonus (D120, 04/10): R100 presenza in casa +1, R101 in trasferta +2, R102 coro contro la Piana +2 (evento Curva Morello), R103 offese ai giocatori +2 (evento Piana). Viste nel Calcolo giornata › Fazioni.
 - [ ] Regole doppie di vecchia data: **R098** "Che cazzo fischi" e **R099** "Convocazione" esistono due volte ciascuna (stesso testo e valore). Lasciate così (toccarle può cambiare i conti delle giornate passate); `live-core.js` ne tiene già una sola. Da decidere con gli admin quale tenere.
@@ -32,7 +44,7 @@ Allineato a: D120
 - [ ] Aggiornamento automatico alla riapertura (D120, `resources/app-fresh.js`): attivo solo dalla **prossima** pubblicazione in poi — la volta dopo, verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
 - [ ] Fazioni delle 18 squadre: nessuna ce l'ha ancora (le sceglieranno i giocatori o gli admin da `admin-fazioni.html`).
 - [ ] **Stagione 2026/27 (aperta vuota, D096)**: la compilano gli admin dal percorso guidato (`admin-stagione.html#percorso`): calendario Athletic, fazioni, controllo giocatori e regole, rose dopo l'asta (la pagina Asta **non** riempie le rose: si fanno da Squadre), stato "In corso".
-- [ ] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`, compare come codice): sistemarlo da `admin-players.html` — **in sospeso, si aspettano gli admin** (D114).
+- [x] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`): sistemato dagli admin, ora è Guglielmo Cesari (verificato il 23/10, D121).
 - [ ] Dire agli admin: la "sconfitta a tavolino" degli scontri diretti ora funziona davvero (prima falliva sempre, D095).
 
 **Da decidere con gli admin:**

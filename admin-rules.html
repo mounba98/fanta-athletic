@@ -99,8 +99,7 @@
           <option value="squadra:comune">🏟️ Per squadra (tutte le fazioni)</option>
           <option value="squadra:comune:casa">🏠 Presenza IN CASA (si spunta solo "presente")</option>
           <option value="squadra:comune:trasferta">🚌 Presenza IN TRASFERTA (si spunta solo "presente")</option>
-          <option value="squadra:curva">🏟️ Per squadra – solo Curva Morello</option>
-          <option value="squadra:piana">🏟️ Per squadra – solo Piana</option>
+          <!-- "Per squadra – solo Curva/Piana" nascoste (D121): nessun bonus le usa; per rimetterle riaggiungere le due option qui e togliere 'hidden' in ASSEGNAZIONI -->
           <option value="fazione:curva">📣 Evento Curva Morello (una volta, vale per la fazione)</option>
           <option value="fazione:piana">📣 Evento Piana (una volta, vale per la fazione)</option>
         </select>
@@ -120,7 +119,7 @@
           <option value="ALL">Tutte le tipologie</option>
           <option value="Giocatore">👤 Giocatori</option>
           <option value="Allenatore">👔 Allenatori</option>
-          <option value="Curva">📣 Curva</option>
+          <option value="Curva">📣 Tifo</option>
         </select>
           <button class="btn btn-sm" onclick="exportRules()">Export JSON</button>
         <button class="btn btn-sm" type="button" onclick="manualSyncRules()" title="Aggiorna cache Firestore">Sync cache</button>
@@ -245,8 +244,10 @@
         const payload = {
           rule_id, 
           nome_bonus: descrizione,
-          descrizione, 
-          valore, 
+          descrizione,
+          valore,
+          // D121: prima mancava, la riga mostrava "Giocatore" ma il Calcolo giornata la ignorava
+          soggetto: 'Giocatore',
           attivo: true, 
           visible: true,
           ordine: maxOrder+1, 
@@ -335,9 +336,10 @@
             <select onchange="updateRule('${r.id}','soggetto',this.value)" style="padding:8px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;">
               <option value="Giocatore" ${soggetto==='Giocatore'?'selected':''}>👤 Giocatore</option>
               <option value="Allenatore" ${soggetto==='Allenatore'?'selected':''}>👔 Allenatore</option>
-              <option value="Curva" ${soggetto==='Curva'?'selected':''}>📣 Curva</option>
+              <option value="Curva" ${soggetto==='Curva'?'selected':''}>📣 Tifo</option>
             </select>
             ${soggetto==='Curva' ? assegnazioneSelect(r) : ''}
+            ${soggetto==='Giocatore' && /imbattibil/i.test(r.nome_bonus || r.descrizione || '') ? '<div style="margin-top:6px;font-size:12px;color:var(--muted);" title="Calcolo giornata: se dal Calendario Athletic l\'Athletic non ha subito gol, si spunta da sola su portieri e difensori (D121)">🧤 si spunta da sola</div>' : ''}
           </td>
           <td style="text-align:center;">
             <select onchange="updateRule('${r.id}','input_type',this.value)" style="padding:8px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;">
@@ -382,8 +384,9 @@
       ['squadra:comune', '🏟️ Per squadra (tutte le fazioni)'],
       ['squadra:comune:casa', '🏠 Presenza IN CASA'],
       ['squadra:comune:trasferta', '🚌 Presenza IN TRASFERTA'],
-      ['squadra:curva', '🏟️ Per squadra – solo Curva Morello'],
-      ['squadra:piana', '🏟️ Per squadra – solo Piana'],
+      // Nascoste (D121): compaiono solo su una regola che le usa già
+      ['squadra:curva', '🏟️ Per squadra – solo Curva Morello', 'hidden'],
+      ['squadra:piana', '🏟️ Per squadra – solo Piana', 'hidden'],
       ['fazione:curva', '📣 Evento Curva Morello'],
       ['fazione:piana', '📣 Evento Piana']
     ];
@@ -391,7 +394,7 @@
     function assegnazioneSelect(r) {
       const cur = assegnazioneOf(r);
       return '<select onchange="setAssegnazione(\'' + r.id + '\',this.value)" style="margin-top:6px;padding:6px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;font-size:12px;max-width:190px;">' +
-        ASSEGNAZIONI.map(o => '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
+        ASSEGNAZIONI.filter(o => !o[2] || o[0] === cur).map(o => '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
     }
     async function setAssegnazione(id, val) {
       const data = {};

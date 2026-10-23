@@ -153,7 +153,7 @@
         .sort((a, b) => (ROLE[a.role] || 9) - (ROLE[b.role] || 9) || String(a.name).localeCompare(String(b.name)));
       S.coaches = (cj.coaches || cj || []).map(c => ({ id: c.coach_id, name: c.nome }));
       S.teams = ts.docs.map(d => Object.assign({ id: d.id }, d.data()));
-      S.cal = cal.docs.map(d => d.data());
+      S.cal = cal.docs.map(d => Object.assign({ _id: d.id }, d.data()));
     }
     function venueOf(g) {
       const n = parseInt(String(g).slice(1), 10);
@@ -205,6 +205,17 @@
       let remote = null, local = null;
       try { const d = await mySheetRef().get(); if (d.exists) remote = d.data(); } catch (e) {}
       try { local = JSON.parse(localStorage.getItem(localKey()) || 'null'); } catch (e) {}
+      // Foglio salvato ma partita cancellata (prove ripulite, D121): non succede nel
+      // funzionamento normale (la partita si crea prima del foglio) → si riparte vuoti.
+      if (remote) {
+        let liveExists = true;
+        try { liveExists = (await liveRef().get()).exists; } catch (e) {}
+        if (!liveExists) {
+          try { await mySheetRef().delete(); } catch (e) { console.warn('[live] foglio vecchio non cancellato', e && e.code); }
+          try { localStorage.removeItem(localKey()); } catch (e) {}
+          remote = null; local = null;
+        }
+      }
       const pick = (local && (!remote || (local.savedAt || 0) > (remote.savedAt || 0))) ? local : remote;
       S.sheet = Object.assign(C.emptySheet(), pick ? { players: pick.players || {}, coaches: pick.coaches || {}, curva: pick.curva || {}, log: pick.log || [], closed: !!pick.closed, closedAt: pick.closedAt || null, savedAt: pick.savedAt } : {});
       if (local && pick === local && (!remote || local.savedAt > (remote.savedAt || 0))) pushSheet();
@@ -361,7 +372,11 @@
     };
 
     // ---------- dopo il fischio ----------
-    function peersList() { return Object.values(S.sheets); }
+    // Senza partita sul database contano solo il proprio foglio: quelli degli altri sono avanzi (D121)
+    function peersList() {
+      const all = Object.values(S.sheets);
+      return (S.live && S.live.createdAt) ? all : all.filter(s => s.uid === S.user.uid);
+    }
     function renderPeers() {
       const ps = peersList();
       $('peers').innerHTML = ps.length ? 'Fogli: ' + ps.map(s => esc(s.name || 'admin') + (s.uid === S.user.uid ? ' (tu)' : '') + ' ' + (s.closed ? '✅ chiuso' : '✍️ sta segnando')).join(' • ') : '';
@@ -380,15 +395,72 @@
         h += '<p class="info">Fogli incrociati: <b>' + Object.keys(m.agreed).filter(k => m.agreed[k]).length + '</b> voci uguali, <b>' + m.disputes.length + '</b> diverse (vanno in revisione e per ora non contano).</p>' +
           '<button class="sbtn ok" id="pubProv">Pubblica punti provvisori</button>';
       }
-      h += '</section>';
+      h += '</section>' + resultCard();
       $('view').innerHTML = h;
+      bindResultCard(renderClosed);
       const b = $('pubProv'); if (b) b.onclick = publishProvisional;
     }
+    // ---------- risultato della partita (D121) ----------
+    // Si salva nel Calendario Athletic (come il pulsante "Risultato" di admin-calendario):
+    // da lì il Calcolo giornata capisce se l'Athletic non ha subito gol (Imbattibilità).
+    const hasScore = m => !!m && m.homeScore !== null && m.homeScore !== undefined && m.homeScore !== '' && m.awayScore !== null && m.awayScore !== undefined && m.awayScore !== '';
+    function resultCard() {
+      const m = S.venue && S.venue.m;
+      if (!m) return '<section class="card"><h3>Risultato della partita</h3><p class="info">Partita non trovata nel Calendario Athletic: inseritela lì, con il risultato, prima di pubblicare (serve per l\'Imbattibilità).</p></section>';
+      const v = x => (x === null || x === undefined) ? '' : esc(String(x));
+      return '<section class="card"><h3>Risultato della partita</h3>' +
+        '<p class="info">' + (hasScore(m) ? 'Salvato: <b>' + esc(m.homeTeam) + ' ' + m.homeScore + '-' + m.awayScore + ' ' + esc(m.awayTeam) + '</b>' : 'Non ancora inserito. Serve per l\'<b>Imbattibilità</b> (+1 a portieri e difensori schierati se l\'Athletic non subisce gol).') + '</p>' +
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+        '<span>' + esc(m.homeTeam) + '</span><input id="resH" type="number" min="0" inputmode="numeric" value="' + v(m.homeScore) + '" style="width:64px;padding:8px;border-radius:10px;border:1px solid var(--line,#ccc);font:inherit">' +
+        '<span>-</span><input id="resA" type="number" min="0" inputmode="numeric" value="' + v(m.awayScore) + '" style="width:64px;padding:8px;border-radius:10px;border:1px solid var(--line,#ccc);font:inherit">' +
+        '<span>' + esc(m.awayTeam) + '</span><button class="sbtn blue" id="resSave">Salva risultato</button></div></section>';
+    }
+    function bindResultCard(rerender) {
+      const b = $('resSave'); if (!b) return;
+      b.onclick = async () => {
+        const m = S.venue && S.venue.m; if (!m) return;
+        const h = $('resH').value, a = $('resA').value;
+        if (h === '' || a === '' || Number(h) < 0 || Number(a) < 0) return toast('Scrivi i gol di tutte e due le squadre');
+        try {
+          await db().collection('athletic_calendar').doc(m._id).update({ homeScore: parseInt(h, 10), awayScore: parseInt(a, 10) });
+          m.homeScore = parseInt(h, 10); m.awayScore = parseInt(a, 10);
+          toast('Risultato salvato');
+          rerender();
+        } catch (e) { toast('Errore: ' + (e.code || e.message)); }
+      };
+    }
+    // Imbattibilità (D121): con il risultato salvato e 0 gol subiti dall'Athletic, la
+    // regola "Imbattibilità" va a tutti i portieri e difensori già nei punti pubblicati
+    // dalla live (poi conta solo per chi li ha schierati, doppia al capitano).
+    // Se un admin l'ha già segnata a qualcuno non si tocca niente (come in matchday.html).
+    function athleticConceded() {
+      const m = S.venue && S.venue.m;
+      if (!hasScore(m)) return null;
+      if (/athletic/i.test(m.homeTeam || '')) return Number(m.awayScore);
+      if (/athletic/i.test(m.awayTeam || '')) return Number(m.homeScore);
+      return null;
+    }
+    function withImbattibilita(sel) {
+      const rule = S.rules.players.find(r => /imbattibil/i.test(C.label(r)));
+      if (!rule || athleticConceded() !== 0) return sel;
+      const rid = C.rid(rule);
+      sel.players = sel.players || {};
+      if (Object.values(sel.players).some(x => x && Number(x[rid]) > 0)) return sel;
+      const DEF = { Portiere: 1, Difensore: 1, P: 1, D: 1 };
+      S.players.filter(p => DEF[p.role || p.ruolo] && !p.fuori_rosa).forEach(p => { (sel.players[p.id] = sel.players[p.id] || {})[rid] = 1; });
+      return sel;
+    }
+    const imbattNote = () => athleticConceded() === 0 ? '\n\n🧤 Athletic imbattuta: Imbattibilità a portieri e difensori.' : '';
+    function resultMissingOk() {
+      return hasScore(S.venue && S.venue.m) || confirm('Il risultato della partita non è inserito: l\'Imbattibilità non verrà spuntata. Pubblico lo stesso?');
+    }
+
     async function publishProvisional() {
+      if (!resultMissingOk()) return;
       const ps = peersList().filter(s => s.closed);
       const m = C.merge(ps);
-      if (!confirm('Pubblico i punti provvisori (' + m.disputes.length + ' voci in revisione)? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".')) return;
-      const sel = C.unflat(m.agreed);
+      if (!confirm('Pubblico i punti provvisori (' + m.disputes.length + ' voci in revisione)? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".' + imbattNote())) return;
+      const sel = withImbattibilita(C.unflat(m.agreed));
       await L().collection('matchday_temp').doc(S.g).set({ giornata: S.g, players: sel.players, coaches: sel.coaches, curva: sel.curva,
         updatedBy: 'Partita live (provvisorio)', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
       await liveRef().set({ stato: 'provvisorio', agreed: m.agreed, disputes: m.disputes, sheetsUsed: ps.map(s => ({ uid: s.uid, name: s.name })),
@@ -429,7 +501,9 @@
         const pending = (lv.disputes || []).filter(d => !(d.key in res)).length;
         h += '<section class="card"><p class="info">' + (pending ? 'Mancano <b>' + pending + '</b> voci da decidere.' : 'Tutto deciso.') + '</p><button class="sbtn ok" id="pubFinal" ' + (pending ? 'disabled' : '') + '>Pubblica punti definitivi</button></section>';
       }
+      if (lv.stato === 'provvisorio') h += resultCard();
       $('view').innerHTML = h;
+      bindResultCard(renderReview);
       $('view').querySelectorAll('[data-res]').forEach(b => b.onclick = async () => {
         // merge:true aggiunge/cambia solo questa decisione, il resto del documento resta com'è
         try { await liveRef().set({ resolutions: { [b.dataset.res]: Number(b.dataset.v) }, lastEditBy: S.user.uid }, { merge: true }); }
@@ -454,9 +528,10 @@
     }
     async function publishFinal() {
       const lv = S.live;
-      if (!confirm('Pubblico i punti DEFINITIVI? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".')) return;
+      if (!resultMissingOk()) return;
+      if (!confirm('Pubblico i punti DEFINITIVI? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".' + imbattNote())) return;
       const fin = C.finalMap(lv.agreed, lv.resolutions, lv.corrections);
-      const sel = C.unflat(fin);
+      const sel = withImbattibilita(C.unflat(fin));
       await L().collection('matchday_temp').doc(S.g).set({ giornata: S.g, players: sel.players, coaches: sel.coaches, curva: sel.curva,
         updatedBy: 'Partita live (definitivo)', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
       await liveRef().set({ stato: 'definitivo', final: fin, finalAt: Date.now(), finalBy: S.user.uid }, { merge: true });

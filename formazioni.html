@@ -99,6 +99,18 @@
       overflow: hidden;
     }
 
+    .modulo-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 10px; }
+    .modulo-bar label { display:flex; align-items:center; gap:8px; font-weight:700; }
+    .modulo-bar select { width:auto; min-width:96px; }
+    .modulo-count { font-size:13px; }
+    /* D121: colonne che non superano il campo (minmax 0), anche con le regole dei media query */
+    .pitch .pitch-grid { grid-template-columns: minmax(0, 1fr); }
+    .pitch .pitch-grid .line.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pitch .pitch-grid .line.three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .pitch .pitch-grid .line.coach-row { display:flex; justify-content:flex-end; }
+    .pitch .slot { min-width: 0; }
+    .pitch .slot-empty { text-align:center; }
+    @media (max-width: 767px) { .pitch .slot-empty { font-size: 11px; letter-spacing: 0; } }
     .pitch-grid { display:grid; gap: 14px; margin-top: 10px; position: relative; z-index: 1; }
     .pitch-grid .line { display:grid; gap: 14px; justify-content:center; align-items:center; }
     .pitch-grid .line.two { grid-template-columns: repeat(2, 1fr); }
@@ -1062,6 +1074,7 @@
           <!-- Campo a sinistra -->
           <div>
             <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+            <div class="modulo-bar"><label>Modulo <select class="input modulo-select" aria-label="Modulo"></select></label><span class="modulo-count muted"></span></div>
             <div class="pitch">
               <div class="pitch-lines"></div>
               <div class="pitch-circle"></div>
@@ -1086,7 +1099,7 @@
                 </div>
               </div>
             </div>
-            <div class="hint" style="margin-top:6px; max-width:520px;">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+            <div class="hint" style="margin-top:6px; max-width:520px;">Moduli ammessi (Difesa-Centrocampo-Attacco): 1-2-2, 2-2-1, 2-1-2, 3-1-1. Il portiere conta in difesa.</div>
             <div class="actions-grid" style="margin:8px 0;">
               <button class="btn desktop-only" id="saveFormation">Salva</button>
               <button class="btn btn-secondary desktop-only" id="clearLineup">Svuota campo</button>
@@ -1117,6 +1130,7 @@
         <!-- Campo mobile -->
         <div class="mobile-only" style="margin-top: 16px;">
           <div class="sectionh" style="margin-top:0;">Titolari (5 a 5)</div>
+            <div class="modulo-bar"><label>Modulo <select class="input modulo-select" aria-label="Modulo"></select></label><span class="modulo-count muted"></span></div>
           <div class="pitch">
             <div class="pitch-lines"></div>
             <div class="pitch-circle"></div>
@@ -1141,7 +1155,7 @@
               </div>
             </div>
           </div>
-          <div class="hint" style="margin-top:6px; max-width:300px; margin-left:auto; margin-right:auto;">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+          <div class="hint" style="margin-top:6px; max-width:300px; margin-left:auto; margin-right:auto;">Moduli ammessi (Difesa-Centrocampo-Attacco): 1-2-2, 2-2-1, 2-1-2, 3-1-1. Il portiere conta in difesa.</div>
         </div>
         
         <div class="mobile-only" style="margin-top: 16px;">
@@ -1253,9 +1267,12 @@
         return;
       }
       
+      if (!ensureModulo(t)) { toast('⚠️ Scegli prima il modulo (sopra il campo)'); return; }
+      const slotRole = slotRoles(t.modulo)[slotIndex];
       const onField = new Set((t.lineup||[]).filter(Boolean));
       const availablePlayers = (t.roster||[])
         .filter(pid => !onField.has(pid))
+        .filter(pid => !slotRole || roleForConstraint(pid) === slotRole)
         .map(pid => {
           const p = state.players.find(x => x.player_id === pid);
           return p ? { ...p, player_id: pid } : null;
@@ -1330,7 +1347,9 @@
       modal.querySelectorAll('.picker-player-item').forEach(item => {
         item.addEventListener('click', () => {
           const pid = item.dataset.pid;
-          t.lineup[slotIndex] = pid;
+          const testLine = t.lineup.map(x => x === pid ? null : x); testLine[slotIndex] = pid;
+          if (!checkModulo(t, testLine)) return;
+          t.lineup = testLine;
           saveTeams();
           renderEditor();
           modal.remove();
@@ -1381,13 +1400,16 @@
         return;
       }
       
-      // Giocatore in panchina? → AGGIUNGI al primo slot vuoto
-      const emptySlot = t.lineup.findIndex(p => p === null);
+      // Giocatore in panchina? → AGGIUNGI al primo posto libero del suo ruolo
+      if (!ensureModulo(t)) { toast('⚠️ Scegli prima il modulo (sopra il campo)'); return; }
+      const emptySlot = freeSlotFor(t, pid);
       if (emptySlot === -1) {
-        toast('⚠️ Tutti gli slot occupati! Rimuovi prima un giocatore.');
+        if (checkModulo(t, t.lineup.concat([pid]))) toast('⚠️ Tutti gli slot occupati! Rimuovi prima un giocatore.');
         return;
       }
       
+      const testLine = t.lineup.slice(); testLine[emptySlot] = pid;
+      if (!checkModulo(t, testLine)) return;
       t.lineup[emptySlot] = pid;
       saveTeams();
       renderEditor();
@@ -1442,6 +1464,11 @@
         return;
       }
       
+      const wantRole = slotRoles(ensureModulo(t))[slotIndex];
+      if (wantRole && roleForConstraint(pid) !== wantRole) { toast(`⚠️ Questa casella è per: ${ROLE_LABEL[wantRole]}`); return; }
+      const testLine = t.lineup.map(x => x === pid ? null : x); testLine[slotIndex] = pid;
+      if (!checkModulo(t, testLine)) return;
+
       // Rimuovi il giocatore dalla sua posizione attuale (se presente)
       const oldIndex = t.lineup.indexOf(pid);
       if (oldIndex !== -1 && oldIndex !== slotIndex) {
@@ -1473,13 +1500,17 @@
         return;
       }
       
-      // Trova il primo slot vuoto
-      const emptySlotIndex = t.lineup.findIndex(p => p === null);
+      // Trova il primo posto libero del suo ruolo
+      if (!ensureModulo(t)) { toast('⚠️ Scegli prima il modulo (sopra il campo)'); return; }
+      const emptySlotIndex = freeSlotFor(t, pid);
       if (emptySlotIndex === -1) {
-        toast('Tutti gli slot sono occupati! Rimuovi prima un giocatore dal campo.');
+        if (checkModulo(t, t.lineup.filter(x => x !== pid).concat([pid]))) toast('Tutti gli slot sono occupati! Rimuovi prima un giocatore dal campo.');
         return;
       }
       
+      const testLine = t.lineup.map(x => x === pid ? null : x); testLine[emptySlotIndex] = pid;
+      if (!checkModulo(t, testLine)) return;
+
       // Rimuovi il giocatore dalla sua posizione attuale (se presente)
       const oldIndex = t.lineup.indexOf(pid);
       if (oldIndex !== -1) {
@@ -1899,6 +1930,8 @@
     async function saveCurrentTeamFormation(){
       const t = state.teams[state.selectedTeamIdx]; if (!t) return false;
       if (!t.captain){ toast('Seleziona il capitano prima di salvare'); return false; }
+      const mod = ensureModulo(t);
+      if (!mod || !fitsModulo(t.lineup, mod)){ toast('⚠️ La formazione non rispetta un modulo ammesso (1-2-2, 2-2-1, 2-1-2, 3-1-1)'); return false; }
       const leagueId = await ensureLeagueReady();
       if (!leagueId) {
         notifyMissingLeague('salvare la formazione');
@@ -1909,6 +1942,7 @@
       const payload = {
         lineup: sanitizedLineup,
         captain: t.captain||null,
+        modulo: mod,
         name: t.name||'',
         updated_at: firebase.firestore.FieldValue?.serverTimestamp?.() || Date.now()
       };
@@ -2090,6 +2124,7 @@
           if (result && result.snap && result.snap.exists){
             const d = result.snap.data() || {};
             if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
+            t.modulo = (d.modulo in MODULI) ? d.modulo : inferModulo(t.lineup);
             if (d.captain!==undefined) t.captain = d.captain;
             if (d.name && !t.name) t.name = d.name;
           }
@@ -2119,6 +2154,7 @@
           if (doc.exists){
             const d = doc.data()||{};
             if (Array.isArray(d.lineup)) t.lineup = d.lineup.slice(0,5).concat(Array(5).fill(null)).slice(0,5);
+            t.modulo = (d.modulo in MODULI) ? d.modulo : inferModulo(t.lineup);
             if (d.captain!==undefined) t.captain = d.captain;
             if (d.name && !t.name) t.name = d.name;
           }
@@ -2162,6 +2198,101 @@
       if (!p) return '';
       if (p.role === 'Portiere') return 'Difensore';
       return p.role;
+    }
+
+    // ===== Moduli (D121): Difesa-Centrocampo-Attacco, il portiere conta in difesa =====
+    const MODULI = { '1-2-2': [1,2,2], '2-2-1': [2,2,1], '2-1-2': [2,1,2], '3-1-1': [3,1,1] };
+    const MODULO_ROLES = ['Difensore', 'Centrocampista', 'Attaccante'];
+    const MODULO_NAMES = [['difensore/portiere','difensori/portieri'], ['centrocampista','centrocampisti'], ['attaccante','attaccanti']];
+    function lineupCounts(line){
+      const c = [0,0,0];
+      (line||[]).filter(Boolean).forEach(pid => { const i = MODULO_ROLES.indexOf(roleForConstraint(pid)); if (i >= 0) c[i]++; });
+      return c;
+    }
+    function fitsModulo(line, mod){
+      const m = MODULI[mod]; if (!m) return false;
+      const c = lineupCounts(line);
+      return c.every((n,i) => n <= m[i]);
+    }
+    // Modulo di una formazione già fatta (salvata prima dei moduli): il primo che la contiene
+    function inferModulo(line){
+      const n = (line||[]).filter(Boolean).length;
+      if (!n) return null;
+      return Object.keys(MODULI).find(k => fitsModulo(line, k)) || null;
+    }
+    function ensureModulo(t){
+      if (t && !(t.modulo in MODULI)) t.modulo = inferModulo(t.lineup);
+      return t ? t.modulo : null;
+    }
+    // Unico controllo per ogni modo di mettere un giocatore in campo
+    function checkModulo(t, testLine){
+      const mod = ensureModulo(t);
+      if (!mod) { toast('⚠️ Scegli prima il modulo (sopra il campo)'); return false; }
+      if (fitsModulo(testLine, mod)) return true;
+      const m = MODULI[mod], c = lineupCounts(testLine);
+      const i = c.findIndex((n,k) => n > m[k]);
+      toast(`⚠️ Il ${mod} prevede ${m[i]} ${MODULO_NAMES[i][m[i] === 1 ? 0 : 1]}`);
+      return false;
+    }
+    function renderModuloBar(t, canWrite){
+      const mod = ensureModulo(t);
+      const c = lineupCounts(t.lineup), m = MODULI[mod];
+      const count = m ? `Difesa ${c[0]}/${m[0]} · Centrocampo ${c[1]}/${m[1]} · Attacco ${c[2]}/${m[2]}` : 'Scegli il modulo prima di schierare';
+      $$('.modulo-select').forEach(sel => {
+        sel.innerHTML = (mod ? '' : '<option value="">Scegli…</option>') + Object.keys(MODULI).map(k => `<option value="${k}" ${k===mod?'selected':''}>${k}</option>`).join('');
+        sel.disabled = !canWrite;
+        sel.onchange = () => {
+          const v = sel.value;
+          if (!fitsModulo(t.lineup, v)) {
+            const mm = MODULI[v], cc = lineupCounts(t.lineup), i = cc.findIndex((n,k) => n > mm[k]);
+            toast(`⚠️ Per il ${v} togli prima dal campo ${cc[i]-mm[i]} ${MODULO_NAMES[i][cc[i]-mm[i] === 1 ? 0 : 1]}`);
+            sel.value = mod || '';
+            return;
+          }
+          t.modulo = v; saveTeams(); renderEditor();
+        };
+      });
+      $$('.modulo-count').forEach(el => { el.textContent = count; });
+    }
+
+    // Caselle del campo secondo il modulo (D121): dall'alto attacco, centrocampo,
+    // difesa (vicino alla porta). L'ordine di t.lineup segue le caselle; il calcolo
+    // dei punti non guarda le posizioni.
+    const ROLE_LABEL = { Attaccante: 'Attaccante', Centrocampista: 'Centrocampista', Difensore: 'Difensore / portiere' };
+    const SLOT_LABEL = { Attaccante: 'Attacco', Centrocampista: 'Centrocampo', Difensore: 'Difesa' };
+    function slotRoles(mod){
+      const m = MODULI[mod]; if (!m) return [];
+      return [...Array(m[2]).fill('Attaccante'), ...Array(m[1]).fill('Centrocampista'), ...Array(m[0]).fill('Difensore')];
+    }
+    // Primo posto libero del ruolo del giocatore (-1 se non c'è)
+    function freeSlotFor(t, pid){
+      const roles = slotRoles(t.modulo);
+      return t.lineup.findIndex((x,k) => x === null && roles[k] === roleForConstraint(pid));
+    }
+    // Rimette ogni giocatore in una casella del suo ruolo (formazioni vecchie, cambio modulo)
+    function arrangeLineup(t){
+      const roles = slotRoles(t.modulo);
+      if (!roles.length || !fitsModulo(t.lineup, t.modulo)) return;
+      const out = Array(5).fill(null), rest = [];
+      (t.lineup||[]).forEach((pid,i) => { if (!pid) return; if (roles[i] === roleForConstraint(pid)) out[i] = pid; else rest.push(pid); });
+      rest.forEach(pid => { const j = roles.findIndex((r,k) => r === roleForConstraint(pid) && !out[k]); if (j >= 0) out[j] = pid; });
+      t.lineup = out;
+    }
+    function layoutPitch(sel, mod){
+      const g = document.querySelector(sel);
+      if (!g || g.dataset.mod === String(mod||'')) return;
+      g.dataset.mod = String(mod||'');
+      const coach = g.querySelector('.coach-slot-mini');
+      const m = MODULI[mod] || [2,2,1];
+      const rows = [m[2], m[1], m[0]];
+      const cls = { 1: 'one', 2: 'two', 3: 'three' };
+      let k = 0;
+      g.innerHTML = rows.map((n, r) => {
+        const slots = Array.from({ length: n }, () => `<div class="slot" data-slot="${k++}"${r === 2 && n === 1 ? ' style="flex: 0 0 auto;"' : ''}></div>`).join('');
+        if (r === 2 && n === 1) return `<div class="line one coach-line" style="display: flex; align-items: center; justify-content: flex-start; gap: 12px; position: relative; padding-right: 0;">${slots}</div>`;
+        return `<div class="line ${cls[n]}">${slots}</div>`;
+      }).join('') + (m[0] > 1 ? '<div class="line coach-line coach-row"></div>' : '');
+      if (coach) g.querySelector('.coach-line').appendChild(coach);
     }
 
     async function fetchOwnersForTeam(idx){
@@ -2220,6 +2351,10 @@
       const locked = isLockedAuto();
       const computedReadOnly = state.daysComputed && !state.isAdmin; // Giornate calcolate read-only per non-admin
       const canWrite = canEdit(state.selectedTeamIdx) && (!locked || state.isAdmin) && !computedReadOnly;
+      renderModuloBar(t, canWrite);
+      arrangeLineup(t);
+      layoutPitch('#pitchGrid', t.modulo);
+      layoutPitch('#pitchGridMobile', t.modulo);
       const canSelectCoach = state.isAdmin; // Solo admin possono selezionare coach (non più usato in formazioni, ma mantenuto per compatibilità)
       // snapshot iniziale per annulla modifiche: creato se assente
       if (!state.snapshots[state.selectedTeamIdx]){
@@ -2549,7 +2684,8 @@
             });
           }
         } else {
-          slot.innerHTML = `<div class="slot-empty">Trascina qui</div>`;
+          const slotRole = slotRoles(t.modulo)[i];
+          slot.innerHTML = `<div class="slot-empty">${slotRole ? SLOT_LABEL[slotRole] : 'Scegli il modulo'}</div>`;
           
           // Mobile: click su slot vuoto apre finestra con giocatori in panchina
           if (isMobile()) {

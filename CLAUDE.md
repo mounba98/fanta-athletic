@@ -1,4 +1,4 @@
-Allineato a: D120
+Allineato a: D121
 
 # Fanta Athletic — contesto per Claude
 
@@ -50,6 +50,7 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
+**▶ ULTIMO LAVORO (D121, 23/10/2026, sera dell'asta)**: richieste admin fatte e committate — "Tifo" nelle Regole, giocatori "fuori rosa", Imbattibilità +1 automatica (dal risultato salvato nella Partita live o nel Calendario), moduli 1-2-2/2-2-1/2-1-2/3-1-1 con caselle per ruolo in Formazioni, R099 Convocazione ripristinata, R043 Porta inviolata +1. Da verificare dopo l'asta: Formazioni con una rosa vera dal telefono; i fogli live G1 di prova (mounba, marta) spariscono quando loro riaprono la live. PDF guida e presentazione da rifare (utente). Dettaglio in `docs/DECISION_LOG.md` D121.
 **▶ PROSSIMA SESSIONE — PARTI DA QUI (D120, 04/10/2026)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
 `main`), ultima pubblicazione **04/10/2026** (D120, commit `b97a39a`). Stagione 2026/27

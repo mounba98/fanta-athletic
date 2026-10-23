@@ -128,17 +128,10 @@
         <h3 id="statAttaccanti">0</h3>
         <p>Attaccanti</p>
       </div>
+      <!-- D121: tolte le caselle In Firestore / Solo in JSON / Solo in Firestore (confondevano gli admin) -->
       <div class="stat-card">
-        <h3 id="statFirestore">0</h3>
-        <p>In Firestore</p>
-      </div>
-      <div class="stat-card">
-        <h3 id="statJSON">0</h3>
-        <p>Solo in JSON</p>
-      </div>
-      <div class="stat-card">
-        <h3 id="statNew">0</h3>
-        <p>Solo in Firestore</p>
+        <h3 id="statFuoriRosa">0</h3>
+        <p>Fuori rosa</p>
       </div>
     </div>
 
@@ -347,6 +340,14 @@
         const searchText = `${p.nome_completo} ${p.nickname || ''} ${p.role} ${p.team || ''}`.toLowerCase();
         return searchText.includes(filter.toLowerCase());
       });
+      // Ordine (D121): ruolo, poi in rosa prima dei fuori rosa, poi cognome
+      const ROLE_ORDER = ['Portiere', 'Difensore', 'Centrocampista', 'Attaccante'];
+      const roleIdx = r => { const i = ROLE_ORDER.indexOf(r); return i < 0 ? 9 : i; };
+      const surname = p => String(p.nome_completo || '').trim().split(/\s+/).pop().toLowerCase();
+      filtered.sort((a, b) => roleIdx(a.role) - roleIdx(b.role)
+        || (a.fuori_rosa ? 1 : 0) - (b.fuori_rosa ? 1 : 0)
+        || surname(a).localeCompare(surname(b), 'it')
+        || String(a.nome_completo).localeCompare(String(b.nome_completo), 'it'));
 
       if (filtered.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Nessun giocatore trovato</td></tr>';
@@ -355,12 +356,13 @@
 
       tbody.innerHTML = filtered.map(p => `
         <tr>
-          <td><strong>${p.nome_completo}</strong></td>
+          <td><strong>${p.nome_completo}</strong>${p.fuori_rosa ? ' <span class="badge" style="background:#6b7280;color:#fff;">Fuori rosa</span>' : ''}</td>
           <td><span class="badge badge-${p.role.toLowerCase()}">${p.role}</span></td>
           <td>${p.nickname || '-'}</td>
           <td>${p.team || '-'}</td>
           <td>
             <button class="btn-edit" onclick="editPlayer('${p.player_id}')">Modifica</button>
+            <button class="btn-edit" style="background:#6b7280;" onclick="toggleFuoriRosa('${p.player_id}')">${p.fuori_rosa ? 'Rimetti in rosa' : 'Fuori rosa'}</button>
             <button class="btn-delete" onclick="deletePlayer('${p.player_id}', '${p.nome_completo}')">Elimina</button>
           </td>
         </tr>
@@ -385,9 +387,7 @@
       document.getElementById('statDifensori').textContent = stats.difensori;
       document.getElementById('statCentrocampisti').textContent = stats.centrocampisti;
       document.getElementById('statAttaccanti').textContent = stats.attaccanti;
-      document.getElementById('statFirestore').textContent = stats.firestore;
-      document.getElementById('statJSON').textContent = stats.json;
-      document.getElementById('statNew').textContent = stats.new;
+      document.getElementById('statFuoriRosa').textContent = allPlayers.filter(p => p.fuori_rosa).length;
     }
 
     // Save player
@@ -440,6 +440,30 @@
       const modal = document.getElementById('editModal');
       if (modal) {
         modal.style.display = 'flex';
+      }
+    };
+
+    // Fuori rosa (D121): il giocatore resta nel database (storico, Archivio Athletic,
+    // Albo d'oro intatti) ma non compare tra quelli da mettere in rosa in Squadre.
+    // Si scrive la scheda completa: un giocatore che esiste solo in players.json
+    // non deve diventare in Firestore una scheda senza nome.
+    window.toggleFuoriRosa = async function(playerId) {
+      const p = allPlayers.find(x => x.player_id === playerId);
+      if (!p) return;
+      const out = !p.fuori_rosa;
+      const msg = out
+        ? `Segnare "${p.nome_completo}" FUORI ROSA?\n\nNon si potrà più mettere in una rosa finché non lo rimettete. Lo storico resta.`
+        : `Rimettere "${p.nome_completo}" in rosa (di nuovo acquistabile)?`;
+      if (!confirm(msg)) return;
+      try {
+        const { source, id, ...data } = p;
+        data.fuori_rosa = out;
+        await db.collection('players').doc(playerId).set(data, { merge: true });
+        showAlert(out ? '✅ Giocatore fuori rosa' : '✅ Giocatore di nuovo in rosa', 'success');
+        await loadPlayers();
+      } catch (error) {
+        console.error('Errore fuori rosa:', error);
+        showAlert('❌ Errore: ' + error.message, 'error');
       }
     };
 

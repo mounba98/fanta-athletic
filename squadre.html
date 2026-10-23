@@ -813,7 +813,7 @@
               <div class="slot" data-slot="4"></div>
             </div>
           </div>
-          <div class="hint">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+          <div class="hint">Moduli ammessi (Difesa-Centrocampo-Attacco): 1-2-2, 2-2-1, 2-1-2, 3-1-1. Il portiere conta in difesa.</div>
         </div>
         <div class="actions-grid" style="margin:8px 0;">
           <button class="btn desktop-only" id="saveFormation">Salva formazione titolari</button>
@@ -879,7 +879,7 @@
               </div>
             </div>
           </div>
-          <div class="hint" style="font-size: 10px; padding: 4px; text-align: center; width: 100%; margin-top: 6px;">Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante. I Portieri contano come Difensori.</div>
+          <div class="hint" style="font-size: 10px; padding: 4px; text-align: center; width: 100%; margin-top: 6px;">Moduli ammessi (Difesa-Centrocampo-Attacco): 1-2-2, 2-2-1, 2-1-2, 3-1-1. Il portiere conta in difesa.</div>
         </div>
 
         <!-- Panchina -->
@@ -1560,10 +1560,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
           const pid = item.dataset.pid;
           const testLine = (t.lineup || []).slice();
           testLine[slotIndex] = pid;
-          if (!validateLineup(testLine)) {
-            toast('Vincolo: almeno 1 Difensore, 1 Centrocampista, 1 Attaccante.');
-            return;
-          }
+          if (!validateLineup(testLine)) return;
           t.lineup[slotIndex] = pid;
           state.mobilePick = null;
           saveTeams();
@@ -1758,6 +1755,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
     async function saveCurrentTeamFormation(){
       const t = state.teams[state.selectedTeamIdx]; if (!t) return;
       if (!t.captain){ toast('Seleziona il capitano prima di salvare'); return; }
+      if (!validateLineup(t.lineup)) return;
       const leagueId = await getLeagueIdOrNotify('salvare la formazione');
       if (!leagueId) return;
       const sanitizedLineup = (t.lineup || []).slice(0, 5).concat(Array(5).fill(null)).slice(0, 5);
@@ -2320,6 +2318,8 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
       const needle = ($('#playerSearch').value||'').toLowerCase();
       const grouped = new Map(['Portiere','Difensore','Centrocampista','Attaccante'].map(r=>[r,[]]));
       state.players.forEach(p=>{
+        // Fuori rosa (D121): non acquistabile; resta visibile solo se è già nella rosa
+        if (p.fuori_rosa && !t.roster.includes(p.player_id)) return;
         const text = (p.nome_completo+' '+(p.nickname||'')).toLowerCase();
         if (needle && !text.includes(needle)) return;
         // Difesa contro giocatori con ruolo mancante/non valido nel database
@@ -2834,16 +2834,15 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
       });
     }
 
+    // Moduli ammessi (D121, come formazioni.html): Difesa-Centrocampo-Attacco, il portiere conta in difesa.
+    // La formazione (anche incompleta) deve stare dentro almeno uno dei moduli.
+    const MODULI = { '1-2-2': [1,2,2], '2-2-1': [2,2,1], '2-1-2': [2,1,2], '3-1-1': [3,1,1] };
     function validateLineup(line){
-      const chosen = line.filter(Boolean);
-      const roles = chosen.map(roleForConstraint);
-      const hasD = roles.includes('Difensore');
-      const hasC = roles.includes('Centrocampista');
-      const hasA = roles.includes('Attaccante');
-      // must be <=5 length check happens by grid size; enforce min role presence if there are 5
-      if (chosen.length===0) return true; // allow progressive build
-      if (chosen.length<5) return true; // relax until full
-      return hasD && hasC && hasA;
+      const c = [0,0,0];
+      (line||[]).filter(Boolean).forEach(pid => { const i = ['Difensore','Centrocampista','Attaccante'].indexOf(roleForConstraint(pid)); if (i >= 0) c[i]++; });
+      const ok = Object.values(MODULI).some(m => c.every((n,i) => n <= m[i]));
+      if (!ok) toast('⚠️ Moduli ammessi: 1-2-2, 2-2-1, 2-1-2, 3-1-1 (il portiere conta in difesa)');
+      return ok;
     }
 
     const LEAGUES_WITH_CUSTOM_PLAYER_FILES = new Set(['y3GQ05GhHsMSZLZj1Oew']);

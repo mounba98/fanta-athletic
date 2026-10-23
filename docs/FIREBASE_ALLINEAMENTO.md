@@ -1,6 +1,6 @@
 # Firebase ↔ locale: cosa vive dove e come si tiene allineato
 
-Allineato a: D120
+Allineato a: D121
 
 **Regola (decisa dall'utente il 24/09/2026)**: tutto ciò che si fa su
 Firebase deve avere la sua copia in questo progetto. Si scrive PRIMA qui,
@@ -14,7 +14,7 @@ va riportato qui subito.
 | Regole di sicurezza Firestore | Console → Firestore → Regole | `firestore.rules` | **allineato**: pubblicate dall'utente il 25/09/2026 sera (scelta allenatore + `coachLocked`, D108) |
 | Indici Firestore | Console → Firestore → Indici | *(manca; copia storica nov. 2025 in `docs/firebase-storico/`)* | da esportare; noto 1: `notifications` (userId ↑ + createdAt ↓, D037) |
 | Catalogo bonus/malus | `leagues/{lega}/rules` | `resources/rules.json` (seme per leghe nuove) | allineato al seme; le leghe esistenti si modificano da `admin-rules.html` |
-| Giocatori / allenatori | `leagues/{lega}/players`, `coaches` | `resources/players.json`, `coaches.json` | seme locale |
+| Giocatori / allenatori | `leagues/{lega}/players`, `coaches` | `resources/players.json`, `coaches.json` | seme locale. Campo `fuori_rosa: true` (D121): giocatore fermo, escluso dalle rose ma conservato |
 | Calendario Athletic | `athletic_calendar` | *(solo online)* | fonte partite del contest; **vuoto dal 25/09/2026** (azzeramento D096), lo ricompilano gli admin |
 | Configurazione Hosting | — | `firebase.json` + `.firebaserc` (ricreati D101) | cosa si pubblica e cosa no, cache (D120: anche l'indirizzo principale `/` senza cache, prima restava fino a 1 ora) |
 | Regole Storage | Console → Storage → Regole | *(copia storica nov. 2025 in `docs/firebase-storico/`, da confrontare)* | non collegate a `firebase.json` |
