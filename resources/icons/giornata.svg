@@ -1,11 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="#facc15" stroke="#facc15" stroke-width="9" stroke-linejoin="round" stroke-linecap="round">
-  <!-- Giornata / scontro diretto (D124): due spade incrociate, stesso oro e stesso peso delle icone della barra -->
-  <path d="M10 10 L34 14 L82 62 L62 82 L14 34 Z" stroke-width="5"/>
-  <path d="M56 98 L98 56" fill="none"/>
-  <path d="M84 84 L108 108" fill="none" stroke-width="11"/>
-  <circle cx="113" cy="113" r="7" stroke="none"/>
-  <path d="M118 10 L94 14 L46 62 L66 82 L114 34 Z" stroke-width="5"/>
-  <path d="M30 56 L72 98" fill="none"/>
-  <path d="M44 84 L20 108" fill="none" stroke-width="11"/>
-  <circle cx="15" cy="113" r="7" stroke="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" stroke="#facc15" stroke-width="8" stroke-linejoin="round" stroke-linecap="round">
+  <!-- Giornata / scontro diretto (D125): due spade incrociate a tratto, stesso oro delle icone della barra -->
+  <path d="M10 10 L32 14 L84 66 L66 84 L14 32 Z"/>
+  <path d="M58 96 L96 58"/>
+  <path d="M84 84 L108 108"/>
+  <path d="M118 10 L96 14 L44 66 L62 84 L114 32 Z"/>
+  <path d="M32 58 L70 96"/>
+  <path d="M44 84 L20 108"/>
 </svg>

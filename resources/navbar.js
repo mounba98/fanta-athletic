@@ -32,7 +32,7 @@
       { href: 'index.html', label: 'Home', icon: '<img src="resources/icons/home.png" alt="Home" />', desktop: true, mobile: true },
       { href: 'squadre.html', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', desktop: true, mobile: false },
       { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', desktop: true, mobile: true },
-      { href: 'sfida.html', label: 'Giornata', icon: '<img src="resources/icons/giornata.svg" alt="Giornata" />', desktop: true, mobile: false },
+      { href: 'sfida.html', label: 'Giornata', icon: '<img src="resources/icons/giornata.svg?v=20261024b" alt="Giornata" />', desktop: true, mobile: false },
       { href: 'contest.html', label: 'Mini-gioco', icon: '', desktop: true, mobile: false },
       { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', desktop: true, mobile: false },
       { href: 'statistiche.html', label: 'Statistiche', icon: '<img src="resources/icons/statistiche.png" alt="Statistiche" />', desktop: true, mobile: false },

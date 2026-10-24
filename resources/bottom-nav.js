@@ -15,7 +15,7 @@
     { id: 'dashboard', label: 'Home', iconFile: 'home', href: 'index.html' },
     { id: 'formazioni', label: 'Formazioni', iconFile: 'formazioni', href: 'formazioni.html' },
     // Al centro la Giornata (D124, al posto di Squadre, che resta in Home e nel menu ☰)
-    { id: 'giornata', label: 'Giornata', iconFile: 'giornata.svg', href: 'sfida.html' },
+    { id: 'giornata', label: 'Giornata', iconFile: 'giornata.svg?v=20261024b', href: 'sfida.html' },
     { id: 'classifiche', label: 'Classifiche', iconFile: 'classifica', href: 'classifiche.html' },
     { id: 'bacheca', label: 'Bacheca', iconFile: 'bacheca', href: 'bacheca.html' }
   ];
@@ -40,7 +40,7 @@
     
     nav.innerHTML = navItems.map(item => {
       const isActive = currentPage === item.href;
-      const iconSrc = `resources/icons/${item.iconFile}${/\.\w+$/.test(item.iconFile) ? '' : '.png'}`;
+      const iconSrc = `resources/icons/${item.iconFile}${/\.\w+(\?|$)/.test(item.iconFile) ? '' : '.png'}`;
       return `
         <a href="${item.href}" class="bottom-nav-item ${isActive ? 'active' : ''}" data-id="${item.id}">
           <span class="bottom-nav-icon"><img src="${iconSrc}" alt="${item.label}" /></span>
