@@ -3,115 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Calendario Athletic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="resources/theme-preload.js?v=20260925b"></script>
+  <link rel="stylesheet" href="resources/theme-tokens.css?v=20261024">
   <style>
+    /* Riallineata al sistema grafico (D122): colori e font da theme-tokens.css,
+       tema scuro, una colonna sul telefono. Prima: grafica a parte, sfondo
+       bianco fisso e nessun adattamento allo schermo del telefono. */
     * { box-sizing: border-box; }
     body {
-      font-family: system-ui;
+      font-family: var(--font-sans);
       margin: 0;
-      padding: 20px;
-      background: #f5f5f5;
+      padding: 20px 16px 40px;
+      background: var(--bg);
+      color: var(--text);
     }
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    h1 {
-      color: #0c0f6d;
-      margin-bottom: 30px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { color: var(--text); font-size: clamp(24px, 4vw, 32px); margin: 8px 0 24px; }
+    h2 { font-size: clamp(18px, 2.4vw, 22px); margin: 0 0 18px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
     .card {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: var(--card);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(148,163,184,0.18);
+      min-width: 0;
     }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #374151;
-    }
+    .muted { color: var(--muted); }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text); font-size: 14px; }
     input, select {
       width: 100%;
-      padding: 12px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 14px;
+      padding: 11px 16px;
+      border: 1px solid rgba(148,163,184,0.45);
+      border-radius: 999px;
+      font: inherit;
+      font-size: 15px;
+      background: var(--bg);
+      color: var(--text);
     }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #0c0f6d;
-    }
+    input:focus, select:focus { outline: none; border-color: var(--secondary); box-shadow: 0 0 0 3px var(--ring); }
     .btn {
-      padding: 14px 28px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 8px;
-      font-weight: 600;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 700;
       cursor: pointer;
       font-size: 15px;
-      transition: all 0.2s;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+      transition: filter 0.2s, transform 0.1s;
     }
-    .btn-primary {
-      background: #0c0f6d;
-      color: white;
-    }
-    .btn-primary:hover {
-      background: #080a4d;
-    }
-    .btn-success {
-      background: #16a34a;
-      color: white;
-    }
-    .btn-success:hover {
-      background: #15803d;
-    }
-    .btn-danger {
-      background: #920100;
-      color: white;
-    }
-    .btn-danger:hover {
-      background: #920100;
-    }
-    .matches-list {
-      max-height: 600px;
-      overflow-y: auto;
-    }
+    .btn:hover { filter: brightness(1.12); }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: linear-gradient(135deg, #0c0f6d, #1b1f8a); }
+    .btn-success { background: linear-gradient(135deg, var(--success), var(--success-hover)); }
+    .btn-danger { background: linear-gradient(135deg, #a80200, var(--primary)); }
+    .matches-list { max-height: 600px; overflow-y: auto; }
     .match-item {
-      background: #f9fafb;
-      padding: 15px;
-      border-radius: 8px;
+      background: var(--bg);
+      padding: 14px;
+      border-radius: 12px;
       margin-bottom: 10px;
-      border-left: 4px solid #0c0f6d;
+      border-left: 4px solid var(--secondary);
     }
-    .match-item:hover {
-      background: #eff6ff;
-    }
-    .match-title {
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-    .match-details {
-      font-size: 13px;
-      color: #6b7280;
-    }
-    .match-actions {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-    }
+    :root.dark .match-item { border-left-color: var(--gold); }
+    .match-title { font-weight: 700; margin-bottom: 4px; }
+    .match-details { font-size: 13px; color: var(--muted); }
+    .match-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
     .toast {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #0c0f6d;
+      background: var(--secondary);
       color: white;
       padding: 15px 25px;
       border-radius: 10px;
@@ -123,10 +89,14 @@
       from { transform: translateX(400px); }
       to { transform: translateX(0); }
     }
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
+    .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .card { padding: 18px; }
+      .toast { left: 16px; right: 16px; bottom: 16px; }
+    }
+    @media (max-width: 420px) {
+      .row { grid-template-columns: minmax(0, 1fr); gap: 0; }
     }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
@@ -201,15 +171,15 @@
       <div class="card">
         <h2>Partite Inserite</h2>
         <div class="matches-list" id="matchesList">
-          <p style="color:#6b7280;text-align:center;">Caricamento...</p>
+          <p class="muted" style="text-align:center;">Caricamento...</p>
         </div>
       </div>
     </div>
 
     <!-- Sync Contest -->
-    <div class="card" style="margin-top:30px;">
+    <div class="card" style="margin-top:24px;">
       <h2>Sync Contest</h2>
-      <p style="color:#6b7280;margin-bottom:20px;">
+      <p class="muted" style="margin-bottom:20px;">
         Sincronizza partite Athletic con il contest pronostici. 
         Solo partite future saranno aggiunte al contest.
       </p>
@@ -283,7 +253,7 @@
       const container = document.getElementById('matchesList');
       
       if (matches.length === 0) {
-        container.innerHTML = '<p style="color:#6b7280;text-align:center;">Nessuna partita inserita</p>';
+        container.innerHTML = '<p class="muted" style="text-align:center;">Nessuna partita inserita</p>';
         return;
       }
 
@@ -438,6 +408,6 @@
 
     init();
   </script>
-  <script src="resources/admin-back.js?v=20260925b" data-block="stagione"></script>
+  <script src="resources/admin-back.js?v=20261024" data-block="stagione"></script>
 </body>
 </html>

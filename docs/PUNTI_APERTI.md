@@ -1,4 +1,4 @@
-Allineato a: D121
+Allineato a: D122
 
 # FASE 3 — cosa manca, in ordine (stato al 23/10/2026, D121)
 
@@ -41,6 +41,9 @@ Allineato a: D121
 - [ ] **Prove online dell'utente** delle funzioni nuove non legate all'asta (riquadro risultato nella Partita live, Regole, fuori rosa, menu Modulo): raccogliere i bug segnalati.
 - [ ] **Aggiornamento automatico alla riapertura** (D120, `app-fresh.js`): la pubblicazione del 23/10 è la prima con il controllo già sui telefoni → verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
 - [ ] **Prima giornata vera con la Partita live**: salvare il risultato prima di pubblicare e controllare che l'Imbattibilità arrivi ai giocatori (provata solo con risultati finti). Controllare anche che i fogli di prova di mounba e marta si siano svuotati alla loro riapertura.
+- [ ] **Novità sul telefono (D122)**: dopo la prossima pubblicazione, verificare su iPhone e Android che Bacheca › Novità app mostri anche quella del 24/10 (prima il magazzino dell'app teneva ferma la prima copia di `news.json`).
+- [ ] **Pannello dal telefono (D122)**: Regole e Giocatori a schede, Calendario admin rinnovato, margini uguali ovunque: guardarli sul telefono vero dopo la pubblicazione.
+- [ ] **Revisione efficienza e velocità dell'app** (richiesta dell'utente 24/10, D122): da fare dopo l'avvio della stagione, prima dell'ultimo commit+push del giro. Riprende D063/D066 (bundle JS/CSS, Firebase modulare, sfarfallio del banner).
 - [ ] Etichette "New" scadono il **30/10**: dopo, toglierle dal codice (`index.html`, `admin.html`; lo segnala `check-coerenza.py`).
 
 **Piccole cose notate il 23/10, non urgenti (D121):**
@@ -49,6 +52,10 @@ Allineato a: D121
 - [ ] I giocatori **fuori rosa** compaiono ancora nella griglia Convocati della Partita live (non sono in nessuna rosa, quindi non danno punti a nessuno: è solo ingombro).
 - [ ] La pagina Squadre salva la formazione senza il campo `modulo` (Formazioni lo ricava dai giocatori): va bene, ma se si usa Squadre per schierare il modulo scelto potrebbe non essere ricordato.
 - [ ] `admin-rules.html`: al primo caricamento una volta ha mostrato 0 regole (ricaricando 97): probabile caricamento lento della lega, da osservare.
+
+- [ ] Calendario admin (`admin-calendario.html`) senza intestazione con menu (come contest e calendario-athletic): si torna indietro col pulsante "← Pannello admin". Valutare se aggiungerla (D122).
+- [ ] `user-profile-upload.html` non è collegata da nessuna pagina e ha emoji rovinate ("??"): da archiviare dopo un controllo dei riferimenti (D122).
+- [ ] `results-h2h-modal.html` non è collegata da nessuna pagina e sul telefono sborda: da archiviare dopo un controllo dei riferimenti (D122).
 
 **Da fare nell'app (dati, non codice):**
 - [x] Create le 4 regole bonus (D120, 04/10): R100 presenza in casa +1, R101 in trasferta +2, R102 coro contro la Piana +2 (evento Curva Morello), R103 offese ai giocatori +2 (evento Piana). Viste nel Calcolo giornata › Fazioni.
@@ -66,7 +73,7 @@ Allineato a: D121
 **Da fare a fine Fase 3:**
 - [x] ~~Recuperare `firebase.json` / `.firebaserc`~~ **ricreati (D101)**; per pubblicare serve la Firebase CLI (Node.js non installato: da decidere). Vecchio: (configurazione Hosting, non presenti nella cartella, D099): servono per pubblicare. Chiederli all'amico o ricrearli; valutare lì intestazioni di cache lunghe per i file etichettati `?v=`.
 - [x] **Novità dell'app** (D116, spostate in Bacheca D117): scheda **Novità app** in `bacheca.html#novita`, finestra all'apertura, casella in Home, collegamento da Notifiche; comunicati in `resources/news.json`, scritti da Claude a ogni aggiornamento.
-- [ ] **Notifiche push** (D082): rimandate, priorità dopo le Novità (serve Firebase Cloud Messaging; su iPhone solo con l'app installata sulla schermata Home).
+- [ ] **Notifiche push** (D082; **in coda, decisione dell'utente 24/10, D122**): sessione dedicata dopo la revisione della velocità, con prove su due telefoni. Ricevere: permesso + token salvato (il service worker ha già il gestore `push`). Inviare in automatico: Cloud Functions → piano Firebase "a consumo" (Blaze, carta collegata, costo atteso ~0) da decidere con l'utente; in alternativa invio manuale degli admin dalla Console. Su iPhone solo con l'app sulla schermata Home (iOS 16.4+).
 - [ ] Etichette "New" in scadenza il **13/10/2026** (7 giorni dopo l'asta del 6/10, decisione dell'utente D120): spariscono da sole, lo script poi le segnala per toglierle dal codice.
 - [x] **Guida per gli admin anche in app** (D115, `guida-admin.html`, fonte del PDF). Da tenere aggiornata a ogni modifica di una funzione admin.
 - [x] **Guida PDF per gli admin**: versione 2 del 26/09 (D114, 12 pagine, con schemi disegnati di Home e tendina 🏆) in `~/Claude/fanta-athletic-backups/03-documenti-admin/`; la v1 in `versioni-precedenti/`. Screenshot veri dell'app: non fatti (servirebbero la cattura dello schermo, esclusa dalle regole di sicurezza, o foto dal telefono dell'utente).

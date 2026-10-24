@@ -7,7 +7,7 @@
   <meta http-equiv="Expires" content="0" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cookie Policy - Fanta Athletic</title>
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <style>
@@ -36,6 +36,10 @@
       width: 100%;
       border-collapse: collapse;
       margin: 20px 0;
+    }
+    /* telefono (D122): la tabella scorre di lato dentro la pagina invece di uscirne */
+    @media (max-width: 768px) {
+      .legal-content table { display: block; overflow-x: auto; font-size: 14px; }
     }
     .legal-content table th,
     .legal-content table td {

@@ -1,7 +1,24 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D121",
+  "allineato": "D122",
   "news": [
+    {
+      "id": "2026-10-24-admin",
+      "date": "2026-10-24",
+      "audience": "admin",
+      "icon": "📱",
+      "title": "Pannello più comodo dal telefono",
+      "intro": "Alcune pagine admin uscivano dallo schermo del telefono: ora no.",
+      "items": [
+        "<b>Regole</b> e <b>Giocatori</b>: dal telefono ogni regola e ogni giocatore è una scheda, con tutti i comandi a portata di dito (dal computer resta la tabella).",
+        "<b>Calendario Athletic</b> (Stagione): stessa grafica del resto dell'app, anche in tema scuro.",
+        "Margini uguali in tutte le pagine, niente più pagine rimpicciolite.",
+        "<b>Scadenze formazioni</b>: sistemati i pulsanti che mostravano \"???\" al posto delle scritte.",
+        "Le <b>Novità</b> come questa ora si aggiornano anche sul telefono (prima restavano ferme alle prime scaricate)."
+      ],
+      "link": "admin-rules.html",
+      "linkLabel": "Vai alle regole"
+    },
     {
       "id": "2026-10-23-app",
       "date": "2026-10-23",

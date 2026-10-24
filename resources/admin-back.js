@@ -15,7 +15,7 @@
       st.id = 'admin-back-css';
       st.textContent =
         'a.admin-back{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;justify-self:start;width:auto;' +
-        'max-width:max-content;margin:10px 16px 6px;padding:7px 16px;border-radius:999px;' +
+        'max-width:max-content;margin:10px 0 6px;padding:7px 16px;border-radius:999px;' +
         'font:600 14px/1.2 Inter,system-ui,sans-serif;color:#fff !important;' +
         'background:linear-gradient(135deg,#0c0f6d,#1b1f8a);border:1px solid rgba(255,255,255,.18);' +
         'box-shadow:0 2px 6px rgba(0,0,0,.18);text-decoration:none;position:relative;z-index:5}' +

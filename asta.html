@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Asta Giocatori - Fanta Athletic</title>
   <meta name="description" content="Sistema di asta per l'acquisto dei giocatori" />
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
       <script src="resources/mobile-detect.js?v=20260920-final"></script>
@@ -261,6 +261,13 @@
       .current-bid { font-size: 36px; }
       .timer { font-size: 28px; }
     }
+    /* Tema scuro (D122): la regola comune di sheet.css ingrigisce i pulsanti senza classe .btn; questi devono restare colorati */
+    html:root.dark button:not(.btn).bid-btn { background: var(--primary); color: #fff; }
+    html:root.dark button:not(.btn).bid-btn.custom { background: #9b59b6; }
+    html:root.dark button:not(.btn).admin-btn.primary { background: #920100; color: #fff; }
+    html:root.dark button:not(.btn).admin-btn.secondary { background: #34495e; color: #fff; }
+    /* Pulsanti a pillola come nel resto dell'app (D122, sistema grafico D039) */
+    .admin-btn { border-radius: 999px; }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />

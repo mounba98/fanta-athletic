@@ -69,3 +69,9 @@
   --ring: rgba(146,1,0,0.35);
   --shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
+
+/* Pulsanti e campi con il font dell'app (D122). I browser non passano il
+   font della pagina a button/input/select/textarea: molti pulsanti uscivano
+   in Arial (Salva in Formazioni, Profilo, pannello admin...). Già fatto per
+   le textarea in D049; qui per tutti. Solo il font, non la grandezza. */
+button, input, select, textarea { font-family: inherit; }

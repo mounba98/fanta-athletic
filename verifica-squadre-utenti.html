@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verifica Squadre & Utenti</title>
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header">
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024">
   <style>
     body {
       background: linear-gradient(135deg, #0c0f6d 0%, #920100 100%);
@@ -36,6 +36,10 @@
       justify-content: space-between;
       align-items: center;
     }
+    /* telefono (D122): nome e comandi vanno a capo invece di uscire dallo schermo */
+    .user-card { flex-wrap: wrap; gap: 10px; }
+    .user-card > div { min-width: 0; overflow-wrap: anywhere; }
+    .user-card select { max-width: 100%; }
     .user-card.no-team { border-color: #920100; background: rgba(239,68,68,0.1); }
     .user-card.has-team { border-color: #16a34a; }
     .btn {
@@ -377,6 +381,6 @@
   </script>
   
   <script src="resources/league-selector.js?v=20260925l"></script>
-  <script src="resources/admin-back.js?v=20260925b" data-block="squadre"></script>
+  <script src="resources/admin-back.js?v=20261024" data-block="squadre"></script>
 </body>
 </html>

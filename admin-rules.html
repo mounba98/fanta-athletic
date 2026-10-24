@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin • Regole Bonus/Malus</title>
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <script src="resources/mobile-detect.js?v=20260920-final"></script>
@@ -61,11 +61,31 @@
     :root.dark .input { background: #0f172a; border-color: #334155; color: #e2e8f0; }
     :root.dark .input::placeholder { color: rgba(148,163,184,0.7); }
     :root.dark select { background: #0f172a; color: #e2e8f0; border-color: #334155; }
-    :root.dark .toggle input + .slider { background: #1e293b; }
+    :root.dark .toggle input + .slider { background: #334155; }
+    :root.dark .toggle input:checked + .slider { background: #16a34a; } /* prima acceso e spento erano uguali (D122) */
     :root.dark .slider:before { background: #e2e8f0; }
     :root.dark .toast { background: #1e293b; color: #e2e8f0; }
     :root.dark .toast.error { background: #5c0000; }
     :root.dark .status-badge { opacity: 0.9; }
+
+    /* Telefono (D122): ogni regola diventa una scheda invece di una riga di
+       tabella larga 1000 px (costringeva il telefono a rimpicciolire la pagina).
+       In alto codice + descrizione, sotto una riga per impostazione. */
+    @media (max-width: 768px) {
+      #rulesTable thead { display: none; }
+      #rulesTable, #rulesTable tbody, #rulesTable tr, #rulesTable td { display: block; width: auto; }
+      #rulesTable tr { border: 1px solid var(--border, rgba(148,163,184,0.25)); border-radius: 14px; padding: 10px 14px; margin-bottom: 12px; }
+      #rulesTable td { border: 0 !important; padding: 7px 0 !important; min-width: 0 !important; text-align: left !important; }
+      #rulesTable td[data-label] { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 10px; border-top: 1px solid rgba(148,163,184,0.15) !important; }
+      #rulesTable td[data-label]::before { content: attr(data-label); font-size: 12px; font-weight: 600; color: var(--muted); margin-right: auto; }
+      #rulesTable td[data-label] br { display: none; }
+      #rulesTable td[data-label="Tipo input"] > div { display: none; } /* ripete il menu */
+      #rulesTable td.r-code { display: inline-block; padding: 0 8px 0 0 !important; }
+      #rulesTable td.r-desc { display: inline; padding: 0 !important; font-weight: 600; }
+      #rulesTable td[colspan] { text-align: center !important; }
+    }
+    /* Pulsanti a pillola come nel resto dell'app (D122, sistema grafico D039) */
+    .btn { border-radius: 999px; }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />
@@ -329,10 +349,10 @@
         const inputType = r.input_type || r.input || 'auto';
         const inputTypeLabel = inputType === 'counter' ? '🔢 Moltiplicatore' : inputType === 'toggle' ? '✓ Toggle' : '🔄 Auto';
         return `<tr style="${!visible ? 'opacity:0.6;' : ''}">
-          <td style="font-family:monospace;font-size:14px;font-weight:600;color:var(--primary);">${r.rule_id || '—'}</td>
-          <td style="color:var(--text);min-width:200px;">${r.nome_bonus || r.descrizione || '—'}</td>
-          <td style="text-align:center;color:var(--text);font-weight:600;">${r.valore || 0}</td>
-          <td style="text-align:center;">
+          <td class="r-code" style="font-family:monospace;font-size:14px;font-weight:600;color:var(--primary);">${r.rule_id || '—'}</td>
+          <td class="r-desc" style="color:var(--text);min-width:200px;">${r.nome_bonus || r.descrizione || '—'}</td>
+          <td data-label="Valore" style="text-align:center;color:var(--text);font-weight:600;">${r.valore || 0}</td>
+          <td data-label="Soggetto" style="text-align:center;">
             <select onchange="updateRule('${r.id}','soggetto',this.value)" style="padding:8px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;">
               <option value="Giocatore" ${soggetto==='Giocatore'?'selected':''}>👤 Giocatore</option>
               <option value="Allenatore" ${soggetto==='Allenatore'?'selected':''}>👔 Allenatore</option>
@@ -341,7 +361,7 @@
             ${soggetto==='Curva' ? assegnazioneSelect(r) : ''}
             ${soggetto==='Giocatore' && /imbattibil/i.test(r.nome_bonus || r.descrizione || '') ? '<div style="margin-top:6px;font-size:12px;color:var(--muted);" title="Calcolo giornata: se dal Calendario Athletic l\'Athletic non ha subito gol, si spunta da sola su portieri e difensori (D121)">🧤 si spunta da sola</div>' : ''}
           </td>
-          <td style="text-align:center;">
+          <td data-label="Tipo input" style="text-align:center;">
             <select onchange="updateRule('${r.id}','input_type',this.value)" style="padding:8px;border-radius:8px;border:2px solid #e9ecef;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;">
               <option value="auto" ${inputType==='auto'?'selected':''}>🔄 Auto</option>
               <option value="toggle" ${inputType==='toggle'?'selected':''}>✓ Toggle</option>
@@ -349,7 +369,7 @@
             </select>
             <div style="font-size:11px;color:var(--muted);margin-top:4px;">${inputTypeLabel}</div>
           </td>
-          <td style="text-align:center;">
+          <td data-label="Stato" style="text-align:center;">
             <span class="status-badge ${active ? 'status-active' : 'status-inactive'}">
               ${active ? '✅ Attiva' : '❌ Disattiva'}
             </span>
@@ -359,7 +379,7 @@
               <span class="slider"></span>
             </label>
           </td>
-          <td style="text-align:center;">
+          <td data-label="Visibilità" style="text-align:center;">
             <span class="status-badge ${visible ? 'status-visible' : 'status-hidden'}">
               ${visible ? '👁️ Visibile' : '🚫 Nascosta'}
             </span>
@@ -368,7 +388,7 @@
               ${visible ? '👁️ Nascondi' : '🚫 Mostra'}
             </button>
           </td>
-          <td style="text-align:center;">
+          <td data-label="Azioni" style="text-align:center;">
             <div class="rule-actions">
               <button class="btn btn-sm" onclick="editRule('${r.id}')" style="padding:6px 12px;background:#3490dc;color:white;">Modifica</button>
               <button class="btn btn-sm btn-secondary" onclick="delRule('${r.id}')" style="padding:6px 12px;">Elimina</button>
@@ -647,6 +667,6 @@
   <script src="resources/navbar.js?v=20260925"></script>
   <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
-  <script src="resources/admin-back.js?v=20260925b" data-block="regole"></script>
+  <script src="resources/admin-back.js?v=20261024" data-block="regole"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 /* Colori e font del tema: vivono in un file a parte, così anche le
    pagine con impaginazione propria possono seguirli senza ereditare il
    layout di questo foglio (2026-09-20). */
-@import url('theme-tokens.css?v=20260920-menu1');
+@import url('theme-tokens.css?v=20261024');
 
 /* Dark theme - elementi specifici */
 :root.dark input,
@@ -2054,5 +2054,16 @@ body.dark .hamburger-btn:focus {
   body {
     min-width: 320px;
     overflow-x: auto;
+  }
+}
+/* Margini laterali uguali in tutta l'app sul telefono (D122): il bordo
+   standard è quello del body (16 px). Molte pagine aggiungevano un proprio
+   bordo al contenitore principale (main.container, .admin-container, ...),
+   arrivando a 32-36 px per lato. Squadre ha un'impaginazione a tutto schermo
+   sua (D062) e resta esclusa. */
+@media (max-width: 768px) {
+  body:not(.page-squadre) > main {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }

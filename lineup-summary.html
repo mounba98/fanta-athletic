@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Riepilogo Titolari - Fanta Athletic</title>
   <script src="resources/theme-preload.js?v=20260925b"></script>
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     :root {
@@ -977,6 +977,10 @@
     .device-tablet .field-role {
       display: none !important;
     }
+    /* Tema scuro (D122): la regola comune di sheet.css ingrigisce i pulsanti senza classe .btn; questi devono restare colorati */
+    html:root.dark button:not(.btn).btn-primary { background: linear-gradient(135deg, #0c0f6d, #920100); color: #fff; border: none; }
+    /* Pulsanti a pillola come nel resto dell'app (D122, sistema grafico D039) */
+    .btn-primary { border-radius: 999px; }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fanta-athletic-v2026092502';
+const CACHE_NAME = 'fanta-athletic-v2026102401';
 // Precaricati all'installazione: le librerie Firebase (le più pesanti, ~550 KB,
 // identiche finché non si cambia versione) e le pagine principali.
 const urlsToCache = [
@@ -43,8 +43,10 @@ self.addEventListener('install', event => {
 // - File con etichetta di versione (?v=...) e librerie Firebase locali:
 //   PRIMA IL MAGAZZINO. Non possono essere vecchi: quando un file cambia
 //   gli si cambia l'etichetta, quindi l'indirizzo è nuovo e si riscarica.
-// - HTML e JS/CSS senza etichetta: PRIMA LA RETE (sempre freschi), con
-//   copia di riserva per quando si è offline.
+// - HTML, JS/CSS senza etichetta e file .json (es. resources/news.json, le
+//   Novità): PRIMA LA RETE (sempre freschi), con copia di riserva per quando
+//   si è offline. Fino al D122 i .json finivano tra le immagini e restavano
+//   fermi alla prima copia scaricata.
 // - Immagini e altro: prima il magazzino (come prima).
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
@@ -62,7 +64,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (isCode || url.pathname.endsWith('.html') || url.pathname === '/') {
+  if (isCode || url.pathname.endsWith('.html') || url.pathname.endsWith('.json') || url.pathname === '/') {
     event.respondWith(networkFirst(event.request));
     return;
   }

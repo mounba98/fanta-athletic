@@ -1,4 +1,4 @@
-Allineato a: D121
+Allineato a: D122
 
 # Fanta Athletic — contesto per Claude
 
@@ -50,7 +50,9 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D121, 23/10/2026)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D122, 24/10/2026)**
+**Ultimo lavoro (D122, 24/10)**: Novità ferme sul telefono → `sw.js` ora tratta i `.json` "prima la rete" (magazzino rinominato, `firebase.json` senza cache sui `.json`); proporzioni uniformi su tutta l'app al telefono (regola unica in `sheet.css`: bordo del `main` a zero fino a 768 px, Squadre esclusa), Regole e Giocatori a schede, `admin-calendario.html` riallineata al tema. Da verificare sul telefono vero dopo la pubblicazione.
+**Prima (D121, 23/10)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
 `main`), ultima pubblicazione **23/10/2026** (D121, commit `661721d`), sera dell'asta
 2026/27 (rimandata dal 6/10). Stagione 2026/27 "in preparazione": gli admin la finiscono

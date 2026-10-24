@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fanta Athletic - Bacheca</title>
   <meta name="description" content="Bacheca goliardica e trash talk" />
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/ui-kit.css?v=20260926c" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
       <script src="resources/mobile-detect.js?v=20260920-final"></script>
@@ -521,6 +521,9 @@
       .emoji-picker { gap: 3px; }
       .emoji-btn { font-size: 20px; }
     }
+    /* Tema scuro (D122): la regola comune di sheet.css ingrigisce i pulsanti senza classe .btn; questi devono restare colorati */
+    html:root.dark button:not(.btn).image-preview-remove { background: rgba(146, 1, 0, 0.9); color: #fff; border: none; }
+    html:root.dark button:not(.btn).post-menu-btn, html:root.dark button:not(.btn).emoji-btn { background: transparent; border-color: transparent; }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />

@@ -1,4 +1,4 @@
-Allineato a: D121
+Allineato a: D122
 
 # Mappa delle pagine — a cosa serve ogni file
 
@@ -67,9 +67,9 @@ nomi di classe generici che vanno in conflitto.
 |---|---|
 | `admin.html` | Hub centrale admin, punto di ingresso a tutte le altre |
 | `admin-setup.html` | Impostazioni generali della lega |
-| `admin-players.html` | Gestione giocatori |
+| `admin-players.html` | Gestione giocatori (dal telefono una scheda per giocatore, D122) |
 | `admin-teams.html` | Gestione squadre (collegata al menu dal 2026-09-20, D034 — sostituisce `admin-squadre.html`, archiviata perché lavorava su dati finti) |
-| `admin-rules.html` | Gestione regole bonus/malus (con campo "Assegnazione": globale / squadra / presenza / fazione, D080) |
+| `admin-rules.html` | Gestione regole bonus/malus (con campo "Assegnazione": globale / squadra / presenza / fazione, D080; dal telefono una scheda per regola, D122) |
 | `live.html` | Partita live: pannello a tasti per segnare bonus/malus durante la partita, doppio controllo tra admin, revisione 48h (D093) |
 | `admin-stagione.html` | Parametri della stagione, archiviazione, apertura stagione nuova (D087) |
 | `archivio.html` | Archivio stagioni / albo d'oro, per tutti (D087) |
@@ -77,7 +77,7 @@ nomi di classe generici che vanno in conflitto.
 | `admin-contest.html` | Mini-gioco Curva vs Piana: calcolo punti, classifica, testo WhatsApp (D069) |
 | `admin-fazioni.html` | Fazione delle squadre e nomi reali dei giocatori (D073) |
 | `guida-admin.html` | Guida per gli admin dentro l'app, solo admin (Pannello › 📖 Guida). È la fonte del PDF: `scripts/guida-admin-pdf.py` (D115) |
-| `admin-calendario.html` | Gestione calendario reale Athletic |
+| `admin-calendario.html` | Gestione calendario reale Athletic (grafica riallineata al tema, D122) |
 | `admin-deadline.html` | Gestione scadenze/deadline formazioni |
 | `admin-cards-manager.html` | Gestione card mostrate in home |
 | `admin-store.html` | Gestione prodotti dello store |

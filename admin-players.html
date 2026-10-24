@@ -5,13 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestione Giocatori - Admin</title>
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <script src="resources/mobile-detect.js?v=20260920-final"></script>
   <style>
     .admin-container { max-width: 1200px; margin: 20px auto; padding: 20px; }
-    .admin-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 20px; }
+    .admin-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 20px; margin-top: 20px; }
     .admin-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: var(--shadow); }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); }
@@ -81,10 +81,31 @@
       justify-content: flex-end;
       flex-wrap: wrap;
     }
+    :root.dark .players-table th { background: #1e293b; color: #e2e8f0; }
+    /* il tema scuro comune ingrigisce i pulsanti senza classe .btn (sheet.css): qui servono i colori (D122) */
+    :root.dark .players-table td button.btn-edit { background: #0c0f6d; color: #fff; }
+    :root.dark .players-table td button.btn-delete { background: #920100; color: #fff; }
+    :root.dark .players-table th, :root.dark .players-table td { border-bottom-color: rgba(148,163,184,0.2); }
+    :root.dark .players-table tr:hover { background: rgba(148,163,184,0.08); }
+    :root.dark .form-group input, :root.dark .form-group select, :root.dark .search-box { border-color: #334155; }
     @media (max-width: 768px) {
-      .admin-grid { grid-template-columns: 1fr; }
+      /* Telefono (D122): un giocatore = una scheda compatta, senza scorrere di lato */
+      .players-table thead { display: none; }
+      .players-table, .players-table tbody, .players-table tr { display: block; }
+      .players-table tr { border: 1px solid rgba(148,163,184,0.25); border-radius: 14px; padding: 10px 14px; margin-bottom: 10px; }
+      .players-table tr:hover { background: transparent; }
+      .players-table td { display: block; border: 0; padding: 3px 0; }
+      .players-table td.p-name, .players-table td.p-role { display: inline-block; margin-right: 8px; }
+      .players-table td[data-label] { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; }
+      .players-table td[data-label]::before { content: attr(data-label); color: var(--muted); font-size: 12px; font-weight: 600; }
+      .players-table td.p-actions { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; }
+      .players-table td.p-actions button { margin: 0; flex: 1 1 auto; }
+      .players-table td[colspan] { text-align: center; }
+      .admin-grid { grid-template-columns: minmax(0, 1fr); } /* minmax: la tabella non allarga la colonna oltre lo schermo (D122) */
       .stats { grid-template-columns: repeat(2, 1fr); }
     }
+    /* Pulsanti a pillola come nel resto dell'app (D122, sistema grafico D039) */
+    .btn, .players-table button { border-radius: 999px; }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />
@@ -356,11 +377,11 @@
 
       tbody.innerHTML = filtered.map(p => `
         <tr>
-          <td><strong>${p.nome_completo}</strong>${p.fuori_rosa ? ' <span class="badge" style="background:#6b7280;color:#fff;">Fuori rosa</span>' : ''}</td>
-          <td><span class="badge badge-${p.role.toLowerCase()}">${p.role}</span></td>
-          <td>${p.nickname || '-'}</td>
-          <td>${p.team || '-'}</td>
-          <td>
+          <td class="p-name"><strong>${p.nome_completo}</strong>${p.fuori_rosa ? ' <span class="badge" style="background:#6b7280;color:#fff;">Fuori rosa</span>' : ''}</td>
+          <td class="p-role"><span class="badge badge-${p.role.toLowerCase()}">${p.role}</span></td>
+          <td data-label="Nickname">${p.nickname || '-'}</td>
+          <td data-label="Squadra">${p.team || '-'}</td>
+          <td class="p-actions">
             <button class="btn-edit" onclick="editPlayer('${p.player_id}')">Modifica</button>
             <button class="btn-edit" style="background:#6b7280;" onclick="toggleFuoriRosa('${p.player_id}')">${p.fuori_rosa ? 'Rimetti in rosa' : 'Fuori rosa'}</button>
             <button class="btn-delete" onclick="deletePlayer('${p.player_id}', '${p.nome_completo}')">Elimina</button>
@@ -630,6 +651,6 @@
   <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
   <script src="resources/footer.js?v=20260920-final3"></script>
-  <script src="resources/admin-back.js?v=20260925b" data-block="squadre"></script>
+  <script src="resources/admin-back.js?v=20261024" data-block="squadre"></script>
 </body>
 </html>

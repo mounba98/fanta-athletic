@@ -9,7 +9,7 @@
   <title>Store Ufficiale - Athletic 2018</title>
   <meta name="description" content="Felpe, maglie, sticker e merchandising ufficiale Athletic 2018." />
   <script src="resources/theme-preload.js?v=20260925b"></script>
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <script src="resources/mobile-detect.js?v=20260920-final"></script>
@@ -58,6 +58,11 @@
     .store-alert { background: rgba(12,15,109,0.12); border: 1px solid rgba(12,15,109,0.25); color: #1e293b; border-radius: 14px; padding: 14px 18px; font-size: 14px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start; }
     .store-alert strong { display: block; }
     @media (max-width: 720px) { .store-hero h1 { font-size: clamp(26px, 5vw, 36px); } }
+    /* Tema scuro (D122): la regola comune di sheet.css ingrigisce i pulsanti senza classe .btn; questi devono restare colorati */
+    html:root.dark button:not(.btn).btn-primary { background: linear-gradient(135deg, #0c0f6d, #920100); color: #fff; }
+    html:root.dark button:not(.btn).btn-outline { background: transparent; border: 1px solid rgba(148,163,184,0.3); color: var(--text); }
+    /* Pulsanti a pillola come nel resto dell'app (D122, sistema grafico D039) */
+    .btn-primary, .product-actions button { border-radius: 999px; }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />

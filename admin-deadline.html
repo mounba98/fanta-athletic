@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestione Deadline - Fanta Athletic</title>
-  <link rel="stylesheet" href="resources/sheet.css?v=20260921-header" />
+  <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
   <script src="resources/mobile-detect.js?v=20260920-final"></script>
@@ -62,6 +62,7 @@
       gap: 12px;
       margin-top: 24px;
     }
+    .btn-group .btn { white-space: nowrap; } /* "🗑️ Rimuovi" su una riga (D122) */
     
     .btn-full { width: 100%; }
     
@@ -170,26 +171,26 @@
         <label>Preset Veloci:</label>
         <div class="quick-presets">
           <button class="preset-btn" onclick="setPreset('sunday')">
-            ??? Domenica<br>15:00
+            Domenica<br>15:00
           </button>
           <button class="preset-btn" onclick="setPreset('wednesday')">
-            ?? Mercoledì<br>20:45
+            Mercoledì<br>20:45
           </button>
           <button class="preset-btn" onclick="setPreset('thursday')">
-            ?? Giovedì<br>20:45
+            Giovedì<br>20:45
           </button>
           <button class="preset-btn" onclick="setPreset('monday')">
-            ? Lunedì<br>20:45
+            Lunedì<br>20:45
           </button>
         </div>
       </div>
 
       <div class="btn-group">
         <button class="btn btn-primary btn-full" onclick="saveDeadline()">
-          ? Salva Deadline
+          💾 Salva scadenza
         </button>
         <button class="btn btn-secondary" onclick="clearDeadline()">
-          ??? Rimuovi
+          🗑️ Rimuovi
         </button>
       </div>
     </div>
@@ -415,11 +416,11 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         
-        alert('? Deadline salvata con successo!');
+        alert('✅ Scadenza salvata!');
         await loadHistory();
       } catch (error) {
         console.error('Error saving deadline:', error);
-        alert('? Errore: ' + error.message);
+        alert('❌ Errore: ' + error.message);
       }
     }
 
@@ -434,12 +435,12 @@
           .doc(`giornata_${currentGiornata}`)
           .delete();
         
-        alert('? Deadline rimossa!');
+        alert('🗑️ Scadenza rimossa!');
         await loadCurrentDeadline();
         await loadHistory();
       } catch (error) {
         console.error('Error:', error);
-        alert('? Errore: ' + error.message);
+        alert('❌ Errore: ' + error.message);
       }
     }
 
@@ -480,7 +481,7 @@
             </div>
             <div style="text-align: right;">
               <span style="color: ${isPast ? '#920100' : '#16a34a'}; font-weight: 600;">
-                ${isPast ? '?? Scaduta' : '? Attiva'}
+                ${isPast ? '⏰ Scaduta' : '✅ Attiva'}
               </span>
             </div>
           </div>
@@ -488,6 +489,6 @@
       }).join('');
     }
   </script>
-  <script src="resources/admin-back.js?v=20260925b" data-block="live"></script>
+  <script src="resources/admin-back.js?v=20261024" data-block="live"></script>
 </body>
 </html>
