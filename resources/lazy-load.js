@@ -64,7 +64,7 @@
     
     // Map pagine → probabili prossime pagine
     const likelyNextPages = {
-      'index.html': ['squadre.html', 'formazioni.html'],
+      'index.html': ['formazioni.html', 'sfida.html'],   // le due voci della barra più usate (D124)
       'squadre.html': ['formazioni.html', 'classifiche.html'],
       'formazioni.html': ['squadre.html', 'matchday.html'],
       'classifiche.html': ['statistiche.html'],

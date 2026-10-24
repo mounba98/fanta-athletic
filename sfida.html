@@ -4,7 +4,7 @@
   <script src="resources/theme-preload.js?v=20260925b"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>La mia sfida - Fanta Athletic</title>
+  <title>Giornata - Fanta Athletic</title>
   <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
@@ -15,7 +15,7 @@
     .days { display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; scrollbar-width:none; }
     .days button { flex:0 0 auto; padding:8px 14px; border-radius:999px; border:1px solid rgba(148,163,184,.35) !important; background:var(--card) !important; color:var(--text) !important; font-weight:700; font-family:inherit; cursor:pointer; }
     .days button.on { background:#0c0f6d !important; border-color:#0c0f6d !important; color:#fff !important; }
-    .hero { padding:16px; border-radius:18px; background:linear-gradient(135deg,#920100,#0c0f6d); color:#fff; box-shadow:var(--shadow); margin-bottom:14px; }
+    .hero { padding:18px; border-radius:18px; background:linear-gradient(135deg,#920100,#0c0f6d); color:#fff; box-shadow:var(--shadow); margin-bottom:14px; }
     .hero .k { font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.85; display:flex; justify-content:space-between; gap:8px; }
     .hero .vs { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; margin-top:10px; }
     .hero .vs .t { font-weight:800; font-size:16px; line-height:1.25; }
@@ -25,9 +25,11 @@
     .hero .sub { opacity:.9; font-size:13px; margin-top:8px; text-align:center; }
     .pill { font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; background:rgba(255,255,255,.18); text-transform:none; letter-spacing:0; }
     .cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; margin-bottom:14px; }
-    .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 12px; min-width:0; }
+    .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; min-width:0; }
+    .cols .card { padding: 12px; }
     @media (max-width: 420px) { .cols .card { padding: 10px 8px; } .pl { font-size:13px; gap:5px; } .pl .r { width:20px; height:20px; } }
-    .card h2 { font-size:15px; margin:0 0 8px; line-height:1.25; }
+    .card h2 { font-size:18px; margin:0 0 10px; line-height:1.25; }
+    .cols .card h2 { font-size:15px; margin-bottom:8px; }
     .pl { display:flex; align-items:center; gap:6px; padding:7px 0; border-top:1px solid rgba(148,163,184,.18); font-size:14px; }
     .pl:first-of-type { border-top:0; }
     .pl .r { flex:0 0 auto; font-size:10px; font-weight:800; width:22px; height:22px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; background:rgba(148,163,184,.18); color:var(--text); }
@@ -52,7 +54,7 @@
 <body>
   <header>
     <a class="logo-home" href="index.html" aria-label="Home"><img src="resources/logo.png" alt="Fanta Athletic" /></a>
-    <h1>La mia sfida</h1>
+    <h1>Giornata</h1>
   </header>
 
   <main class="container">
@@ -230,11 +232,11 @@
     }
     init();
   </script>
-  <script src="resources/navbar.js?v=20260925"></script>
+  <script src="resources/navbar.js?v=20261024"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>
-  <script src="resources/mobile-menu.js?v=20260926"></script>
+  <script src="resources/mobile-menu.js?v=20261024"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/bottom-nav.js?v=20260920-final"></script>
+  <script src="resources/bottom-nav.js?v=20261024"></script>
   <script src="resources/theme.js?v=20260925b"></script>
 </body>
 </html>

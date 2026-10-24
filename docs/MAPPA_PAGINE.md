@@ -1,4 +1,4 @@
-Allineato a: D124
+Allineato a: D125
 
 # Mappa delle pagine — a cosa serve ogni file
 
@@ -33,7 +33,7 @@ nomi di classe generici che vanno in conflitto.
 | `statistiche.html` | Statistiche giocatori, allenatori, curve di rendimento |
 | ~~`standings.html`~~ | Archiviata (D102): leggeva la memoria del browser, non il database |
 | `h2h-standings.html` | Classifica scontri diretti |
-| `sfida.html` | La mia sfida (D124): le due formazioni affiancate, avversaria visibile solo a formazioni chiuse; punti dopo il calcolo; tutte le sfide della giornata. Da Home › La mia sfida |
+| `sfida.html` | **Giornata**, al centro della barra in basso al posto di Squadre (D125); la mia sfida (D124): le due formazioni affiancate, avversaria visibile solo a formazioni chiuse; punti dopo il calcolo; tutte le sfide della giornata. Da Home › La mia sfida |
 | `profile.html` | Profilo utente |
 | `user-profile-upload.html` | Upload foto profilo — verificare se sovrapposta a `profile.html` |
 | `store.html` | Negozio ufficiale (prodotti/gadget) |

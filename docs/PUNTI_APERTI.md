@@ -1,4 +1,4 @@
-Allineato a: D124
+Allineato a: D125
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D124)
 

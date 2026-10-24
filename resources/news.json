@@ -1,7 +1,21 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D124",
+  "allineato": "D125",
   "news": [
+    {
+      "id": "2026-10-24-barra",
+      "date": "2026-10-24",
+      "audience": "all",
+      "icon": "🧭",
+      "title": "Al centro della barra c'è Giornata",
+      "intro": "Nella barra in basso, al posto di Squadre, ora c'è <b>Giornata</b>.",
+      "items": [
+        "Da lì vedi subito la giornata in corso: la tua sfida, le due formazioni e tutte le altre sfide.",
+        "<b>Squadre</b> c'è ancora: la apri dal riquadro Squadre in Home o dal menu ☰."
+      ],
+      "link": "sfida.html",
+      "linkLabel": "Apri Giornata"
+    },
     {
       "id": "2026-10-24-scontri",
       "date": "2026-10-24",

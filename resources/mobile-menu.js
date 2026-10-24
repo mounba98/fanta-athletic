@@ -12,6 +12,7 @@
     { href: 'index.html', label: 'Dashboard', icon: '<img src="resources/icons/home.png" alt="Home" />', priority: 1 },
     { href: 'squadre.html', label: 'Squadre', icon: '<img src="resources/icons/squadre.png" alt="Squadre" />', priority: 2 },
     { href: 'formazioni.html', label: 'Formazioni', icon: '<img src="resources/icons/formazioni.png" alt="Formazioni" />', priority: 3 },
+    { href: 'sfida.html', label: 'Giornata', icon: '<img src="resources/icons/giornata.svg" alt="Giornata" />', priority: 3 },
     { href: 'calendario.html', label: 'Calendario', icon: '<img src="resources/icons/calendario.png" alt="Calendario" />', priority: 4 },
     { href: 'contest.html', label: 'Mini-gioco', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h9"/></svg>', priority: 5 },
     { href: 'calendario-athletic.html', label: 'Partite Athletic', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>', priority: 5 },
@@ -46,7 +47,7 @@
     // D113: freccia "indietro" sulle pagine secondarie (tutte tranne le 5 della barra in basso),
     // come nelle app: torna alla pagina precedente dell'app, altrimenti alla Home.
     const pageName = window.location.pathname.split('/').pop() || 'index.html';
-    const ROOT_PAGES = ['index.html', 'formazioni.html', 'squadre.html', 'classifiche.html', 'bacheca.html'];
+    const ROOT_PAGES = ['index.html', 'formazioni.html', 'sfida.html', 'classifiche.html', 'bacheca.html'];
     if (ROOT_PAGES.indexOf(pageName) === -1 && !document.getElementById('appBackBtn')) {
       const back = document.createElement('button');
       back.id = 'appBackBtn';
