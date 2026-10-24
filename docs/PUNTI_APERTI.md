@@ -1,8 +1,8 @@
 Allineato a: D128
 
-# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D127)
+# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D128)
 
-**▶ SESSIONE DI DOMANI, 25/10 (decisione dell'utente, D126) — in quest'ordine:**
+**▶ SESSIONE DI DOMANI, 25/10 (decisioni dell'utente, D126–D128) — in quest'ordine:**
 0. **Convocati in app, prima della G1** (richiesta dell'utente 24/10 sera, D128): gli admin oggi mandano i convocati sul gruppo il giorno prima della partita; segnarli in app così chi fa la formazione vede chi è convocato. Proposta: pagina admin **Convocati** (giornata, griglia dei giocatori con foto, tocco = convocato, Salva) in `leagues/{lega}/config/convocati` (nessuna regola nuova: config è già leggibile dai membri e scrivibile dagli admin); in **Formazioni** e Squadre un segno "Convocato / Non convocato" su ogni giocatore quando la lista c'è, i convocati per primi, e un avviso se in formazione c'è un non convocato; nella Home, sul riquadro Formazione, "Convocati pubblicati". Poi (da decidere) la Partita live e il Calcolo giornata partono con i convocati già spuntati. Casella nel Pannello, guida admin, Novità per giocatori e admin.
 1. **Ricollegare gli utenti** appena gli admin finiscono la lista squadre (D123: colleghiamo per nome, le email solo per chi resta): `team_index` come fa Verifica squadre; prova a vuoto, copia, scrittura, verifica rileggendo. Controllare chi ha già scelto da solo. Elenco dei 18 senza squadra e delle 9 squadre senza utenti in DECISION_LOG D123.
 2. **Foto giocatori (D127)**: fatte e collegate il 24/10 sera. Da fare: controllare sul telefono vero Formazioni, Squadre e Riepilogo; **foto di Tiziano Ferretti** da chiedere agli admin (non era nel PowerPoint); poi togliere i vecchi file degli allenatori non più usati (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage (`players/P010_…`, `players/P026_…`).
@@ -12,7 +12,8 @@ Allineato a: D128
 6. **Prove sul telefono vero**: Novità aggiornate in Bacheca, Pannello a schede, formazioni chiuse lunedì alle 20.15, app che si aggiorna da sola alla riapertura, swipe dal bordo, barra con Giornata al centro, e un **account non admin** (serve un secondo telefono): fazione/nome, cambio fazione (deve fallire), voto nel mini-gioco.
 7. **Etichette "New"**: scadono il 30/10, poi toglierle (lo segnala `check-coerenza.py`).
 8. **PDF della guida admin** da rifare (modifiche sostanziali del 24/10: scontri diretti, Stagione, formazione non consegnata, barra): lo lancia l'utente, comando in `scripts/guida-admin-pdf.py`.
-9. Pulizia di questa lista: chiudere le voci superate da D124 ("messaggio sul gruppo con le email", "cosa vuol dire formazione mancante negli scontri").
+9. **Un messaggio unico per gli admin** (l'utente lo gira sul gruppo): foto di Tiziano Ferretti; fazioni delle 10 squadre senza; da quando ci sono i convocati in app come segnarli (dopo il punto 0); la chiave da revocare (Mocci); le regole nuove degli scontri e della formazione non consegnata (pareggio entro 2, -1). La lista squadre la stanno già raccogliendo.
+10. Pulizia di questa lista: chiudere le voci superate da D124 ("messaggio sul gruppo con le email", "cosa vuol dire formazione mancante negli scontri").
 
 **▶ A RIDOSSO DELLE PARTITE:**
 - **Dopo il calcolo della G1** (26–27/10): controllare esiti delle sfide (pareggio entro 2), Scontri, Supremo, card "La mia squadra" (Scontri/Supremo, D126), "La mia sfida" e pagina Giornata con i dati veri.
@@ -86,12 +87,12 @@ Allineato a: D128
 - [ ] Fazioni delle **16** squadre (D122): le hanno le 6 che continuano con le stesse persone (Fanta Dirigenti, Curva gonfi, Shœrty Team, Gli ArraPATO, Minis Blortzos; Pettegole no); le nuove la scelgono i giocatori al primo accesso o gli admin da `admin-fazioni.html`.
 - [x] **Stagione 2026/27 avviata** (24/10, D122): rose inserite, 16 squadre, stato "In corso". Restano il calendario completo e il ricollegamento degli utenti (sotto).
 - [x] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`): sistemato dagli admin, ora è Guglielmo Cesari (verificato il 23/10, D121).
-- [ ] Dire agli admin: la "sconfitta a tavolino" degli scontri diretti ora funziona davvero (prima falliva sempre, D095).
+- [ ] (Superato in parte da D124: ora chi non consegna gioca con la formazione precedente; il tavolino resta solo per chi non ha mai consegnato.) Dire agli admin: la "sconfitta a tavolino" degli scontri diretti ora funziona davvero (prima falliva sempre, D095).
 
 **Da decidere con gli admin:**
 - [x] **Regole "Civi in porta"** (R071, R095): spente il 24/10 (D123), si riaccendono se Civi torna in rosa.
 - [x] **Lorenzo Diana (P026) è anche portiere?** No, centrocampista: tolto dalle regole da portiere e dal ruolo secondario (D123). Era:: ha ereditato da Civi il ruolo secondario Portiere e le regole da portiere R043 Porta inviolata, R044 Rigore parato, R045 Parata decisiva, R072 Gol subiti (giocatori P001, P002, P026). Se non lo è, togliere P026 da quelle regole e il ruolo secondario.
-- [ ] **Consiglio agli admin per il futuro** (D123): un giocatore nuovo va creato nuovo in Pannello › Giocatori, non scritto sopra uno vecchio; a stagione in corso i punti già fatti passerebbero al nuovo nome (l'Albo d'oro invece è al sicuro). Valutare un avviso nella pagina Giocatori quando si cambia il nome di uno esistente.
+- [x] **Consiglio agli admin per il futuro** (D123; l'utente li ha avvisati il 24/10): un giocatore nuovo va creato nuovo in Pannello › Giocatori, non scritto sopra uno vecchio; a stagione in corso i punti già fatti passerebbero al nuovo nome (l'Albo d'oro invece è al sicuro). Valutare un avviso nella pagina Giocatori quando si cambia il nome di uno esistente.
 - [x] **Foto giocatori nello stile nuovo** (D123 → fatto D127). Era: l'utente le manda tutte (Diana già arrivata, `resources/players/P026.jpg`). Poi: 450 px, file in `resources/players/{id}.jpg`, pubblicare, **solo dopo** scrivere `image_url` nel database; controllare che Riepilogo formazioni (`player-photo-loader.js`, legge lo Storage con le foto vecchie) preferisca la foto nuova. Regole Storage: caricare è bloccato anche agli admin, copia locale da recuperare (`docs/FIREBASE_ALLINEAMENTO.md`).
 - [ ] **Console Firebase › Authentication: cancellare 6 accessi** (D123, lo fa l'utente quando ha tempo): a@a.com, test@gmail.com, sfssd@gmail.com, sdsfsdfsdfsfsss@gmail.com, asad@a.com e l'accesso senza email con id `xx5Aa02vdjXz07MMuf1ZyejOZOG2` (doppione di Sissiana). I loro dati nell'app sono già tolti (copia in `backups-firestore/account-prova-D123-2026-10-24.json`).
 - [ ] Copia di sicurezza nel database `leagues/{lega}/config/backup-squadre-20261024` (squadre di prima, loghi compresi; email tolte perché leggibile dai membri della lega): cancellarla quando il ricollegamento è finito e nessuno ha segnalato problemi (D122).
