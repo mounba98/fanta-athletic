@@ -14,11 +14,11 @@ non si committa. Le Novità le scrive Claude, in linguaggio da giocatore.
 
 ## Il piano generale, in ordine (D034 — importante, leggere prima di tutto)
 
-**Stagione 2025/26 archiviata (Albo d'oro, D089), 2026/27 aperta e vuota
-"in preparazione" (D096)**: la compilano gli admin; l'asta è a ottobre 2026.
-I dati 2025/26 restano reali (archivio) e vanno trattati con rispetto. Finché
-la 2026/27 non è "In corso" nessuno gioca: la finestra di rischio è bassa, ma
-l'app è ONLINE e usata dagli admin, quindi ogni pubblicazione va provata prima.
+**Stagione 2026/27 IN CORSO dal 24/10/2026 (D122)**: rose dell'asta inserite,
+16 squadre, prima giornata lunedì 26/10. **I giocatori ora usano l'app ogni
+settimana**: niente modifiche rischiose a ridosso delle partite, ogni
+pubblicazione va provata prima in locale. La 2025/26 è archiviata (Albo d'oro,
+D089): dati reali, da trattare con rispetto.
 
 Il piano dell'utente, in ordine:
 1. ✅ **Revisione/bugfix — CHIUSA DAVVERO AL 100%** il 2026-09-20 (D037):
@@ -32,7 +32,7 @@ Il piano dell'utente, in ordine:
    azione rimasta in sospeso su questo fronte.
 2. **Redesign grafico** dell'app — fatto in gran parte (D039-D067);
    rifiniture estetiche e velocità rimandate a dopo la Fase 3 (D085).
-   **Fase attiva ora: 3** (D085) — vedi "PROSSIMA SESSIONE" sotto.
+   **Fase attiva ora: stagione in corso** (D122): bug fix e piccoli miglioramenti — vedi "PROSSIMA SESSIONE" sotto.
 3. **Aggiungere le funzioni nuove** (dopo il redesign): foto giocatori
    con stile uniforme (D025); ricostruire per bene le funzioni di
    `admin-squadre.html` (cambio numero squadre, generazione calendario,
@@ -45,67 +45,66 @@ Il piano dell'utente, in ordine:
    sovrapposizione con `h2h-standings.html` già esistente), aggiornamento
    lista giocatori — dettaglio completo in `docs/PUNTI_APERTI.md` e
    `docs/DECISION_LOG.md` D038.
-4. **Solo a quel punto**: inserire i giocatori corretti, le squadre
-   corrette, impostare la stagione nuova e far ripartire il campionato.
+4. ✅ **Giocatori, squadre e stagione nuova: fatto il 24/10/2026 (D122)**,
+   campionato ripartito. Da qui: bug fix e piccoli miglioramenti, più due
+   sessioni dedicate (velocità, notifiche push).
 
 ## Riprendi da qui (prossima sessione)
 
 **▶ PROSSIMA SESSIONE — PARTI DA QUI (D122, 24/10/2026)**
-**Ultimo lavoro (D122, 24/10)**: Novità ferme sul telefono → `sw.js` ora tratta i `.json` "prima la rete" (magazzino rinominato, `firebase.json` senza cache sui `.json`); proporzioni uniformi su tutta l'app al telefono (regola unica in `sheet.css`: bordo del `main` a zero fino a 768 px, Squadre esclusa), Regole e Giocatori a schede, `admin-calendario.html` riallineata al tema. Da verificare sul telefono vero dopo la pubblicazione. **Rose 2026/27 inserite** (16 squadre, posti 0–15; 12 utenti collegati, 21 scollegati che scelgono da soli o ricolleghiamo con la lista degli admin), **stagione "In corso"**, formazioni chiuse da sole 1 ora prima della partita (`resources/lineup-deadline.js`). Compiti per gli admin in `docs/PUNTI_APERTI.md` ("Da decidere con gli admin"). Prossima sessione dedicata: velocità (interventi grossi) e notifiche push.
-**Prima (D121, 23/10)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
-`main`), ultima pubblicazione **23/10/2026** (D121, commit `661721d`), sera dell'asta
-2026/27 (rimandata dal 6/10). Stagione 2026/27 "in preparazione": gli admin la finiscono
-(rose dopo l'asta, da Squadre). Guida admin in app (Pannello › 📖 Guida) e PDF rifatto
-il 23/10 in `~/Claude/fanta-athletic-backups/03-documenti-admin/`.
-**Ultimo lavoro (D121, 23/10)** — richieste degli admin: moduli 1-2-2 / 2-2-1 / 2-1-2 /
-3-1-1 con menu e caselle per ruolo in `formazioni.html` (controllo anche in
-`squadre.html`); **Imbattibilità** +1 automatica a portieri e difensori se l'Athletic
-non subisce gol (risultato salvato nella Partita live → bonus alla pubblicazione;
-anche nel Calcolo giornata), regola R104; R043 Porta inviolata +1; R099 Convocazione
-rimessa "Giocatore" (serve alla live); giocatori **fuori rosa** (campo `fuori_rosa`,
-mai eliminarli); "Tifo" al posto di "Curva" nelle Regole (solo scritta); fogli live
-senza partita svuotati all'apertura. Regola Firebase dei fogli live **invariata** per
-scelta dell'utente.
-**Da fare per primi** (lista in `docs/PUNTI_APERTI.md`, sezione "Dopo l'asta"):
-Formazioni con una rosa vera dal telefono; bug che l'utente trova provando online;
-app che si aggiorna da sola alla riapertura (iPhone e Android); prima giornata vera
-con Partita live + Imbattibilità; "New" da togliere dopo il 30/10.
+`main`), ultima pubblicazione **24/10/2026** (D122, ultimo commit di codice `695d879`),
+verificata online. **Stagione 2026/27 "In corso"**: 16 squadre (posti 0–15) con rose da
+11 e allenatore; G1 lunedì 26/10 (Rifredi–Athletic 21.15), formazioni chiuse da sole
+alle 20.15.
+**Ultimo lavoro (D122, 24/10)**: Novità ferme sul telefono corrette (`sw.js`: `.json`
+"prima la rete"); proporzioni uguali in tutta l'app al telefono (regola unica in
+`sheet.css`), pulsanti con font Inter e a pillola, colori ridati ai pulsanti grigi in
+tema scuro; Regole e Giocatori a schede al telefono, Calendario admin nello stile
+dell'app; Scadenze senza "???"; **formazioni che si chiudono da sole 1 ora prima della
+partita** del Calendario Athletic (`resources/lineup-deadline.js`, usato da Formazioni,
+Squadre e Home; la scadenza manuale degli admin vale al posto); rose inserite (12 utenti
+collegati, 21 scollegati: scelgono la squadra all'accesso o li ricolleghiamo con la
+lista degli admin); immagini alleggerite. Copia di sicurezza delle squadre di prima:
+`backups-firestore/squadre-prima-D122-2026-10-24.json` (locale) e
+`leagues/{lega}/config/backup-squadre-20261024` (database, senza email).
+**Da fare per primi** (dettaglio in `docs/PUNTI_APERTI.md`):
+1. **Ricollegare gli utenti** quando arriva la lista degli admin (squadra + email di
+   ciascuno): collegarli con `team_index` come fa Verifica squadre; chi ha già scelto da
+   solo va solo controllato.
+2. **Dati dagli admin**: lista giocatori (nome, cognome, soprannome; nome di Taruntoli,
+   id `P1792806853123npkq9z5va`), foto di Mario, calendario completo (oggi solo G1–G4),
+   conferma chiusura 1 ora prima, scontri diretti sì/no.
+3. **Prove sul telefono vero**: Novità aggiornate in Bacheca, Pannello a schede,
+   formazioni chiuse lunedì alle 20.15, app che si aggiorna da sola alla riapertura,
+   prima giornata con Partita live + Imbattibilità (risultato salvato prima di pubblicare).
+4. Etichette "New" da togliere dopo il 30/10 (lo segnala `check-coerenza.py`).
+**Sessioni dedicate in coda** (decisione dell'utente): **velocità** (unire i file di
+codice, Firebase modulare, squadre con una sola richiesta, sfarfallio del banner D063,
+foto Guarducci in JPG) e poi **notifiche push** (piano Firebase da decidere).
+**Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
+`feature/uniform-pitch-bench` (D101).
 **Pubblicazione**: commit/push li fa Claude; il deploy lo lancia l'utente con un blocco
 "Esegui" (il sandbox blocca a Claude `~/.local/bin/firebase`):
 `cd ~/Claude/fanta-athletic-code && ~/.local/bin/firebase deploy --only hosting --project fanta-athletic; echo "--- FINITO (codice $?) ---"`
-**Regole nuove (28/09)**: sicurezza più stretta — Claude non avvia Chrome (i PDF li
-crea l'utente) e non esce dalla cartella del progetto senza permesso; quando l'utente
-deve eseguire qualcosa, dargli blocchi di comandi pronti per "Esegui" che si chiudono
-da soli; `git commit`/`push` lanciati da soli dalla cartella del progetto.
+Il sandbox blocca anche `sips` (immagini): comando da dare all'utente.
+**Regole di sicurezza (28/09)**: Claude non avvia Chrome (i PDF li crea l'utente) e non
+esce dalla cartella del progetto senza permesso; i comandi per l'utente in blocchi
+"Esegui" che si chiudono da soli; `git commit`/`push` lanciati da soli dalla cartella.
+**Scritture sul database vero** (come le rose del 24/10): sempre prima una prova a vuoto,
+poi copia di sicurezza (mai dati personali in documenti leggibili dalla lega), poi
+scrittura in un solo passaggio e verifica rileggendo.
 **A inizio sessione**: riavviare il server locale (`preview_start` "static-server");
-nel browser di prova (porta 8912) l'utente è collegato (rifatto il 23/10); se il login si perde,
-rifarlo è compito dell'utente, non di Claude. Lanciare `python3 scripts/check-coerenza.py` per vedere
-subito se qualcosa è rimasto indietro. Nel Cestino del Mac c'è la copia doppia
-dei backup tolta in D118 (l'originale è in `~/Claude/fanta-athletic-backups/`).
-**Cartella backup = parte del progetto** (autorizzata dall'utente il 28/09, D119):
-`~/Claude/fanta-athletic-backups/` (database, guida PDF, presentazioni). Con le regole
-di sicurezza è fuori dal recinto: a inizio sessione, se serve, proporre
-`/add-dir ~/Claude/fanta-athletic-backups`. I PDF (Chrome) li crea l'utente:
-comandi in `docs/presentazioni/LEGGIMI.md` e `scripts/guida-admin-pdf.py`.
-**Come si lavora** (D103/D106/D116): modifica → prova in locale (telefono e
-computer, chiaro/scuro) → **aggiorna le parti collegate** (Novità in
-`resources/news.json`, guida admin + PDF, mappa, `?v=`, etichette "New", documenti:
-tabella in `docs/CHECKLIST_AGGIORNAMENTO.md`) → `python3 scripts/check-coerenza.py`
-→ commit+push (con conferma) → pubblicazione, passo SEPARATO:
-`~/.local/bin/firebase deploy --only hosting --project fanta-athletic` (con conferma).
-**Ultimo giro (D114–D117)**: guida admin v2 anche in app; Novità dell'app in
-Bacheca (scheda "Novità app", finestra all'apertura, casella in Home); bordo oro
-tenue sulle caselle (`resources/ui-kit.css`); etichette "New" a segnalibro (scadono
-il 13/10/2026, D120); controllo di coerenza automatico; titolo "Pannello"; **cartella
-riordinata** (D118: struttura in `README.md`, il controllo segnala file fuori posto).
-**Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
-`feature/uniform-pitch-bench` (D101).
-**Prossimi passi**: bug segnalati dall'utente; rifiniture estetiche ("ancora un
-pelo grezza": valutare il bordo oro anche altrove); giocatore senza nome (attesa
-admin); decisioni scontri diretti (admin); prova Partita live con due admin e con
-un secondo telefono/account non admin (rimandate); notifiche push (dopo);
-**velocità/sfarfallio a fine stagione** (D114). Lista in `docs/PUNTI_APERTI.md`.
+nel browser di prova (porta 8912) l'utente è collegato (rifatto il 24/10); se il login si
+perde, rifarlo è compito dell'utente. Lanciare `python3 scripts/check-coerenza.py`.
+**Cartella backup = parte del progetto** (D119): `~/Claude/fanta-athletic-backups/`,
+fuori dal recinto: se serve, proporre `/add-dir ~/Claude/fanta-athletic-backups`.
+PDF della guida admin: si rifà solo per modifiche sostanziali o tante insieme (D122).
+**Come si lavora** (D103/D106/D116): modifica → prova in locale (telefono e computer,
+chiaro/scuro) → **aggiorna le parti collegate** (Novità in `resources/news.json`, guida
+admin, mappa, `?v=`, etichette "New", documenti: tabella in
+`docs/CHECKLIST_AGGIORNAMENTO.md`) → `python3 scripts/check-coerenza.py` → commit+push
+(con conferma) → pubblicazione, passo SEPARATO (con conferma).
 
 1. **Fase 1 chiusa al 100% (D037). Fase 2 (redesign) fatta in gran parte
    il 2026-09-20 (D039-D051)**: font, colori, forme, tipografia, menu,

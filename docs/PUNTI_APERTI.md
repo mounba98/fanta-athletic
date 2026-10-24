@@ -1,6 +1,13 @@
 Allineato a: D122
 
-# FASE 3 — cosa manca, in ordine (stato al 23/10/2026, D121)
+# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D122)
+
+**▶ PROSSIMA SESSIONE (D122) — in quest'ordine:**
+1. **Ricollegare gli utenti** con la lista degli admin (squadra + email di ciascuno): `team_index` come fa Verifica squadre; controllare chi ha già scelto da solo. 21 scollegati il 24/10 (elenco nella copia `backups-firestore/squadre-prima-D122-2026-10-24.json`).
+2. **Dati dagli admin** (sezione "Da decidere con gli admin" sotto): lista giocatori con nome di Taruntoli, foto di Mario, calendario completo, conferma chiusura 1 ora prima, scontri diretti sì/no.
+3. **Prove sul telefono vero** (sezione "Dopo l'asta" sotto) e bug segnalati dopo la G1 del 26/10.
+4. **Sessione dedicata velocità** (interventi grossi, sotto), poi **notifiche push**.
+
 
 **⚠️ SICUREZZA, URGENTE (D101)**
 - [ ] Nel ramo GitHub `feature/uniform-pitch-bench` c'è `fanta-athletic-firebase-adminsdk.json` (chiave di servizio admin di Firebase, dal nome). **Mocci** (o chi ha i permessi sul progetto) deve **revocarla** in Google Cloud Console → IAM e amministrazione → Account di servizio → `firebase-adminsdk…` → Chiavi → elimina quella chiave (se qualche script la usa, crearne una nuova e tenerla SOLO in locale). Poi togliere il file dalla repository. Revocare è ciò che conta: il file resta comunque nella storia di Git.
@@ -36,7 +43,7 @@ Allineato a: D122
 - [x] Fogli live di prova G1: partita cancellata; i fogli si svuotano quando mounba e marta riaprono la live. Regola del database invariata (decisione dell'utente: le pulizie le facciamo noi dal codice).
 - [x] PDF rifatti dall'utente il 23/10 alle 20:29 (guida admin 563.848 byte, presentazione 935.313 byte).
 
-**▶ Dopo l'asta del 23/10 — da fare per primi (D121):**
+**▶ Dopo l'asta — prove sul telefono e prima giornata (D121–D122):**
 - [ ] **Formazioni con una rosa vera, dal telefono** (moduli e caselle per ruolo provati solo con una rosa finta): scegliere il modulo, schierare con tocco/trascinamento/popup, cambiare modulo, salvare; anche dalla pagina Squadre.
 - [ ] **Prove online dell'utente** delle funzioni nuove non legate all'asta (riquadro risultato nella Partita live, Regole, fuori rosa, menu Modulo): raccogliere i bug segnalati.
 - [ ] **Aggiornamento automatico alla riapertura** (D120, `app-fresh.js`): la pubblicazione del 23/10 è la prima con il controllo già sui telefoni → verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
@@ -69,6 +76,7 @@ Allineato a: D122
 - [ ] Dire agli admin: la "sconfitta a tavolino" degli scontri diretti ora funziona davvero (prima falliva sempre, D095).
 
 **Da decidere con gli admin:**
+- [ ] Copia di sicurezza nel database `leagues/{lega}/config/backup-squadre-20261024` (squadre di prima, loghi compresi; email tolte perché leggibile dai membri della lega): cancellarla quando il ricollegamento è finito e nessuno ha segnalato problemi (D122).
 - [ ] **Messaggio sul gruppo (admin, D122)**: per ogni squadra il nome e tutti i partecipanti, ciascuno con l'**email con cui entra nell'app** (più email possono stare nella stessa squadra). Servirà a ricollegare i 21 utenti scollegati il 24/10. Scelta dell'utente: ognuno entra con la sua email e sceglie la squadra da solo; con la lista colleghiamo prima noi il più possibile, così le scelte a mano restano poche (gli admin correggono da Verifica squadre).
 - [ ] **Foto dell'allenatore Mario (admin, D122)**: manca nell'app.
 - [ ] **Lista completa dei giocatori (admin, D122)**: nome, cognome e soprannome di ognuno. Nel database i soprannomi sono pochi; manca il nome di battesimo di **Taruntoli**.
@@ -99,7 +107,7 @@ Allineato a: D122
 - [x] Regola archivio pubblicata e **stagione 2025/26 archiviata e verificata** campo per campo (D089).
 - [x] Backup completo del database su disco (D088): `~/Claude/fanta-athletic-backups/02-database/` (la copia doppia dentro il progetto è stata tolta in D118; il server locale salva i backup nuovi direttamente lì).
 
-**In coda (dopo la Fase 3):** restyling generale "da app" (D084), notifiche push (D082). **Velocità (D066) e sfarfallio banner (D063): rimandati a fine stagione 2026/27** per scelta dell'utente (D114) — toccano file usati da tutte le pagine, meglio non farlo a stagione in corso.
+**In coda:** restyling generale "da app" (D084). **Velocità (D066) e sfarfallio banner (D063)**: prima rimandati a fine stagione (D114); **il 24/10 l'utente ha chiesto una sessione dedicata a breve** (D122), poi le notifiche push (D082). Toccano file usati da tutte le pagine: farla tra una giornata e l'altra, provare tutto in locale e pubblicare lontano dalle scadenze delle formazioni.
 
 # Punti aperti — da riprendere
 
@@ -429,9 +437,8 @@ la Fase 2. Cose già individuate da includerci:
       solo in locale → Git; Firebase resta solo "parte web", non si
       tocca mai più direttamente (deciso con l'utente).
 
-**Fase 4 — Nuova stagione**: inserire giocatori corretti, squadre
-corrette, impostare la stagione e far ripartire il campionato. Non prima
-di aver completato le fasi 2-3.
+**Fase 4 — Nuova stagione**: ✅ **fatta il 24/10/2026 (D122)**: rose
+dell'asta inserite, 16 squadre, stagione 2026/27 "In corso".
 
 ## Progetti "in pausa", non legati alle fasi sopra (D004, D020)
 
