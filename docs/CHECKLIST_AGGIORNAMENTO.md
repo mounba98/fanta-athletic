@@ -1,4 +1,4 @@
-Allineato a: D127
+Allineato a: D128
 
 # Checklist di ogni aggiornamento — cosa deve seguire una modifica
 

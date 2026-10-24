@@ -1,8 +1,9 @@
-Allineato a: D127
+Allineato a: D128
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D127)
 
 **▶ SESSIONE DI DOMANI, 25/10 (decisione dell'utente, D126) — in quest'ordine:**
+0. **Convocati in app, prima della G1** (richiesta dell'utente 24/10 sera, D128): gli admin oggi mandano i convocati sul gruppo il giorno prima della partita; segnarli in app così chi fa la formazione vede chi è convocato. Proposta: pagina admin **Convocati** (giornata, griglia dei giocatori con foto, tocco = convocato, Salva) in `leagues/{lega}/config/convocati` (nessuna regola nuova: config è già leggibile dai membri e scrivibile dagli admin); in **Formazioni** e Squadre un segno "Convocato / Non convocato" su ogni giocatore quando la lista c'è, i convocati per primi, e un avviso se in formazione c'è un non convocato; nella Home, sul riquadro Formazione, "Convocati pubblicati". Poi (da decidere) la Partita live e il Calcolo giornata partono con i convocati già spuntati. Casella nel Pannello, guida admin, Novità per giocatori e admin.
 1. **Ricollegare gli utenti** appena gli admin finiscono la lista squadre (D123: colleghiamo per nome, le email solo per chi resta): `team_index` come fa Verifica squadre; prova a vuoto, copia, scrittura, verifica rileggendo. Controllare chi ha già scelto da solo. Elenco dei 18 senza squadra e delle 9 squadre senza utenti in DECISION_LOG D123.
 2. **Foto giocatori (D127)**: fatte e collegate il 24/10 sera. Da fare: controllare sul telefono vero Formazioni, Squadre e Riepilogo; **foto di Tiziano Ferretti** da chiedere agli admin (non era nel PowerPoint); poi togliere i vecchi file degli allenatori non più usati (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage (`players/P010_…`, `players/P026_…`).
 3. **Fazioni delle 10 squadre che non ce l'hanno** (le 6 che continuano la hanno): la scelgono gli admin (Fazioni e nomi reali) o i giocatori al primo accesso.
