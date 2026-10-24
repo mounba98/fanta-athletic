@@ -1,12 +1,15 @@
 Allineato a: D124
 
-# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D122)
+# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D124)
 
-**▶ PROSSIMA SESSIONE (D122) — in quest'ordine:**
-1. **Ricollegare gli utenti** (D123: niente email, l'utente gira agli admin le 9 squadre senza utenti e i nomi degli utenti senza squadra; colleghiamo per nome, le email solo per chi resta) — prima con la lista degli admin (squadra + email di ciascuno): `team_index` come fa Verifica squadre; controllare chi ha già scelto da solo. 21 scollegati il 24/10 (elenco nella copia `backups-firestore/squadre-prima-D122-2026-10-24.json`).
-2. **Dati dagli admin** (sezione "Da decidere con gli admin" sotto): lista giocatori con nome di Taruntoli, foto di Mario, calendario completo, conferma chiusura 1 ora prima, scontri diretti sì/no.
-3. **Prove sul telefono vero** (sezione "Dopo l'asta" sotto) e bug segnalati dopo la G1 del 26/10.
-4. **Sessione dedicata velocità** (interventi grossi, sotto), poi **notifiche push**.
+**▶ PROSSIMA SESSIONE (D124) — in quest'ordine:**
+1. **Dopo il calcolo della G1** (26–27/10): controllare che gli esiti delle sfide (pareggio entro 2 punti), la classifica Scontri, la Supremo, il riquadro "La mia sfida" e la pagina della sfida escano giusti con i dati veri.
+2. **Prima del calcolo della G2** (2/11): riprovare in sola lettura la regola "formazione precedente" (D124 punto 8) con le formazioni G1 vere, squadra per squadra.
+3. **Ricollegare gli utenti** con la lista squadre che gli admin stanno raccogliendo (D123: colleghiamo per nome, le email solo per chi resta): `team_index` come fa Verifica squadre; prima prova a vuoto, copia, scrittura, verifica. Controllare chi ha già scelto da solo. Elenco dei 18 senza squadra e delle 9 squadre senza utenti in DECISION_LOG D123.
+4. **Foto giocatori nello stile nuovo** (l'utente le manda, con il nome di ciascuno): 450 px, `resources/players/{id}.jpg` (Diana già lì, `P026.jpg`, da alleggerire), pubblicare, **poi** `image_url` nel database; controllare il Riepilogo formazioni (legge le foto vecchie dallo Storage).
+5. **Console Firebase › Authentication**: l'utente cancella i 6 accessi di prova (elenco sotto, "Da decidere con gli admin"), con Claude che guida.
+6. **Prove sul telefono vero** (sezione "Dopo l'asta" sotto) e bug segnalati dopo la G1.
+7. **Sessione dedicata velocità** (interventi grossi, sotto), poi **notifiche push**.
 
 
 **⚠️ SICUREZZA, URGENTE (D101)**
