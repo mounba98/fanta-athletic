@@ -117,7 +117,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
-  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/season.js?v=20261024b"></script>
   <script src="resources/live-core.js?v=20260925"></script>
   <script>
     const C = window.LiveCore;
@@ -567,7 +567,9 @@
         S.lid = season.leagueId;
         if (!S.lid) { $('denied').style.display = 'block'; return; }
         await loadStatic();
-        const n = Number(season.numGiornate) || 38;
+        // giornate della stagione, più quelle in più del Calendario Athletic (playoff/playout, D124)
+        const calMax = Math.max(0, ...S.cal.map(c => parseInt(c.giornata, 10)).filter(Number.isFinite));
+        const n = Math.max(Number(season.numGiornate) || 38, calMax);
         let first = 'G1';
         for (let i = 1; i <= n; i++) { const d = await L().collection('days').doc('G' + i).get().catch(() => null); if (!d || !d.exists || d.data().computed !== true) { first = 'G' + i; break; } }
         const q = new URLSearchParams(location.search).get('g');

@@ -1,7 +1,64 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D122",
+  "allineato": "D124",
   "news": [
+    {
+      "id": "2026-10-24-scontri",
+      "date": "2026-10-24",
+      "audience": "all",
+      "icon": "⚔️",
+      "title": "Arrivano gli scontri diretti",
+      "intro": "Da questa stagione si gioca in due modi insieme, con la stessa formazione.",
+      "items": [
+        "Ogni giornata sfidi un'altra squadra: <b>vince chi fa più punti</b>, ma se la differenza è di <b>2 punti o meno è pareggio</b>. Vittoria 3, pareggio 1, sconfitta 0.",
+        "Resta la <b>classifica classica</b> (chi somma più punti). In Classifiche trovi anche gli <b>Scontri</b> e la <b>Supremo</b>: posizione in classica + posizione negli scontri, vince il numero più basso.",
+        "In Home c'è il riquadro <b>La mia sfida</b>: toccalo per vedere le due formazioni affiancate. Quella dell'avversario si vede solo quando le formazioni sono chiuse.",
+        "Ti dimentichi la formazione? Giochi con quella della giornata prima, con <b>-1</b>."
+      ],
+      "link": "sfida.html",
+      "linkLabel": "Vai alla mia sfida"
+    },
+    {
+      "id": "2026-10-24-scontri-admin",
+      "date": "2026-10-24",
+      "audience": "admin",
+      "icon": "⚙️",
+      "title": "Scontri diretti pronti",
+      "intro": "Stagione in modalità Entrambe, calendario delle sfide già generato (30 giornate).",
+      "items": [
+        "In Pannello › Stagione: nuovo campo <b>Pareggio se la differenza è al massimo… punti</b> (oggi 2) e nuova scheda <b>Formazione non consegnata</b> (ultima salvata + malus, oggi -1).",
+        "Il Calcolo giornata fa tutto da solo: per chi non consegna usa la formazione precedente e il malus."
+      ],
+      "link": "admin-stagione.html",
+      "linkLabel": "Apri Stagione"
+    },
+    {
+      "id": "2026-10-24-albo",
+      "date": "2026-10-24",
+      "audience": "all",
+      "icon": "🏆",
+      "title": "Albo d'oro con i giocatori",
+      "intro": "Nell'Archivio della stagione 2025/26 c'è ora anche la classifica dei giocatori.",
+      "items": [
+        "Per ogni giocatore: presenze, gol e punti di tutta la stagione.",
+        "Restano i nomi di allora, anche di chi quest'anno non gioca più."
+      ],
+      "link": "archivio.html",
+      "linkLabel": "Apri l'Albo d'oro"
+    },
+    {
+      "id": "2026-10-24-mario",
+      "date": "2026-10-24",
+      "audience": "all",
+      "icon": "📸",
+      "title": "C'è anche Mister Mario",
+      "intro": "Ora tutti e tre gli allenatori hanno la loro foto.",
+      "items": [
+        "Se la tua squadra è allenata da <b>Mario</b>, la sua foto compare nella Home, in Formazioni e in Squadre."
+      ],
+      "link": "formazioni.html",
+      "linkLabel": "Vai alle formazioni"
+    },
     {
       "id": "2026-10-24-app",
       "date": "2026-10-24",

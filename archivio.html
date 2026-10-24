@@ -25,6 +25,8 @@
     .rank td { padding:9px 6px; border-top:1px solid rgba(148,163,184,.18); }
     .rank td.pos { width:34px; font-weight:800; text-align:center; }
     .rank td.pts { text-align:right; font-weight:800; }
+    .rank td.num { text-align:right; width:44px; }
+    .rank td .muted { font-size:12px; }
     .rank tr.p1 td.pos { color:#facc15; } .rank tr.p2 td.pos { color:#cbd5e1; } .rank tr.p3 td.pos { color:#d97706; }
     .muted { color:var(--muted); font-size:13px; }
     .scroll { overflow-x:auto; }
@@ -57,7 +59,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
-  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/season.js?v=20261024b"></script>
   <script src="resources/season-archive.js?v=20260925b"></script>
   <script>
     const $ = id => document.getElementById(id);
@@ -107,6 +109,48 @@
         }
         $('extra').innerHTML = ex;
       } catch (e) { console.warn('[archivio] dettagli', e && (e.code || e.message)); }
+
+      // Classifica giocatori (D123): tutto dalla copia archiviata (giornate, regole e
+      // giocatori di quella stagione), così i nomi restano quelli di allora anche se
+      // gli admin riassegnano un numero di maglia nella stagione nuova.
+      try {
+        const rows = await playerRanking(a.id);
+        if (rows.length) {
+          $('extra').insertAdjacentHTML('beforeend', '<section class="card"><h2>Classifica giocatori</h2><table class="rank">' +
+            '<tr class="muted"><td></td><td></td><td class="num">Pres.</td><td class="num">Gol</td><td class="pts">Punti</td></tr>' +
+            rows.map((r, i) => '<tr class="p' + (i + 1) + '"><td class="pos">' + (i + 1) + '</td><td>' + esc(r.name) +
+              (r.role ? '<div class="muted">' + esc(r.role) + '</div>' : '') + '</td><td class="num muted">' + r.pres + '</td><td class="num muted">' + r.gol +
+              '</td><td class="pts">' + fmt(r.pts) + '</td></tr>').join('') + '</table></section>');
+        }
+      } catch (e) { console.warn('[archivio] giocatori', e && (e.code || e.message)); }
+    }
+
+    // Stesso calcolo della Classifica Giocatori di classifiche.html (regole "Giocatore",
+    // contatore × valore, interruttore = 1 × valore), ma sui dati archiviati.
+    async function playerRanking(seasonId) {
+      const [days, rules, players] = await Promise.all(['days', 'rules', 'players'].map(k => SeasonArchive.items(lid, seasonId, k)));
+      const last = p => String(p || '').split('/').pop();
+      const R = new Map(rules.map(r => [r.data.rule_id || last(r.path), r.data]));
+      const P = new Map(players.map(p => [p.data.player_id || last(p.path), p.data]));
+      const val = raw => (raw && typeof raw === 'object') ? (raw.value ?? raw.count ?? raw.qty) : raw;
+      const tot = {};
+      days.filter(d => /^G\d+$/i.test(last(d.path))).forEach(d => Object.entries((d.data && d.data.players) || {}).forEach(([pid, sel]) => {
+        const t = tot[pid] = tot[pid] || { pts: 0, pres: 0, gol: 0 };
+        t.pres++;
+        Object.entries(sel || {}).forEach(([rid, raw]) => {
+          const r = R.get(rid);
+          if (!r || r.soggetto !== 'Giocatore') return;
+          const v = val(raw), inc = r.input === 'counter' ? Number(v || 0) : (v ? 1 : 0);
+          t.pts += inc * Number(r.valore || 0);
+          if (rid === 'R040' || rid === 'R041') t.gol += inc;
+        });
+      }));
+      const cap = s => String(s).replace(/(^|\s)\S/g, c => c.toUpperCase());
+      return Object.entries(tot).map(([pid, t]) => {
+        const p = P.get(pid) || {};
+        const nick = String(p.nickname || '').trim();
+        return Object.assign({ name: nick ? cap(nick) : (p.nome_completo || p.name || pid), role: p.role || '' }, t);
+      }).filter(r => r.pts !== 0 || r.pres > 0).sort((x, y) => y.pts - x.pts || y.pres - x.pres);
     }
 
     async function init() {

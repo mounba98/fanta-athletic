@@ -2234,6 +2234,9 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
                 if (!coachPhoto && (coachName === 'Trendiu' || c.coach_id === 'trendiu' || c.coach_id?.toLowerCase() === 'trendiu')) {
                   coachPhoto = 'resources/trendiu_athletic.jpg';
                 }
+                if (!coachPhoto && (coachName === 'Mario' || c.coach_id?.toLowerCase() === 'mario')) {
+                  coachPhoto = 'resources/mario_athletic.jpg';
+                }
                 const coachInitials = coachName.split(/\s+/).map(n => n[0]).join('').toUpperCase().substring(0, 2);
                 const isSelected = t.coach_ids && t.coach_ids.length === 1 && t.coach_ids[0] === c.coach_id;
                 return `
@@ -2993,7 +2996,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
   <script src="resources/league-selector.js?v=20260925l"></script>
   <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20260925f"></script>
+  <script src="resources/faction.js?v=20261024b"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
   <script src="resources/navbar-autohide.js?v=20260920-final"></script>

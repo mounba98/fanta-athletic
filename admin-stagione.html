@@ -103,7 +103,7 @@
         <section class="card" id="h2hCard">
           <h2>Scontri diretti</h2>
           <p class="muted">Come si decide una sfida.</p>
-          <p class="warnbox"><b>Valori provvisori, da decidere insieme prima di attivare gli scontri.</b> Le soglie di partenza (1° gol a 66 punti, poi uno ogni 6) vengono dal fantacalcio classico: nel Fanta Athletic una squadra fa di solito 5–30 punti a giornata, quindi finirebbe quasi sempre 0-0. Guardate l'esempio qui sotto mentre cambiate i numeri.</p>
+          <p class="muted">Per la 2026/27 (decisione del 24/10/2026): vince chi fa più punti, pareggio se la differenza è al massimo 2 punti (circa un pareggio ogni quattro sfide, misurato sulla stagione 2025/26). Le fasce punti → gol del fantacalcio non vanno bene per il Fanta Athletic (5–30 punti a giornata: finirebbe quasi sempre 0-0).</p>
           <div class="grid">
             <label class="f">Punti vittoria <input id="h2h_vittoria" type="number" step="0.5" /></label>
             <label class="f">Punti pareggio <input id="h2h_pareggio" type="number" step="0.5" /></label>
@@ -111,10 +111,11 @@
             <label class="f">Come si decide la sfida
               <select id="h2h_conversione"><option value="soglie">Punti → gol a fasce (stile fantacalcio)</option><option value="diretta">Vince chi fa più punti</option></select>
             </label>
+            <label class="f diretta">Pareggio se la differenza è al massimo… punti <input id="h2h_scartoPareggio" type="number" step="0.5" min="0" /></label>
             <label class="f soglie">Punti per il 1° gol <input id="h2h_primaSoglia" type="number" step="0.5" /></label>
             <label class="f soglie">Un gol in più ogni… punti <input id="h2h_ampiezza" type="number" step="0.5" min="0.5" /></label>
-            <label class="f">Formazione mancante: punti a chi vince <input id="h2h_forfaitVincente" type="number" step="0.5" /></label>
-            <label class="f">Formazione mancante: punti a chi perde <input id="h2h_forfaitPerdente" type="number" step="0.5" /></label>
+            <label class="f">Formazione mai consegnata: punti a chi vince <input id="h2h_forfaitVincente" type="number" step="0.5" /></label>
+            <label class="f">Formazione mai consegnata: punti a chi perde <input id="h2h_forfaitPerdente" type="number" step="0.5" /></label>
             <label class="f">Formazione mancante se i titolari sono meno di… <input id="h2h_minTitolari" type="number" min="1" step="1" /></label>
           </div>
           <div class="preview" id="h2hPreview"></div>
@@ -123,6 +124,18 @@
           </div>
           <p class="muted" style="margin-top:6px">Da usare dopo aver cambiato e <b>salvato</b> soglie o tavolino a stagione iniziata: rifà tutte le sfide delle giornate già calcolate. I punti vittoria/pareggio/sconfitta invece valgono subito, senza ricalcolo.</p>
           <div class="log" id="h2hLog" style="display:none;"></div>
+        </section>
+
+        <section class="card" id="fmCard">
+          <h2>Formazione non consegnata</h2>
+          <p class="muted">Vale per tutte le classifiche (classica e scontri diretti).</p>
+          <div class="grid">
+            <label class="f">Chi non la consegna
+              <select id="fm_usaPrecedente"><option value="1">Gioca con l'ultima formazione salvata</option><option value="0">Prende 0 punti (e perde a tavolino)</option></select>
+            </label>
+            <label class="f prec">Malus per la formazione non consegnata <input id="fm_malus" type="number" step="0.5" max="0" /></label>
+          </div>
+          <p class="muted prec" style="margin-top:6px">Chi non ha mai salvato una formazione in questa stagione prende comunque 0 punti (e negli scontri perde a tavolino).</p>
         </section>
 
         <section class="card">
@@ -190,9 +203,9 @@
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/contest-scoring.js?v=20261024"></script>
-  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/season.js?v=20261024b"></script>
   <script src="resources/season-archive.js?v=20260925b"></script>
-  <script src="resources/h2h.js?v=20260925e"></script>
+  <script src="resources/h2h.js?v=20261024b"></script>
   <script>
     const KIND = {
       league: 'Lega', season_config: 'Impostazioni stagione', teams: 'Squadre (con rose)', saved: 'Formazioni salvate',
@@ -223,6 +236,9 @@
       $('numSquadre').value = s.numSquadre ?? ''; $('numGiornate').value = s.numGiornate ?? '';
       document.querySelectorAll('input[name=modalita]').forEach(r => r.checked = r.value === s.modalita);
       ['vittoria','pareggio','sconfitta','conversione','primaSoglia','ampiezza','forfaitVincente','forfaitPerdente','minTitolari'].forEach(k => $('h2h_' + k).value = s.h2h[k] != null ? s.h2h[k] : '');
+      $('h2h_scartoPareggio').value = s.h2h.scartoPareggio != null ? s.h2h.scartoPareggio : 0;
+      $('fm_usaPrecedente').value = s.formazioneMancante.usaPrecedente ? '1' : '0';
+      $('fm_malus').value = s.formazioneMancante.malus != null ? s.formazioneMancante.malus : 0;
       ['punti','aperturaOre','chiusuraMinuti'].forEach(k => $('c_' + k).value = s.contest[k]);
       $('savedInfo').textContent = s.saved ? 'Impostazioni salvate nel database.' : 'Mai salvate: stai vedendo i valori di oggi (quelli scritti nel codice). Salvando diventano modificabili da qui.';
       $('techInfo').textContent = 'Dati tecnici: stagione "' + s.id + '", cartella scontri diretti "' + s.h2h.key + '", lega ' + s.leagueId + '.';
@@ -238,7 +254,9 @@
         numSquadre: n('numSquadre'), numGiornate: n('numGiornate'),
         modalita: (document.querySelector('input[name=modalita]:checked') || {}).value || 'classica',
         h2h: { vittoria: n('h2h_vittoria'), pareggio: n('h2h_pareggio'), sconfitta: n('h2h_sconfitta'), conversione: $('h2h_conversione').value,
+               scartoPareggio: Math.max(0, n('h2h_scartoPareggio') || 0),
                primaSoglia: n('h2h_primaSoglia'), ampiezza: n('h2h_ampiezza'), forfaitVincente: n('h2h_forfaitVincente'), forfaitPerdente: n('h2h_forfaitPerdente'), minTitolari: Math.max(1, Math.round(n('h2h_minTitolari') || 1)) },
+        formazioneMancante: { usaPrecedente: $('fm_usaPrecedente').value === '1', malus: Math.min(0, n('fm_malus') || 0) },
         contest: { punti: n('c_punti'), aperturaOre: n('c_aperturaOre'), chiusuraMinuti: n('c_chiusuraMinuti') }
       });
     }
@@ -247,8 +265,16 @@
       const v = read();
       const soglie = v.h2h.conversione === 'soglie';
       document.querySelectorAll('.soglie').forEach(el => el.style.display = soglie ? '' : 'none');
+      document.querySelectorAll('.diretta').forEach(el => el.style.display = soglie ? 'none' : '');
+      document.querySelectorAll('.prec').forEach(el => el.style.display = v.formazioneMancante.usaPrecedente ? '' : 'none');
       $('h2hCard').style.opacity = v.modalita === 'classica' ? .6 : 1;
-      if (!soglie) { $('h2hPreview').textContent = 'Esempio: 58 punti contro 55 → vince chi ne ha 58 (' + v.h2h.vittoria + ' punti in classifica).'; return; }
+      if (!soglie) {
+        const m = v.h2h.scartoPareggio || 0, f = x => String(x).replace('.', ',');
+        $('h2hPreview').innerHTML = m > 0
+          ? 'Esempio: 24 contro ' + f(24 - m) + ' → <b>pareggio</b> (' + v.h2h.pareggio + (Number(v.h2h.pareggio) === 1 ? ' punto' : ' punti') + ' a testa) • 24 contro ' + f(24 - m - 0.5) + ' → vince chi ne ha 24 (' + v.h2h.vittoria + ' punti in classifica).'
+          : 'Esempio: 58 punti contro 55 → vince chi ne ha 58 (' + v.h2h.vittoria + ' punti in classifica). Pareggio solo a punti identici.';
+        return;
+      }
       const ex = [v.h2h.primaSoglia - 1, v.h2h.primaSoglia, v.h2h.primaSoglia + v.h2h.ampiezza, v.h2h.primaSoglia + 3 * v.h2h.ampiezza];
       $('h2hPreview').innerHTML = 'Esempio: ' + ex.map(p => '<b>' + p + '</b> punti = ' + Season.goalsFromPoints(p, v.h2h) + ' gol').join(' • ');
     }

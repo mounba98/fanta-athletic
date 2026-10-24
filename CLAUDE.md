@@ -1,4 +1,4 @@
-Allineato a: D122
+Allineato a: D124
 
 # Fanta Athletic — contesto per Claude
 
@@ -52,6 +52,15 @@ Il piano dell'utente, in ordine:
 ## Riprendi da qui (prossima sessione)
 
 **▶ PROSSIMA SESSIONE — PARTI DA QUI (D122, 24/10/2026)**
+**Aggiornamento D123–D124 (24/10, pomeriggio)**: risposte degli admin recepite — foto di Mario,
+giocatori riallineati (nomi nuovi sulle maglie vecchie, `players.json` uguale al database), Albo
+d'oro con la classifica giocatori dall'archivio, account di prova tolti (accessi da cancellare in
+Console), regole "Civi in porta" spente, Diana non portiere. **Scontri diretti attivi** (modalità
+Entrambe, pareggio entro 2, formazione precedente con -1, Supremo, La mia sfida in Home,
+`sfida.html`, calendario sfide 2026-27 generato, 20 giornate + playoff). Da fare: **prima del
+calcolo della G2** riprovare in sola lettura la "formazione precedente"; foto giocatori nello stile
+nuovo (l'utente le manda; `image_url` solo dopo la pubblicazione); ricollegare gli utenti con la
+lista degli admin. Dettagli in `docs/DECISION_LOG.md` D123–D124.
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
 `main`), ultima pubblicazione **24/10/2026** (D122, ultimo commit di codice `695d879`),
 verificata online. **Stagione 2026/27 "In corso"**: 16 squadre (posti 0–15) con rose da

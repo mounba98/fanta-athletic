@@ -147,6 +147,7 @@
     const n = String(c.nome || c.name || '').toLowerCase(), id = String(c.coach_id || '').toLowerCase();
     if (n === 'tommy' || id === 'tommy') return 'resources/tommy_guardu.png';
     if (n === 'trendiu' || id === 'trendiu') return 'resources/trendiu_athletic.jpg';
+    if (n === 'mario' || id === 'mario') return 'resources/mario_athletic.jpg';
     return '';
   }
 

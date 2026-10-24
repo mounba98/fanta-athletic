@@ -2386,6 +2386,9 @@
       if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Trendiu' || selectedCoach.coach_id === 'trendiu' || selectedCoach.coach_id?.toLowerCase() === 'trendiu')) {
         coachPhoto = 'resources/trendiu_athletic.jpg';
       }
+      if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Mario' || selectedCoach.coach_id?.toLowerCase() === 'mario')) {
+        coachPhoto = 'resources/mario_athletic.jpg';
+      }
       // Coach slot mini vicino al capitano (desktop e mobile)
       const updateCoachSlot = (slotId) => {
         const coachSlotMiniEl = document.getElementById(slotId);
@@ -3218,7 +3221,7 @@
   </script>
   <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20260925f"></script>
+  <script src="resources/faction.js?v=20261024b"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>

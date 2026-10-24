@@ -339,8 +339,8 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
-  <script src="resources/season.js?v=20260925e"></script>
-  <script src="resources/h2h.js?v=20260925e"></script>
+  <script src="resources/season.js?v=20261024b"></script>
+  <script src="resources/h2h.js?v=20261024b"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
   <script src="resources/toast.js?v=20260920-final"></script>
   <script src="resources/rules-loader.js?v=20260920-final"></script>
@@ -1195,6 +1195,11 @@
       await loadCalendar();
       const fbCtx = { venue: venueForGiornata(state.giornata).venue };
 
+      // Formazione non consegnata (D124): regola della Stagione
+      let fmRule = { usaPrecedente: false, malus: 0 };
+      try { if (window.Season) fmRule = (await window.Season.load()).formazioneMancante || fmRule; } catch (_) {}
+      const gNow = parseInt(String(state.giornata).replace(/\D/g, ''), 10) || 0;
+
       // Calcola punti per ogni squadra
       const h2hByTeam = {};
       for (const team of teams) {
@@ -1223,6 +1228,30 @@
           lineup = [];
         }
         lineup = lineup.map(slot => slot || null);
+
+        // Nessuna formazione per questa giornata: si gioca con l'ultima salvata
+        // nelle giornate precedenti (solo giocatori ancora in rosa), D124
+        let lineupFrom = null;
+        if (fmRule.usaPrecedente && !lineup.some(Boolean) && gNow > 1) {
+          const roster = Array.isArray(team.roster) ? team.roster.map(String) : [];
+          const teamRef = getLeagueCollection('teams', leagueId)?.doc(team.id);
+          for (let k = gNow - 1; k >= 1 && teamRef && !lineupFrom; k--) {
+            try {
+              const prev = await teamRef.collection('saved').doc('G' + k).get();
+              if (!prev.exists) continue;
+              const pd = prev.data() || {};
+              const pl = (pd.lineup || []).map(pid => (pid && (!roster.length || roster.includes(String(pid)))) ? pid : null);
+              if (!pl.some(Boolean)) continue;
+              lineup = pl;
+              captain = pl.includes(pd.captain) ? pd.captain : null;
+              coachId = (Array.isArray(pd.coach_ids) && pd.coach_ids.length ? pd.coach_ids[0] : (pd.coach_id || pd.coachId || null));
+              lineupFrom = 'G' + k;
+            } catch (e) {
+              console.warn(`Errore formazione precedente team ${team.id} G${k}:`, e);
+            }
+          }
+        }
+        const lineupMalus = lineupFrom ? Math.min(0, Number(fmRule.malus) || 0) : 0;
         
         // Calcola punti giocatori titolari
         const starters = lineup.filter(Boolean);
@@ -1268,13 +1297,14 @@
         // Formazione pubblicata bonus (feature flag)
         const formationEnabled = isFormationBonusEnabled();
         const formationValue = getFormationBonusValue();
-        let formationBonus = (formationEnabled && starters.length >= 5) ? formationValue : 0;
+        // il bonus "formazione pubblicata" non spetta a chi gioca con quella della giornata prima (D124)
+        let formationBonus = (formationEnabled && starters.length >= 5 && !lineupFrom) ? formationValue : 0;
 
         // Bonus di fazione (presenze per squadra + eventi della sua fazione), D080
         const fbRaw = window.FactionBonus ? window.FactionBonus.teamBonus(team.id, team.fazione, state.selCurva, state.rules, fbCtx) : { total: 0 };
         let factionBonus = fbRaw.total;
 
-        let total = curvaBase + playerSum + captainBonus + coachPts + formationBonus + factionBonus;
+        let total = curvaBase + playerSum + captainBonus + coachPts + formationBonus + factionBonus + lineupMalus;
         if (missingLineup) {
           factionBonus = 0;
           total = 0;
@@ -1297,11 +1327,13 @@
               captain: captainBonus,
               coach: coachPts,
               formation: formationBonus,
-              fazione: factionBonus
+              fazione: factionBonus,
+              malusFormazione: missingLineup ? 0 : lineupMalus
             },
             faction: team.fazione || null,
             lineup: lineup,
           missingLineup,
+          lineupFrom: missingLineup ? null : lineupFrom,
             captain: captain,
             coachId: coachId,
             players: Array.from(playerContribs.values()).map(entry => ({
@@ -3448,7 +3480,7 @@
   </script>
   <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20260925f"></script>
+  <script src="resources/faction.js?v=20261024b"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
     <script src="resources/navbar-autohide.js?v=20260920-final"></script>

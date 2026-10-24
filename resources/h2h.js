@@ -29,7 +29,10 @@
       out.scoreAway = goals(away.points, cfg);
       out.forfeitHome = false; out.forfeitAway = false;
     }
-    out.esito = out.scoreHome > out.scoreAway ? '1' : out.scoreHome < out.scoreAway ? '2' : 'X';
+    // "Vince chi fa più punti" con scarto (D124): pareggio se la differenza è al massimo scartoPareggio
+    const margin = !hm && !am && cfg.conversione === 'diretta' ? Math.max(0, Number(cfg.scartoPareggio) || 0) : 0;
+    const diff = out.scoreHome - out.scoreAway;
+    out.esito = Math.abs(diff) <= margin ? 'X' : diff > 0 ? '1' : '2';
     if (hm && am) out.esito = '0'; // nessuno prende punti
     out.ptsHome = out.esito === '1' ? cfg.vittoria : out.esito === 'X' ? cfg.pareggio : cfg.sconfitta;
     out.ptsAway = out.esito === '2' ? cfg.vittoria : out.esito === 'X' ? cfg.pareggio : cfg.sconfitta;

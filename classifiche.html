@@ -267,6 +267,9 @@
       <button class="tab-btn" data-tab="h2h" onclick="switchTab('h2h', event)">
         <span class="tab-label-full">Scontri Diretti</span><span class="tab-label-short">H2H</span>
       </button>
+      <button class="tab-btn" data-tab="supremo" onclick="switchTab('supremo', event)" style="display:none">
+        <span class="tab-label-full">Supremo</span><span class="tab-label-short">Supremo</span>
+      </button>
       <button class="tab-btn" data-tab="giornate" onclick="switchTab('giornate', event)">
         <span class="tab-label-full">Per Giornata</span><span class="tab-label-short">Giornate</span>
       </button>
@@ -353,6 +356,20 @@
                 <th>Pt Fatti</th><th>Pt Subiti</th><th>Diff</th><th>Punti</th>
               </tr>
             </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Supremo (D124): posizione in classica + posizione negli scontri -->
+    <div id="tab-supremo" class="tab-content">
+      <div class="card">
+        <h2>Classifica Supremo</h2>
+        <p class="muted" style="font-size:13px;">Somma dei piazzamenti: posizione nella Classifica Squadre + posizione negli Scontri Diretti. Vince il numero più basso; a parità conta la Classifica Squadre. Sempre su tutta la stagione.</p>
+        <div class="table-wrapper">
+          <table class="table rank-table" id="supremoTable">
+            <thead><tr><th>#</th><th>Squadra</th><th>Classica</th><th>Scontri</th><th>Somma</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -562,7 +579,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
-  <script src="resources/season.js?v=20260925e"></script>
+  <script src="resources/season.js?v=20261024b"></script>
   <script src="resources/competitions.js?v=20260925"></script>
   <script src="resources/provisional-badge.js?v=20260925"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
@@ -743,6 +760,7 @@
     }
 
     if (location.hash === '#fazioni') window.addEventListener('load', function(){ switchTab('fazioni'); loadFazioni(); });
+    if (location.hash === '#supremo') window.addEventListener('load', async function(){ for (let i = 0; i < 50 && !(state.teams && state.teams.length); i++) await new Promise(r => setTimeout(r, 200)); switchTab('supremo'); });
     // D113: la competizione scelta nella tendina 🏆 guida la scheda d'apertura
     // (#h2h = Scontri diretti, #squadre = Campionato; senza indirizzo vale la scelta salvata)
     window.addEventListener('load', async function() {
@@ -1647,6 +1665,7 @@
       });
 
       stats.sort((a, b) => (b.pts - a.pts) || ((b.pf - b.ps) - (a.pf - a.ps)) || (b.pf - a.pf) || a.name.localeCompare(b.name, 'it'));
+      state.h2hSorted = stats;
 
       tbody.innerHTML = stats.map((row, index) => {
         const style = podiumStyles[index] || { bg: 'transparent', color: 'var(--text)' };
@@ -1662,6 +1681,34 @@
         `;
       }).join('');
     }
+
+    // Classifica Supremo (D124): posizione classica (punti totali di tutta la stagione)
+    // + posizione scontri (stesso ordine della tabella Scontri). Parità = stessa posizione.
+    function renderSupremo() {
+      const btn = document.querySelector('.tab-btn[data-tab="supremo"]');
+      const tbody = document.querySelector('#supremoTable tbody');
+      const on = !!(state.hasH2H && window.__SEASON && window.__SEASON.modalita === 'entrambe');
+      if (btn) btn.style.display = on ? '' : 'none';
+      if (!on || !tbody || !state.teams.length) return;
+      const tot = new Map(state.teams.map(t => [String(t.id), 0]));
+      state.results.forEach(g => Object.entries(g.teams || {}).forEach(([id, d]) => { if (tot.has(String(id))) tot.set(String(id), tot.get(String(id)) + extractPoints(d)); }));
+      const classic = state.teams.map(t => ({ id: String(t.id), name: t.name, total: tot.get(String(t.id)) || 0 })).sort((a, b) => b.total - a.total);
+      const posC = new Map(); classic.forEach((r, i) => posC.set(r.id, i && r.total === classic[i - 1].total ? posC.get(classic[i - 1].id) : i + 1));
+      const h = state.h2hSorted || [];
+      const same = (a, b) => a.pts === b.pts && (a.pf - a.ps) === (b.pf - b.ps) && a.pf === b.pf;
+      const posH = new Map(); h.forEach((r, i) => posH.set(String(r.teamId), i && same(r, h[i - 1]) ? posH.get(String(h[i - 1].teamId)) : i + 1));
+      const rows = classic.map(r => ({ name: r.name, c: posC.get(r.id), h: posH.get(r.id) || h.length || state.teams.length }))
+        .map(r => Object.assign(r, { s: r.c + r.h }))
+        .sort((a, b) => (a.s - b.s) || (a.c - b.c) || a.name.localeCompare(b.name, 'it'));
+      const played = Array.from(state.results.values()).some(g => Object.keys(g.teams || {}).length);
+      if (!played) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);">Nessuna giornata calcolata ancora.</td></tr>'; return; }
+      tbody.innerHTML = rows.map((r, i) => {
+        const pos = i && r.s === rows[i - 1].s && r.c === rows[i - 1].c ? '' : String(i + 1);
+        const style = podiumStyles[i] || { bg: 'transparent', color: 'var(--text)' };
+        return '<tr style="background:' + style.bg + ';color:' + style.color + ';"><td>' + pos + '</td><td style="font-weight:' + (i < 3 ? 800 : 600) + ';">' + escapeHtmlSafe(r.name) + '</td><td>' + r.c + '°</td><td>' + r.h + '°</td><td style="font-weight:' + (i < 3 ? 900 : 700) + ';">' + r.s + '</td></tr>';
+      }).join('');
+    }
+    function escapeHtmlSafe(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
     function renderGiornataSelect() {
       const select = document.getElementById('giornataSel');
@@ -2067,6 +2114,7 @@
         setupTeamsRangeSelectors();
         renderTeamsRanking();
         renderH2HTable();
+        renderSupremo();
         renderGiornataSelect();
       } catch (error) {
         console.error('[classifiche] Errore caricamento classifiche:', error);
@@ -2335,7 +2383,7 @@
   <script src="resources/players-leaderboard-classifiche.js?v=20260921-final"></script>
   <script src="resources/mobile-menu.js?v=20260926"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20260925f"></script>
+  <script src="resources/faction.js?v=20261024b"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20260920-final"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>

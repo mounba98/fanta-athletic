@@ -130,6 +130,58 @@
     el.innerHTML = '<div class="hd-k">Mini-gioco 1-X-2</div><div class="hd-mid">' + map[1] + '</div><div class="hd-sub">' + map[2] + '</div>';
   }
 
+  // La mia sfida (D124): avversario della prossima giornata (o risultato dell'ultima
+  // calcolata), solo se la stagione ha gli scontri diretti e il calendario sfide.
+  async function renderSfida(m, core) {
+    const el = $('hdSfida');
+    const S = core.S;
+    if (!el || !S || core.idx === null || !(S.modalita === 'scontri' || S.modalita === 'entrambe')) return;
+    const key = S.h2h && S.h2h.key;
+    const sched = await safe(core.L.collection('h2h_schedule').doc(key).collection('giornate').get(), null);
+    if (!sched || sched.empty) return;
+    const res = await safe(core.L.collection('h2h_results').doc(key).collection('giornate').get(), null);
+    const results = {}; if (res) res.docs.forEach(d => { results[d.id] = d.data(); });
+    const me = Number(core.idx);
+    const find = doc => ((doc && doc.matches) || []).find(x => x.home === me || x.away === me);
+    // giornata da mostrare: la prossima del calendario Athletic se non è ancora calcolata, altrimenti l'ultima calcolata
+    const nextG = m.next && m.next.n ? 'G' + m.next.n : null;
+    const lastDone = Object.keys(results).filter(g => (results[g].matches || []).length).sort((a, b) => gNum(b) - gNum(a))[0] || null;
+    const recent = lastDone && (!nextG || gNum(lastDone) >= gNum(nextG) - 1) && m.last && m.last.start > new Date(Date.now() - 3 * DAY) ? lastDone : null;
+    const g = recent || nextG || lastDone;
+    const schedDoc = sched.docs.find(d => d.id === g);
+    if (!g || !schedDoc) return;
+    const mt = find(schedDoc.data());
+    const name = id => (core.teams[String(id)] || {}).name || ('Squadra ' + id);
+    el.href = 'sfida.html?g=' + encodeURIComponent(g);
+    if (!mt) { el.hidden = false; el.innerHTML = '<div class="hd-row"><span class="hd-k">La mia sfida · ' + gNum(g) + 'ª giornata</span></div><div class="hd-big">Turno di riposo</div>'; return; }
+    const opp = mt.home === me ? mt.away : mt.home;
+    // posizione dell'avversario negli scontri (dagli esiti salvati)
+    let pos = '';
+    if (window.H2H && Object.keys(results).length) {
+      const st = window.H2H.standings(Object.values(results), S.h2h);
+      const i = st.findIndex(r => Number(r.team) === Number(opp));
+      if (i >= 0) pos = (i + 1) + '° negli scontri';
+    }
+    const r = (results[g] && find(results[g])) || null;
+    const fmtS = x => String(Math.round(Number(x) * 2) / 2).replace('.', ',');
+    let mid, sub, pill = mt.home === me ? 'In casa' : 'In trasferta';
+    if (r && r.scoreHome != null) {
+      const mine = mt.home === me ? r.scoreHome : r.scoreAway, theirs = mt.home === me ? r.scoreAway : r.scoreHome;
+      const e = r.esito === 'X' ? 'Pareggio' : r.esito === '0' ? 'Nessun punto' : ((r.esito === '1') === (mt.home === me) ? 'Vittoria' : 'Sconfitta');
+      pill = e;
+      mid = '<small style="white-space:nowrap"><b>' + fmtS(mine) + '</b>–<b>' + fmtS(theirs) + '</b></small>';
+      sub = 'Tocca per vedere le due formazioni';
+    } else {
+      mid = '<small>vs</small>';
+      const dl = m.next && m.next.start && window.FALineupDeadline ? new Date(m.next.start.getTime() - FALineupDeadline.BEFORE_MINUTES * 60000) : null;
+      sub = (pos ? esc(pos) + ' · ' : '') + (dl && dl > new Date() ? 'La sua formazione si vede da ' + dl.toLocaleString('it-IT', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'Tocca per vedere le due formazioni');
+    }
+    el.hidden = false;
+    el.innerHTML = '<div class="hd-row"><span class="hd-k">La mia sfida · ' + gNum(g) + 'ª giornata</span><span class="hd-pill">' + esc(pill) + '</span></div>' +
+      '<div class="hd-vs"><span>' + esc(name(me)) + '</span>' + mid + '<span>' + esc(name(opp)) + '</span></div>' +
+      '<div class="hd-sub">' + sub + '</div>';
+  }
+
   async function renderBanner(core) {
     const el = $('hdBanner');
     const a = await safe(core.db.collection('auction').doc('current').get(), null);
@@ -159,6 +211,7 @@
       photo = cc.photo_url || cc.photoUrl || cc.photo || cc.image_url || '';
       if (!photo && /tommy/i.test(coachName)) photo = 'resources/tommy_guardu.png';
       if (!photo && /trendiu/i.test(coachName)) photo = 'resources/trendiu_athletic.jpg';
+      if (!photo && /mario/i.test(coachName)) photo = 'resources/mario_athletic.jpg';
     }
     const fz = FACTIONS[t.fazione] || FACTIONS[core.u.fazione] || '';
     extra.textContent = [coachName ? 'All. ' + coachName : '', fz].filter(Boolean).join(' · ');
@@ -233,7 +286,7 @@
     if (core.isAdmin) $('hdAdmin').hidden = false;
     const m = matches(core);
     renderNext(m, core);
-    await Promise.all([renderBanner(core), renderFormation(m, core), renderGame(m, core), renderTeam(core), renderBoard(), renderAthletic(m, core)]
+    await Promise.all([renderBanner(core), renderFormation(m, core), renderGame(m, core), renderSfida(m, core), renderTeam(core), renderBoard(), renderAthletic(m, core)]
       .map(p => p.catch(e => console.warn('[home] blocco', e && (e.code || e.message)))));
   }
 

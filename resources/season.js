@@ -17,12 +17,17 @@
       key: '2024-25',             // cartella del calendario scontri (storica, D086)
       vittoria: 3, pareggio: 1, sconfitta: 0,
       conversione: 'soglie',      // soglie = punti → gol a fasce (stile fantacalcio) | diretta = vince chi fa più punti
+      scartoPareggio: 0,          // solo "diretta": pareggio se la differenza è al massimo questa (D124: 2 nella 2026/27)
       primaSoglia: 66,            // punti per il primo gol  (DA CONFERMARE con gli admin)
       ampiezza: 6,                // ogni quanti punti in più un altro gol (DA CONFERMARE)
       forfaitVincente: 3,         // come oggi in matchday.html
       forfaitPerdente: -10,
       minTitolari: 1              // sotto questo numero di titolari la formazione conta come mancante (1 = serve almeno un titolare)
     },
+    // Formazione non consegnata (D124), vale per tutte le classifiche: si gioca con
+    // l'ultima formazione salvata nelle giornate precedenti, più il malus.
+    // Mai salvata = formazione mancante (0 punti, tavolino negli scontri).
+    formazioneMancante: { usaPrecedente: false, malus: 0 },
     contest: { punti: 10, aperturaOre: 24, chiusuraMinuti: 30 }
   };
 
