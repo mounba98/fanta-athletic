@@ -1,7 +1,35 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D125",
+  "allineato": "D127",
   "news": [
+    {
+      "id": "2026-10-24-foto",
+      "date": "2026-10-24",
+      "audience": "all",
+      "icon": "📸",
+      "title": "Le foto dei giocatori",
+      "intro": "Quando schieri la formazione ora vedi la faccia di ogni giocatore.",
+      "items": [
+        "Le foto ci sono in Formazioni (in campo, in panchina e nell'elenco), in Squadre e nel Riepilogo.",
+        "Nuove anche le foto degli allenatori Tommy, Trendiu e Mario."
+      ],
+      "link": "formazioni.html",
+      "linkLabel": "Vai alle formazioni"
+    },
+    {
+      "id": "2026-10-24-card",
+      "date": "2026-10-24",
+      "audience": "all",
+      "icon": "📊",
+      "title": "Tutte le classifiche nella tua squadra",
+      "intro": "In Home, nel riquadro della tua squadra, ora vedi la posizione in tutte e tre le classifiche.",
+      "items": [
+        "A destra la <b>Classica</b>, sotto <b>Scontri</b> (posizione e punti) e <b>Supremo</b>.",
+        "Tocca Scontri o Supremo per aprire quella classifica."
+      ],
+      "link": "classifiche.html#supremo",
+      "linkLabel": "Vai alle classifiche"
+    },
     {
       "id": "2026-10-24-barra",
       "date": "2026-10-24",

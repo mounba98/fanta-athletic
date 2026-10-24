@@ -1,4 +1,4 @@
-Allineato a: D125
+Allineato a: D127
 
 # Fanta Athletic — contesto per Claude
 
@@ -51,43 +51,29 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D122, 24/10/2026)**
-**Aggiornamento D123–D124 (24/10, pomeriggio)**: risposte degli admin recepite — foto di Mario,
-giocatori riallineati (nomi nuovi sulle maglie vecchie, `players.json` uguale al database), Albo
-d'oro con la classifica giocatori dall'archivio, account di prova tolti (accessi da cancellare in
-Console), regole "Civi in porta" spente, Diana non portiere. **Scontri diretti attivi** (modalità
-Entrambe, pareggio entro 2, formazione precedente con -1, Supremo, La mia sfida in Home,
-`sfida.html`, calendario sfide 2026-27 generato, 20 giornate + playoff). Da fare: **prima del
-calcolo della G2** riprovare in sola lettura la "formazione precedente"; foto giocatori nello stile
-nuovo (l'utente le manda; `image_url` solo dopo la pubblicazione); ricollegare gli utenti con la
-lista degli admin. Dettagli in `docs/DECISION_LOG.md` D123–D124.
-**Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
-`main`), ultima pubblicazione **24/10/2026** (D122, ultimo commit di codice `695d879`),
-verificata online. **Stagione 2026/27 "In corso"**: 16 squadre (posti 0–15) con rose da
-11 e allenatore; G1 lunedì 26/10 (Rifredi–Athletic 21.15), formazioni chiuse da sole
-alle 20.15.
-**Ultimo lavoro (D122, 24/10)**: Novità ferme sul telefono corrette (`sw.js`: `.json`
-"prima la rete"); proporzioni uguali in tutta l'app al telefono (regola unica in
-`sheet.css`), pulsanti con font Inter e a pillola, colori ridati ai pulsanti grigi in
-tema scuro; Regole e Giocatori a schede al telefono, Calendario admin nello stile
-dell'app; Scadenze senza "???"; **formazioni che si chiudono da sole 1 ora prima della
-partita** del Calendario Athletic (`resources/lineup-deadline.js`, usato da Formazioni,
-Squadre e Home; la scadenza manuale degli admin vale al posto); rose inserite (12 utenti
-collegati, 21 scollegati: scelgono la squadra all'accesso o li ricolleghiamo con la
-lista degli admin); immagini alleggerite. Copia di sicurezza delle squadre di prima:
-`backups-firestore/squadre-prima-D122-2026-10-24.json` (locale) e
-`leagues/{lega}/config/backup-squadre-20261024` (database, senza email).
-**Da fare per primi** (dettaglio in `docs/PUNTI_APERTI.md`):
-1. **Ricollegare gli utenti** quando arriva la lista degli admin (squadra + email di
-   ciascuno): collegarli con `team_index` come fa Verifica squadre; chi ha già scelto da
-   solo va solo controllato.
-2. **Dati dagli admin**: lista giocatori (nome, cognome, soprannome; nome di Taruntoli,
-   id `P1792806853123npkq9z5va`), foto di Mario, calendario completo (oggi solo G1–G4),
-   conferma chiusura 1 ora prima, scontri diretti sì/no.
-3. **Prove sul telefono vero**: Novità aggiornate in Bacheca, Pannello a schede,
-   formazioni chiuse lunedì alle 20.15, app che si aggiorna da sola alla riapertura,
-   prima giornata con Partita live + Imbattibilità (risultato salvato prima di pubblicare).
-4. Etichette "New" da togliere dopo il 30/10 (lo segnala `check-coerenza.py`).
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D127, 24/10/2026 sera)**
+**Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic` `main`),
+ultima pubblicazione **24/10/2026** (D127), verificata online. **Stagione 2026/27 "In corso"**:
+16 squadre con rose e allenatore; G1 lunedì 26/10 (Rifredi–Athletic 21.15), formazioni chiuse
+da sole alle 20.15 (1 ora prima, `resources/lineup-deadline.js`).
+**Cosa c'è di nuovo dal 24/10 (D123–D127)**:
+- **Scontri diretti insieme alla classica** (modalità Entrambe): vince chi fa più punti,
+  **pareggio entro 2**; chi non consegna gioca con l'ultima formazione salvata **con -1**
+  (`matchday.html`); classifica **Supremo** = posizione classica + posizione scontri;
+  calendario sfide `h2h_schedule/2026-27` (G1–G15 andata, G16–G20 ritorno, poi riserva per
+  playoff; `numGiornate` = 20). Impostazioni in Pannello › Stagione.
+- **Barra in basso**: Home · Formazioni · **Giornata** (`sfida.html`, al centro) · Classifiche ·
+  Bacheca; Squadre si apre da Home e dal menu ☰. Home: riquadro "La mia sfida", card della
+  squadra con Classica, Scontri e Supremo.
+- **Giocatori** riallineati (nomi nuovi sulle maglie riassegnate: sono corretti; `players.json`
+  uguale al database); **foto** di 29 giocatori (ritaglio sul viso in `resources/players/viso/`) e
+  dei 3 allenatori (`resources/coaches/`); Albo d'oro con la classifica giocatori presa solo
+  dall'archivio (non dipende dalla stagione nuova).
+- Account di prova tolti dall'app (accessi ancora in Console), regole "Civi in porta" spente.
+**Da fare**: la coda della sessione del 25/10 e i controlli a ridosso delle partite (dopo il
+calcolo della G1; prima del calcolo della G2 riprovare la "formazione precedente") sono in cima a
+`docs/PUNTI_APERTI.md`. Copie di sicurezza del 24/10: `backups-firestore/` (locale, con email) e
+`config/backup-*-20261024` nel database (senza dati personali).
 **Sessioni dedicate in coda** (decisione dell'utente): **velocità** (unire i file di
 codice, Firebase modulare, squadre con una sola richiesta, sfarfallio del banner D063,
 foto Guarducci in JPG) e poi **notifiche push** (piano Firebase da decidere).

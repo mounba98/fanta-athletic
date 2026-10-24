@@ -1,4 +1,4 @@
-Allineato a: D125
+Allineato a: D127
 
 # Checklist di ogni aggiornamento — cosa deve seguire una modifica
 
@@ -21,6 +21,7 @@ Niente deve restare indietro. Il collegamento è esplicito in due modi:
 | modifica un **file condiviso** in `resources/` (.js/.css) | nuova etichetta `?v=` in **tutte** le pagine che lo usano (il service worker tiene i file etichettati) | sì: file cambiato senza etichetta nuova; etichette diverse tra pagine |
 | tocca **Firebase** (regole, indici, struttura dati) | `firestore.rules` + `docs/FIREBASE_ALLINEAMENTO.md` prima; l'utente pubblica in Console | no: da ricordare |
 | cambia **parole** (lega, stagione, competizione…) | `docs/GLOSSARIO_LEGHE.md` e la memoria di Claude | no: da ricordare |
+| aggiunge o cambia **immagini** (foto giocatori/allenatori, icone) | file **nuovo** o etichetta `?v=` nell'indirizzo: il service worker tiene le immagini nel magazzino del telefono e non le riscarica se l'indirizzo è lo stesso (D125, D127). Foto: 450 px, e per i riquadri piccoli il ritaglio sul viso (`resources/players/viso/`, 160 px); `image_url` nel database solo **dopo** la pubblicazione | no: da ricordare |
 | cambia qualcosa di **visivo** | prova su telefono e computer, tema chiaro e scuro; caselle con il bordo oro `var(--tile-border)` (`resources/ui-kit.css`) | no: da verificare a occhio |
 | cambia una **regola di gioco** o una funzione raccontata ai giocatori | anche la presentazione `docs/presentazioni/asta-2026-27.html` (e il PDF, che crea Iacopo: comando in `docs/presentazioni/LEGGIMI.md`) | no: da ricordare |
 | cambia i **backup** o i documenti fuori dal progetto | `~/Claude/fanta-athletic-backups/LEGGIMI.md` | no: da ricordare |

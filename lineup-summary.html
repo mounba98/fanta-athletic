@@ -2077,7 +2077,8 @@
       const placeholderPath = '/assets/player-placeholder.svg';
       
       // Usa placeholder se non c'è photoUrl valido (deve contenere token=)
-      const photo = photoUrl && photoUrl.includes('token=')
+      // vale anche la foto come file dell'app (resources/players/…, D127)
+      const photo = photoUrl && (photoUrl.includes('token=') || /^(\/|resources\/)/.test(photoUrl))
         ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(label)}" onerror="this.src='${placeholderPath}'" />` 
         : `<img src="${placeholderPath}" alt="${escapeHtml(label)}" />`;
       
@@ -2410,11 +2411,11 @@
   </script>
 
   <script src="resources/feature-flags.js?v=20260920-final"></script>
-  <script src="resources/player-photo-loader.js?v=20260920-final"></script>
+  <script src="resources/player-photo-loader.js?v=20261024"></script>
   <script src="resources/app-init.js?v=20260925m"></script>
   <script src="resources/mobile-menu.js?v=20261024b"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20261024b"></script>
+  <script src="resources/faction.js?v=20261024c"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20261024b"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>

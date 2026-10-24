@@ -177,7 +177,8 @@
       sub = (pos ? esc(pos) + ' · ' : '') + (dl && dl > new Date() ? 'La sua formazione si vede da ' + dl.toLocaleString('it-IT', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'Tocca per vedere le due formazioni');
     }
     el.hidden = false;
-    el.innerHTML = '<div class="hd-row"><span class="hd-k">La mia sfida · ' + gNum(g) + 'ª giornata</span><span class="hd-pill">' + esc(pill) + '</span></div>' +
+    el.innerHTML = '<span class="fa-new" data-new-until="2026-11-07">New</span>' +
+      '<div class="hd-row"><span class="hd-k">La mia sfida · ' + gNum(g) + 'ª giornata</span><span class="hd-pill">' + esc(pill) + '</span></div>' +
       '<div class="hd-vs"><span>' + esc(name(me)) + '</span>' + mid + '<span>' + esc(name(opp)) + '</span></div>' +
       '<div class="hd-sub">' + sub + '</div>';
   }
@@ -209,15 +210,17 @@
       const cc = Object.assign({}, c, lc && lc.exists ? lc.data() : {});
       coachName = cc.nome || cc.name || cid;
       photo = cc.photo_url || cc.photoUrl || cc.photo || cc.image_url || '';
-      if (!photo && /tommy/i.test(coachName)) photo = 'resources/tommy_guardu.png';
-      if (!photo && /trendiu/i.test(coachName)) photo = 'resources/trendiu_athletic.jpg';
-      if (!photo && /mario/i.test(coachName)) photo = 'resources/mario_athletic.jpg';
+      if (!photo && /tommy/i.test(coachName)) photo = 'resources/coaches/T1.jpg';
+      if (!photo && /trendiu/i.test(coachName)) photo = 'resources/coaches/T2.jpg';
+      if (!photo && /mario/i.test(coachName)) photo = 'resources/coaches/T3.jpg';
     }
     const fz = FACTIONS[t.fazione] || FACTIONS[core.u.fazione] || '';
     extra.textContent = [coachName ? 'All. ' + coachName : '', fz].filter(Boolean).join(' · ');
     if (photo) $('hdTeamFace').innerHTML = '<img src="' + esc(photo) + '" alt="' + esc(coachName) + '">';
     // posizione e punti dalle giornate calcolate
-    if (!core.computed.length) { stats.innerHTML = '<b>—</b><small>stagione non iniziata</small>'; return; }
+    const both = !!(core.S && core.S.modalita === 'entrambe' && window.H2H);
+    const label = both ? '<span class="k">Classica</span>' : '';
+    if (!core.computed.length) { stats.innerHTML = label + '<b>—</b><small>stagione non iniziata</small>'; if (both) renderRanks(core, null); return; }
     const tot = {}; let lastPts = null;
     const lastG = core.computed[core.computed.length - 1];
     const snaps = await Promise.all(core.computed.map(g => safe(core.L.collection('results').doc(g).collection('teams').get(), null)));
@@ -228,7 +231,35 @@
     }));
     const order = Object.keys(tot).sort((a, b) => tot[b] - tot[a]);
     const pos = order.indexOf(String(core.idx)) + 1;
-    stats.innerHTML = '<b>' + (pos ? pos + 'º' : '—') + '</b><small>' + fmt(tot[String(core.idx)] || 0) + ' pt' + (lastPts !== null ? ' · ' + lastG + ' ' + (lastPts >= 0 ? '+' : '') + fmt(lastPts) : '') + '</small>';
+    stats.innerHTML = label + '<b>' + (pos ? pos + 'º' : '—') + '</b><small>' + fmt(tot[String(core.idx)] || 0) + ' pt' + (lastPts !== null ? ' · ' + lastG + ' ' + (lastPts >= 0 ? '+' : '') + fmt(lastPts) : '') + '</small>';
+    if (both) renderRanks(core, tot);
+  }
+
+  // Scontri diretti e Supremo della mia squadra (D126): stessi criteri di Classifiche
+  // (Supremo = posizione classica + posizione scontri, parità = stessa posizione).
+  async function renderRanks(core, tot) {
+    const el = $('hdTeamRanks');
+    const me = String(core.idx);
+    const chip = (href, k, v) => '<a href="' + href + '" onclick="event.stopPropagation()"><span>' + k + '</span><b>' + v + '</b></a>';
+    const res = tot ? await safe(core.L.collection('h2h_results').doc(core.S.h2h.key).collection('giornate').get(), null) : null;
+    const days = res ? res.docs.map(d => d.data() || {}).filter(d => (d.matches || []).some(m => m.scoreHome != null)) : [];
+    if (!tot || !days.length) {
+      el.innerHTML = chip('classifiche.html#h2h', 'Scontri', '—') + chip('classifiche.html#supremo', 'Supremo', '—');
+      el.hidden = false; return;
+    }
+    const ids = Object.keys(core.teams);
+    const h = window.H2H.standings(days, core.S.h2h);
+    const same = (a, b) => a.pts === b.pts && (a.gf - a.gs) === (b.gf - b.gs) && a.gf === b.gf;
+    const posH = {}; h.forEach((r, i) => { posH[String(r.team)] = i && same(r, h[i - 1]) ? posH[String(h[i - 1].team)] : i + 1; });
+    const unplayed = h.length + 1;
+    const cl = ids.map(id => ({ id, t: tot[id] || 0 })).sort((a, b) => b.t - a.t);
+    const posC = {}; cl.forEach((r, i) => { posC[r.id] = i && r.t === cl[i - 1].t ? posC[cl[i - 1].id] : i + 1; });
+    const sup = ids.map(id => ({ id, s: posC[id] + (posH[id] || unplayed), c: posC[id] })).sort((a, b) => a.s - b.s || a.c - b.c);
+    const posS = {}; sup.forEach((r, i) => { posS[r.id] = i && r.s === sup[i - 1].s && r.c === sup[i - 1].c ? posS[sup[i - 1].id] : i + 1; });
+    const mine = h.find(r => String(r.team) === me);
+    el.innerHTML = chip('classifiche.html#h2h', 'Scontri', (posH[me] ? posH[me] + 'º' : '—') + (mine ? ' · ' + fmt(mine.pts) + ' pt' : '')) +
+      chip('classifiche.html#supremo', 'Supremo', posS[me] ? posS[me] + 'º' : '—');
+    el.hidden = false;
   }
 
   async function renderBoard() {

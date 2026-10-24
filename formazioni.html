@@ -2381,13 +2381,13 @@
       let coachPhoto = selectedCoach ? (selectedCoach.photo_url || selectedCoach.photoUrl || selectedCoach.photo || selectedCoach.image_url || selectedCoach.imageUrl || '') : '';
       // Fallback per Tommy e Trendiu: usa immagine locale se disponibile
       if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Tommy' || selectedCoach.coach_id === 'tommy' || selectedCoach.coach_id?.toLowerCase() === 'tommy')) {
-        coachPhoto = 'resources/tommy_guardu.png';
+        coachPhoto = 'resources/coaches/T1.jpg';
       }
       if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Trendiu' || selectedCoach.coach_id === 'trendiu' || selectedCoach.coach_id?.toLowerCase() === 'trendiu')) {
-        coachPhoto = 'resources/trendiu_athletic.jpg';
+        coachPhoto = 'resources/coaches/T2.jpg';
       }
       if (!coachPhoto && selectedCoach && (selectedCoach.nome === 'Mario' || selectedCoach.coach_id?.toLowerCase() === 'mario')) {
-        coachPhoto = 'resources/mario_athletic.jpg';
+        coachPhoto = 'resources/coaches/T3.jpg';
       }
       // Coach slot mini vicino al capitano (desktop e mobile)
       const updateCoachSlot = (slotId) => {
@@ -3221,7 +3221,7 @@
   </script>
   <script src="resources/mobile-menu.js?v=20261024b"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20261024b"></script>
+  <script src="resources/faction.js?v=20261024c"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20261024b"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>

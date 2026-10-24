@@ -628,6 +628,7 @@
     .hd-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
     /* La mia sfida (D124): stesso stacco di 10px degli altri riquadri, poi come la griglia sopra */
     .hd-grid2 + #hdSfida { margin-top: 10px; margin-bottom: 4px; }
+    #hdSfida { position: relative; }
     .hd-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 10px; }
     .hd-grid4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin-bottom: 10px; }
     .hd-tile { display: block; border-radius: 16px; padding: 12px 14px; text-decoration: none; background: var(--card); color: var(--text); box-shadow: var(--shadow); border: 1px solid transparent; }
@@ -656,6 +657,14 @@
     .hd-team-stats { text-align: right; flex: none; }
     .hd-team-stats b { display: block; font-size: 24px; font-weight: 800; }
     .hd-team-stats small { font-size: 11px; opacity: .9; }
+    .hd-team-stats .k { display: block; font-size: 11px; opacity: .85; }
+    /* Scontri e Supremo sotto la squadra (D126), solo con le due modalità insieme */
+    .hd-team { flex-wrap: wrap; }
+    .hd-team-ranks { flex: 1 1 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .hd-team-ranks[hidden] { display: none; }
+    .hd-team-ranks a { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.12); color: #fff; text-decoration: none; font-size: 12px; }
+    .hd-team-ranks a span { opacity: .9; }
+    .hd-team-ranks a b { font-size: 15px; font-weight: 800; white-space: nowrap; }
     .hd-banner { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 16px; margin: 4px 0 6px; background: linear-gradient(135deg,#920100,#0c0f6d); color: #fff; text-decoration: none; box-shadow: var(--shadow); }
     .hd-banner span { font-size: 13px; opacity: .92; }
     .hd-banner.soft { background: var(--card); color: var(--text); flex-direction: column; align-items: flex-start; gap: 2px; }
@@ -693,6 +702,7 @@
         <div id="hdTeamExtra" class="hd-team-extra"></div>
       </div>
       <div id="hdTeamStats" class="hd-team-stats"></div>
+      <div id="hdTeamRanks" class="hd-team-ranks" hidden></div>
     </div>
     <div class="hd-grid3">
       <a class="hd-mini" href="classifiche.html"><img src="resources/icons/classifica.png" alt="" aria-hidden="true"><span>Classifica</span></a>
@@ -803,11 +813,11 @@
   <script src="resources/season-archive.js?v=20260925b"></script>
   <script src="resources/athletic-stats.js?v=20260925"></script>
   <script src="resources/lineup-deadline.js?v=20261024"></script>
-  <script src="resources/home-dashboard.js?v=20261024c"></script>
+  <script src="resources/home-dashboard.js?v=20261024f"></script>
   <script src="resources/news.js?v=20260926b"></script>
   <script>FANews.homeCard(document.getElementById('hdNews')); FANews.popup();</script>
   <script src="resources/provisional-badge.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20261024b"></script>
+  <script src="resources/faction.js?v=20261024c"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20261024b"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>

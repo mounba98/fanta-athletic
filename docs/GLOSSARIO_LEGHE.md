@@ -1,4 +1,4 @@
-Allineato a: D125
+Allineato a: D127
 
 # Lega, stagione, competizioni — le parole giuste (per il multilega futuro)
 
@@ -11,6 +11,7 @@ documenti: usare sempre queste parole, con questo significato.
 LEGA            Fanta Athletic                     chi gioca insieme
  └─ STAGIONE    2026/27 (in corso) · 2025/26 (archiviata)    quando
      ├─ COMPETIZIONI   Campionato · Scontri diretti · Coppa    tornei tra le squadre del fanta
+     │    └─ Supremo   classifica che somma i piazzamenti di Campionato e Scontri (D124)
      ├─ GIOCHI COLLATERALI   Curva vs Piana    tra le tifoserie, con i voti dei singoli utenti
      └─ GIORNATE   G1, G2, …                    ogni partita dell'Athletic
 ```
@@ -39,7 +40,8 @@ esiste nel codice ma è spenta.
 
 1. **Tutto ciò che appartiene a una lega sta sotto `leagues/{idLega}/…`.** Niente dati di gioco in raccolte "globali".
 2. **Ciò che appartiene a una stagione porta la chiave della stagione** (come già `h2h_*/{chiaveStagione}` e l'archivio) oppure viene azzerato/archiviato con la stagione.
-3. Nell'interfaccia: "Lega" = il gruppo; "Stagione" = l'anno; "Competizione" = il torneo tra le squadre; "Gioco collaterale" = Curva vs Piana e simili. Non usare "Campionato" per dire "lega" né "Stagione" per dire "competizione".
+3. **Supremo** (D124) non è una competizione a sé: è la classifica che somma la posizione nel Campionato e negli Scontri diretti (vince il numero più basso), esiste solo con la modalità "Entrambe". **Giornata** (D125) è anche il nome della pagina `sfida.html`, al centro della barra in basso: la giornata in corso vista dalla propria sfida.
+4. Nell'interfaccia: "Lega" = il gruppo; "Stagione" = l'anno; "Competizione" = il torneo tra le squadre; "Gioco collaterale" = Curva vs Piana e simili. Non usare "Campionato" per dire "lega" né "Stagione" per dire "competizione".
 
 ## Debiti da saldare prima di attivare davvero il multilega
 

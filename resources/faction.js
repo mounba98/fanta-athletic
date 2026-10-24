@@ -145,9 +145,9 @@
     const p = c.photo_url || c.photoUrl || c.photo || c.image_url || c.imageUrl || '';
     if (p) return p;
     const n = String(c.nome || c.name || '').toLowerCase(), id = String(c.coach_id || '').toLowerCase();
-    if (n === 'tommy' || id === 'tommy') return 'resources/tommy_guardu.png';
-    if (n === 'trendiu' || id === 'trendiu') return 'resources/trendiu_athletic.jpg';
-    if (n === 'mario' || id === 'mario') return 'resources/mario_athletic.jpg';
+    if (n === 'tommy' || id === 'tommy') return 'resources/coaches/T1.jpg';
+    if (n === 'trendiu' || id === 'trendiu') return 'resources/coaches/T2.jpg';
+    if (n === 'mario' || id === 'mario') return 'resources/coaches/T3.jpg';
     return '';
   }
 

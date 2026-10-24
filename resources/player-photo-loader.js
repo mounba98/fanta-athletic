@@ -200,8 +200,17 @@
     img.src = url || '/assets/player-placeholder.svg';
   }
 
+  // Foto come file dell'app (D127: resources/players/{id}.jpg) o indirizzo completo:
+  // si usa così com'è, senza passare dallo Storage di Firebase
+  function directUrl(hint){
+    const h = String(hint || '').trim();
+    return /^(https?:\/\/|\/|resources\/)/.test(h) ? h : null;
+  }
+
   async function getPlayerPhotoURL(playerId, leagueId = null, hintOverride = null){
     if (!playerId) return null;
+    const direct = directUrl(hintOverride);
+    if (direct) return direct;
 
     if (!window.firebase || !window.firebase.storage) {
       console.warn('[player-photo-loader] Firebase Storage non disponibile');

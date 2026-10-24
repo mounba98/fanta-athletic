@@ -1,6 +1,6 @@
 # Firebase ↔ locale: cosa vive dove e come si tiene allineato
 
-Allineato a: D125
+Allineato a: D127
 
 **Regola (decisa dall'utente il 24/09/2026)**: tutto ciò che si fa su
 Firebase deve avere la sua copia in questo progetto. Si scrive PRIMA qui,
@@ -14,11 +14,12 @@ va riportato qui subito.
 | Regole di sicurezza Firestore | Console → Firestore → Regole | `firestore.rules` | **allineato**: pubblicate dall'utente il 25/09/2026 sera (scelta allenatore + `coachLocked`, D108) |
 | Indici Firestore | Console → Firestore → Indici | *(manca; copia storica nov. 2025 in `docs/firebase-storico/`)* | da esportare; noto 1: `notifications` (userId ↑ + createdAt ↓, D037) |
 | Catalogo bonus/malus | `leagues/{lega}/rules` | `resources/rules.json` (seme per leghe nuove) | allineato al seme; le leghe esistenti si modificano da `admin-rules.html` |
-| Giocatori / allenatori | `leagues/{lega}/players`, `coaches` | `resources/players.json`, `coaches.json` | seme locale. Campo `fuori_rosa: true` (D121): giocatore fermo, escluso dalle rose ma conservato |
-| Calendario Athletic | `athletic_calendar` | *(solo online)* | fonte partite del contest; **vuoto dal 25/09/2026** (azzeramento D096), lo ricompilano gli admin |
+| Giocatori / allenatori | `leagues/{lega}/players`, `coaches` | `resources/players.json`, `coaches.json` | **`players.json` uguale al database dal 24/10** (D123: nomi nuovi sulle maglie riassegnate, 32 giocatori). Campo `fuori_rosa: true` (D121). Foto (D127): `image_url` = `resources/players/viso/{id}.jpg` (ritaglio 160 px; la foto intera 450 px è in `resources/players/{id}.jpg`); allenatori in `resources/coaches/T1-T3.jpg` |
+| Calendario Athletic | `athletic_calendar` | *(solo online)* | fonte partite del contest e della chiusura formazioni; al 24/10 G1–G4, lo aggiornano a mano gli admin (D123, niente Tuttocampo) |
+| Calendario scontri diretti | `leagues/{lega}/h2h_schedule/2026-27/giornate/G1…G30` | *(solo online; si rigenera da Calendario)* | generato il 24/10 (D124): 16 squadre, G1–G15 andata, G16–G20 ritorno parziale, G21–G30 riserva per playoff |
 | Configurazione Hosting | — | `firebase.json` + `.firebaserc` (ricreati D101) | cosa si pubblica e cosa no, cache (D120: anche l'indirizzo principale `/` senza cache, prima restava fino a 1 ora; D122: anche i file `.json`, es. le Novità) |
-| Regole Storage | Console → Storage → Regole | *(copia storica nov. 2025 in `docs/firebase-storico/`, da confrontare)* | non collegate a `firebase.json` |
-| Hosting (i file del sito) | Firebase Hosting (pubblicato 25/09/2026 09:11, commit `9e3b8fd`, D106) | questa cartella | **allineato** al commit `9e3b8fd`; si ripubblica solo su conferma (D106) |
+| Regole Storage | Console → Storage → Regole | *(copia storica nov. 2025 in `docs/firebase-storico/`, da confrontare)* | non collegate a `firebase.json`; **il 24/10 caricare in `players/{lega}/` è bloccato anche all'admin** (D123): per questo le foto stanno nei file dell'app |
+| Hosting (i file del sito) | Firebase Hosting (ultima pubblicazione 24/10/2026, D125–D127) | questa cartella | si ripubblica solo su conferma; ogni pubblicazione è segnata nel DECISION_LOG con il suo commit |
 | Dati utenti (email, nomi) | `users` | *non si copia* | dati personali: restano solo su Firebase |
 
 ## Struttura dati aggiunta per Curva Morello vs Piana (D069–D074)
@@ -34,7 +35,9 @@ va riportato qui subito.
 - `leagues/{lega}/rules/{id}`: campi nuovi `ambito` (`squadra`|`fazione`, assente = globale) e `fazione` (`comune`|`curva`|`piana`) — D080.
 - `leagues/{lega}/days/{g}` e `matchday_temp/{g}`: nella mappa `curva` chiavi nuove `tm:<squadra>:<regola>` (bonus per squadra) e `fz:<fazione>:<regola>` (evento di fazione).
 - `leagues/{lega}/results/{g}`: campo `faction_bonus` (`curva`/`piana` → `squadre`, `eventi`, `total`); `results/{g}/teams/{n}`: `breakdown.fazione` e `faction`.
-- `leagues/{lega}/config/season`: parametri della stagione (D087) — nome, stato, modalità, scontri diretti, mini-gioco. Nessuna regola nuova (percorso già coperto).
+- `leagues/{lega}/config/season`: parametri della stagione (D087) — nome, stato, modalità, scontri diretti, mini-gioco. Nessuna regola nuova (percorso già coperto). Dal 24/10 (D124): `modalita: entrambe`, `numGiornate: 20`, `h2h.conversione: diretta`, `h2h.scartoPareggio: 2`, `formazioneMancante: { usaPrecedente: true, malus: -1 }`.
+- `leagues/{lega}/results/{G}/teams/{n}` (D124): `lineupFrom` (giornata della formazione usata se non consegnata) e `breakdown.malusFormazione`.
+- Copie di sicurezza nel database del 24/10: `config/backup-squadre-20261024` (D122, senza email), `config/backup-giocatori-20261024` (D123, prima del riallineamento dei nomi), `config/backup-foto-giocatori-20261024` (D127, campi foto prima delle foto nuove). Da cancellare quando non servono più.
 - `leagues/{lega}/archive/{stagione}` + `/items/{id}`: archivio stagioni (D087), `{kind, path, data}` per ogni documento copiato. **Regola nuova in `firestore.rules`.**
 - `leagues/{lega}/h2h_results/{chiave}/giornate/{G}`: ora anche `pointsHome/Away`, `esito`, `ptsHome/Away`, `regole` (quando la modalità scontri è attiva).
 - `leagues/{lega}/live/{G}`: stato della Partita live (`aperta`/`provvisorio`/`definitivo`), `agreed`, `disputes`, `resolutions`, `corrections`, `deadline`, `sheetsUsed`, `final` (D093). **Regola nuova in `firestore.rules`.**
