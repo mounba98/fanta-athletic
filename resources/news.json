@@ -3,6 +3,22 @@
   "allineato": "D122",
   "news": [
     {
+      "id": "2026-10-24-app",
+      "date": "2026-10-24",
+      "audience": "all",
+      "icon": "⏰",
+      "title": "Rose online e formazioni",
+      "intro": "Si parte con la stagione 2026/27!",
+      "items": [
+        "Le <b>rose dell'asta</b> sono nell'app: le trovi in Squadre e in Formazioni.",
+        "Non vedi la tua squadra? Sceglila dall'elenco quando l'app te lo chiede (o dalla Home), oppure aspetta: gli admin stanno ricollegando tutti.",
+        "Le formazioni si chiudono da sole <b>1 ora prima della partita</b> dell'Athletic. In Formazioni, sopra il campo, trovi scritto fino a quando puoi schierare.",
+        "Vale anche per la pagina <b>Squadre</b>: prima lì c'era un orario fisso il lunedì sera, uguale per ogni settimana."
+      ],
+      "link": "formazioni.html",
+      "linkLabel": "Vai alle formazioni"
+    },
+    {
       "id": "2026-10-24-admin",
       "date": "2026-10-24",
       "audience": "admin",
@@ -13,7 +29,7 @@
         "<b>Regole</b> e <b>Giocatori</b>: dal telefono ogni regola e ogni giocatore è una scheda, con tutti i comandi a portata di dito (dal computer resta la tabella).",
         "<b>Calendario Athletic</b> (Stagione): stessa grafica del resto dell'app, anche in tema scuro.",
         "Margini uguali in tutte le pagine, niente più pagine rimpicciolite.",
-        "<b>Scadenze formazioni</b>: sistemati i pulsanti che mostravano \"???\" al posto delle scritte.",
+        "<b>Scadenze formazioni</b>: non serve più impostarle a mano. Le formazioni si chiudono da sole 1 ora prima della partita del Calendario Athletic: inserite ogni partita con giornata, data e ora. Una scadenza impostata a mano vale al posto di quella automatica. Sistemati anche i pulsanti che mostravano \"???\".",
         "Le <b>Novità</b> come questa ora si aggiornano anche sul telefono (prima restavano ferme alle prime scaricate)."
       ],
       "link": "admin-rules.html",

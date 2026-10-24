@@ -902,6 +902,7 @@
   <script src="resources/firebase-storage-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
+  <script src="resources/lineup-deadline.js?v=20261024"></script>
   <script src="resources/toast.js?v=20260920-final"></script>
   <script src="resources/team-invite-system.js"></script>
   <script>
@@ -1296,6 +1297,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
     }
 
     const state = {
+      deadlineTime: null, // scadenza formazioni della giornata (D122, resources/lineup-deadline.js)
       players: [],
       coaches: [],
       teams: [], // 19 elements
@@ -1573,28 +1575,30 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
       });
     }
 
-    function mondayWindow(now){
-      // returns [startLock, endLock) for current week: Mon 20:30 .. Wed 00:30
-      const d = new Date(now);
-      const day = d.getDay(); // 0 Sun .. 6 Sat
-      // get current week Monday 20:30
-      const curMon = new Date(d);
-      const diffToMon = (day + 6) % 7; // days since Monday
-      curMon.setDate(d.getDate() - diffToMon);
-      curMon.setHours(20,30,0,0);
-      // End: Wednesday 00:30 of the same week (Mon + 2 days at 00:30)
-      const wed0030 = new Date(curMon);
-      wed0030.setDate(curMon.getDate()+2);
-      wed0030.setHours(0,30,0,0);
-      return [curMon, wed0030];
+    // Scadenza formazioni (D122): la stessa di Formazioni. Prima qui c'era una
+    // finestra fissa lunedì 20:30 → mercoledì 00:30, qualunque fosse il giorno
+    // della partita. Ora: scadenza manuale degli admin, altrimenti orario della
+    // partita nel Calendario Athletic meno 1 ora.
+    async function loadDeadline(){
+      state.deadlineTime = null;
+      try{
+        const giornataNum = parseInt(String(state.giornata).replace('G',''), 10);
+        const leagueId = await getLeagueIdOrNotify('caricare la scadenza delle formazioni', { notify: false });
+        const ref = leagueId ? getLeagueDoc('deadlines', `giornata_${giornataNum}`, leagueId) : null;
+        const doc = ref ? await ref.get() : null;
+        if (doc && doc.exists && doc.data().deadline){
+          state.deadlineTime = doc.data().deadline.toDate();
+        } else if (window.FALineupDeadline) {
+          const c = await FALineupDeadline.fromCalendar(giornataNum);
+          if (c) state.deadlineTime = c.deadline;
+        }
+      }catch(e){ console.warn('[squadre] scadenza formazioni non letta', e && (e.code || e.message)); }
     }
     function isLockedAuto(){
-      const now = new Date();
-      // Weekly lock window: Mon 20:30 -> Wed 00:30
-      const [start, end] = mondayWindow(now);
-      return now >= start && now < end;
+      return !!(state.deadlineTime && new Date() >= state.deadlineTime);
     }
     async function updateDaysComputed(){
+      await loadDeadline(); // sempre insieme: chi cambia giornata chiama questa funzione
       // Reads days/{giornata}.computed from Firestore; fallback false
       try{
         if (window.db){
@@ -1701,7 +1705,9 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
       const teamSelMobile = document.getElementById('teamSelMobile');
       const updateTeamSelector = (sel) => {
         if (!sel) return;
+        const anyKnown = state.teams.some(t => t.exists === true);
         sel.innerHTML = state.teams.map((t, idx) => {
+          if (anyKnown && t.exists === false) return '';
           const name = t.name || `Squadra ${idx + 1}`;
           return `<option value="${idx}">${escapeHtml(name)}</option>`;
         }).join('');
@@ -1743,9 +1749,10 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
       const locked = isLockedAuto();
       const final = state.daysComputed && !state.isAdmin; // admin bypassa
       ls.dataset.locked = (locked||final)? '1':'0';
-      const [start,end] = mondayWindow(new Date());
+      const when = state.deadlineTime ? state.deadlineTime.toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
       if (final) ls.textContent = `Giornata ${state.giornata} calcolata: modifiche disabilitate`;
-      else ls.textContent = locked ? `Formazioni bloccate fino a ${end.toLocaleString()}` : `Si bloccano da ${start.toLocaleString()} a ${end.toLocaleString()}`;
+      else if (!state.deadlineTime) ls.textContent = 'Formazioni aperte';
+      else ls.textContent = locked ? `Formazioni chiuse (${when})` : `Formazioni aperte fino a ${when}`;
     }
 
     // LocalStorage fallback disabilitato per evitare divergenze tra finestre
@@ -1804,6 +1811,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
         state.teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null, stats: {} }));
       } else {
         state.teams = state.teams.map((team, idx) => ({
+          exists: team.exists,
           name: team.name || `Squadra ${idx + 1}`,
           coach_ids: Array.isArray(team.coach_ids) ? team.coach_ids : [],
           roster: Array.isArray(team.roster) ? team.roster : [],
@@ -1853,6 +1861,8 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
         });
         const docs = await Promise.all(tasks);
         docs.forEach((doc, i)=>{
+          // Posti senza squadra nel database (la lega ne ha meno di 19): nascosti dal menu (D122)
+          if (state.teams[i] && doc) state.teams[i].exists = !!doc.exists;
           if (doc && doc.exists){
             const d = doc.data();
             const t = state.teams[i];
@@ -2030,6 +2040,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
         if (name.toLowerCase() === 'squadra 19') {
           return '';
         }
+        if (t.exists === false && state.teams.some(x => x.exists === true)) return ''; // posti vuoti (D122)
         const starters = (t.lineup||[]).filter(Boolean);
         const hasFormation = starters.length>=5;
         const logo = getTeamLogo(idx);
@@ -2741,8 +2752,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
         if (!canWrite) {
           const locked = isLockedAuto();
           if (locked && !state.isAdmin){
-            const [,end] = mondayWindow(new Date());
-            toast(`Formazioni bloccate fino a ${end.toLocaleString()}`);
+            toast('Formazioni chiuse per questa giornata');
           } else if (!(state.user && state.userTeamIdx===state.selectedTeamIdx) && !state.isAdmin){
             toast('Non puoi salvare la formazione di un\'altra squadra');
           } else {
@@ -2782,7 +2792,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
       // Mobile: populate team selector and confirm button
       const sel = document.getElementById('teamSelectMobile');
       if (sel){
-        sel.innerHTML = state.teams.map((tm,idx)=>`<option value="${idx}">${tm.name||('Squadra '+(idx+1))}</option>`).join('');
+        sel.innerHTML = state.teams.map((tm,idx)=> (state.teams.some(t => t.exists === true) && tm.exists === false) ? '' : `<option value="${idx}">${tm.name||('Squadra '+(idx+1))}</option>`).join(''); // posti vuoti nascosti (D122)
         sel.value = String(state.selectedTeamIdx);
         sel.onchange = ()=>{ state.selectedTeamIdx = Number(sel.value); state.mobilePick = null; renderEditor(); };
       }

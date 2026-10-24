@@ -26,7 +26,7 @@ nomi di classe generici che vanno in conflitto.
 | `auth.html` | Login e registrazione |
 | `bacheca.html` | Bacheca della lega, con due schede: **Messaggi** (post della community) e **Novità app** (`#novita`: comunicati sugli aggiornamenti da `resources/news.json`, D116) |
 | `squadre.html` | Gestione della propria squadra |
-| `formazioni.html` | Composizione della formazione da schierare |
+| `formazioni.html` | Composizione della formazione da schierare (si chiude da sola 1 ora prima della partita del Calendario Athletic, regola in `resources/lineup-deadline.js`, D122) |
 | `lineup-summary.html` | Riepilogo dettagliato di una formazione schierata |
 | `classifiche.html` | Classifica generale e per giornata |
 | `matchday.html` | Inserimento/calcolo risultati di una giornata (uso principalmente admin, ma non protetta da login) |
@@ -78,7 +78,7 @@ nomi di classe generici che vanno in conflitto.
 | `admin-fazioni.html` | Fazione delle squadre e nomi reali dei giocatori (D073) |
 | `guida-admin.html` | Guida per gli admin dentro l'app, solo admin (Pannello › 📖 Guida). È la fonte del PDF: `scripts/guida-admin-pdf.py` (D115) |
 | `admin-calendario.html` | Gestione calendario reale Athletic (grafica riallineata al tema, D122) |
-| `admin-deadline.html` | Gestione scadenze/deadline formazioni |
+| `admin-deadline.html` | Scadenze formazioni impostate a mano (valgono al posto di quella automatica, D122) |
 | `admin-cards-manager.html` | Gestione card mostrate in home |
 | `admin-store.html` | Gestione prodotti dello store |
 | `admin-debug.html` | Pannello di debug/monitoraggio permanente |

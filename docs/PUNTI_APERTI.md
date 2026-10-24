@@ -43,7 +43,8 @@ Allineato a: D122
 - [ ] **Prima giornata vera con la Partita live**: salvare il risultato prima di pubblicare e controllare che l'Imbattibilità arrivi ai giocatori (provata solo con risultati finti). Controllare anche che i fogli di prova di mounba e marta si siano svuotati alla loro riapertura.
 - [ ] **Novità sul telefono (D122)**: dopo la prossima pubblicazione, verificare su iPhone e Android che Bacheca › Novità app mostri anche quella del 24/10 (prima il magazzino dell'app teneva ferma la prima copia di `news.json`).
 - [ ] **Pannello dal telefono (D122)**: Regole e Giocatori a schede, Calendario admin rinnovato, margini uguali ovunque: guardarli sul telefono vero dopo la pubblicazione.
-- [ ] **Revisione efficienza e velocità dell'app** (richiesta dell'utente 24/10, D122): da fare dopo l'avvio della stagione, prima dell'ultimo commit+push del giro. Riprende D063/D066 (bundle JS/CSS, Firebase modulare, sfarfallio del banner).
+- [x] **Revisione velocità (24/10, D122)**: misurata; alleggerite le immagini (icone a 128 px, foto Trendiu a 450 px: comando lanciato dall'utente).
+- [ ] **Velocità, interventi grossi (sessione dedicata, D122)**: unire i ~30 file di codice di ogni pagina in pochi pacchetti, Firebase modulare, squadre lette con una sola richiesta (oggi 19 in Formazioni/Squadre, più 19 per le formazioni salvate), sfarfallio del banner (D063); foto `tommy_guardu.png` (306 KB) da convertire in JPG (cambia il nome del file in 3 punti del codice).
 - [ ] Etichette "New" scadono il **30/10**: dopo, toglierle dal codice (`index.html`, `admin.html`; lo segnala `check-coerenza.py`).
 
 **Piccole cose notate il 23/10, non urgenti (D121):**
@@ -62,25 +63,31 @@ Allineato a: D122
 - [x] Regole doppie R098/R099: al 23/10 ce n'è una sola per codice (sistemate dagli admin); R099 rimessa "Giocatore" (D121).
 - [ ] Bacheca: provare in una lega di prova (di Mocci) che si vedano solo i suoi messaggi (D120; nella lega vera i 3 storici ci sono ancora, verificato).
 - [x] PDF della guida admin rifatto (23/10, D121).
-- [ ] Fazioni delle 18 squadre: **7 su 18** ce l'hanno (23/10); le altre le sceglieranno i giocatori o gli admin da `admin-fazioni.html`.
-- [ ] **Stagione 2026/27** (al 23/10: "in preparazione", modalità classica, 18 squadre, 4 partite nel Calendario Athletic, nessuna rosa): gli admin finiscono dal percorso guidato (`admin-stagione.html#percorso`): rose dopo l'asta (la pagina Asta **non** riempie le rose: si fanno da Squadre), resto del calendario, fazioni, stato "In corso".
+- [ ] Fazioni delle **16** squadre (D122): le hanno le 6 che continuano con le stesse persone (Fanta Dirigenti, Curva gonfi, Shœrty Team, Gli ArraPATO, Minis Blortzos; Pettegole no); le nuove la scelgono i giocatori al primo accesso o gli admin da `admin-fazioni.html`.
+- [x] **Stagione 2026/27 avviata** (24/10, D122): rose inserite, 16 squadre, stato "In corso". Restano il calendario completo e il ricollegamento degli utenti (sotto).
 - [x] Giocatore senza nome (id `c4fyWntWj1mTj4fekijO`): sistemato dagli admin, ora è Guglielmo Cesari (verificato il 23/10, D121).
 - [ ] Dire agli admin: la "sconfitta a tavolino" degli scontri diretti ora funziona davvero (prima falliva sempre, D095).
 
 **Da decidere con gli admin:**
+- [ ] **Messaggio sul gruppo (admin, D122)**: per ogni squadra il nome e tutti i partecipanti, ciascuno con l'**email con cui entra nell'app** (più email possono stare nella stessa squadra). Servirà a ricollegare i 21 utenti scollegati il 24/10. Scelta dell'utente: ognuno entra con la sua email e sceglie la squadra da solo; con la lista colleghiamo prima noi il più possibile, così le scelte a mano restano poche (gli admin correggono da Verifica squadre).
+- [ ] **Foto dell'allenatore Mario (admin, D122)**: manca nell'app.
+- [ ] **Lista completa dei giocatori (admin, D122)**: nome, cognome e soprannome di ognuno. Nel database i soprannomi sono pochi; manca il nome di battesimo di **Taruntoli**.
+- [ ] **Chiusura automatica delle formazioni: 1 ora prima della partita va bene?** (D122, scelta provvisoria dell'utente; si cambia in un punto solo, `BEFORE_MINUTES` in `resources/lineup-deadline.js`).
+- [ ] **Calendario Athletic completo**: al 24/10 ci sono solo 4 partite (G1–G4). Gli admin lo completano man mano, oppure l'utente si fa mandare il calendario intero e lo inseriamo noi (D122). Serve anche per la chiusura automatica delle formazioni: una giornata senza partita resta aperta.
+- [ ] **Scontri diretti dalla prima giornata? (admin, D122)**: oggi **non sono predisposti** (stagione in modalità "classica", nessun calendario delle sfide). Se li vogliono subito: in Pannello › Stagione scegliere la modalità (solo scontri o entrambe), decidere i valori qui sotto e generare il calendario delle sfide con le 16 squadre **prima della G1**; altrimenti si possono accendere più avanti.
 - [ ] **Scontri diretti (D087, logica pronta D100)**: decidere anche cosa vuol dire "formazione mancante" (oggi: nessun titolare; il vecchio codice: meno di 5). Dopo aver salvato i valori, se la stagione è già iniziata usare "Ricalcola tutti gli scontri" nelle Impostazioni. Mai provato sul database vero (generazione + giornata + ricalcolo). Resto del punto: soglie punti→gol adatte alla scala Fanta Athletic (5–30 punti a giornata; con 66/6 del fantacalcio finirebbe sempre 0-0), risultato a tavolino (oggi 3 a -10, scritto per punti), punti V/N/P; poi generare il calendario sfide con le squadre nuove. (3/1 fissi e numerazione già sistemati, D100.)
 
 **Da fare a fine Fase 3:**
 - [x] ~~Recuperare `firebase.json` / `.firebaserc`~~ **ricreati (D101)**; per pubblicare serve la Firebase CLI (Node.js non installato: da decidere). Vecchio: (configurazione Hosting, non presenti nella cartella, D099): servono per pubblicare. Chiederli all'amico o ricrearli; valutare lì intestazioni di cache lunghe per i file etichettati `?v=`.
 - [x] **Novità dell'app** (D116, spostate in Bacheca D117): scheda **Novità app** in `bacheca.html#novita`, finestra all'apertura, casella in Home, collegamento da Notifiche; comunicati in `resources/news.json`, scritti da Claude a ogni aggiornamento.
 - [ ] **Notifiche push** (D082; **in coda, decisione dell'utente 24/10, D122**): sessione dedicata dopo la revisione della velocità, con prove su due telefoni. Ricevere: permesso + token salvato (il service worker ha già il gestore `push`). Inviare in automatico: Cloud Functions → piano Firebase "a consumo" (Blaze, carta collegata, costo atteso ~0) da decidere con l'utente; in alternativa invio manuale degli admin dalla Console. Su iPhone solo con l'app sulla schermata Home (iOS 16.4+).
-- [ ] Etichette "New" in scadenza il **13/10/2026** (7 giorni dopo l'asta del 6/10, decisione dell'utente D120): spariscono da sole, lo script poi le segnala per toglierle dal codice.
+- [x] ~~Etichette "New" al 13/10~~ superato: scadenza spostata al 30/10 (D121).
 - [x] **Guida per gli admin anche in app** (D115, `guida-admin.html`, fonte del PDF). Da tenere aggiornata a ogni modifica di una funzione admin.
 - [x] **Guida PDF per gli admin**: versione 2 del 26/09 (D114, 12 pagine, con schemi disegnati di Home e tendina 🏆) in `~/Claude/fanta-athletic-backups/03-documenti-admin/`; la v1 in `versioni-precedenti/`. Screenshot veri dell'app: non fatti (servirebbero la cattura dello schermo, esclusa dalle regole di sicurezza, o foto dal telefono dell'utente).
 - [x] **Pubblicazione del sito + GitHub fatte il 25/09/2026 (D103, D106).** Da qui: commit e deploy separati, su conferma. La copia del 19/09 è già fuori dal progetto (D101); `backups-firestore/` è escluso da Git e da `firebase.json`.
 
 **Note tecniche emerse (non urgenti):**
-- [ ] Restyling: `admin-calendario.html` su telefono a due colonne strette; ovale "Campionato H2H" in `calendario.html` (D102).
+- [ ] Restyling: ovale "Campionato H2H" in `calendario.html` (D102). (`admin-calendario.html` riallineata in D122.)
 - [x] `calendario-athletic.html`: stagione collegata alla lega e pagina nel menu ☰ (D098).
 - [x] `live.html` crea la partita solo al primo dato segnato (D102).
 - [ ] Le regole "ripetibili" (gol, ammonizioni…) sono scritte in due posti: `matchday.html` (REPEATABLE_*) e `resources/live-core.js`. Se si cambiano, cambiarle in entrambi (meglio: un file condiviso, quando si tocca `matchday.html`).

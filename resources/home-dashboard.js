@@ -92,7 +92,9 @@
     ]);
     const lineup = saved && saved.exists ? (saved.data().lineup || []) : [];
     const starters = lineup.filter(Boolean).length;
-    const deadline = dl && dl.exists && dl.data().deadline && dl.data().deadline.toDate ? dl.data().deadline.toDate() : null;
+    const manual = dl && dl.exists && dl.data().deadline && dl.data().deadline.toDate ? dl.data().deadline.toDate() : null;
+    // Senza scadenza manuale: orario della partita meno 1 ora, come Formazioni e Squadre (D122, lineup-deadline.js)
+    const deadline = manual || (m.next.start && window.FALineupDeadline ? new Date(m.next.start.getTime() - FALineupDeadline.BEFORE_MINUTES * 60000) : null);
     const dtxt = deadline ? deadline.toLocaleString('it-IT', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : null;
     if (starters >= 5) return set('ok', 'Formazione ' + g, 'Consegnata', 'Tocca per modificarla', 'formazioni.html');
     if (deadline && deadline < new Date()) return set('bad', 'Formazione ' + g, 'Scadenza passata', starters ? starters + '/5 titolari' : 'Non consegnata', 'formazioni.html');

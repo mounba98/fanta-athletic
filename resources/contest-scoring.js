@@ -44,7 +44,8 @@
     const day = parseInt(cal.date, 10);
     if (monthIndex < 0 || isNaN(day)) return null;
     const year = monthIndex >= 8 ? startYear : startYear + 1;
-    const parts = String(cal.time == null ? '15:00' : cal.time).split(':');
+    // "21:15" o "21.15" (nel calendario gli admin scrivono col punto: prima 21.15 diventava 21:00, D122)
+    const parts = String(cal.time == null ? '15:00' : cal.time).split(/[:.]/);
     const hours = parseInt(parts[0], 10);
     const minutes = parts[1] !== undefined ? parseInt(parts[1], 10) : 0;
     return new Date(year, monthIndex, day, isNaN(hours) ? 15 : hours, isNaN(minutes) ? 0 : minutes);

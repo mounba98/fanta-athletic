@@ -1180,6 +1180,7 @@
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
+  <script src="resources/lineup-deadline.js?v=20261024"></script>
   <script src="resources/toast.js?v=20260920-final"></script>
   <script>
     // Init Firebase SUBITO
@@ -1838,8 +1839,12 @@
         const doc = await docRef.get();
         if (doc.exists && doc.data().deadline){
           state.deadlineTime = doc.data().deadline.toDate();
+        } else if (window.FALineupDeadline) {
+          // Nessuna scadenza manuale: orario della partita nel Calendario Athletic meno 1 ora (D122)
+          const c = await FALineupDeadline.fromCalendar(giornataNum);
+          if (c) state.deadlineTime = c.deadline;
         }
-        // Se non esiste deadline, le formazioni restano aperte
+        // Senza scadenza manuale né partita in calendario le formazioni restano aperte
       }catch(e){ 
         console.error('❌ Deadline load error:', e); 
         toast('❌ Errore nel caricamento della deadline per questa lega. Formazioni considerate aperte.');
@@ -1897,14 +1902,16 @@
       } else if (state.deadlineTime) {
         const now = new Date();
         if (locked) {
-          ls.textContent = `🔒 Formazioni bloccate (deadline: ${state.deadlineTime.toLocaleString()})`;
+          ls.textContent = `🔒 Formazioni chiuse (${state.deadlineTime.toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })})`;
           ls.style.color = '#facc15';
           ls.style.fontWeight = '600';
         } else {
           const timeUntil = state.deadlineTime - now;
           const hoursLeft = Math.floor(timeUntil / (1000*60*60));
           const minutesLeft = Math.floor((timeUntil % (1000*60*60)) / (1000*60));
-          if (hoursLeft > 0) {
+          if (hoursLeft >= 24) {
+            ls.textContent = `✅ Formazioni aperte fino a ${state.deadlineTime.toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
+          } else if (hoursLeft > 0) {
             ls.textContent = `✅ Formazioni aperte (chiudono tra ${hoursLeft}h ${minutesLeft}m)`;
           } else if (minutesLeft > 0) {
             ls.textContent = `⚠️ Formazioni aperte (chiudono tra ${minutesLeft}m)`;
@@ -2085,6 +2092,8 @@
         const docs = await Promise.all(tasks);
         let loadedCount = 0;
         docs.forEach((doc, i)=>{
+          // Posti senza squadra nel database (la lega ne ha meno di 19): nascosti dall'elenco (D122)
+          if (state.teams[i] && doc) state.teams[i].exists = !!doc.exists;
           if (doc && doc.exists){
             const d = doc.data();
             const t = state.teams[i];
@@ -2171,7 +2180,9 @@
     function renderTeamsList(){
       const list = document.getElementById('teams');
       const saved = loadSaved(state.giornata);
+      const anyKnown = state.teams.some(t => t.exists === true);
       list.innerHTML = state.teams.map((t, idx)=>{
+        if (anyKnown && t.exists === false) return '';
         const starters = (t.lineup||[]).filter(Boolean);
         const incomplete = starters.length<5;
         const logo = getTeamLogo(idx);
@@ -2930,7 +2941,7 @@
       if (sel){
         // Admin vedono tutte le squadre, user solo la propria
         if (state.isAdmin) {
-          sel.innerHTML = state.teams.map((tm,idx)=>`<option value="${idx}">${tm.name||('Squadra '+(idx+1))}</option>`).join('');
+          sel.innerHTML = state.teams.map((tm,idx)=> (state.teams.some(t => t.exists === true) && tm.exists === false) ? '' : `<option value="${idx}">${tm.name||('Squadra '+(idx+1))}</option>`).join(''); // posti vuoti nascosti (D122)
         } else if (typeof state.userTeamIdx === 'number') {
           // User vedono solo la loro squadra
           sel.innerHTML = `<option value="${state.userTeamIdx}">${state.teams[state.userTeamIdx]?.name||('Squadra '+(state.userTeamIdx+1))}</option>`;
