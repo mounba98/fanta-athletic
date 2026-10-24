@@ -51,7 +51,7 @@ Il piano dell'utente, in ordine:
 ## Riprendi da qui (prossima sessione)
 
 **▶ PROSSIMA SESSIONE — PARTI DA QUI (D122, 24/10/2026)**
-**Ultimo lavoro (D122, 24/10)**: Novità ferme sul telefono → `sw.js` ora tratta i `.json` "prima la rete" (magazzino rinominato, `firebase.json` senza cache sui `.json`); proporzioni uniformi su tutta l'app al telefono (regola unica in `sheet.css`: bordo del `main` a zero fino a 768 px, Squadre esclusa), Regole e Giocatori a schede, `admin-calendario.html` riallineata al tema. Da verificare sul telefono vero dopo la pubblicazione.
+**Ultimo lavoro (D122, 24/10)**: Novità ferme sul telefono → `sw.js` ora tratta i `.json` "prima la rete" (magazzino rinominato, `firebase.json` senza cache sui `.json`); proporzioni uniformi su tutta l'app al telefono (regola unica in `sheet.css`: bordo del `main` a zero fino a 768 px, Squadre esclusa), Regole e Giocatori a schede, `admin-calendario.html` riallineata al tema. Da verificare sul telefono vero dopo la pubblicazione. **Rose 2026/27 inserite** (16 squadre, posti 0–15; 12 utenti collegati, 21 scollegati che scelgono da soli o ricolleghiamo con la lista degli admin), **stagione "In corso"**, formazioni chiuse da sole 1 ora prima della partita (`resources/lineup-deadline.js`). Compiti per gli admin in `docs/PUNTI_APERTI.md` ("Da decidere con gli admin"). Prossima sessione dedicata: velocità (interventi grossi) e notifiche push.
 **Prima (D121, 23/10)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic`
 `main`), ultima pubblicazione **23/10/2026** (D121, commit `661721d`), sera dell'asta
