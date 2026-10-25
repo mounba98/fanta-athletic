@@ -52,11 +52,11 @@
       "title": "Inviti per i secondi della squadra",
       "intro": "Il codice invito per i vice-allenatori ora funziona anche per chi non è admin.",
       "items": [
-        "In Squadre, in fondo, <b>Invita Vice-Allenatori</b> crea un codice e un link da mandare: chi lo apre entra nella tua squadra.",
+        "In fondo a <b>Formazioni</b> (e a Squadre) c'è <b>Invita Vice-Allenatori</b>: crea un codice e un link da mandare, chi lo apre entra nella tua squadra.",
         "Se il codice (T-…) viene scritto nella pagina \"Unisciti a una lega\", l'app porta da sola alla pagina giusta."
       ],
-      "link": "squadre.html",
-      "linkLabel": "Vai a Squadre"
+      "link": "formazioni.html",
+      "linkLabel": "Vai alle formazioni"
     },
     {
       "id": "2026-10-25-convocati-admin",

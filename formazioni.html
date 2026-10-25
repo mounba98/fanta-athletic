@@ -1195,6 +1195,8 @@
           <div class="sectionh">Panchina</div>
           <div id="benchStrip" class="strip"></div>
         </div>
+        <!-- Invita Vice-Allenatori (D129): Squadre non è più nella barra in basso, qui lo trovano tutti -->
+        <div class="mobile-only team-invite-panel" id="teamInvitePanelMobile" style="margin-top: 20px;"></div>
       </div>
           
           <!-- Mobile: tasti fissi in basso -->
@@ -2380,6 +2382,21 @@
       if (coach) g.querySelector('.coach-line').appendChild(coach);
     }
 
+    // Pannello "Invita Vice-Allenatori" in fondo (telefono), come in squadre.html: sempre per la
+    // PROPRIA squadra e disegnato una volta sola, altrimenti il codice appena creato sparirebbe
+    function renderMobileInvitePanel(){
+      const box = document.getElementById('teamInvitePanelMobile');
+      if (!box) return;
+      const myIdx = (state.user && typeof state.userTeamIdx === 'number') ? state.userTeamIdx : null;
+      if (myIdx === null || !window.TeamInviteSystem) { box.innerHTML = ''; box.dataset.teamIdx = ''; return; }
+      if (box.dataset.teamIdx === String(myIdx)) return;
+      const leagueId = getCurrentLeagueIdCached();
+      const myTeam = state.teams[myIdx];
+      if (!leagueId || !myTeam) return;
+      box.dataset.teamIdx = String(myIdx);
+      TeamInviteSystem.renderInviteUI(box, leagueId, String(myIdx), myTeam.name || ('Squadra ' + (myIdx + 1)));
+    }
+
     async function fetchOwnersForTeam(idx){
       // Solo gli admin possono vedere i proprietari delle squadre.
       // Per gli utenti normali saltiamo la query per evitare errori di permesso.
@@ -2550,6 +2567,7 @@
           </div>
         </div>
       `;
+      renderMobileInvitePanel();
       // async owners list
       fetchOwnersForTeam(state.selectedTeamIdx).then(arr=>{
         const el = document.getElementById('ownersList'); if (!el) return;
