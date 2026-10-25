@@ -893,6 +893,16 @@
       text-align: center;
     }
     
+    /* Invito vice-allenatori in fondo (telefono): una riga discreta che si apre al tocco (D129) */
+    .invite-mini { margin: 18px auto 0; text-align: center; }
+    .invite-mini summary { display: inline-flex; align-items: center; gap: 6px; list-style: none; cursor: pointer; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(148,163,184,0.35); color: var(--muted); font-size: 13px; font-weight: 600; }
+    .invite-mini summary::-webkit-details-marker { display: none; }
+    .invite-mini summary::after { content: '›'; font-size: 15px; transition: transform .15s; }
+    .invite-mini[open] summary::after { transform: rotate(90deg); }
+    .invite-mini .team-invite-panel { margin-top: 10px; }
+    .invite-mini .team-invite-panel > div { box-shadow: none !important; padding: 14px !important; }
+    .invite-mini .team-invite-panel h3 { display: none; }
+
     .team-invite-section {
       flex: 1;
       display: flex;
@@ -1196,7 +1206,10 @@
           <div id="benchStrip" class="strip"></div>
         </div>
         <!-- Invita Vice-Allenatori (D129): Squadre non è più nella barra in basso, qui lo trovano tutti -->
-        <div class="mobile-only team-invite-panel" id="teamInvitePanelMobile" style="margin-top: 20px;"></div>
+        <details class="mobile-only invite-mini" id="inviteMiniMobile" style="display:none;">
+          <summary>Invita vice-allenatori</summary>
+          <div class="team-invite-panel" id="teamInvitePanelMobile"></div>
+        </details>
       </div>
           
           <!-- Mobile: tasti fissi in basso -->
@@ -2388,7 +2401,9 @@
       const box = document.getElementById('teamInvitePanelMobile');
       if (!box) return;
       const myIdx = (state.user && typeof state.userTeamIdx === 'number') ? state.userTeamIdx : null;
-      if (myIdx === null || !window.TeamInviteSystem) { box.innerHTML = ''; box.dataset.teamIdx = ''; return; }
+      const wrap = document.getElementById('inviteMiniMobile');
+      if (myIdx === null || !window.TeamInviteSystem) { box.innerHTML = ''; box.dataset.teamIdx = ''; if (wrap) wrap.style.display = 'none'; return; }
+      if (wrap) wrap.style.display = '';
       if (box.dataset.teamIdx === String(myIdx)) return;
       const leagueId = getCurrentLeagueIdCached();
       const myTeam = state.teams[myIdx];
