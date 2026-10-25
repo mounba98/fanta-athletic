@@ -4,7 +4,7 @@ Allineato a: D129
 
 **▶ FATTO IL 25/10 (D129), DA PUBBLICARE PRIMA DELLA G1 (lunedì 26/10):** utenti della lista ricollegati (7, copia locale), convocati in app (`admin-convocati.html`), cambio modulo che risistema i giocatori, ruolo in panchina, inviti per i secondi corretti.
 - [x] Commit, pubblicazione del sito e regola `teamInvites` in Console: fatti il 25/10 (D129).
-- [ ] **Prova degli inviti con un giocatore non admin** (es. un altro secondo di Curva gonfi): codice da Squadre, link, accesso, entra nella squadra, non è admin.
+- [x] (D129, riuscita: Sissiana → Chep in Le Diahane Girls) **Prova degli inviti con un giocatore non admin** (es. un altro secondo di Curva gonfi): codice da Squadre, link, accesso, entra nella squadra, non è admin.
 - [ ] Gli admin pubblicano i **convocati della G1** dalla pagina nuova; controllare al telefono Formazioni con la lista vera.
 - [x] Convocati pubblicati → Convocazione: precompilata nel Calcolo giornata, pulsante nella Partita live; riga "Convocazione" tolta dai bonus (fine del doppio +1, D129). Da decidere solo: accenno "Convocati pubblicati" in Home.
 - [ ] Idea dell'utente per dopo la G1 (D129): flusso unico nella Partita live (conferma dei convocati, poi "fase 2" in attesa del fischio d'inizio). Per ora restano due pagine.
