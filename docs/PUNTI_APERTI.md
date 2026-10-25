@@ -3,7 +3,7 @@ Allineato a: D129
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D128)
 
 **▶ FATTO IL 25/10 (D129), DA PUBBLICARE PRIMA DELLA G1 (lunedì 26/10):** utenti della lista ricollegati (7, copia locale), convocati in app (`admin-convocati.html`), cambio modulo che risistema i giocatori, ruolo in panchina, inviti per i secondi corretti.
-- [ ] **Commit + pubblicazione del sito** (l'utente) e **regola nuova `teamInvites` da incollare in Console** (senza: i codici li creano solo gli admin; con: anche il capitano di una squadra).
+- [x] Commit, pubblicazione del sito e regola `teamInvites` in Console: fatti il 25/10 (D129).
 - [ ] **Prova degli inviti con un giocatore non admin** (es. un altro secondo di Curva gonfi): codice da Squadre, link, accesso, entra nella squadra, non è admin.
 - [ ] Gli admin pubblicano i **convocati della G1** dalla pagina nuova; controllare al telefono Formazioni con la lista vera.
 - [x] Convocati pubblicati → Convocazione: precompilata nel Calcolo giornata, pulsante nella Partita live; riga "Convocazione" tolta dai bonus (fine del doppio +1, D129). Da decidere solo: accenno "Convocati pubblicati" in Home.
