@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Guida</title>
   <!-- Alzare a ogni decisione dopo aver verificato se la guida va aggiornata (scripts/check-coerenza.py) -->
-  <meta name="guida-allineata" content="D128" />
+  <meta name="guida-allineata" content="D129" />
   <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
@@ -150,7 +150,7 @@ Nuova <b>Home</b> "centro di controllo" &middot; <b>Archivio Athletic</b> con le
   <li><a href="#c3">Il pannello in 6 blocchi</a></li>
   <li><a href="#c4">Preparare la stagione 2026/27 (percorso guidato)</a></li>
   <li><a href="#c5">Impostazioni della stagione</a></li>
-  <li><a href="#c6">Durante la partita: la Partita live</a></li>
+  <li><a href="#c6">Prima della partita: i Convocati. Durante: la Partita live</a></li>
   <li><a href="#c7">Calcolo giornata</a></li>
   <li><a href="#c8">Curva Morello vs Piana: fazioni e bonus</a></li>
   <li><a href="#c9">Il mini-gioco 1-X-2</a></li>
@@ -163,6 +163,7 @@ Nuova <b>Home</b> "centro di controllo" &middot; <b>Archivio Athletic</b> con le
   <li>Da qualsiasi pagina: tocca il <b>menu ☰</b> in alto a sinistra e poi <b>Admin Panel</b> (la voce la vede solo chi è admin).</li>
   <li>Su telefono si apre il menu anche <b>trascinando il dito dal bordo sinistro</b> dello schermo.</li>
   <li>Ogni pagina admin ha in alto il pulsante blu <span class="pill">&larr; Pannello admin</span>, che vi riporta al blocco da cui eravate partiti.</li>
+  <li><span class="new">NUOVO</span> In cima al pannello c'è il <b>codice invito della lega</b> (CSJVAV) con il tasto <b>Copia</b>, da mandare a chi deve iscriversi, e la casella <b>Cerca nel pannello</b>: scrivete una parola (es. "convocati", "foto") e restano solo le voci che la contengono.</li>
   <li><span class="new">NUOVO</span> Dalla <b>Home</b> ci sono anche le scorciatoie della fascia <b>Solo admin</b> (Partita live, Calcolo giornata, Pannello), in fondo alla pagina.</li>
   <li><span class="new">NUOVO</span> Su telefono, in <b>tutte le pagine secondarie</b> c'è la freccia <b>&lsaquo;</b> accanto al menu ☰: torna alla pagina precedente dell'app (o alla Home). Non si resta più "intrappolati" in una pagina.</li>
 </ul>
@@ -255,7 +256,7 @@ Nuova <b>Home</b> "centro di controllo" &middot; <b>Archivio Athletic</b> con le
 <p>Il pannello è diviso in 6 blocchi, nell'ordine in cui servono durante l'anno. In cima c'è una barra per saltare da un blocco all'altro e un riquadro con la stagione in corso.</p>
 <table>
   <tr><th>Blocco</th><th>Cosa c'è dentro</th><th>Quando si usa</th></tr>
-  <tr><td>1 · Partita live</td><td><b>Partita live</b>, Calcolo giornata, Scadenze formazioni, Sblocco rapido formazioni</td><td>Ogni partita</td></tr>
+  <tr><td>1 · Partita live</td><td><span class="new">NUOVO</span> <b>Convocati</b>, <b>Partita live</b>, Calcolo giornata, Scadenze formazioni, Sblocco rapido formazioni</td><td>Ogni partita</td></tr>
   <tr><td>2 · Stagione</td><td><b>Impostazioni stagione</b>, <b>Creazione nuova stagione</b> (percorso guidato), Calendario Athletic, Calendario scontri diretti, Coppa</td><td>Inizio e fine stagione</td></tr>
   <tr><td>3 · Squadre e giocatori</td><td>Squadre e rose, Giocatori, Asta, <b>Fazioni e nomi reali</b>, Utenti senza squadra, Foto giocatori</td><td>Prima dell'inizio, poi quando cambia qualcosa</td></tr>
   <tr><td>4 · Regole</td><td>Bonus e malus: valori, a chi si applicano, attivi o no</td><td>Quando si cambia il regolamento</td></tr>
@@ -311,13 +312,24 @@ Modalità <b>Entrambe</b>; vince chi fa più punti, <b>pareggio entro 2 punti</b
 
 <!-- ===================================================== -->
 <div class="section">
-<h2 id="c6">6. Durante la partita: la Partita live</h2>
+<h2 id="c6">6. Prima della partita: i Convocati <span class="new">NUOVO</span></h2>
+<p>Pannello &rsaquo; <b>1 · Partita live</b> &rsaquo; <b>Convocati</b>. Al posto del messaggio sul gruppo, il giorno prima della partita segnate qui chi è convocato: così chi fa la formazione lo vede subito.</p>
+<ol>
+  <li>Scegliete la <b>giornata</b> (si apre da sola sulla prossima da giocare, con la partita del Calendario Athletic).</li>
+  <li>Toccate i giocatori convocati: diventano verdi con la spunta. <b>Tutti</b> e <b>Nessuno</b> segnano o tolgono tutti insieme; <b>Come la giornata prima</b> riprende la lista precedente.</li>
+  <li>Premete <b>Pubblica</b>. In alto compare <i>"Pubblicati il&hellip; da&hellip;"</i>.</li>
+</ol>
+<p>Cosa vedono i giocatori, in <b>Formazioni</b> e <b>Squadre</b>: sopra la panchina <i>"Convocati G1 pubblicati"</i>; i convocati hanno un <b>cerchio oro</b> intorno alla foto, i non convocati sono <b>sbiaditi</b> e in fondo alla panchina; se ne schierano uno, in campo compare l'etichetta rossa <b>Non convocato</b> e al salvataggio l'app chiede conferma. <b>Non è un blocco</b>: la formazione si può salvare lo stesso (la lista può cambiare fino alla partita).</p>
+<p>Si può correggere quando serve: cambiate le spunte e ripremete <b>Pubblica</b>. <b>Togli la lista</b> la cancella (in Formazioni torna <i>"non ancora pubblicati"</i>). </p>
+<p><b>La Convocazione (+1) dopo la partita</b> <span class="new">NUOVO</span>: nella <b>Partita live</b>, scheda Convocati, c'è il pulsante <b>Segna i N convocati pubblicati</b> (un tocco e sono tutti segnati; poi si tolgono o aggiungono a mano). Nel <b>Calcolo giornata</b> il tasto <b>Giocatori Convocati</b> si apre già spuntato con la lista pubblicata: controllate e premete <b>Salva</b>. La riga "Convocazione" tra i bonus del giocatore <b>non c'è più</b>: si segna solo dal tasto, così il +1 non può più contare due volte.</p>
+
+<h2>Durante la partita: la Partita live</h2>
 <p>Pannello &rsaquo; <b>1 · Partita live</b> &rsaquo; <b>Partita live</b>. È pensata per il telefono, a bordo campo. Ogni admin segna <b>il suo foglio</b> senza vedere quello dell'altro. A fine partita l'app confronta i due fogli.</p>
 
 <h3>Mentre si gioca</h3>
 <ul>
   <li>In alto scegliete la <b>giornata</b> (di solito è già quella giusta).</li>
-  <li>Le schede: <b>Convocati</b> (un tocco su ogni convocato, vale +1) &middot; <b>Giocatori</b> &middot; <b>Allenatori</b> &middot; <b>Curva</b> &middot; <b>Fazioni</b>.</li>
+  <li>Le schede: <b>Convocati</b> (un tocco su ogni convocato, vale +1; se la lista è pubblicata c'è il pulsante per segnarli tutti insieme) &middot; <b>Giocatori</b> &middot; <b>Allenatori</b> &middot; <b>Curva</b> &middot; <b>Fazioni</b>.</li>
   <li>Toccando un giocatore si apre la sua scheda con le scorciatoie <b>Gol</b>, <b>Assist</b>, <b>Giallo</b>, <b>Rosso</b>, e sotto tutti i bonus e malus con i pulsanti <b>+</b> e <b>&minus;</b>. In alto a destra vedete i punti del giocatore.</li>
   <li><b>Curva</b>: le voci sono divise in Generali / In casa / In trasferta. Quella della partita di oggi è evidenziata (lo prende dal Calendario Athletic).</li>
   <li>Barra in basso: <b>Annulla</b> (toglie l'ultima cosa segnata) &middot; <b>Diario</b> (tutto quello che avete segnato; ogni voce si può togliere) &middot; <b>Fischio finale</b>.</li>
@@ -445,6 +457,7 @@ Cancella giornate, risultati, formazioni, scadenze, calendario Athletic, Partita
 <h3>Domande frequenti</h3>
 <p><b>Ho segnato una cosa sbagliata durante la partita.</b><br>Premete <b>Annulla</b>, oppure aprite il <b>Diario</b> e togliete quella voce. Se avete già fischiato, si corregge in revisione.</p>
 <p><b>Ha segnato solo uno di noi due.</b><br>Nessun problema: vale il suo foglio, poi si procede normalmente.</p>
+<p><b>Una squadra vuole aggiungere i suoi "secondi" (vice-allenatori).</b> <span class="new">NUOVO</span><br>Chi è già nella squadra apre <b>Squadre</b> &rsaquo; in fondo <b>Invita Vice-Allenatori</b> &rsaquo; <b>Genera codice invito</b>, e manda il link al secondo (vale 7 giorni, un codice per persona). Il secondo apre il link, accede e finisce nella squadra: <b>non diventa admin</b>. Se scrive il codice (T-&hellip;) nella pagina "Unisciti a una lega", l'app lo porta da sola alla pagina giusta.</p>
 <p><b>Un giocatore dice che gli manca un bonus dopo la pubblicazione.</b><br>Entro le 48 ore: Partita live &rsaquo; <b>Correzioni da segnalazioni</b>, con una nota. Poi si pubblicano i definitivi.</p>
 <p><b>Un giocatore ha scelto la fazione sbagliata.</b><br>Correggetela voi da <b>Fazioni e nomi reali</b> (vale per tutta la squadra).</p>
 <p><b>Ho finito l'asta ma le rose sono vuote.</b><br>È normale: la pagina Asta non riempie le rose. Compilatele dalla pagina <b>Squadre</b>.</p>

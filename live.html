@@ -118,6 +118,7 @@
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/season.js?v=20261024b"></script>
+  <script src="resources/convocati.js?v=20261025"></script>
   <script src="resources/live-core.js?v=20260925"></script>
   <script>
     const C = window.LiveCore;
@@ -246,7 +247,11 @@
       if (S.tab === 'conv') {
         const cid = S.conv ? C.rid(S.conv) : null;
         const n = S.players.filter(p => cid && count('players', p.id, cid)).length;
-        h += '<p class="info">Tocca chi è convocato (+1). Convocati: <b>' + n + '</b></p><div class="grid">' +
+        h += '<p class="info">Tocca chi è convocato (+1). Convocati: <b>' + n + '</b></p>';
+        // Lista pubblicata dalla pagina Convocati (D129): un tocco per segnarla tutta
+        const pub = S.pubConv ? S.players.filter(p => S.pubConv.ids.has(p.id)) : [];
+        if (cid && !n && pub.length) h += '<p><button class="key on" id="usePubConv" style="width:100%;">Segna i ' + pub.length + ' convocati pubblicati</button></p>';
+        h += '<div class="grid">' +
           S.players.map(p => { const on = cid && count('players', p.id, cid);
             return '<button class="key ' + (on ? 'on' : '') + '" data-conv="' + p.id + '">' + esc(pname(p.id)) + '<span class="sub">' + esc(p.role || '') + '</span></button>'; }).join('') + '</div>';
       } else if (S.tab === 'gio') {
@@ -268,6 +273,13 @@
       }
       $('view').innerHTML = h;
       $('view').querySelectorAll('.l1 button').forEach(b => b.onclick = () => { S.tab = b.dataset.t; render(); });
+      const upc = $('usePubConv');
+      if (upc) upc.onclick = () => {
+        if (S.sheet.closed) return toast('Hai già chiuso il tuo foglio');
+        const k = C.rid(S.conv);
+        S.players.filter(p => S.pubConv.ids.has(p.id) && !count('players', p.id, k)).forEach(p => C.bump(S.sheet, 'players', p.id, k, 1, S.conv));
+        vibe(); persist(); render();
+      };
       $('view').querySelectorAll('[data-conv]').forEach(b => b.onclick = () => { const k = C.rid(S.conv); tap('players', b.dataset.conv, k, count('players', b.dataset.conv, k) ? -1 : 1, S.conv); });
       $('view').querySelectorAll('[data-open]').forEach(b => b.onclick = () => openPanel(b.dataset.open));
       $('view').querySelectorAll('[data-fz]').forEach(b => b.onclick = () => {
@@ -541,10 +553,11 @@
     // ---------- avvio giornata ----------
     async function openGiornata(g) {
       S.unsub.forEach(f => f()); S.unsub = [];
-      S.g = g; S.tab = 'conv'; S.live = null;
+      S.g = g; S.tab = 'conv'; S.live = null; S.pubConv = null;
       const v = venueOf(g); S.venue = v;
       $('venueInfo').textContent = v && v.m ? (v.m.homeTeam + ' – ' + v.m.awayTeam) : '';
       await openSheet();
+      if (window.Convocati) S.pubConv = await Convocati.forGiornata(S.lid, g, true);
       // La partita si crea sul database al primo dato segnato (pushSheet), non alla sola apertura (D102)
       S.unsub.push(liveRef().onSnapshot(s => { S.live = s.data() || { stato: 'aperta' }; render(); }, e => console.warn('[live]', e.code)));
       S.unsub.push(liveRef().collection('sheets').onSnapshot(s => {

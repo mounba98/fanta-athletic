@@ -1,4 +1,4 @@
-Allineato a: D128
+Allineato a: D129
 
 # Fanta Athletic — contesto per Claude
 
@@ -51,7 +51,7 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D128, 24/10/2026 sera)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D129, 25/10/2026)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic` `main`),
 ultima pubblicazione **24/10/2026** (D127), verificata online. **Stagione 2026/27 "In corso"**:
 16 squadre con rose e allenatore; G1 lunedì 26/10 (Rifredi–Athletic 21.15), formazioni chiuse
@@ -70,9 +70,11 @@ da sole alle 20.15 (1 ora prima, `resources/lineup-deadline.js`).
   dei 3 allenatori (`resources/coaches/`); Albo d'oro con la classifica giocatori presa solo
   dall'archivio (non dipende dalla stagione nuova).
 - Account di prova tolti dall'app (accessi ancora in Console), regole "Civi in porta" spente.
-**Primo punto del 25/10 (D128)**: **convocati in app** prima della G1 (pagina admin per giornata in
-`config/convocati`, segno Convocato/Non convocato in Formazioni e Squadre): proposta completa in
-`docs/PUNTI_APERTI.md`, punto 0.
+**Fatto il 25/10 (D129), da pubblicare prima della G1**: utenti della lista degli admin ricollegati;
+**Convocati** (`admin-convocati.html` → `leagues/{lega}/config/convocati`, mostrati in Formazioni e Squadre
+con `resources/convocati.js`); cambio modulo che manda in panchina chi è di troppo; ruolo P/D/C/A in
+panchina; inviti per i secondi che funzionano per i non admin (`team-invite-system.js`, regola
+`teamInvites` nuova **da incollare in Console**). Dettagli e cose da provare in cima a `docs/PUNTI_APERTI.md`.
 **Da fare**: la coda della sessione del 25/10 e i controlli a ridosso delle partite (dopo il
 calcolo della G1; prima del calcolo della G2 riprovare la "formazione precedente") sono in cima a
 `docs/PUNTI_APERTI.md`. Copie di sicurezza del 24/10: `backups-firestore/` (locale, con email) e

@@ -316,6 +316,19 @@
       font-weight: 700;
     }
 
+    /* Convocati (D129): giocatore non convocato per la giornata */
+    .slot-badge--nc {
+      background: #920100;
+      border-color: #920100;
+      color: #fff;
+    }
+    .bench-chip.non-conv { opacity: 0.45; }
+    /* convocato: cerchio oro intorno alla foto (richiesta dell'utente) */
+    .bench-chip.conv img { border-color: #facc15; box-shadow: 0 0 0 1px rgba(250,204,21,0.45); }
+    .slot-card.conv .slot-avatar { border-color: #facc15 !important; box-shadow: 0 0 0 1px rgba(250,204,21,0.45), 0 8px 14px rgba(15,23,42,0.3); }
+    .conv-note { font-size: 13px; line-height: 1.4; margin: 0 0 8px; color: var(--muted); }
+    .conv-note strong { color: var(--text); }
+
     .slot-badge--hint {
       background: rgba(255,255,255,0.18);
       border-color: rgba(255,255,255,0.24);
@@ -538,6 +551,26 @@
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    /* Ruolo in panchina (D129, richiesta degli admin): pallino sull'angolo della foto,
+       per non togliere spazio al nome */
+    .bench-chip { position: relative; }
+    .bench-chip-role {
+      position: absolute;
+      left: 31px;
+      top: 25px;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 17px;
+      text-align: center;
+      background: var(--secondary, #0c0f6d);
+      color: #fff;
+      box-shadow: 0 0 0 1.5px var(--card, #fff);
+      pointer-events: none;
     }
 
     .bench-chip-name {
@@ -1179,6 +1212,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/convocati.js?v=20261025"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
   <script src="resources/lineup-deadline.js?v=20261024"></script>
   <script src="resources/toast.js?v=20260920-final"></script>
@@ -1274,6 +1308,7 @@
       const availablePlayers = (t.roster||[])
         .filter(pid => !onField.has(pid))
         .filter(pid => !slotRole || roleForConstraint(pid) === slotRole)
+        .sort((a, b) => (isNonConvocato(a) ? 1 : 0) - (isNonConvocato(b) ? 1 : 0))
         .map(pid => {
           const p = state.players.find(x => x.player_id === pid);
           return p ? { ...p, player_id: pid } : null;
@@ -1326,7 +1361,7 @@
                   <img src="${photoURL}" alt="${displayName}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" onerror="this.src='resources/logo.png'" />
                   <div style="flex: 1;">
                     <div style="font-weight: 600;">${escapeHtml(displayName)}</div>
-                    <div style="font-size: 12px; color: var(--muted);">${escapeHtml(p.role || '')}</div>
+                    <div style="font-size: 12px; color: var(--muted);">${escapeHtml(p.role || '')}${isNonConvocato(p.player_id) ? ' · <strong style="color:#dc2626;">Non convocato</strong>' : ''}</div>
                   </div>
                 </div>
               `;
@@ -1939,6 +1974,12 @@
       if (!t.captain){ toast('Seleziona il capitano prima di salvare'); return false; }
       const mod = ensureModulo(t);
       if (!mod || !fitsModulo(t.lineup, mod)){ toast('⚠️ La formazione non rispetta un modulo ammesso (1-2-2, 2-2-1, 2-1-2, 3-1-1)'); return false; }
+      // Convocati (D129): avviso, non blocco (la lista può cambiare fino alla partita)
+      const nc = (t.lineup||[]).filter(isNonConvocato);
+      if (nc.length) {
+        const names = nc.map(pid => { const p = state.players.find(x => x.player_id === pid); return p ? getPlayerDisplayLabel(p, 'initial.surname') : pid; });
+        if (!confirm(`${names.join(', ')} ${nc.length === 1 ? 'non è convocato' : 'non sono convocati'} per la ${state.giornata}. Salvare lo stesso?`)) return false;
+      }
       const leagueId = await ensureLeagueReady();
       if (!leagueId) {
         notifyMissingLeague('salvare la formazione');
@@ -2148,6 +2189,29 @@
     // Realtime subscription to saved formations for current giornata
     let savedUnsubs = [];
     function unsubscribeSaved(){ try{ savedUnsubs.forEach(u=>u&&u()); }catch{} savedUnsubs=[]; }
+    // Convocati della giornata (D129): null = lista non ancora pubblicata dagli admin
+    async function loadConvocati(leagueId, g){
+      if (!window.Convocati) return;
+      const c = await Convocati.forGiornata(leagueId, g, true);
+      if (state.giornata !== g) return;
+      state.convocati = c;
+      renderEditor();
+    }
+    function isNonConvocato(pid){ return !!(state.convocati && pid && !state.convocati.ids.has(pid)); }
+    function isConvocato(pid){ return !!(state.convocati && pid && state.convocati.ids.has(pid)); }
+    function renderConvNote(){
+      const txt = state.convocati
+        ? `<strong>Convocati ${escapeHtml(state.giornata)} pubblicati.</strong> Cerchio oro = convocato, sbiadito = non convocato.`
+        : `Convocati ${escapeHtml(state.giornata || '')} non ancora pubblicati dagli admin.`;
+      ['#benchStrip', '#benchStripDesktop'].forEach(sel => {
+        const strip = document.querySelector(sel);
+        if (!strip || !strip.parentNode) return;
+        let note = strip.parentNode.querySelector(':scope > .conv-note');
+        if (!note) { note = document.createElement('p'); note.className = 'conv-note'; strip.parentNode.insertBefore(note, strip); }
+        note.innerHTML = txt;
+      });
+    }
+
     async function subscribeSavedForGiornata(g){
       unsubscribeSaved();
       const leagueId = await ensureLeagueReady(10000);
@@ -2155,6 +2219,8 @@
         notifyMissingLeague('sottoscrivere le formazioni salvate');
         return;
       }
+      state.convocati = null;
+      loadConvocati(leagueId, g);
       for (let i=0;i<19;i++){
         const ref = getSavedDocRef(i, g, leagueId);
         if (!ref) continue;
@@ -2254,13 +2320,21 @@
         sel.disabled = !canWrite;
         sel.onchange = () => {
           const v = sel.value;
-          if (!fitsModulo(t.lineup, v)) {
-            const mm = MODULI[v], cc = lineupCounts(t.lineup), i = cc.findIndex((n,k) => n > mm[k]);
-            toast(`⚠️ Per il ${v} togli prima dal campo ${cc[i]-mm[i]} ${MODULO_NAMES[i][cc[i]-mm[i] === 1 ? 0 : 1]}`);
-            sel.value = mod || '';
-            return;
-          }
+          if (!(v in MODULI)) { sel.value = mod || ''; return; }
+          // D129: il modulo cambia sempre; chi è di troppo in un reparto torna in panchina
+          // (resta in campo il capitano, poi i primi del reparto; gli altri giocatori non si toccano)
+          const mm = MODULI[v], kept = [0,0,0], out = [], stay = new Set();
+          const line = (t.lineup||[]);
+          [t.captain, ...line].forEach(pid => {
+            if (!pid || stay.has(pid) || !line.includes(pid)) return;
+            const i = MODULO_ROLES.indexOf(roleForConstraint(pid));
+            if (i < 0 || kept[i] < mm[i]) { stay.add(pid); if (i >= 0) kept[i]++; }
+            else out[i] = (out[i]||0) + 1;
+          });
+          t.lineup = line.map(pid => (pid && !stay.has(pid)) ? null : pid);
           t.modulo = v; saveTeams(); renderEditor();
+          const msg = out.map((n,i) => n ? `${n} ${MODULO_NAMES[i][n === 1 ? 0 : 1]}` : '').filter(Boolean).join(' e ');
+          if (msg) toast(`Modulo ${v}: ${msg} in panchina`);
         };
       });
       $$('.modulo-count').forEach(el => { el.textContent = count; });
@@ -2620,6 +2694,9 @@
           if (roleAbbr) {
             badges.push(`<span class="slot-badge slot-badge--hint">${roleAbbr}</span>`);
           }
+          if (isNonConvocato(pid)) {
+            badges.push('<span class="slot-badge slot-badge--nc">Non convocato</span>');
+          }
           if (Number.isFinite(pointsValue) && pointsValue !== 0) {
             badges.push(`<span class="slot-badge slot-badge--hint">${pointsValue.toFixed(1)} pt</span>`);
           }
@@ -2632,7 +2709,7 @@
             ? `<button class="slot-icon slot-cap-toggle${isCaptain ? ' is-active' : ''}" data-act="cap" title="Imposta capitano" aria-label="Imposta capitano">★</button>`
             : '';
           slot.innerHTML = `
-            <div class="slot-card draggable${isCaptain ? ' captain-card' : ''}" draggable="true" data-pid="${pid}">
+            <div class="slot-card draggable${isCaptain ? ' captain-card' : ''}${isConvocato(pid) ? ' conv' : ''}" draggable="true" data-pid="${pid}">
               ${capIconHtml}
               <button class="slot-icon slot-remove-btn" data-act="remove" title="Rimuovi" aria-label="Rimuovi giocatore">×</button>
               <div class="slot-card-main">
@@ -2741,7 +2818,10 @@
           if (state.benchFilter === 'all') return true;
           const p = state.players.find(x => x.player_id === pid);
           return p && roleMap[p.role] === state.benchFilter;
-        });
+        })
+        // convocati per primi (D129), per il resto l'ordine resta quello della rosa
+        .sort((a, b) => (isNonConvocato(a) ? 1 : 0) - (isNonConvocato(b) ? 1 : 0));
+      renderConvNote();
       
       const benchHTML = filteredRoster
         .map(pid=>{
@@ -2752,9 +2832,10 @@
           const displayName = p ? getPlayerDisplayLabel(p, 'initial.surname') : pid;
           const safeDisplayName = escapeHtml(displayName);
           const badge = isCaptain ? '<span class="slot-badge slot-badge--captain slot-badge--bench">Capitano</span>' : '';
-          return `<div class="bench-chip${isCaptain ? ' captain-chip' : ''} draggable" draggable="true" data-pid="${pid}">
+          return `<div class="bench-chip${isCaptain ? ' captain-chip' : ''}${isNonConvocato(pid) ? ' non-conv' : ''}${isConvocato(pid) ? ' conv' : ''} draggable" draggable="true" data-pid="${pid}"${isNonConvocato(pid) ? ' title="Non convocato"' : isConvocato(pid) ? ' title="Convocato"' : ''}>
             <img src="${photoURL}" alt="${safeDisplayName}" onerror="this.src='resources/logo.png'" />
             <span class="bench-chip-name">${safeDisplayName}</span>
+            ${p && roleMap[p.role] ? `<span class="bench-chip-role" title="${escapeHtml(p.role)}">${roleMap[p.role]}</span>` : ''}
             ${badge}
           </div>`;
         }).join('');
@@ -3228,7 +3309,7 @@
     <script src="resources/navbar-autohide.js?v=20260920-final"></script>
   <script src="resources/lazy-load.js?v=20261024"></script>
   <script src="resources/theme.js?v=20260925b"></script>
-  <script src="resources/team-invite-system.js?v=20260920-final"></script>
+  <script src="resources/team-invite-system.js?v=20261025"></script>
   <script src="resources/navbar.js?v=20261024b"></script>
   <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>

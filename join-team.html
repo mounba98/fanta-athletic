@@ -85,7 +85,7 @@
     if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
     const db = firebase.firestore();
   </script>
-  <script src="resources/team-invite-system.js"></script>
+  <script src="resources/team-invite-system.js?v=20261025"></script>
   <script>
     // Check URL params
     const urlParams = new URLSearchParams(window.location.search);
@@ -113,7 +113,8 @@
         if (leagueIdFromURL) {
           localStorage.setItem('join_team_league', leagueIdFromURL);
         }
-        location.href = 'auth.html?return=join-team';
+        // auth.html legge "redirect" (con "return" si finiva in Home e l'invito si perdeva, D129)
+        location.href = 'auth.html?redirect=' + encodeURIComponent('join-team.html');
         return;
       }
       

@@ -1,7 +1,79 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D128",
+  "allineato": "D129",
   "news": [
+    {
+      "id": "2026-10-25-pannello",
+      "date": "2026-10-25",
+      "audience": "admin",
+      "icon": "🔎",
+      "title": "Codice lega e ricerca nel Pannello",
+      "intro": "In cima al Pannello ora trovi il <b>codice invito della lega</b> con il tasto Copia, da mandare a chi deve iscriversi.",
+      "items": [
+        "Sotto c'è la casella <b>Cerca nel pannello</b>: scrivi una parola (es. \"convocati\", \"foto\") e restano solo le voci che la contengono."
+      ],
+      "link": "admin.html",
+      "linkLabel": "Apri il Pannello"
+    },
+    {
+      "id": "2026-10-25-convocati",
+      "date": "2026-10-25",
+      "audience": "all",
+      "icon": "📋",
+      "title": "I convocati in Formazioni",
+      "intro": "Quando gli admin pubblicano i convocati, li vedi direttamente mentre fai la formazione.",
+      "items": [
+        "Sopra la panchina trovi scritto se i convocati della giornata sono pubblicati.",
+        "I convocati hanno un <b>cerchio oro</b> intorno alla foto; i <b>non convocati</b> sono sbiaditi e in fondo alla panchina. Se ne metti uno in campo compare l'etichetta rossa <b>Non convocato</b> e al salvataggio l'app ti chiede conferma.",
+        "Vale anche nella pagina Squadre."
+      ],
+      "link": "formazioni.html",
+      "linkLabel": "Vai alle formazioni"
+    },
+    {
+      "id": "2026-10-25-formazioni",
+      "date": "2026-10-25",
+      "audience": "all",
+      "icon": "🔄",
+      "title": "Cambiare modulo è più facile",
+      "intro": "Ora puoi cambiare modulo anche con i giocatori già in campo.",
+      "items": [
+        "Chi è di troppo in un reparto torna da solo in panchina (il capitano resta in campo) e un messaggio ti dice chi.",
+        "In panchina, sull'angolo della foto, c'è il <b>ruolo</b> di ogni giocatore: P portiere, D difensore, C centrocampista, A attaccante."
+      ],
+      "link": "formazioni.html",
+      "linkLabel": "Vai alle formazioni"
+    },
+    {
+      "id": "2026-10-25-inviti",
+      "date": "2026-10-25",
+      "audience": "all",
+      "icon": "🤝",
+      "title": "Inviti per i secondi della squadra",
+      "intro": "Il codice invito per i vice-allenatori ora funziona anche per chi non è admin.",
+      "items": [
+        "In Squadre, in fondo, <b>Invita Vice-Allenatori</b> crea un codice e un link da mandare: chi lo apre entra nella tua squadra.",
+        "Se il codice (T-…) viene scritto nella pagina \"Unisciti a una lega\", l'app porta da sola alla pagina giusta."
+      ],
+      "link": "squadre.html",
+      "linkLabel": "Vai a Squadre"
+    },
+    {
+      "id": "2026-10-25-convocati-admin",
+      "date": "2026-10-25",
+      "audience": "admin",
+      "icon": "📋",
+      "title": "Convocati in app",
+      "intro": "Nel Pannello, blocco Partita live, c'è la pagina <b>Convocati</b>.",
+      "items": [
+        "Scegli la giornata, tocca i convocati e premi <b>Pubblica</b>: i giocatori li vedono in Formazioni e Squadre.",
+        "Dopo la partita: nella Partita live il pulsante <b>Segna i convocati pubblicati</b> li segna tutti insieme; nel Calcolo giornata il tasto <b>Giocatori Convocati</b> si apre già spuntato.",
+        "La riga \"Convocazione\" tra i bonus del giocatore non c'è più: il +1 si dà solo dal tasto Convocati, così non può contare due volte.",
+        "Dettagli nella guida admin, capitolo 6."
+      ],
+      "link": "admin-convocati.html",
+      "linkLabel": "Apri Convocati"
+    },
     {
       "id": "2026-10-24-foto",
       "date": "2026-10-24",

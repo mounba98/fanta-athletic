@@ -215,7 +215,7 @@
       </div>
 
       <div class="code-input-group">
-        <input type="text" id="codeInput" placeholder="CODICE (ES. ABC123)" maxlength="6" style="text-transform: uppercase;" />
+        <input type="text" id="codeInput" placeholder="CODICE (ES. ABC123)" maxlength="8" style="text-transform: uppercase;" />
       </div>
 
       <div id="errorMessage" class="error-message"></div>
@@ -280,6 +280,15 @@
     const leagueIdFromURL = urlParams.get('leagueId');
     const codeFromURL = urlParams.get('code');
 
+    // Il codice di squadra si usa in join-team.html, che collega alla lega e alla squadra insieme
+    function goToTeamInvite(code) {
+      const leagueParam = leagueIdFromURL ? `&leagueId=${encodeURIComponent(leagueIdFromURL)}` : '';
+      showSuccess('Codice di squadra: ti porto alla pagina giusta...');
+      setTimeout(() => {
+        window.location.href = `join-team.html?code=${encodeURIComponent(code)}${leagueParam}`;
+      }, 600);
+    }
+
     async function checkCode() {
       const input = document.getElementById('codeInput');
       const code = input.value.trim().toUpperCase();
@@ -293,6 +302,10 @@
       joinBtn.disabled = true;
       selectedTeamId = null;
 
+      if (code.startsWith('T-')) {
+        if (code.length === 8) goToTeamInvite(code);
+        return;
+      }
       if (code.length !== 6) return;
 
       try {
@@ -608,6 +621,11 @@
       codeInput.addEventListener('input', (e) => {
         const code = e.target.value.trim().toUpperCase();
         e.target.value = code; // Force uppercase
+        // Codice di SQUADRA (T-XXXXXX, da un compagno): va nella pagina "Unisciti alla squadra" (D129)
+        if (code.startsWith('T-')) {
+          if (code.length === 8) goToTeamInvite(code);
+          return;
+        }
         if (code.length === 6) {
           console.log('✅ 6 caratteri inseriti, verifico codice...');
           setTimeout(() => checkCode().catch(err => console.error('Error in checkCode:', err)), 300);

@@ -1,10 +1,21 @@
-Allineato a: D128
+Allineato a: D129
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D128)
 
-**▶ SESSIONE DI DOMANI, 25/10 (decisioni dell'utente, D126–D128) — in quest'ordine:**
-0. **Convocati in app, prima della G1** (richiesta dell'utente 24/10 sera, D128): gli admin oggi mandano i convocati sul gruppo il giorno prima della partita; segnarli in app così chi fa la formazione vede chi è convocato. Proposta: pagina admin **Convocati** (giornata, griglia dei giocatori con foto, tocco = convocato, Salva) in `leagues/{lega}/config/convocati` (nessuna regola nuova: config è già leggibile dai membri e scrivibile dagli admin); in **Formazioni** e Squadre un segno "Convocato / Non convocato" su ogni giocatore quando la lista c'è, i convocati per primi, e un avviso se in formazione c'è un non convocato; nella Home, sul riquadro Formazione, "Convocati pubblicati". Poi (da decidere) la Partita live e il Calcolo giornata partono con i convocati già spuntati. Casella nel Pannello, guida admin, Novità per giocatori e admin.
-1. **Ricollegare gli utenti** appena gli admin finiscono la lista squadre (D123: colleghiamo per nome, le email solo per chi resta): `team_index` come fa Verifica squadre; prova a vuoto, copia, scrittura, verifica rileggendo. Controllare chi ha già scelto da solo. Elenco dei 18 senza squadra e delle 9 squadre senza utenti in DECISION_LOG D123.
+**▶ FATTO IL 25/10 (D129), DA PUBBLICARE PRIMA DELLA G1 (lunedì 26/10):** utenti della lista ricollegati (7, copia locale), convocati in app (`admin-convocati.html`), cambio modulo che risistema i giocatori, ruolo in panchina, inviti per i secondi corretti.
+- [ ] **Commit + pubblicazione del sito** (l'utente) e **regola nuova `teamInvites` da incollare in Console** (senza: i codici li creano solo gli admin; con: anche il capitano di una squadra).
+- [ ] **Prova degli inviti con un giocatore non admin** (es. un altro secondo di Curva gonfi): codice da Squadre, link, accesso, entra nella squadra, non è admin.
+- [ ] Gli admin pubblicano i **convocati della G1** dalla pagina nuova; controllare al telefono Formazioni con la lista vera.
+- [x] Convocati pubblicati → Convocazione: precompilata nel Calcolo giornata, pulsante nella Partita live; riga "Convocazione" tolta dai bonus (fine del doppio +1, D129). Da decidere solo: accenno "Convocati pubblicati" in Home.
+- [ ] Idea dell'utente per dopo la G1 (D129): flusso unico nella Partita live (conferma dei convocati, poi "fase 2" in attesa del fischio d'inizio). Per ora restano due pagine.
+- [ ] Prima giornata vera: controllare che i convocati prendano +1 una volta sola (Calcolo giornata e Partita live).
+- [ ] **Si sceglie con fabione (2) non ha ancora nessun utente** (Fabione, Pippo, Salvadori non iscritti). Parrini collegato a BrigatEbosse e Cesari a Diletta (D129).
+- [ ] Lista squadre: 14 email senza account (si collegano da soli al primo accesso), Vagge/Pogge/Salvadori senza email; controllare dopo qualche giorno chi è ancora senza squadra.
+- [ ] Chi entra con Google non ha il documento utente finché non entra in una lega (solo un problema di nome/email in Verifica squadre): valutare se crearlo all'accesso.
+
+**▶ SESSIONE DEL 25/10 (decisioni dell'utente, D126–D128) — in quest'ordine:**
+0. ✅ (D129) **Convocati in app, prima della G1** (richiesta dell'utente 24/10 sera, D128): gli admin oggi mandano i convocati sul gruppo il giorno prima della partita; segnarli in app così chi fa la formazione vede chi è convocato. Proposta: pagina admin **Convocati** (giornata, griglia dei giocatori con foto, tocco = convocato, Salva) in `leagues/{lega}/config/convocati` (nessuna regola nuova: config è già leggibile dai membri e scrivibile dagli admin); in **Formazioni** e Squadre un segno "Convocato / Non convocato" su ogni giocatore quando la lista c'è, i convocati per primi, e un avviso se in formazione c'è un non convocato; nella Home, sul riquadro Formazione, "Convocati pubblicati". Poi (da decidere) la Partita live e il Calcolo giornata partono con i convocati già spuntati. Casella nel Pannello, guida admin, Novità per giocatori e admin.
+1. ✅ (D129, i 7 con account) **Ricollegare gli utenti** appena gli admin finiscono la lista squadre (D123: colleghiamo per nome, le email solo per chi resta): `team_index` come fa Verifica squadre; prova a vuoto, copia, scrittura, verifica rileggendo. Controllare chi ha già scelto da solo. Elenco dei 18 senza squadra e delle 9 squadre senza utenti in DECISION_LOG D123.
 2. **Foto giocatori (D127)**: fatte e collegate il 24/10 sera. Da fare: controllare sul telefono vero Formazioni, Squadre e Riepilogo; **foto di Tiziano Ferretti** da chiedere agli admin (non era nel PowerPoint); poi togliere i vecchi file degli allenatori non più usati (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage (`players/P010_…`, `players/P026_…`).
 3. **Fazioni delle 10 squadre che non ce l'hanno** (le 6 che continuano la hanno): la scelgono gli admin (Fazioni e nomi reali) o i giocatori al primo accesso.
 4. **Mocci, urgente**: revocare la chiave admin di Firebase nel ramo `feature/uniform-pitch-bench` (sezione Sicurezza sotto).
@@ -70,7 +81,7 @@ Allineato a: D128
 
 **Piccole cose notate il 23/10, non urgenti (D121):**
 - [ ] Decidere se scrivere "Tifo" anche in Calcolo giornata, Partita live, Classifiche (oggi solo nella pagina Regole; nel database resta `Curva`).
-- [ ] Nel Calcolo giornata aperto a mano "Convocazione" (R099) compare tra i bonus dei giocatori **e** c'è il tasto Convocati (+1): se un admin li spunta entrambi il giocatore prende +2 (era così anche a ottobre). Valutare di nascondere R099 nel Calcolo giornata o avvisare.
+- [x] (D129, corretto) Nel Calcolo giornata aperto a mano "Convocazione" (R099) compare tra i bonus dei giocatori **e** c'è il tasto Convocati (+1): se un admin li spunta entrambi il giocatore prende +2 (era così anche a ottobre). Valutare di nascondere R099 nel Calcolo giornata o avvisare.
 - [ ] I giocatori **fuori rosa** compaiono ancora nella griglia Convocati della Partita live (non sono in nessuna rosa, quindi non danno punti a nessuno: è solo ingombro).
 - [ ] La pagina Squadre salva la formazione senza il campo `modulo` (Formazioni lo ricava dai giocatori): va bene, ma se si usa Squadre per schierare il modulo scelto potrebbe non essere ricordato.
 - [ ] `admin-rules.html`: al primo caricamento una volta ha mostrato 0 regole (ricaricando 97): probabile caricamento lento della lega, da osservare.

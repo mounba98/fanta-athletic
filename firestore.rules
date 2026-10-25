@@ -350,6 +350,17 @@ service cloud.firestore {
     match /leagues/{leagueId}/teamInvites/{inviteId} {
       allow read: if isSignedIn();
       allow create, update, delete: if isLeagueAdmin(leagueId);
+      // D129: un membro della squadra crea inviti per la PROPRIA squadra (i secondi non sono admin)
+      allow create: if isLeagueMember(leagueId) &&
+                       request.resource.data.createdBy == request.auth.uid &&
+                       request.resource.data.status == 'active' &&
+                       string(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.team_index) == request.resource.data.teamId;
+      // D129: chi usa un invito attivo lo segna come usato a proprio nome (nient'altro)
+      allow update: if isSignedIn() &&
+                       resource.data.status == 'active' &&
+                       request.resource.data.status == 'used' &&
+                       request.resource.data.usedBy == request.auth.uid &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'usedBy', 'usedAt']);
     }
 
     match /leagues/{leagueId}/cups/{cupId} {

@@ -1,8 +1,8 @@
-Allineato a: D128
+Allineato a: D129
 
 # Mappa delle pagine — a cosa serve ogni file
 
-Indice rapido degli 80 file `.html` ancora attivi nella cartella principale,
+Indice rapido degli 81 file `.html` ancora attivi nella cartella principale,
 così non serve aprirli uno per uno per capire cosa fanno. Aggiornare
 questa mappa quando si aggiunge, rinomina o archivia una pagina.
 
@@ -77,6 +77,7 @@ nomi di classe generici che vanno in conflitto.
 | `archivio-athletic.html` | Archivio Athletic: statistiche dei giocatori veri stagione per stagione, scheda giocatore (D109, motore `resources/athletic-stats.js`) |
 | `admin-contest.html` | Mini-gioco Curva vs Piana: calcolo punti, classifica, testo WhatsApp (D069) |
 | `admin-fazioni.html` | Fazione delle squadre e nomi reali dei giocatori (D073) |
+| `admin-convocati.html` | Convocati per giornata: gli admin li pubblicano, Formazioni e Squadre li mostrano (`resources/convocati.js`, D129) |
 | `guida-admin.html` | Guida per gli admin dentro l'app, solo admin (Pannello › 📖 Guida). È la fonte del PDF: `scripts/guida-admin-pdf.py` (D115) |
 | `admin-calendario.html` | Gestione calendario reale Athletic (grafica riallineata al tema, D122) |
 | `admin-deadline.html` | Scadenze formazioni impostate a mano (valgono al posto di quella automatica, D122) |

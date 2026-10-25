@@ -339,6 +339,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/convocati.js?v=20261025"></script>
   <script src="resources/season.js?v=20261024b"></script>
   <script src="resources/h2h.js?v=20261024b"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
@@ -893,12 +894,23 @@
       }
     }
 
+    // D129: il tasto "Giocatori Convocati" segna la regola Giocatore "Convocazione"
+    // (R099), la stessa della Partita live; la riga non compare più tra i bonus: un solo +1.
+    // Prima scriveva un '__convocato' a parte e, spuntando anche la riga, si prendeva +2.
+    // Il '__convocato' delle giornate vecchie resta valido (si legge, non si scrive più).
+    function convocazioneRule(){
+      return normalizePlayersRules({ rules: state.rules })
+        .find(r => /^convocazione$/i.test(String(r.nome_bonus || r.descrizione || '').trim()));
+    }
+    function convocazioneKey(){ const r = convocazioneRule(); return r ? r.rule_id : '__convocato'; }
+
     // Funzione globale per ripristinare convocati da selezione
     function restoreConvocatiFromSelections() {
       const convSet = new Set();
+      const ck = convocazioneKey();
       Object.entries(state.selPlayers || {}).forEach(([pid, selections]) => {
         if (!selections) return;
-        const flag = selections.__convocato;
+        const flag = selections[ck] || selections.__convocato;
         const isConvocato = Boolean(
           (typeof flag === 'number' && flag > 0) ||
           (typeof flag === 'string' && (flag === '1' || flag === 'true')) ||
@@ -1849,7 +1861,9 @@
         const filteredRules = state.bonusMalusFilter === 'all' ? rulesSorted :
           state.bonusMalusFilter === 'curva' ? rulesSorted.filter(r => /curva|tribuna|squalificato.*presente/i.test(r.nome_bonus || '')) :
           rulesSorted.filter(r => !/curva|tribuna|squalificato.*presente/i.test(r.nome_bonus || ''));
-        filteredRules.forEach(r=>{ (byTipo[r.tipo]||byTipo.Bonus).push(r); });
+        // La Convocazione non si spunta qui: la dà il tasto "Giocatori Convocati" (D129, come la Partita live)
+        const convId = (convocazioneRule() || {}).rule_id;
+        filteredRules.filter(r => r.rule_id !== convId).forEach(r=>{ (byTipo[r.tipo]||byTipo.Bonus).push(r); });
         const MULTIPLIER_NAMES = [/gol\s*segnato/i, /gol\s*in\s*panchina/i, /ammoni/i, /toccate?\s+di\s+capelli/i, /esultan/i, /gesti?\s+sportivi/i, /rigori?\s+sbagliati/i, /rigori?\s+parati/i, /parat[ae]\s+decisiv/i, /pallone\s+perso/i];
         const isMultiplier = (r)=> MULTIPLIER_NAMES.some(re=> re.test(r.nome_bonus||'')) || (p.role==='Portiere' && (/rigori?\s+parati/i.test(r.nome_bonus||'') || /parat[ae]\s+decisiv/i.test(r.nome_bonus||'')));
         
@@ -2438,9 +2452,11 @@
       
       // Funzione per applicare/rimuovere bonus +1 ai convocati
       function applyConvocatiBonus() {
-        // Rimuovi bonus da tutti i giocatori
+        // Rimuovi bonus da tutti i giocatori (la Convocazione e il vecchio '__convocato')
+        const ck = convocazioneKey();
         state.players.forEach(p => {
           if (state.selPlayers[p.player_id]) {
+            delete state.selPlayers[p.player_id][ck];
             delete state.selPlayers[p.player_id]['__convocato'];
             if (Object.keys(state.selPlayers[p.player_id]).length === 0) {
               delete state.selPlayers[p.player_id];
@@ -2453,7 +2469,7 @@
           if (!state.selPlayers[playerId]) {
             state.selPlayers[playerId] = {};
           }
-          state.selPlayers[playerId]['__convocato'] = 1;
+          state.selPlayers[playerId][ck] = 1;
         });
         
         saveDay();
@@ -2467,7 +2483,22 @@
       }
       
       // Funzione per aprire il modal dei convocati
-      function openConvocatiModal() {
+      async function openConvocatiModal() {
+        // Si parte sempre da quello che è davvero spuntato nella giornata (D129)
+        restoreConvocatiFromSelections();
+        // Nessuno spuntato ancora: si precompila con la lista pubblicata in Convocati (D129).
+        // Non si applica da sola: conta solo dopo "Salva" (e poi "Salva giornata").
+        let prefilled = false;
+        if (!state.convocati.size && window.Convocati) {
+          try {
+            const lid = await ensureLeagueReady(5000);
+            const c = lid ? await Convocati.forGiornata(lid, state.giornata, true) : null;
+            if (c && c.ids.size) {
+              state.convocati = new Set([...c.ids].filter(id => state.players.some(p => p.player_id === id)));
+              prefilled = state.convocati.size > 0;
+            }
+          } catch (e) { console.warn('[matchday] lista convocati non letta', e); }
+        }
         const modal = document.createElement('div');
         modal.id = 'convocatiModal';
         modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;';
@@ -2481,6 +2512,13 @@
           <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--text, #1e293b);">Giocatori Convocati</h2>
           <button class="btn btn-secondary btn-sm" id="closeConvocatiModal" style="padding:8px 12px; min-width:44px;">&times;</button>
         `;
+        if (prefilled) {
+          const note = document.createElement('p');
+          note.style.cssText = 'margin:-8px 0 14px; font-size:13px; line-height:1.4; padding:8px 12px; border-radius:10px; background:rgba(22,163,74,0.12); border:1px solid rgba(22,163,74,0.4); color:var(--text, #1e293b);';
+          note.textContent = 'Spuntati dalla lista Convocati pubblicata per la ' + state.giornata + '. Controlla e premi Salva.';
+          modalContent.appendChild(header);
+          modalContent.appendChild(note);
+        }
         
         const controls = document.createElement('div');
         controls.style.cssText = 'display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;';
@@ -2549,7 +2587,7 @@
           <button class="btn btn-primary" id="saveConvocati" style="padding:10px 20px;">Salva</button>
         `;
         
-        modalContent.appendChild(header);
+        if (!prefilled) modalContent.appendChild(header);
         modalContent.appendChild(controls);
         modalContent.appendChild(playersList);
         modalContent.appendChild(footer);
@@ -2566,9 +2604,11 @@
         const closeModal = () => {
           modal.remove();
         };
+        // Annulla/chiudi: si torna a quello che è spuntato davvero (prima restavano le scelte non salvate)
+        const cancelModal = () => { closeModal(); restoreConvocatiFromSelections(); };
         
-        closeBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', cancelModal);
+        cancelBtn.addEventListener('click', cancelModal);
         saveBtn.addEventListener('click', () => {
           // Salva nel localStorage
           try {

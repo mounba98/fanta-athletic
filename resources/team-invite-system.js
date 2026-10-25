@@ -1,6 +1,6 @@
 /**
  * Team Invite System - Inviti Squadra con Codice/Link
- * v2025101907
+ * v20261025 (D129: funziona anche per giocatori non admin)
  * 
  * Sistema per invitare vice-allenatori a una squadra:
  * - Admin lega manda link invito lega
@@ -59,7 +59,11 @@
   }
   
   /**
-   * Verifica e usa codice invito squadra
+   * Verifica e usa codice invito squadra.
+   * D129: deve funzionare per un giocatore normale (non admin, magari non ancora nella lega).
+   * Le regole permettono a lui solo: leggere l'invito, entrare nei membri della lega,
+   * scrivere il proprio profilo. I passaggi "da admin" (contare gli allenatori, segnare
+   * l'invito come usato, lista coaches della squadra) sono tentati ma non bloccano.
    */
   async function useTeamInvite(code, userId, leagueIdHint = null) {
     const db = firebase.firestore();
@@ -78,9 +82,8 @@
         return { success: false, error: 'Invito già usato o scaduto' };
       }
       
-      if (invite.expiresAt.toDate() < new Date()) {
-        await snapshot.ref.update({ status: 'expired' });
-        return { success: false, error: 'Invito scaduto' };
+      if (invite.expiresAt && invite.expiresAt.toDate() < new Date()) {
+        return { success: false, error: 'Invito scaduto: chiedine uno nuovo' };
       }
       
       const numericTeamIndex = parseInt(invite.teamId, 10);
@@ -91,30 +94,32 @@
       const userRef = db.collection('users').doc(userId);
       const userSnap = await userRef.get();
       const userData = userSnap.exists ? (userSnap.data() || {}) : {};
-
-      const existingMembersSnap = await db.collection('users')
-        .where('currentLeague', '==', leagueId)
-        .where('team_index', '==', numericTeamIndex)
-        .get();
-
       const alreadyOnTeam = userData.currentLeague === leagueId && userData.team_index === numericTeamIndex;
-      if (!alreadyOnTeam && existingMembersSnap.size >= 3) {
-        return { success: false, error: 'Questa squadra ha già il numero massimo di allenatori (3).' };
+
+      // Massimo 3 allenatori: il conteggio legge gli altri utenti, permesso solo agli admin
+      if (!alreadyOnTeam) {
+        try {
+          const existingMembersSnap = await db.collection('users')
+            .where('currentLeague', '==', leagueId)
+            .where('team_index', '==', numericTeamIndex)
+            .get();
+          if (existingMembersSnap.size >= 3) {
+            return { success: false, error: 'Questa squadra ha già il numero massimo di allenatori (3).' };
+          }
+        } catch (countErr) {
+          console.warn('[team-invite] Conteggio allenatori non permesso, salto il controllo:', countErr.code || countErr);
+        }
       }
 
-      // Aggiungi utente alla squadra (lista coaches per tracking ruoli)
-      await db.collection(`leagues/${leagueId}/teams`).doc(invite.teamId).update({
-        coaches: firebase.firestore.FieldValue.arrayUnion({
-          userId: userId,
-          role: invite.role,
-          joinedAt: firebase.firestore.Timestamp.now()
-        })
-      });
-      
-      // Aggiungi utente alla lega se non presente
-      await db.collection('leagues').doc(leagueId).update({
-        members: firebase.firestore.FieldValue.arrayUnion(userId)
-      });
+      // Entra nella lega se non c'è (le regole lo permettono solo a chi non è già membro)
+      const leagueRef = db.collection('leagues').doc(leagueId);
+      const leagueSnap = await leagueRef.get();
+      const members = (leagueSnap.exists && leagueSnap.data().members) || [];
+      if (!members.includes(userId)) {
+        await leagueRef.update({
+          members: firebase.firestore.FieldValue.arrayUnion(userId)
+        });
+      }
 
       // Aggiorna profilo utente con lega e squadra corrente
       const authUser = firebase.auth().currentUser;
@@ -128,19 +133,36 @@
         if (authUser.email) {
           userPayload.email = authUser.email;
         }
-        if (authUser.displayName) {
+        if (authUser.displayName && !userData.displayName) {
           userPayload.displayName = authUser.displayName;
         }
         userPayload.uid = userId;
       }
       await userRef.set(userPayload, { merge: true });
       
-      // Mark invite as used
-      await snapshot.ref.update({
-        status: 'used',
-        usedBy: userId,
-        usedAt: firebase.firestore.Timestamp.now()
-      });
+      // Passaggi non indispensabili (riusciti solo dove le regole lo permettono)
+      try {
+        await snapshot.ref.update({
+          status: 'used',
+          usedBy: userId,
+          usedAt: firebase.firestore.Timestamp.now()
+        });
+      } catch (markErr) {
+        console.warn('[team-invite] Invito non segnato come usato:', markErr.code || markErr);
+      }
+      try {
+        await db.collection(`leagues/${leagueId}/teams`).doc(invite.teamId).update({
+          coaches: firebase.firestore.FieldValue.arrayUnion({
+            userId: userId,
+            role: invite.role,
+            joinedAt: firebase.firestore.Timestamp.now()
+          })
+        });
+      } catch (coachErr) {
+        console.warn('[team-invite] Lista coaches della squadra non aggiornata:', coachErr.code || coachErr);
+      }
+
+      try { localStorage.setItem('last_league_id', leagueId); } catch (e) {}
       
       return { 
         success: true, 
@@ -230,21 +252,17 @@
       }
     }
 
-    const cgSnapshot = await db.collectionGroup('teamInvites')
-      .where('code', '==', code)
-      .limit(1)
-      .get();
-
-    if (cgSnapshot.empty) {
-      return null;
+    // Senza lega indicata: cerca il codice in ogni lega (le leghe sono leggibili da tutti
+    // gli utenti collegati; la ricerca "in tutte le sottoraccolte" non è permessa dalle regole)
+    const leagues = await db.collection('leagues').get();
+    for (const leagueDoc of leagues.docs) {
+      if (leagueDoc.id === leagueIdHint) continue;
+      const snapshot = await db.collection(`leagues/${leagueDoc.id}/teamInvites`).doc(code).get();
+      if (snapshot.exists) {
+        return { snapshot, leagueId: leagueDoc.id };
+      }
     }
-
-    const snapshot = cgSnapshot.docs[0];
-    const pathSegments = snapshot.ref.path.split('/');
-    const leaguesIndex = pathSegments.indexOf('leagues');
-    const derivedLeagueId = leaguesIndex >= 0 ? pathSegments[leaguesIndex + 1] : snapshot.data().leagueId;
-
-    return { snapshot, leagueId: derivedLeagueId };
+    return null;
   }
   
   // Expose API

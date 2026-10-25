@@ -44,6 +44,13 @@
     details.tech summary { cursor:pointer; color:var(--muted); font-weight:600; padding:8px 0; }
     details.tech .adm-grid { margin-top:8px; }
     .adm-deny { text-align:center; padding:40px 16px; color:var(--muted); }
+    /* Codice invito della lega e ricerca nel pannello (D129) */
+    .adm-status .s-code { flex-basis:100%; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,.2); }
+    .adm-status .s-code b { font-size:18px; letter-spacing:.12em; }
+    .adm-status .s-code button { padding:5px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.45) !important; background:rgba(255,255,255,.12) !important; color:#fff !important; font-weight:600; font-family:inherit; font-size:13px; cursor:pointer; }
+    .adm-search { margin-top:12px; }
+    .adm-search input { width:100%; box-sizing:border-box; padding:11px 16px; border-radius:999px; border:1px solid rgba(148,163,184,.4); background:var(--card); color:var(--text); font-family:inherit; font-size:15px; }
+    .adm-noresult { color:var(--muted); text-align:center; padding:24px 0; display:none; }
     @media (max-width:600px) { .adm-grid { grid-template-columns:1fr; } .adm-status .s-pill { margin-left:0; } }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
@@ -68,7 +75,10 @@
         <div class="s-value" id="seasonLabel">—</div>
       </div>
       <div class="s-pill" id="seasonState">…</div>
+      <div class="s-code" id="leagueCodeBox" style="display:none;">Codice invito della lega <b id="leagueCode"></b><button type="button" id="copyLeagueCode">Copia</button></div>
     </div>
+    <div class="adm-search"><input type="search" id="admSearch" placeholder="Cerca nel pannello…" aria-label="Cerca nel pannello" autocomplete="off" /></div>
+    <p class="adm-noresult" id="admNoResult">Nessuna voce trovata.</p>
 
     <nav class="adm-jump" id="admJump">
       <a href="guida-admin.html" class="guide-chip">📖 Guida</a>
@@ -84,6 +94,7 @@
       <h2><span class="n">1</span> Partita live</h2>
       <p class="desc">Durante e dopo la partita: bonus e malus, presenze, calcolo della giornata.</p>
       <div class="adm-grid">
+        <a class="tile primary" href="admin-convocati.html"><span class="fa-new" data-new-until="2026-11-08">New</span><div class="t">Convocati</div><div class="d">Il giorno prima della partita: segna i convocati, i giocatori li vedono in Formazioni e Squadre.</div></a>
         <a class="tile primary" href="live.html"><span class="fa-new" data-new-until="2026-10-30">New</span><div class="t">Partita live</div><div class="d">Pannello a tasti per segnare durante la partita. Doppio controllo tra i due admin, revisione entro 48 ore.</div></a>
         <a class="tile" href="matchday.html"><div class="t">Calcolo giornata</div><div class="d">Controlla le spunte e calcola i punti (anche dopo la Partita live).</div></a>
         <a class="tile" href="admin-deadline.html"><div class="t">Scadenze formazioni</div><div class="d">Quando si chiude la consegna delle formazioni per ogni giornata.</div></a>
@@ -217,9 +228,46 @@
             const s = window.Season ? await window.Season.load() : null;
             document.getElementById('seasonLabel').textContent = s ? s.label : '—';
             document.getElementById('seasonState').textContent = s ? (STATE[s.stato] || s.stato) : '';
+            // Codice invito della lega (fisso, in leagues/{lega}.inviteCode): sempre a portata degli admin
+            if (s && s.leagueId) {
+              const lg = await raw.collection('leagues').doc(s.leagueId).get();
+              const code = lg.exists ? (lg.data().inviteCode || '') : '';
+              if (code) {
+                document.getElementById('leagueCode').textContent = code;
+                document.getElementById('leagueCodeBox').style.display = '';
+                document.getElementById('copyLeagueCode').onclick = async function(){
+                  try { await navigator.clipboard.writeText(code); this.textContent = 'Copiato'; } catch(e) { this.textContent = code; }
+                  setTimeout(() => { this.textContent = 'Copia'; }, 1500);
+                };
+              }
+            }
           } catch(e) { console.warn('[admin] stagione', e); }
         });
       });
+      // Cerca nel pannello (D129): filtra le caselle per titolo e descrizione
+      const norm = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const search = document.getElementById('admSearch');
+      search.addEventListener('input', function(){
+        const q = norm(search.value.trim());
+        let any = false;
+        document.querySelectorAll('.adm-block').forEach(b => {
+          let n = 0;
+          b.querySelectorAll('.tile').forEach(t => {
+            const hit = !q || norm(t.textContent + ' ' + t.getAttribute('href')).includes(q);
+            t.style.display = hit ? '' : 'none'; if (hit) n++;
+          });
+          const tech = b.querySelector('details.tech');
+          if (tech) {
+            const techHits = [...tech.querySelectorAll('.tile')].some(t => t.style.display !== 'none');
+            tech.style.display = !q || techHits ? '' : 'none';
+            if (q && techHits) tech.open = true;
+          }
+          b.style.display = n ? '' : 'none'; if (n) any = true;
+        });
+        document.getElementById('admJump').style.display = q ? 'none' : '';
+        document.getElementById('admNoResult').style.display = any ? 'none' : 'block';
+      });
+
       // evidenzia il blocco visibile nella barra
       const links = [...document.querySelectorAll('#admJump a')];
       const io = new IntersectionObserver(es => es.forEach(e => {
