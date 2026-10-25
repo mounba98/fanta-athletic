@@ -1,30 +1,34 @@
 Allineato a: D129
 
-# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 24/10/2026, D128)
+# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 25/10/2026 sera, D129)
 
-**▶ FATTO IL 25/10 (D129), DA PUBBLICARE PRIMA DELLA G1 (lunedì 26/10):** utenti della lista ricollegati (7, copia locale), convocati in app (`admin-convocati.html`), cambio modulo che risistema i giocatori, ruolo in panchina, inviti per i secondi corretti.
-- [x] Commit, pubblicazione del sito e regola `teamInvites` in Console: fatti il 25/10 (D129).
-- [x] (D129, riuscita: Sissiana → Chep in Le Diahane Girls) **Prova degli inviti con un giocatore non admin** (es. un altro secondo di Curva gonfi): codice da Squadre, link, accesso, entra nella squadra, non è admin.
-- [ ] Gli admin pubblicano i **convocati della G1** dalla pagina nuova; controllare al telefono Formazioni con la lista vera.
-- [x] Convocati pubblicati → Convocazione: precompilata nel Calcolo giornata, pulsante nella Partita live; riga "Convocazione" tolta dai bonus (fine del doppio +1, D129). Da decidere solo: accenno "Convocati pubblicati" in Home.
-- [ ] Idea dell'utente per dopo la G1 (D129): flusso unico nella Partita live (conferma dei convocati, poi "fase 2" in attesa del fischio d'inizio). Per ora restano due pagine.
-- [ ] Prima giornata vera: controllare che i convocati prendano +1 una volta sola (Calcolo giornata e Partita live).
-- [ ] **Si sceglie con fabione (2) non ha ancora nessun utente** (Fabione, Pippo, Salvadori non iscritti). Parrini collegato a BrigatEbosse e Cesari a Diletta (D129).
-- [ ] Lista squadre: 14 email senza account (si collegano da soli al primo accesso), Vagge/Pogge/Salvadori senza email; controllare dopo qualche giorno chi è ancora senza squadra.
-- [ ] Chi entra con Google non ha il documento utente finché non entra in una lega (solo un problema di nome/email in Verifica squadre): valutare se crearlo all'accesso.
+**▶ PROSSIMA SESSIONE — DOPO LA G1 (lunedì 26/10, Rifredi–Athletic 21.15)**
+Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i secondi (regola in Console, primo invito vero riuscito), cambio modulo, ruolo e cerchio oro in panchina, Convocazione con un solo +1, Pannello con codice lega e Cerca, utenti ricollegati.
 
-**▶ SESSIONE DEL 25/10 (decisioni dell'utente, D126–D128) — in quest'ordine:**
-0. ✅ (D129) **Convocati in app, prima della G1** (richiesta dell'utente 24/10 sera, D128): gli admin oggi mandano i convocati sul gruppo il giorno prima della partita; segnarli in app così chi fa la formazione vede chi è convocato. Proposta: pagina admin **Convocati** (giornata, griglia dei giocatori con foto, tocco = convocato, Salva) in `leagues/{lega}/config/convocati` (nessuna regola nuova: config è già leggibile dai membri e scrivibile dagli admin); in **Formazioni** e Squadre un segno "Convocato / Non convocato" su ogni giocatore quando la lista c'è, i convocati per primi, e un avviso se in formazione c'è un non convocato; nella Home, sul riquadro Formazione, "Convocati pubblicati". Poi (da decidere) la Partita live e il Calcolo giornata partono con i convocati già spuntati. Casella nel Pannello, guida admin, Novità per giocatori e admin.
-1. ✅ (D129, i 7 con account) **Ricollegare gli utenti** appena gli admin finiscono la lista squadre (D123: colleghiamo per nome, le email solo per chi resta): `team_index` come fa Verifica squadre; prova a vuoto, copia, scrittura, verifica rileggendo. Controllare chi ha già scelto da solo. Elenco dei 18 senza squadra e delle 9 squadre senza utenti in DECISION_LOG D123.
-2. **Foto giocatori (D127)**: fatte e collegate il 24/10 sera. Da fare: controllare sul telefono vero Formazioni, Squadre e Riepilogo; **foto di Tiziano Ferretti** da chiedere agli admin (non era nel PowerPoint); poi togliere i vecchi file degli allenatori non più usati (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage (`players/P010_…`, `players/P026_…`).
-3. **Fazioni delle 10 squadre che non ce l'hanno** (le 6 che continuano la hanno): la scelgono gli admin (Fazioni e nomi reali) o i giocatori al primo accesso.
-4. **Mocci, urgente**: revocare la chiave admin di Firebase nel ramo `feature/uniform-pitch-bench` (sezione Sicurezza sotto).
-5. **Console Firebase › Authentication**: l'utente cancella i 6 accessi di prova (elenco sotto, "Da decidere con gli admin"), con Claude che guida passo passo.
-6. **Prove sul telefono vero**: Novità aggiornate in Bacheca, Pannello a schede, formazioni chiuse lunedì alle 20.15, app che si aggiorna da sola alla riapertura, swipe dal bordo, barra con Giornata al centro, e un **account non admin** (serve un secondo telefono): fazione/nome, cambio fazione (deve fallire), voto nel mini-gioco.
-7. **Etichette "New"**: scadono il 30/10, poi toglierle (lo segnala `check-coerenza.py`).
-8. **PDF della guida admin** da rifare (modifiche sostanziali del 24/10: scontri diretti, Stagione, formazione non consegnata, barra): lo lancia l'utente, comando in `scripts/guida-admin-pdf.py`.
-9. **Un messaggio unico per gli admin** (l'utente lo gira sul gruppo): foto di Tiziano Ferretti; fazioni delle 10 squadre senza; da quando ci sono i convocati in app come segnarli (dopo il punto 0); la chiave da revocare (Mocci); le regole nuove degli scontri e della formazione non consegnata (pareggio entro 2, -1). La lista squadre la stanno già raccogliendo.
-10. Pulizia di questa lista: chiudere le voci superate da D124 ("messaggio sul gruppo con le email", "cosa vuol dire formazione mancante negli scontri").
+1. **Controlli sulla G1 con i dati veri** (in sola lettura, prima di toccare qualunque cosa):
+   - [ ] Convocati della G1 pubblicati dagli admin (stasera): Formazioni dal telefono con cerchio oro / sbiaditi.
+   - [ ] Dopo il calcolo: i convocati hanno preso **+1 una volta sola** (Calcolo giornata e/o Partita live); nessun `__convocato` nuovo, solo R099.
+   - [ ] Esiti delle sfide (pareggio entro 2), Scontri, Supremo, card "La mia squadra", "La mia sfida", pagina Giornata.
+   - [ ] Squadre senza formazione consegnata: chi non ha nessuna formazione precedente (prima giornata) come è stato trattato.
+   - [ ] Se usata la Partita live: risultato salvato prima di pubblicare, Imbattibilità arrivata.
+2. **Utenti e squadre** (situazione del 25/10 sera in D129 punti 10, 15):
+   - [ ] **Si sceglie con fabione (2) senza nessun utente**: Fabione, Pippo, Salvadori non iscritti.
+   - [ ] Della lista degli admin ancora senza account: Barta, Alessia (Urusaury), Flondi (Banditi), Hila, Caterino (Tabagisti), Brachi (BrigatEbosse), Tapi (Ciani), Fabione, Pippo, Salvadori (Fabione), Vagge, Pogge (Paolino). Rileggere chi si è iscritto e se è finito nella squadra giusta.
+   - [ ] 6 iscritti senza squadra (Caporaso, Matucci, Panizzi, Roti, Ferretti, Corsi): l'utente chiede conferma agli admin che non giocano; restano fermi, possono entrare con un invito.
+   - [ ] A squadre complete: decidere se **entrare in una squadra solo con un invito** (togliere la scelta libera, D129 punto 17).
+   - [ ] Chi entra con Google non ha il documento utente finché non entra in una lega: valutare se crearlo all'accesso (iscrizioni "a metà" di GiuliONE, Ale Lupi, Parrini, D129).
+3. **Idee e decisioni rimaste**:
+   - [ ] Flusso unico nella Partita live (conferma convocati → "fase 2" in attesa del fischio), idea dell'utente: per ora due pagine (D129 punto 14).
+   - [ ] Accenno "Convocati pubblicati" nella Home (riquadro Formazione)?
+4. **Coda di prima, ancora aperta**:
+   - [ ] **Mocci, urgente**: revocare la chiave admin nel ramo `feature/uniform-pitch-bench` (l'utente glielo ricorda; sezione Sicurezza sotto).
+   - [ ] Foto: controllo sul telefono vero (Formazioni, Squadre, Riepilogo); **foto di Tiziano Ferretti** dagli admin; poi togliere i vecchi file degli allenatori (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage.
+   - [ ] Console Firebase › Authentication: l'utente cancella i 6 accessi di prova, con Claude che guida.
+   - [ ] Prove sul telefono vero: Novità in Bacheca, chiusura formazioni alle 20.15, aggiornamento alla riapertura, swipe dal bordo, account non admin (fazione, cambio fazione che deve fallire, mini-gioco).
+   - [ ] **Etichette "New"**: Partita live, Stagione, Archivio scadono il **30/10**, "La mia sfida" il 7/11, Convocati l'8/11: poi toglierle (lo segnala `check-coerenza.py`).
+   - [ ] **PDF della guida admin** da rifare (scontri diretti, Stagione, Convocati, inviti, Pannello con Cerca): lo lancia l'utente, `scripts/guida-admin-pdf.py`.
+   - [ ] Le fazioni mancanti le scelgono i giocatori al primo accesso (decisione dell'utente, niente da fare).
+   - [ ] Facoltativo, con calma: aggiornare il programma di pubblicazione (firebase-tools 15.30 → 15.34), non prima della G1.
 
 **▶ A RIDOSSO DELLE PARTITE:**
 - **Dopo il calcolo della G1** (26–27/10): controllare esiti delle sfide (pareggio entro 2), Scontri, Supremo, card "La mia squadra" (Scontri/Supremo, D126), "La mia sfida" e pagina Giornata con i dati veri.

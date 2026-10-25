@@ -51,9 +51,9 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D129, 25/10/2026)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D129, 25/10/2026 sera: dopo la G1)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic` `main`),
-ultima pubblicazione **24/10/2026** (D127), verificata online. **Stagione 2026/27 "In corso"**:
+ultima pubblicazione **25/10/2026** (D129), verificata online. **Stagione 2026/27 "In corso"**:
 16 squadre con rose e allenatore; G1 lunedì 26/10 (Rifredi–Athletic 21.15), formazioni chiuse
 da sole alle 20.15 (1 ora prima, `resources/lineup-deadline.js`).
 **Cosa c'è di nuovo dal 24/10 (D123–D127)**:
@@ -70,14 +70,21 @@ da sole alle 20.15 (1 ora prima, `resources/lineup-deadline.js`).
   dei 3 allenatori (`resources/coaches/`); Albo d'oro con la classifica giocatori presa solo
   dall'archivio (non dipende dalla stagione nuova).
 - Account di prova tolti dall'app (accessi ancora in Console), regole "Civi in porta" spente.
-**Fatto il 25/10 (D129), da pubblicare prima della G1**: utenti della lista degli admin ricollegati;
-**Convocati** (`admin-convocati.html` → `leagues/{lega}/config/convocati`, mostrati in Formazioni e Squadre
-con `resources/convocati.js`); cambio modulo che manda in panchina chi è di troppo; ruolo P/D/C/A in
-panchina; inviti per i secondi che funzionano per i non admin (`team-invite-system.js`, regola
-`teamInvites` nuova **da incollare in Console**). Dettagli e cose da provare in cima a `docs/PUNTI_APERTI.md`.
-**Da fare**: la coda della sessione del 25/10 e i controlli a ridosso delle partite (dopo il
-calcolo della G1; prima del calcolo della G2 riprovare la "formazione precedente") sono in cima a
-`docs/PUNTI_APERTI.md`. Copie di sicurezza del 24/10: `backups-firestore/` (locale, con email) e
+**Novità del 25/10 (D129), pubblicate e verificate online**:
+- **Convocati**: pagina admin `admin-convocati.html` (Pannello › Partita live) → `leagues/{lega}/config/convocati`;
+  in Formazioni e Squadre cerchio oro = convocato, sbiadito = non convocato, conferma se se ne schiera uno
+  (`resources/convocati.js`). La **Convocazione +1 si dà solo** dal tasto "Giocatori Convocati" del Calcolo
+  giornata (scrive R099, precompilato con la lista; riga tolta dai bonus: fine del doppio +1) o dal pulsante
+  "Segna i convocati pubblicati" della Partita live. Convocati e Partita live restano due pagine (scelta utente).
+- **Inviti per i secondi** funzionanti per i non admin (`team-invite-system.js`; regola `teamInvites` pubblicata
+  in Console; primo invito vero riuscito: Sissiana → Chep). In fondo a Formazioni (telefono) riga discreta
+  "Invita vice-allenatori". Il codice T- scritto in "Unisciti a una lega" porta a `join-team.html`.
+- Formazioni: cambio modulo che manda in panchina chi è di troppo; ruolo P/D/C/A sulla foto in panchina.
+- Pannello: **codice invito della lega CSJVAV** con Copia, casella **Cerca**.
+- Utenti della lista degli admin ricollegati (squadra per squadra in D129); Tabagisti: Caterino al posto di Momo.
+**Da fare dopo la G1**: scaletta completa in cima a `docs/PUNTI_APERTI.md` (controlli sulla G1 con i dati veri,
+utenti ancora da iscrivere, idee in sospeso, coda di prima). Prima del calcolo della G2 riprovare la
+"formazione precedente". Copie di sicurezza del 24/10: `backups-firestore/` (locale, con email) e
 `config/backup-*-20261024` nel database (senza dati personali).
 **Sessioni dedicate in coda** (decisione dell'utente): **velocità** (unire i file di
 codice, Firebase modulare, squadre con una sola richiesta, sfarfallio del banner D063,
