@@ -166,11 +166,13 @@
     }
     const r = (results[g] && find(results[g])) || null;
     const fmtS = x => String(Math.round(Number(x) * 2) / 2).replace('.', ',');
-    let mid, sub, pill = mt.home === me ? 'In casa' : 'In trasferta';
+    let mid, sub, outcome = '', pill = mt.home === me ? 'In casa' : 'In trasferta';
     if (r && r.scoreHome != null) {
       const mine = mt.home === me ? r.scoreHome : r.scoreAway, theirs = mt.home === me ? r.scoreAway : r.scoreHome;
       const e = r.esito === 'X' ? 'Pareggio' : r.esito === '0' ? 'Nessun punto' : ((r.esito === '1') === (mt.home === me) ? 'Vittoria' : 'Sconfitta');
       pill = e;
+      // Esito a colori (D130): verde vittoria, rosso sconfitta, ambra pareggio
+      outcome = r.esito === 'X' ? 'draw' : r.esito === '0' ? '' : (e === 'Vittoria' ? 'win' : 'lose');
       mid = '<small style="white-space:nowrap"><b>' + fmtS(mine) + '</b>–<b>' + fmtS(theirs) + '</b></small>';
       sub = 'Tocca per vedere le due formazioni';
     } else {
@@ -179,6 +181,8 @@
       sub = (pos ? esc(pos) + ' · ' : '') + (dl && dl > new Date() ? 'La sua formazione si vede da ' + dl.toLocaleString('it-IT', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'Tocca per vedere le due formazioni');
     }
     el.hidden = false;
+    el.classList.remove('res-win', 'res-lose', 'res-draw');
+    if (outcome) el.classList.add('res-' + outcome);
     el.innerHTML = '<span class="fa-new" data-new-until="2026-11-07">New</span>' +
       '<div class="hd-row"><span class="hd-k">La mia sfida · ' + gNum(g) + 'ª giornata</span><span class="hd-pill">' + esc(pill) + '</span></div>' +
       '<div class="hd-vs"><span>' + esc(name(me)) + '</span>' + mid + '<span>' + esc(name(opp)) + '</span></div>' +

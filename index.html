@@ -629,6 +629,13 @@
     /* La mia sfida (D124): stesso stacco di 10px degli altri riquadri, poi come la griglia sopra */
     .hd-grid2 + #hdSfida { margin-top: 10px; margin-bottom: 4px; }
     #hdSfida { position: relative; }
+    /* Esito della sfida a colori (D130): punteggi e bollino; tinte più scure sul tema chiaro */
+    #hdSfida { --res: #f59e0b; }
+    #hdSfida.res-win { --res: #22c55e; } #hdSfida.res-lose { --res: #f87171; }
+    :root:not(.dark) #hdSfida { --res: #b45309; }
+    :root:not(.dark) #hdSfida.res-win { --res: #15803d; } :root:not(.dark) #hdSfida.res-lose { --res: #b91c1c; }
+    #hdSfida.res-win .hd-vs b, #hdSfida.res-lose .hd-vs b, #hdSfida.res-draw .hd-vs b { color: var(--res); }
+    #hdSfida.res-win .hd-pill, #hdSfida.res-lose .hd-pill, #hdSfida.res-draw .hd-pill { color: var(--res); background: color-mix(in srgb, var(--res) 16%, transparent); }
     .hd-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 10px; }
     .hd-grid4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin-bottom: 10px; }
     .hd-tile { display: block; border-radius: 16px; padding: 12px 14px; text-decoration: none; background: var(--card); color: var(--text); box-shadow: var(--shadow); border: 1px solid transparent; }
@@ -813,10 +820,10 @@
   <script src="resources/season-archive.js?v=20260925b"></script>
   <script src="resources/athletic-stats.js?v=20260925"></script>
   <script src="resources/lineup-deadline.js?v=20261024"></script>
-  <script src="resources/home-dashboard.js?v=20261027"></script>
+  <script src="resources/home-dashboard.js?v=20261027c"></script>
   <script src="resources/news.js?v=20260926b"></script>
   <script>FANews.homeCard(document.getElementById('hdNews')); FANews.popup();</script>
-  <script src="resources/provisional-badge.js?v=20260925"></script>
+  <script src="resources/provisional-badge.js?v=20261027"></script>
   <script src="resources/faction.js?v=20261027"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20261024b"></script>
