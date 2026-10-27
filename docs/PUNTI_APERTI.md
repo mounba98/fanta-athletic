@@ -1,56 +1,63 @@
 Allineato a: D130
 
-# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 25/10/2026 sera, D129)
+# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 27/10/2026 sera, D130)
 
-**▶ PROSSIMA SESSIONE (decisione dell'utente, 27/10): REVISIONE GRAFICA E DI VELOCITÀ** (D130 punto 27)
-- [ ] Velocità: Home lenta; unire i file di codice, Firebase modulare, squadre con una sola richiesta, sfarfallio del banner (D063), foto Guarducci in JPG; primo avvio di Formazioni ~7 s.
-- [ ] **Foto della squadra**: caricabile anche dal telefono e salvata nel database per i membri della squadra, non solo per gli admin (D130 punto 25).
-- [ ] **Foto profilo**: finestra di ritaglio con l'area della foto alta 0, selettore del file aperto due volte; chiedere all'utente cosa vede quando non va (D130 punto 26). Cancellare in Console › Storage i 2 file di prova di Claude in `avatars/<uid Iacopo>/`.
-- [ ] Marta: definitivi della G1 entro gio 29/10 18.52 (presenze mancanti in Correzioni).
+**Il 27/10 (D130)**, dopo la G1, tutto corretto, pubblicato e verificato online: Formazioni senza formazione vecchia, "Pubblica come squadra", cookie/Novità su Android, Partita live (fogli di prova ignorati, fischio finale = provvisori se si è soli, convocati confermati al fischio, revisione che si riapre da sola, presenze nelle Correzioni, modulo Correzioni spiegato e con bozza), tifoseria della squadra, mini-gioco **un voto per squadra** con conteggio automatico ed elenco di chi ha votato, **squadra solo con invito** (pagine + regola), Home con sfida a colori e avviso provvisori snello. Regole in Console pubblicate. **G1 calcolata da Claude** (provvisori) e mini-gioco G1 contato.
 
-**▶ PROSSIMA SESSIONE — DOPO LA G1 (lunedì 26/10, Rifredi–Athletic 21.15)**
-Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i secondi (regola in Console, primo invito vero riuscito), cambio modulo, ruolo e cerchio oro in panchina, Convocazione con un solo +1, Pannello con codice lega e Cerca, utenti ricollegati.
+**▶ PROSSIMA SESSIONE (decisione dell'utente): VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
+1. [ ] **Velocità**: la Home è lenta (tante funzioni nuove). Interventi già individuati: unire i file di codice in pochi pacchetti, Firebase "modulare", squadre con una sola richiesta, sfarfallio del banner (D063), foto Guarducci in JPG; primo avvio di Formazioni ~7 s. Misurare prima (come D066), poi intervenire, pagina per pagina, con prove su telefono.
+2. [ ] **Revisione grafica** insieme alla velocità (richiesta dell'utente: "revisione grafica e di velocità").
+3. [ ] **Foto della squadra** (D130 punto 25): oggi solo da Squadre **sul computer** e salvata nel database **solo se carica un admin**; renderla caricabile dal telefono e salvata per i membri della squadra (regola sul solo campo `logo`).
+4. [ ] **Foto profilo** (D130 punto 26): finestra di ritaglio con l'area della foto alta 0, selettore del file aperto due volte; caricamento e lettura nello Storage funzionano. Chiedere all'utente cosa vede quando non va; provarla con lui sul telefono vero. Poi cancellare in Console › Storage i 2 file di prova di Claude in `avatars/<uid Iacopo>/` (le regole non permettono di cancellarli dall'app).
 
-0. **27/10 (D130) — da fare subito, in ordine**:
-   - [x] Commit, regole in Console e sito pubblicati il 27/10, verificati online (D130 punto 17).
-   - [x] Tifoseria sulle 5 squadre senza: scritta il 27/10 (D130 punto 15), 11 Curva e 5 Piana.
-   - [x] **G1** calcolata da Claude il 27/10 (provvisori, D130 punto 20). **Marta**: in revisione (Partita live › Correzioni, "Chi" = la squadra) le presenze in curva delle 5 squadre che non vedeva, se c'erano; poi **Pubblica punti definitivi** entro gio 29/10 18.52 e Salva giornata.
-   - [x] Mini-gioco G1 calcolato (D130 punto 20).
-   - [ ] Prove sui telefoni veri: Android dell'amico (Rifiuta cookie → cambio pagina), un post "come squadra", un voto di squadra cambiato da un compagno, un invito usato da un non admin a stagione in corso.
-1. **Controlli sulla G1 con i dati veri** (in sola lettura, prima di toccare qualunque cosa):
-   - [ ] Convocati della G1 pubblicati dagli admin (stasera): Formazioni dal telefono con cerchio oro / sbiaditi.
-   - [ ] Dopo il calcolo: i convocati hanno preso **+1 una volta sola** (Calcolo giornata e/o Partita live); nessun `__convocato` nuovo, solo R099.
-   - [ ] Esiti delle sfide (pareggio entro 2), Scontri, Supremo, card "La mia squadra", "La mia sfida", pagina Giornata.
-   - [ ] Squadre senza formazione consegnata: chi non ha nessuna formazione precedente (prima giornata) come è stato trattato.
-   - [ ] Se usata la Partita live: risultato salvato prima di pubblicare, Imbattibilità arrivata.
-2. **Utenti e squadre** (situazione del 25/10 sera in D129 punti 10, 15):
-   - [ ] **Si sceglie con fabione (2) senza nessun utente**: Fabione, Pippo, Salvadori non iscritti.
-   - [ ] Della lista degli admin ancora senza account: Barta, Alessia (Urusaury), Flondi (Banditi), Hila, Caterino (Tabagisti), Brachi (BrigatEbosse), Tapi (Ciani), Fabione, Pippo, Salvadori (Fabione), Vagge, Pogge (Paolino). Rileggere chi si è iscritto e se è finito nella squadra giusta.
-   - [ ] 6 iscritti senza squadra (Caporaso, Matucci, Panizzi, Roti, Ferretti, Corsi): l'utente chiede conferma agli admin che non giocano; restano fermi, possono entrare con un invito.
-   - [ ] A squadre complete: decidere se **entrare in una squadra solo con un invito** (togliere la scelta libera, D129 punto 17).
-   - [ ] Chi entra con Google non ha il documento utente finché non entra in una lega: valutare se crearlo all'accesso (iscrizioni "a metà" di GiuliONE, Ale Lupi, Parrini, D129).
-3. **Idee e decisioni rimaste**:
-   - [ ] Flusso unico nella Partita live (conferma convocati → "fase 2" in attesa del fischio), idea dell'utente: per ora due pagine (D129 punto 14).
-   - [ ] Accenno "Convocati pubblicati" nella Home (riquadro Formazione)?
-4. **Coda di prima, ancora aperta**:
-   - [ ] **Mocci, urgente**: revocare la chiave admin nel ramo `feature/uniform-pitch-bench` (l'utente glielo ricorda; sezione Sicurezza sotto).
-   - [ ] Foto: controllo sul telefono vero (Formazioni, Squadre, Riepilogo); **foto di Tiziano Ferretti** dagli admin; poi togliere i vecchi file degli allenatori (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage.
-   - [ ] Console Firebase › Authentication: l'utente cancella i 6 accessi di prova, con Claude che guida.
-   - [ ] Prove sul telefono vero: Novità in Bacheca, chiusura formazioni alle 20.15, aggiornamento alla riapertura, swipe dal bordo, account non admin (fazione, cambio fazione che deve fallire, mini-gioco).
-   - [ ] **Etichette "New"**: Partita live, Stagione, Archivio scadono il **30/10**, "La mia sfida" il 7/11, Convocati l'8/11: poi toglierle (lo segnala `check-coerenza.py`).
-   - [ ] **PDF della guida admin** da rifare (scontri diretti, Stagione, Convocati, inviti, Pannello con Cerca): lo lancia l'utente, `scripts/guida-admin-pdf.py`.
-   - [ ] Le fazioni mancanti le scelgono i giocatori al primo accesso (decisione dell'utente, niente da fare).
-   - [ ] Facoltativo, con calma: aggiornare il programma di pubblicazione (firebase-tools 15.30 → 15.34), non prima della G1.
+**▶ IN SOSPESO DA ALTRI (controllare a inizio sessione)**
+- [ ] **Marta**: revisione della G1 entro **gio 29/10 18.52** — presenze in curva delle 5 squadre che non vedeva (Correzioni, "Chi" = la squadra, valore 1), poi **Pubblica punti definitivi** e Salva giornata. A inizio sessione controllare `live/G1.stato` = definitivo; se no, avvisare l'utente.
+- [ ] Iacopo spiega a voce agli admin il "valore" delle Correzioni (= quante volte, non i punti).
+- [ ] **Mocci, urgente**: revocare la chiave admin nel ramo `feature/uniform-pitch-bench` (sezione Sicurezza sotto).
+
+**▶ PROVE SUI TELEFONI VERI (non fattibili da Claude, che è admin)**
+- [ ] Android dell'amico: Rifiuta cookie → cambio pagina (né banner né Novità).
+- [ ] Un post "come squadra" in Bacheca.
+- [ ] Un voto del mini-gioco di squadra cambiato da un compagno (G2: si vota da dom 1/11 21.15).
+- [ ] Un non admin senza squadra che prova a sceglierla (deve trovare il blocco) e uno che entra con un invito.
+- [ ] Un admin solo che fischia nella Partita live G2 → provvisori subito, convocati +1 da soli.
+
+**▶ CONTROLLI SULLA G1 FATTI (27/10, dati veri)**
+- [x] Convocazione: R099 = 1 a 19 giocatori, nessun +2, nessun `__convocato`.
+- [x] Esiti delle sfide (pareggio entro 2: 4 pareggi su 8), Scontri, Supremo, card "La mia squadra", "La mia sfida" in Home.
+- [x] Calcolo con i bonus di fazione (Curva 12, Piana 4) — prima mai provato.
+- [x] Imbattibilità: non spettava (1-1).
+- [ ] **Formazione precedente** (chi non consegna gioca con l'ultima, -1): nella G1 tutte e 16 consegnate, quindi non ancora messa alla prova → riprovarla in sola lettura prima del calcolo della G2.
+- [ ] **Partita live con due admin**: mai provata davvero (nella G1 ha segnato solo Marta).
+
+**▶ UTENTI E SQUADRE**
+- [ ] Della lista degli admin ancora senza account (situazione del 25/10, D129): Barta, Alessia (Urusaury), Flondi (Banditi), Hila, Caterino (Tabagisti), Brachi (BrigatEbosse), Tapi (Ciani), Fabione, Pippo, Salvadori (Fabione), Vagge, Pogge (Paolino). **Da ora entrano solo con l'invito di un compagno** (D130): ogni squadra ha almeno un utente che può crearlo. Rileggere chi si è iscritto.
+- [ ] 6 iscritti senza squadra (Caporaso, Matucci, Panizzi, Roti, Ferretti, Corsi): fermi; entrano solo con un invito.
+- [ ] Chi entra con Google non ha il documento utente finché non entra in una lega: valutare se crearlo all'accesso (D129).
+- [x] Squadra solo con invito a stagione in corso: fatto (D130 punto 13).
+
+**▶ IDEE E DECISIONI**
+- [x] Curva vs Piana: resta la somma (decisione dell'utente, D130 punto 23).
+- [ ] Flusso unico nella Partita live (conferma convocati → "fase 2" in attesa del fischio), idea dell'utente: per ora due pagine (D129 punto 14). Con i convocati automatici al fischio (D130) è meno urgente.
+- [ ] Accenno "Convocati pubblicati" nella Home (riquadro Formazione)?
+
+**▶ CODA DI PRIMA, ANCORA APERTA**
+- [ ] Foto: controllo sul telefono vero (Formazioni, Squadre, Riepilogo); **foto di Tiziano Ferretti** dagli admin; poi togliere i vecchi file degli allenatori (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage.
+- [ ] Console Firebase › Authentication: l'utente cancella i 6 accessi di prova, con Claude che guida.
+- [ ] Prove sul telefono vero: Novità in Bacheca, chiusura formazioni alle 20.15, aggiornamento alla riapertura, swipe dal bordo.
+- [ ] **Etichette "New"**: Partita live, Stagione, Archivio scadono il **30/10**, "La mia sfida" il 7/11, Convocati l'8/11: poi toglierle (lo segnala `check-coerenza.py`).
+- [ ] **PDF della guida admin** da rifare (scontri diretti, Stagione, Convocati, inviti, Pannello con Cerca, e tutto il D130: Partita live, Correzioni, mini-gioco per squadra, squadra solo con invito): lo lancia l'utente, `scripts/guida-admin-pdf.py`.
+- [ ] Copia locale della G1 (`backups-firestore/G1-prima-calcolo-D130-2026-10-27.json`): cancellarla quando la G1 è definitiva.
+- [ ] Facoltativo, con calma: aggiornare il programma di pubblicazione (firebase-tools 15.30 → 15.34), non a ridosso delle partite.
 
 **▶ PRIMA DELLA STAGIONE 2027/28 (da riprendere quando si prepara la stagione nuova):**
 - [ ] **Pannello "Iscrizione"** (idea dell'utente, D130): all'apertura della stagione nuova chi ha già un account conferma la partecipazione all'edizione nuova (e con quale squadra), così gli admin non ricollegano utenti a mano come nel 2026/27 (D129). Collegare: squadra solo con invito a stagione in corso (D130), iscrizioni a metà con Google (D129), utenti senza squadra.
 
 **▶ A RIDOSSO DELLE PARTITE:**
-- **Dopo il calcolo della G1** (26–27/10): controllare esiti delle sfide (pareggio entro 2), Scontri, Supremo, card "La mia squadra" (Scontri/Supremo, D126), "La mia sfida" e pagina Giornata con i dati veri.
-- **Prima del calcolo della G2** (2/11): riprovare in sola lettura la regola "formazione precedente" (D124 punto 8) con le formazioni G1 vere, squadra per squadra.
-- **Prima partita con la Partita live**: salvare il risultato prima di pubblicare, controllare l'Imbattibilità; mai provate la Partita live con due admin e il calcolo con i bonus di fazione.
+- **Prima del calcolo della G2** (lun 2/11): riprovare in sola lettura la regola "formazione precedente" (D124 punto 8) con le formazioni G1 vere, squadra per squadra.
+- **G2 con la Partita live**: salvare il risultato prima di pubblicare (serve per Imbattibilità e mini-gioco automatico).
 
-**In coda, sessioni dedicate:** velocità (interventi grossi, sotto), poi notifiche push.
+**In coda, sessioni dedicate:** velocità ed efficienza (la prossima, sopra), poi notifiche push.
 
 
 **⚠️ SICUREZZA, URGENTE (D101)**
@@ -60,12 +67,12 @@ Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i se
 
 **Prove ancora da fare (niente è stato provato "a metà": queste parti non sono mai state eseguite sul database vero):**
 - [ ] **Partita live con DUE admin** (il percorso con un admin solo è provato, D095): serve la prima giornata della 2026/27 o una giornata di prova, poi pulizia (ora l'azzeramento non c'è più a pulire: togliere a mano `days`, `results`, `matchday_temp`, `live` della giornata di prova).
-- [ ] **Calcolo giornata con i bonus di fazione** (D080) — mai salvato davvero.
+- [x] **Calcolo giornata con i bonus di fazione** (D080): salvato davvero con la G1 il 27/10 (D130 punto 20), Curva 12 / Piana 4.
 - [ ] **Account non admin** (rimandato dall'utente, D114: serve un secondo telefono/account): scelta fazione/nome, tentativo di cambio fazione (deve fallire), eredità della fazione di squadra, voto nel mini-gioco.
 - [ ] **Swipe dal bordo** su un telefono vero (D067).
 
 **Fatto (D108–D111), pubblicato il 25/09 sera:** finestra allenatore, nuova Home, Archivio Athletic, selettore di lega nell'intestazione (cerchietto), titoli accorciati, glossario leghe.
-- [ ] Home: la fascia "Adesso" è stata provata solo in simulazione; verificarla alla prima partita vera inserita nel Calendario Athletic.
+- [x] Home: la fascia "Adesso" mostra la partita vera (Athletic–Polisportiva Sieci, G2), visto il 27/10.
 - [ ] Archivio Athletic: il bilancio V-N-P compare solo quando gli admin inseriscono i risultati delle partite (2025/26: 1 su 21).
 
 - [x] Home, card "La mia squadra": Scontri e Supremo aggiunti sotto la squadra (D126). Era: seguire la competizione scelta (posizione/punti degli Scontri) — **da decidere quando gli admin accendono gli Scontri diretti** (D113).
@@ -91,7 +98,7 @@ Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i se
 - [ ] **Formazioni con una rosa vera, dal telefono** (moduli e caselle per ruolo provati solo con una rosa finta): scegliere il modulo, schierare con tocco/trascinamento/popup, cambiare modulo, salvare; anche dalla pagina Squadre.
 - [ ] **Prove online dell'utente** delle funzioni nuove non legate all'asta (riquadro risultato nella Partita live, Regole, fuori rosa, menu Modulo): raccogliere i bug segnalati.
 - [ ] **Aggiornamento automatico alla riapertura** (D120, `app-fresh.js`): la pubblicazione del 23/10 è la prima con il controllo già sui telefoni → verificare su iPhone e Android che riaprendo l'app si veda subito la versione nuova.
-- [ ] **Prima giornata vera con la Partita live**: salvare il risultato prima di pubblicare e controllare che l'Imbattibilità arrivi ai giocatori (provata solo con risultati finti). Controllare anche che i fogli di prova di mounba e marta si siano svuotati alla loro riapertura.
+- [x] **Prima giornata vera con la Partita live** (G1, 27/10, D130): risultato salvato prima di pubblicare (1-1, Imbattibilità giustamente assente), un admin solo; i fogli di prova di mounba restano ma ora non contano.
 - [ ] **Novità sul telefono (D122)**: dopo la prossima pubblicazione, verificare su iPhone e Android che Bacheca › Novità app mostri anche quella del 24/10 (prima il magazzino dell'app teneva ferma la prima copia di `news.json`).
 - [ ] **Pannello dal telefono (D122)**: Regole e Giocatori a schede, Calendario admin rinnovato, margini uguali ovunque: guardarli sul telefono vero dopo la pubblicazione.
 - [x] **Revisione velocità (24/10, D122)**: misurata; alleggerite le immagini (icone a 128 px, foto Trendiu a 450 px: comando lanciato dall'utente).

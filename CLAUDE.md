@@ -51,45 +51,40 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D129, 25/10/2026 sera: dopo la G1)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D130, 27/10/2026 sera: dopo la G1)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic` `main`),
-ultima pubblicazione **25/10/2026** (D129), verificata online. **Stagione 2026/27 "In corso"**:
-16 squadre con rose e allenatore; G1 lunedì 26/10 (Rifredi–Athletic 21.15), formazioni chiuse
-da sole alle 20.15 (1 ora prima, `resources/lineup-deadline.js`).
-**Cosa c'è di nuovo dal 24/10 (D123–D127)**:
-- **Scontri diretti insieme alla classica** (modalità Entrambe): vince chi fa più punti,
-  **pareggio entro 2**; chi non consegna gioca con l'ultima formazione salvata **con -1**
-  (`matchday.html`); classifica **Supremo** = posizione classica + posizione scontri;
-  calendario sfide `h2h_schedule/2026-27` (G1–G15 andata, G16–G20 ritorno, poi riserva per
-  playoff; `numGiornate` = 20). Impostazioni in Pannello › Stagione.
-- **Barra in basso**: Home · Formazioni · **Giornata** (`sfida.html`, al centro) · Classifiche ·
-  Bacheca; Squadre si apre da Home e dal menu ☰. Home: riquadro "La mia sfida", card della
-  squadra con Classica, Scontri e Supremo.
-- **Giocatori** riallineati (nomi nuovi sulle maglie riassegnate: sono corretti; `players.json`
-  uguale al database); **foto** di 29 giocatori (ritaglio sul viso in `resources/players/viso/`) e
-  dei 3 allenatori (`resources/coaches/`); Albo d'oro con la classifica giocatori presa solo
-  dall'archivio (non dipende dalla stagione nuova).
-- Account di prova tolti dall'app (accessi ancora in Console), regole "Civi in porta" spente.
-**Novità del 25/10 (D129), pubblicate e verificate online**:
-- **Convocati**: pagina admin `admin-convocati.html` (Pannello › Partita live) → `leagues/{lega}/config/convocati`;
-  in Formazioni e Squadre cerchio oro = convocato, sbiadito = non convocato, conferma se se ne schiera uno
-  (`resources/convocati.js`). La **Convocazione +1 si dà solo** dal tasto "Giocatori Convocati" del Calcolo
-  giornata (scrive R099, precompilato con la lista; riga tolta dai bonus: fine del doppio +1) o dal pulsante
-  "Segna i convocati pubblicati" della Partita live. Convocati e Partita live restano due pagine (scelta utente).
-- **Inviti per i secondi** funzionanti per i non admin (`team-invite-system.js`; regola `teamInvites` pubblicata
-  in Console; primo invito vero riuscito: Sissiana → Chep). In fondo a Formazioni (telefono) riga discreta
-  "Invita vice-allenatori". Il codice T- scritto in "Unisciti a una lega" porta a `join-team.html`.
-- Formazioni: cambio modulo che manda in panchina chi è di troppo; ruolo P/D/C/A sulla foto in panchina.
-- Pannello: **codice invito della lega CSJVAV** con Copia, casella **Cerca**.
-- Utenti della lista degli admin ricollegati (squadra per squadra in D129); Tabagisti: Caterino al posto di Momo.
-**27/10 (D130), dopo la G1, in locale**: Formazioni senza formazione vecchia; "Pubblica come squadra"; Rifiuta dei cookie (Android); Partita live (fogli di prova ignorati, fischio finale = provvisori se si è soli, revisione che si riapre da sola, tutte le squadre in Fazioni); tifoseria portata sulla squadra; mini-gioco **un voto per squadra** con conteggio automatico al salvataggio del risultato ed elenco di chi ha votato; **squadra solo con invito** a stagione in corso (pagine + regola). Pubblicato il 27/10 con le regole in Console, verificato online; **G1 calcolata da Claude** (provvisori, mini-gioco), definitivi di Marta entro gio 29/10 18.52; convocati confermati al fischio finale, presenze nelle Correzioni. Fazioni invariate (decisione dell'utente). **Prossima sessione: revisione grafica e di velocità** (+ foto squadra e foto profilo, D130 punti 25-27): scaletta in cima a `docs/PUNTI_APERTI.md`.
-**Da fare dopo la G1**: scaletta completa in cima a `docs/PUNTI_APERTI.md` (controlli sulla G1 con i dati veri,
-utenti ancora da iscrivere, idee in sospeso, coda di prima). Prima del calcolo della G2 riprovare la
-"formazione precedente". Copie di sicurezza del 24/10: `backups-firestore/` (locale, con email) e
-`config/backup-*-20261024` nel database (senza dati personali).
-**Sessioni dedicate in coda** (decisione dell'utente): **velocità** (unire i file di
-codice, Firebase modulare, squadre con una sola richiesta, sfarfallio del banner D063,
-foto Guarducci in JPG) e poi **notifiche push** (piano Firebase da decidere).
+ultima pubblicazione **27/10/2026** (D130), verificata online, con le **regole Firestore D130 pubblicate
+in Console**. **Stagione 2026/27 "In corso"**: 16 squadre (11 Curva, 5 Piana), G1 giocata (Rifredi–Athletic
+1-1) e **calcolata da Claude come punti provvisori**; G2 lunedì 2/11 (Athletic–Polisportiva Sieci 21.15),
+formazioni chiuse alle 20.15, mini-gioco aperto da dom 1/11 21.15.
+**Prossima sessione (decisione dell'utente): velocità, efficienza e funzioni** — Home lenta, revisione
+grafica e di velocità, **foto della squadra** dal telefono e per i membri, **foto profilo** (ritaglio rotto):
+scaletta in cima a `docs/PUNTI_APERTI.md`. **A inizio sessione** controllare che Marta abbia pubblicato
+i **definitivi della G1** (scadenza gio 29/10 18.52: `leagues/{lega}/live/G1.stato`).
+**Come funziona ora (D130), da sapere prima di toccare qualcosa**:
+- **Partita live**: conta solo il foglio di chi ha segnato davvero (non vuoto e ≥ metà delle voci del più
+  pieno); con un admin solo il **fischio finale pubblica subito i provvisori**; i **convocati pubblicati
+  prendono +1 da soli** se nel foglio manca la Convocazione; revisione 48 ore dalla pubblicazione, nella
+  Partita live, che si riapre da sola sulla giornata in revisione; **Correzioni** con valore = "quante volte"
+  (o 1/0), anteprima dei punti, nota facoltativa, bozza salvata sul telefono, anche le presenze di squadra.
+  Dopo i definitivi le correzioni "in extremis" si fanno nel Calcolo giornata.
+- **Mini-gioco**: **un voto per squadra** (`contest_predictions/{G}_T{n}`, vale l'ultimo, lo cambia
+  qualunque compagno); punti calcolati **da soli al salvataggio del risultato** (Partita live o Calendario,
+  `ContestScoring.scoreMatch`); classifica per squadra con elenco di chi ha votato / no.
+- **Curva vs Piana**: somma di mini-gioco e bonus di giornata (decisione dell'utente: resta così).
+- **Tifoseria**: la sceglie il primo della squadra e vale per tutti (`faction.js` la porta sulla squadra).
+- **Squadra solo con invito** a stagione in corso: pagine (`resources/team-join-lock.js`) **e** regola
+  `teamJoinAllowed` su `users`; gli admin assegnano da Utenti senza squadra.
+- Formazioni senza copia sul telefono (scritta "Carico la tua formazione…"); Bacheca "come squadra";
+  cookie: il Rifiuta non cancella più niente.
+**Prima** (D123–D129, sempre validi): scontri diretti insieme alla classica (pareggio entro 2, chi non
+consegna gioca con l'ultima formazione **con -1**, Supremo); barra in basso con **Giornata** al centro;
+Convocati (`admin-convocati.html`, cerchio oro in Formazioni/Squadre); inviti per i secondi
+(`team-invite-system.js`, ora con `teamInvite` sul profilo); Pannello con codice lega CSJVAV e Cerca.
+Copie di sicurezza locali (con dati personali, escluse da Git **e dalla pubblicazione**, verificato):
+`backups-firestore/` (24–25/10 e G1 del 27/10); nel database `config/backup-*-20261024`.
+**Sessioni dedicate in coda**: velocità/efficienza (la prossima) e poi **notifiche push** (piano Firebase
+da decidere).
 **Urgente, non nostro**: Mocci deve revocare la chiave admin esposta nel ramo
 `feature/uniform-pitch-bench` (D101).
 **Pubblicazione**: commit/push li fa Claude; il deploy lo lancia l'utente con un blocco
