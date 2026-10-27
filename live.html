@@ -490,11 +490,25 @@
       return hasScore(S.venue && S.venue.m) || confirm('Il risultato della partita non è inserito: l\'Imbattibilità non verrà spuntata. Pubblico lo stesso?');
     }
 
+    // Convocati pubblicati = confermati al fischio finale (D130, decisione dell'utente):
+    // se nei fogli non c'è nessuna Convocazione, +1 a ciascun convocato pubblicato.
+    // Entrano nella mappa concordata, quindi restano anche nei definitivi e si
+    // correggono in revisione come tutto il resto.
+    function withConvocati(agreed) {
+      if (!S.conv || !S.pubConv || !S.pubConv.ids.size) return 0;
+      const k = C.rid(S.conv);
+      if (Object.keys(agreed).some(x => x.startsWith('p|') && x.endsWith('|' + k) && agreed[x])) return 0;
+      let n = 0;
+      S.pubConv.ids.forEach(pid => { if (S.players.some(p => p.id === pid)) { agreed['p|' + pid + '|' + k] = 1; n++; } });
+      return n;
+    }
+
     async function publishProvisional() {
       if (!resultMissingOk()) return;
       const ps = peersList().filter(s => s.closed);
       const m = C.merge(ps);
-      if (!confirm('Pubblico i punti provvisori (' + m.disputes.length + ' voci in revisione)? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".' + imbattNote())) return;
+      const nConv = withConvocati(m.agreed);
+      if (!confirm('Pubblico i punti provvisori (' + m.disputes.length + ' voci in revisione)? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".' + imbattNote() + (nConv ? '\n\n📋 Convocazione +1 ai ' + nConv + ' convocati pubblicati.' : ''))) return;
       const sel = withImbattibilita(C.unflat(m.agreed));
       await L().collection('matchday_temp').doc(S.g).set({ giornata: S.g, players: sel.players, coaches: sel.coaches, curva: sel.curva,
         updatedBy: 'Partita live (provvisorio)', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -525,7 +539,8 @@
         h += '<div class="f">Chi <select id="corWho">' +
           '<optgroup label="Giocatori">' + S.players.map(p => '<option value="p|' + p.id + '">' + esc(pname(p.id)) + '</option>').join('') + '</optgroup>' +
           '<optgroup label="Allenatori">' + S.coaches.map(c => '<option value="c|' + c.id + '">' + esc(c.name) + '</option>').join('') + '</optgroup>' +
-          '<option value="v|">Curva</option></select></div>' +
+          '<option value="v|">Curva</option>' +
+          '<optgroup label="Presenza in curva della squadra">' + S.teams.slice().sort((a, b) => Number(a.id) - Number(b.id)).map(t => '<option value="t|' + t.id + '">' + esc(t.name) + '</option>').join('') + '</optgroup></select></div>' +
           '<div class="f">Voce <select id="corRule"></select></div>' +
           '<div class="f">Valore corretto (0 = togli) <input id="corVal" type="number" min="0" value="1"></div>' +
           '<div class="f">Nota (chi l\'ha segnalata, perché) <input id="corNote" placeholder="es. segnalazione di Marco: il gol era di Rossi"></div>' +
@@ -546,12 +561,15 @@
       });
       const who = $('corWho');
       if (who) {
-        const fill = () => { const [sc] = who.value.split('|'); const rules = S.rules[sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva'];
+        const fill = () => { const [sc] = who.value.split('|');
+          if (sc === 't') { $('corRule').innerHTML = '<option value="presenza">Presente alla partita</option>'; return; }
+          const rules = S.rules[sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva'];
           $('corRule').innerHTML = rules.map(r => '<option value="' + C.rid(r) + '">' + esc(C.label(r)) + ' (' + fmt(Number(r.valore)) + ')</option>').join(''); };
         who.onchange = fill; fill();
         $('corAdd').onclick = async () => {
           const [sc, t] = who.value.split('|');
-          const key = sc === 'v' ? 'v||' + $('corRule').value : sc + '|' + t + '|' + $('corRule').value;
+          // presenza di squadra: stessa chiave della scheda Fazioni (curva tm:<squadra>:presenza)
+          const key = sc === 't' ? 'v||tm:' + t + ':presenza' : sc === 'v' ? 'v||' + $('corRule').value : sc + '|' + t + '|' + $('corRule').value;
           const note = $('corNote').value.trim();
           if (!note) return toast('Scrivi una nota');
           const c = { key, value: Number($('corVal').value || 0), note, by: S.user.uid, byName: S.user.displayName || (S.user.email || '').split('@')[0], at: Date.now() };

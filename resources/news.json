@@ -54,7 +54,9 @@
         "<b>Fischio finale</b>: se nessun altro sta segnando davvero, si passa subito ai punti provvisori. I fogli vuoti o \"di prova\" non bloccano più: un foglio conta se ha almeno la metà delle voci del più pieno.",
         "<b>Revisione</b>: la Partita live si apre da sola sulla giornata in revisione, anche se il Calcolo giornata è già salvato.",
         "Scheda <b>Fazioni</b>: ci sono tutte le squadre, anche quelle senza tifoseria.",
-        "<b>Mini-gioco</b>: i punti si calcolano da soli quando salvate il risultato (Partita live o Calendario Athletic)."
+        "<b>Mini-gioco</b>: i punti si calcolano da soli quando salvate il risultato (Partita live o Calendario Athletic).",
+        "<b>Convocati</b>: alla pubblicazione dei provvisori i convocati pubblicati prendono da soli la Convocazione (+1), se nel foglio non l'avete già segnata. Se c'è un errore si corregge in revisione.",
+        "<b>Correzioni in revisione</b>: nel menu \"Chi\" ci sono anche le squadre, per aggiungere una <b>presenza in curva</b> dimenticata."
       ],
       "link": "live.html",
       "linkLabel": "Apri la Partita live"

@@ -2442,11 +2442,12 @@
       const lead = total.curva === total.piana ? 'Parità' : (total.curva > total.piana ? N.curva + ' in vantaggio di ' + (total.curva - total.piana) : N.piana + ' in vantaggio di ' + (total.piana - total.curva));
       h += '<p class="fz-note" style="text-align:center;">' + lead + ' punti</p>';
       // 2) Bonus di giornata
-      const bk = Object.keys(bonus).sort((a, b) => Number(a) - Number(b));
+      const gn = k => parseInt(String(k).replace(/\D/g, ''), 10) || 0;   // id "G1" (o "1" nelle giornate vecchie)
+      const bk = Object.keys(bonus).sort((a, b) => gn(a) - gn(b));
       if (bk.length) {
         h += '<h3 class="fz-h">Bonus di giornata</h3><table class="fz-table"><tr><th>Giornata</th><th>Curva Morello</th><th>Piana</th></tr>' +
           bk.map(k => { const b = bonus[k]; const cell = f => { const x = b[f] || {}; return (x.total || 0) + ' <span class="fz-note">(squadre ' + (x.squadre || 0) + ' • eventi ' + (x.eventi || 0) + ')</span>'; };
-            return '<tr><td>G' + fzEsc(k) + '</td><td>' + cell('curva') + '</td><td>' + cell('piana') + '</td></tr>'; }).join('') + '</table>' +
+            return '<tr><td>G' + gn(k) + '</td><td>' + cell('curva') + '</td><td>' + cell('piana') + '</td></tr>'; }).join('') + '</table>' +
           '<p class="fz-note">I bonus comuni uguali per tutte le squadre non contano qui: si annullano. Contano le presenze per squadra e gli eventi di fazione (una volta per fazione).</p>';
       }
       // 3) Partecipazione al mini-gioco
