@@ -77,6 +77,11 @@ i **definitivi della G1** (scadenza gio 29/10 18.52: `leagues/{lega}/live/G1.sta
   `teamJoinAllowed` su `users`; gli admin assegnano da Utenti senza squadra.
 - Formazioni senza copia sul telefono (scritta "Carico la tua formazione…"); Bacheca "come squadra";
   cookie: il Rifiuta non cancella più niente.
+- **Classifiche al telefono**: Scontri con Punti subito dopo la squadra (G V N P; Pt Fatti/Subiti e Diff
+  solo sul computer), Supremo intero; la regola che taglia le tabelle sotto 760 px vale per quelle a schede.
+  Mini-gioco: in classifica **tutte le 16 squadre** (`withAllTeams`), anche chi non ha votato (0 punti, in
+  fondo); Fazioni › partecipazione con Squadre/Votanti e chi non ha votato per giornata.
+- Home: sfida a colori (verde chi vince, rosso chi perde, arancione pareggio), avviso provvisori su una riga.
 **Prima** (D123–D129, sempre validi): scontri diretti insieme alla classica (pareggio entro 2, chi non
 consegna gioca con l'ultima formazione **con -1**, Supremo); barra in basso con **Giornata** al centro;
 Convocati (`admin-convocati.html`, cerchio oro in Formazioni/Squadre); inviti per i secondi
