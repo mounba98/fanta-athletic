@@ -6,7 +6,7 @@ Allineato a: D130
 
 **▶ PROSSIMA SESSIONE (decisione dell'utente): VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
 1. [ ] **Velocità**: la Home è lenta (tante funzioni nuove). Interventi già individuati: unire i file di codice in pochi pacchetti, Firebase "modulare", squadre con una sola richiesta, sfarfallio del banner (D063), foto Guarducci in JPG; primo avvio di Formazioni ~7 s. Misurare prima (come D066), poi intervenire, pagina per pagina, con prove su telefono.
-2. [ ] **Revisione grafica** insieme alla velocità (richiesta dell'utente: "revisione grafica e di velocità").
+2. [ ] **Revisione grafica obbligatoria** insieme alla velocità (l'utente: "mi sembra obbligatoria"). Metodo: ogni pagina misurata al telefono (tabelle che sbordano o tagliate, come Scontri e Supremo il 27/10, D130 punto 33), chiaro/scuro, colori dei podi.
 3. [ ] **Foto della squadra** (D130 punto 25): oggi solo da Squadre **sul computer** e salvata nel database **solo se carica un admin**; renderla caricabile dal telefono e salvata per i membri della squadra (regola sul solo campo `logo`).
 4. [ ] **Foto profilo** (D130 punto 26): finestra di ritaglio con l'area della foto alta 0, selettore del file aperto due volte; caricamento e lettura nello Storage funzionano. Chiedere all'utente cosa vede quando non va; provarla con lui sul telefono vero. Poi cancellare in Console › Storage i 2 file di prova di Claude in `avatars/<uid Iacopo>/` (le regole non permettono di cancellarli dall'app).
 
