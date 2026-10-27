@@ -2,6 +2,12 @@ Allineato a: D130
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 25/10/2026 sera, D129)
 
+**▶ PROSSIMA SESSIONE (decisione dell'utente, 27/10): REVISIONE GRAFICA E DI VELOCITÀ** (D130 punto 27)
+- [ ] Velocità: Home lenta; unire i file di codice, Firebase modulare, squadre con una sola richiesta, sfarfallio del banner (D063), foto Guarducci in JPG; primo avvio di Formazioni ~7 s.
+- [ ] **Foto della squadra**: caricabile anche dal telefono e salvata nel database per i membri della squadra, non solo per gli admin (D130 punto 25).
+- [ ] **Foto profilo**: finestra di ritaglio con l'area della foto alta 0, selettore del file aperto due volte; chiedere all'utente cosa vede quando non va (D130 punto 26). Cancellare in Console › Storage i 2 file di prova di Claude in `avatars/<uid Iacopo>/`.
+- [ ] Marta: definitivi della G1 entro gio 29/10 18.52 (presenze mancanti in Correzioni).
+
 **▶ PROSSIMA SESSIONE — DOPO LA G1 (lunedì 26/10, Rifredi–Athletic 21.15)**
 Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i secondi (regola in Console, primo invito vero riuscito), cambio modulo, ruolo e cerchio oro in panchina, Convocazione con un solo +1, Pannello con codice lega e Cerca, utenti ricollegati.
 
@@ -10,7 +16,6 @@ Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i se
    - [x] Tifoseria sulle 5 squadre senza: scritta il 27/10 (D130 punto 15), 11 Curva e 5 Piana.
    - [x] **G1** calcolata da Claude il 27/10 (provvisori, D130 punto 20). **Marta**: in revisione (Partita live › Correzioni, "Chi" = la squadra) le presenze in curva delle 5 squadre che non vedeva, se c'erano; poi **Pubblica punti definitivi** entro gio 29/10 18.52 e Salva giornata.
    - [x] Mini-gioco G1 calcolato (D130 punto 20).
-   - [ ] **Decidere Curva vs Piana** (D130 punto 22): somma, media per squadra o solo mini-gioco; dopo la G1 è 42–4.
    - [ ] Prove sui telefoni veri: Android dell'amico (Rifiuta cookie → cambio pagina), un post "come squadra", un voto di squadra cambiato da un compagno, un invito usato da un non admin a stagione in corso.
 1. **Controlli sulla G1 con i dati veri** (in sola lettura, prima di toccare qualunque cosa):
    - [ ] Convocati della G1 pubblicati dagli admin (stasera): Formazioni dal telefono con cerchio oro / sbiaditi.
