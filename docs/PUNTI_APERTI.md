@@ -1,10 +1,10 @@
 Allineato a: D131
 
-# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 27/10/2026 sera, D130)
+# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 28/10/2026 notte, D131)
 
 **Il 27/10 (D130)**, dopo la G1, tutto corretto, pubblicato e verificato online: Formazioni senza formazione vecchia, "Pubblica come squadra", cookie/Novità su Android, Partita live (fogli di prova ignorati, fischio finale = provvisori se si è soli, convocati confermati al fischio, revisione che si riapre da sola, presenze nelle Correzioni, modulo Correzioni spiegato e con bozza), tifoseria della squadra, mini-gioco **un voto per squadra** con conteggio automatico ed elenco di chi ha votato, **squadra solo con invito** (pagine + regola), Home con sfida a colori e avviso provvisori snello; Classifiche al telefono (Punti degli Scontri visibili, Supremo intero, partecipazione con chi non ha votato) e classifica del mini-gioco con tutte le 16 squadre. Regole in Console pubblicate. **G1 calcolata da Claude** (provvisori) e mini-gioco G1 contato.
 
-**Il 28/10 notte (D131)**: definitivi G1 di Marta usciti con punti sbagliati (contavano quasi solo le Convocazioni). Causa nel Calcolo giornata (riscriveva la giornata con dati vecchi del telefono), corretta in locale; **G1 ricalcolata da Claude sul database vero** con il cicchino di Mario (+3), stato "definitivo". Home a pari punti come Classifiche. **Da pubblicare** (commit + sito) prima che un admin prema di nuovo "Salva giornata" dal sito online.
+**Il 28/10 notte (D131)**: definitivi G1 di Marta usciti con punti sbagliati (contavano quasi solo le Convocazioni). Causa nel Calcolo giornata (riscriveva la giornata con dati vecchi del telefono), corretta; **G1 ricalcolata da Claude sul database vero** con il cicchino di Mario (+3), stato "definitivo", banner "in revisione" sparito. Home a pari punti come Classifiche. **Pubblicato e verificato online il 28/10.**
 - [x] Regole del cicchino sistemate (+3 solo Mario, −4 solo Tommy e Trendiu), rispettate anche dalla Partita live; Classifiche mostra il nome dell'allenatore.
 
 **▶ PROSSIMA SESSIONE (decisione dell'utente): VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
@@ -12,12 +12,11 @@ Allineato a: D131
 2. [ ] **Revisione grafica obbligatoria** insieme alla velocità (l'utente: "mi sembra obbligatoria"). Metodo: ogni pagina misurata al telefono (tabelle che sbordano o tagliate, come Scontri e Supremo il 27/10, D130 punto 33), chiaro/scuro, colori dei podi.
 3. [ ] **Foto della squadra** (D130 punto 25): oggi solo da Squadre **sul computer** e salvata nel database **solo se carica un admin**; renderla caricabile dal telefono e salvata per i membri della squadra (regola sul solo campo `logo`).
 4. [ ] **Foto profilo** (D130 punto 26): finestra di ritaglio con l'area della foto alta 0, selettore del file aperto due volte; caricamento e lettura nello Storage funzionano. Chiedere all'utente cosa vede quando non va; provarla con lui sul telefono vero. Poi cancellare in Console › Storage i 2 file di prova di Claude in `avatars/<uid Iacopo>/` (le regole non permettono di cancellarli dall'app).
-
 5. [ ] **Regole: "a chi vale"** (D131, in coda su richiesta dell'utente): in Regole › Bonus e malus aggiungere la scelta di **a quali allenatori/giocatori** vale una regola (`coach_ids`/`player_ids`, già rispettati da Calcolo giornata e Partita live). Oggi si cambia solo dal database (es. cicchino +3 solo Mario, −4 solo Tommy e Trendiu). Poi togliere dalla guida "chiedete a Iacopo".
 
 **▶ IN SOSPESO DA ALTRI (controllare a inizio sessione)**
 - [x] **Marta**: definitivi della G1 pubblicati il 27/10 alle 22.38 (punti ricalcolati da Claude, D131).
-- [ ] Iacopo spiega a voce agli admin il "valore" delle Correzioni (= quante volte, non i punti).
+- [ ] Iacopo spiega a voce agli admin il "valore" delle Correzioni (= quante volte, non i punti) e che **dopo "Pubblica punti definitivi" va sempre premuto "Salva giornata"** (è lì che i punti si calcolano e il banner "in revisione" sparisce); se l'app avvisa "voci diverse dai definitivi", fermarsi e chiedere.
 - [ ] **Mocci, urgente**: revocare la chiave admin nel ramo `feature/uniform-pitch-bench` (sezione Sicurezza sotto).
 
 **▶ PROVE SUI TELEFONI VERI (non fattibili da Claude, che è admin)**
@@ -34,6 +33,8 @@ Allineato a: D131
 - [x] Imbattibilità: non spettava (1-1).
 - [ ] **Formazione precedente** (chi non consegna gioca con l'ultima, -1): nella G1 tutte e 16 consegnate, quindi non ancora messa alla prova → riprovarla in sola lettura prima del calcolo della G2.
 - [ ] **Partita live con due admin**: mai provata davvero (nella G1 ha segnato solo Marta).
+- [ ] **Dopo i definitivi della G2** (primo giro col Calcolo giornata corretto, D131): controllare in sola lettura che `days/G2` coincida con `live/G2.final`, che `results/G2.stato` = definitivo e che i punti delle squadre tornino con un ricalcolo indipendente (come per la G1).
+- [x] **G1 ricalcolata e verificata** (D131): punti squadre, capitani, allenatori, scontri, fazioni; Home = Classifiche.
 
 **▶ UTENTI E SQUADRE**
 - [ ] Della lista degli admin ancora senza account (situazione del 25/10, D129): Barta, Alessia (Urusaury), Flondi (Banditi), Hila, Caterino (Tabagisti), Brachi (BrigatEbosse), Tapi (Ciani), Fabione, Pippo, Salvadori (Fabione), Vagge, Pogge (Paolino). **Da ora entrano solo con l'invito di un compagno** (D130): ogni squadra ha almeno un utente che può crearlo. Rileggere chi si è iscritto.
