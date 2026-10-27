@@ -242,7 +242,7 @@
     #supremoTable th:nth-child(2), #supremoTable td:nth-child(2) { text-align: left; }
     @media (max-width: 760px), (pointer: coarse) {
       #h2hTable, #supremoTable { min-width: 0 !important; width: 100%; }
-      #h2hTable .h2h-wide { display: none; }
+      #h2hTable .h2h-wide, .h2h-legend .h2h-wide { display: none; }
       #h2hTable th, #h2hTable td, #supremoTable th, #supremoTable td { padding: 8px 3px !important; font-size: 14px !important; }
       #h2hTable td:nth-child(2), #supremoTable td:nth-child(2) { white-space: normal; }
     }
@@ -362,13 +362,13 @@
       <div class="card">
         <h2>Classifica Scontri Diretti H2H</h2>
         <p id="h2hRulesLine">Criteri: punti in classifica, differenza reti, reti fatte.</p>
-        <p class="h2h-legend">G giocate · V vinte · N pareggiate · P perse · Diff punti fatti meno subiti</p>
+        <p class="h2h-legend">G giocate · V vinte · N pareggiate · P perse<span class="h2h-wide"> · Diff punti fatti meno subiti</span></p>
         <div class="table-wrapper">
           <table class="table rank-table" id="h2hTable">
             <thead>
               <tr>
                 <th>#</th><th>Squadra</th><th class="h2h-pts">Punti</th><th>G</th><th>V</th><th>N</th><th>P</th>
-                <th class="h2h-wide">Pt Fatti</th><th class="h2h-wide">Pt Subiti</th><th>Diff</th>
+                <th class="h2h-wide">Pt Fatti</th><th class="h2h-wide">Pt Subiti</th><th class="h2h-wide">Diff</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -1693,7 +1693,7 @@
             <td style="font-weight:${index < 3 ? '800' : '600'};">${row.name}${forfeitIndicator}</td>
             <td class="h2h-pts">${row.pts}</td>
             <td>${row.g}</td><td>${row.v}</td><td>${row.n}</td><td>${row.p}</td>
-            <td class="h2h-wide">${fmtH2H(row.pf)}</td><td class="h2h-wide">${fmtH2H(row.ps)}</td><td>${fmtH2H(row.pf - row.ps)}</td>
+            <td class="h2h-wide">${fmtH2H(row.pf)}</td><td class="h2h-wide">${fmtH2H(row.ps)}</td><td class="h2h-wide">${fmtH2H(row.pf - row.ps)}</td>
           </tr>
         `;
       }).join('');
