@@ -212,6 +212,8 @@
     console.log('✅ Firebase initialized:', window.db ? 'OK' : 'FAIL');
   </script>
   <script src="resources/toast-css-class.js?v=20260920-final"></script>
+  <script src="resources/contest-scoring.js?v=20261027"></script>
+  <script src="resources/season.js?v=20261024b"></script>
 
   <script>
     let matches = [];
@@ -329,11 +331,23 @@
         });
 
         toast('✅ Risultato salvato!');
+        await scoreContest(match, parseInt(homeScore), parseInt(awayScore));
         await loadMatches();
       } catch (e) {
         console.error(e);
         toast('❌ Errore salvataggio');
       }
+    }
+
+    // Con il risultato salvato si contano da soli i punti del mini-gioco (D130)
+    async function scoreContest(match, h, a) {
+      const n = parseInt(match.giornata, 10);
+      if (!window.ContestScoring || isNaN(n) || isNaN(h) || isNaN(a)) return;
+      try {
+        const lid = window.Season ? (await window.Season.load()).leagueId : null;
+        const r = await window.ContestScoring.scoreMatch(window.db, 'G' + n, { home: h, away: a }, lid);
+        if (r.total) toast('🗳️ Mini-gioco: ' + r.done + ' pronostici valutati');
+      } catch (e) { console.warn('[calendario] mini-gioco non valutato', e); toast('⚠️ Mini-gioco non valutato: fallo da Pannello › Mini-gioco'); }
     }
 
     async function deleteMatch(matchId) {

@@ -1,10 +1,16 @@
-Allineato a: D129
+Allineato a: D130
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 25/10/2026 sera, D129)
 
 **▶ PROSSIMA SESSIONE — DOPO LA G1 (lunedì 26/10, Rifredi–Athletic 21.15)**
 Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i secondi (regola in Console, primo invito vero riuscito), cambio modulo, ruolo e cerchio oro in panchina, Convocazione con un solo +1, Pannello con codice lega e Cerca, utenti ricollegati.
 
+0. **27/10 (D130) — da fare subito, in ordine**:
+   - [ ] Commit + pubblicazione del sito; **regole nuove in Console** (`firestore.rules` intero: voto per squadra, squadra solo con invito).
+   - [x] Tifoseria sulle 5 squadre senza: scritta il 27/10 (D130 punto 15), 11 Curva e 5 Piana.
+   - [ ] **G1**: Marta riapre la Partita live → "Pubblica punti provvisori" → Calcolo giornata (aggiungere lì le presenze in curva mancanti) → Salva giornata. Poi revisione 48 h e definitivi.
+   - [ ] **Mini-gioco G1**: Pannello › Mini-gioco › Calcola punti (il risultato 1-1 era già salvato prima dell'aggiornamento).
+   - [ ] Prove sui telefoni veri: Android dell'amico (Rifiuta cookie → cambio pagina), un post "come squadra", un voto di squadra cambiato da un compagno, un invito usato da un non admin a stagione in corso.
 1. **Controlli sulla G1 con i dati veri** (in sola lettura, prima di toccare qualunque cosa):
    - [ ] Convocati della G1 pubblicati dagli admin (stasera): Formazioni dal telefono con cerchio oro / sbiaditi.
    - [ ] Dopo il calcolo: i convocati hanno preso **+1 una volta sola** (Calcolo giornata e/o Partita live); nessun `__convocato` nuovo, solo R099.
@@ -29,6 +35,9 @@ Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i se
    - [ ] **PDF della guida admin** da rifare (scontri diretti, Stagione, Convocati, inviti, Pannello con Cerca): lo lancia l'utente, `scripts/guida-admin-pdf.py`.
    - [ ] Le fazioni mancanti le scelgono i giocatori al primo accesso (decisione dell'utente, niente da fare).
    - [ ] Facoltativo, con calma: aggiornare il programma di pubblicazione (firebase-tools 15.30 → 15.34), non prima della G1.
+
+**▶ PRIMA DELLA STAGIONE 2027/28 (da riprendere quando si prepara la stagione nuova):**
+- [ ] **Pannello "Iscrizione"** (idea dell'utente, D130): all'apertura della stagione nuova chi ha già un account conferma la partecipazione all'edizione nuova (e con quale squadra), così gli admin non ricollegano utenti a mano come nel 2026/27 (D129). Collegare: squadra solo con invito a stagione in corso (D130), iscrizioni a metà con Google (D129), utenti senza squadra.
 
 **▶ A RIDOSSO DELLE PARTITE:**
 - **Dopo il calcolo della G1** (26–27/10): controllare esiti delle sfide (pareggio entro 2), Scontri, Supremo, card "La mia squadra" (Scontri/Supremo, D126), "La mia sfida" e pagina Giornata con i dati veri.

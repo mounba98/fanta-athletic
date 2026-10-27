@@ -1,4 +1,4 @@
-Allineato a: D129
+Allineato a: D130
 
 # Mappa delle pagine — a cosa serve ogni file
 
@@ -38,12 +38,12 @@ nomi di classe generici che vanno in conflitto.
 | `user-profile-upload.html` | Upload foto profilo — verificare se sovrapposta a `profile.html` |
 | `store.html` | Negozio ufficiale (prodotti/gadget) |
 | `asta.html` | Asta giocatori |
-| `contest.html` | Mini-gioco Curva vs Piana: voto 1-X-2 sulla partita Athletic (D069/D071) |
-| `contest-leaderboard.html` | Classifica del contest pronostici |
+| `contest.html` | Mini-gioco Curva vs Piana: voto 1-X-2 sulla partita Athletic, **un voto per squadra** (vale l'ultimo, D130) (D069/D071) |
+| `contest-leaderboard.html` | Classifica del mini-gioco per squadra e, per giornata, chi ha votato e chi no (D130) |
 | `calendario.html` | Calendario degli scontri di fantacalcio |
 | `calendario-athletic.html` | Calendario reale della squadra Athletic Brescia (non è un doppione del precedente) |
-| `scegli-squadra.html` | Selezione/creazione della propria squadra |
-| `join-league.html` | Iscrizione a una lega |
+| `scegli-squadra.html` | Selezione della propria squadra; a stagione in corso solo con invito (`resources/team-join-lock.js`, D130) |
+| `join-league.html` | Iscrizione a una lega; a stagione in corso niente scelta della squadra, solo invito (D130) |
 | `join-team.html` | Iscrizione a una squadra |
 | `league-invite.html` | Pagina di invito a una lega |
 | `notifications.html` | Centro notifiche |
@@ -75,7 +75,7 @@ nomi di classe generici che vanno in conflitto.
 | `admin-stagione.html` | Parametri della stagione, archiviazione, apertura stagione nuova (D087) |
 | `archivio.html` | Archivio stagioni / albo d'oro, per tutti (D087); classifica giocatori dalla copia archiviata, con i nomi di quella stagione (D123) |
 | `archivio-athletic.html` | Archivio Athletic: statistiche dei giocatori veri stagione per stagione, scheda giocatore (D109, motore `resources/athletic-stats.js`) |
-| `admin-contest.html` | Mini-gioco Curva vs Piana: calcolo punti, classifica, testo WhatsApp (D069) |
+| `admin-contest.html` | Mini-gioco Curva vs Piana: calcolo punti (di solito automatico al salvataggio del risultato, D130), classifica, testo WhatsApp (D069) |
 | `admin-fazioni.html` | Fazione delle squadre e nomi reali dei giocatori (D073) |
 | `admin-convocati.html` | Convocati per giornata: gli admin li pubblicano, Formazioni e Squadre li mostrano (`resources/convocati.js`, D129) |
 | `guida-admin.html` | Guida per gli admin dentro l'app, solo admin (Pannello › 📖 Guida). È la fonte del PDF: `scripts/guida-admin-pdf.py` (D115) |

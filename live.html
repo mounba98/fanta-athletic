@@ -119,6 +119,7 @@
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/season.js?v=20261024b"></script>
   <script src="resources/convocati.js?v=20261025"></script>
+  <script src="resources/contest-scoring.js?v=20261027"></script>
   <script src="resources/live-core.js?v=20260925"></script>
   <script>
     const C = window.LiveCore;
@@ -290,13 +291,13 @@
       });
     }
     function renderFazioni() {
-      const withF = S.teams.filter(t => t.fazione);
+      // Tutte le squadre, anche quelle senza fazione sulla squadra (D130): la presenza "comune" vale per tutte
+      const withF = S.teams.slice().sort((a, b) => Number(a.id) - Number(b.id));
       const scoped = S.rules.scoped;
       let h = '<p class="info">' + (S.venue && S.venue.v ? 'Partita <b>' + (S.venue.v === 'casa' ? 'IN CASA' : 'IN TRASFERTA') + '</b>: la presenza vale il bonus ' + S.venue.v + '.' : 'Casa/trasferta non trovata nel calendario Athletic.') + '</p>';
       h += '<div class="sect">Presenze delle squadre</div>';
-      if (!withF.length) h += '<p class="info">Nessuna squadra ha ancora una fazione (si imposta da Fazioni e nomi).</p>';
       h += '<div class="grid">' + withF.map(t => { const k = 'tm:' + t.id + ':presenza'; const on = count('curva', null, k);
-        return '<button class="key ' + (on ? 'on' : '') + '" data-fz="' + k + '">' + esc(t.name) + '<span class="sub">' + FNAME[t.fazione] + (on ? ' • presente' : '') + '</span></button>'; }).join('') + '</div>';
+        return '<button class="key ' + (on ? 'on' : '') + '" data-fz="' + k + '">' + esc(t.name) + '<span class="sub">' + (FNAME[t.fazione] || 'tifoseria non scelta') + (on ? ' • presente' : '') + '</span></button>'; }).join('') + '</div>';
       const events = scoped.filter(r => r.ambito === 'fazione');
       if (events.length) {
         h += '<div class="sect">Eventi di fazione</div><div class="grid">' + events.map(r => { const k = 'fz:' + r.fazione + ':' + C.rid(r); const n = count('curva', null, k);
@@ -381,17 +382,32 @@
     $('closeBtn').onclick = async () => {
       if (!confirm('Fischio finale: chiudi il tuo foglio? Dopo non potrai più modificarlo (le correzioni si fanno in revisione).')) return;
       S.sheet.closed = true; S.sheet.closedAt = Date.now(); persist(); await pushSheet(); render();
+      // Se nessun altro sta segnando davvero, il foglio vale da solo: si pubblicano subito i provvisori (D092, D130)
+      const ps = peersList();
+      if (ps.length && ps.every(s => s.closed || s.uid === S.user.uid)) publishProvisional();
     };
 
     // ---------- dopo il fischio ----------
     // Senza partita sul database contano solo il proprio foglio: quelli degli altri sono avanzi (D121)
+    // Contano solo i fogli di chi ha segnato davvero (D130): vuoti o con meno della metà delle
+    // voci del foglio più pieno sono prove ("smanettati") e si ignorano. Il proprio foglio conta se ha qualcosa.
+    const sheetSize = s => Object.keys(C.flat(s)).length;
     function peersList() {
-      const all = Object.values(S.sheets);
-      return (S.live && S.live.createdAt) ? all : all.filter(s => s.uid === S.user.uid);
+      // il proprio foglio sempre nella versione più recente (quella sul telefono)
+      const all = Object.values(S.sheets).filter(s => s.uid !== S.user.uid);
+      if (S.sheet) all.push(Object.assign({ uid: S.user.uid, name: (S.sheets[S.user.uid] || {}).name || 'tu' }, S.sheet));
+      if (!(S.live && S.live.createdAt)) return all.filter(s => s.uid === S.user.uid);
+      const max = Math.max(0, ...all.map(sheetSize));
+      return all.filter(s => { const n = sheetSize(s); return n > 0 && (n * 2 >= max || s.uid === S.user.uid); });
+    }
+    function ignoredSheets() {
+      const keep = new Set(peersList().map(s => s.uid));
+      return (S.live && S.live.createdAt) ? Object.values(S.sheets).filter(s => !keep.has(s.uid) && s.uid !== S.user.uid) : [];
     }
     function renderPeers() {
-      const ps = peersList();
-      $('peers').innerHTML = ps.length ? 'Fogli: ' + ps.map(s => esc(s.name || 'admin') + (s.uid === S.user.uid ? ' (tu)' : '') + ' ' + (s.closed ? '✅ chiuso' : '✍️ sta segnando')).join(' • ') : '';
+      const ps = peersList(), ign = ignoredSheets();
+      $('peers').innerHTML = (ps.length ? 'Fogli: ' + ps.map(s => esc(s.name || 'admin') + (s.uid === S.user.uid ? ' (tu)' : '') + ' ' + (s.closed ? '✅ chiuso' : '✍️ sta segnando')).join(' • ') : '') +
+        (ign.length ? '<br><span style="opacity:.7">Non contano (vuoti o quasi): ' + ign.map(s => esc(s.name || 'admin')).join(', ') + '</span>' : '');
     }
     function renderClosed() {
       const ps = peersList();
@@ -437,6 +453,13 @@
           await db().collection('athletic_calendar').doc(m._id).update({ homeScore: parseInt(h, 10), awayScore: parseInt(a, 10) });
           m.homeScore = parseInt(h, 10); m.awayScore = parseInt(a, 10);
           toast('Risultato salvato');
+          // punti del mini-gioco contati da soli (D130)
+          const n = parseInt(m.giornata, 10);
+          if (window.ContestScoring && !isNaN(n)) {
+            ContestScoring.scoreMatch(db(), 'G' + n, { home: m.homeScore, away: m.awayScore }, S.lid)
+              .then(r => { if (r.total) toast('🗳️ Mini-gioco: ' + r.done + ' pronostici valutati'); })
+              .catch(e => { console.warn('[live] mini-gioco', e); toast('Mini-gioco non valutato: fallo da Pannello › Mini-gioco'); });
+          }
           rerender();
         } catch (e) { toast('Errore: ' + (e.code || e.message)); }
       };
@@ -584,7 +607,13 @@
         const calMax = Math.max(0, ...S.cal.map(c => parseInt(c.giornata, 10)).filter(Number.isFinite));
         const n = Math.max(Number(season.numGiornate) || 38, calMax);
         let first = 'G1';
-        for (let i = 1; i <= n; i++) { const d = await L().collection('days').doc('G' + i).get().catch(() => null); if (!d || !d.exists || d.data().computed !== true) { first = 'G' + i; break; } }
+        // Una giornata in revisione (punti provvisori) ha la precedenza: è lì che si
+        // pubblicano i definitivi, anche se il Calcolo giornata l'ha già salvata (D130)
+        let inReview = null;
+        try { const lv = await L().collection('live').where('stato', '==', 'provvisorio').get();
+          inReview = lv.docs.map(d => d.id).sort((a, b) => parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10))[0] || null; } catch (e) {}
+        if (inReview) first = inReview;
+        else for (let i = 1; i <= n; i++) { const d = await L().collection('days').doc('G' + i).get().catch(() => null); if (!d || !d.exists || d.data().computed !== true) { first = 'G' + i; break; } }
         const q = new URLSearchParams(location.search).get('g');
         $('gSel').innerHTML = Array.from({ length: n }, (_, i) => '<option value="G' + (i + 1) + '">Giornata ' + (i + 1) + '</option>').join('');
         $('gSel').value = q || first;

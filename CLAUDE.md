@@ -1,4 +1,4 @@
-Allineato a: D129
+Allineato a: D130
 
 # Fanta Athletic — contesto per Claude
 
@@ -82,6 +82,7 @@ da sole alle 20.15 (1 ora prima, `resources/lineup-deadline.js`).
 - Formazioni: cambio modulo che manda in panchina chi è di troppo; ruolo P/D/C/A sulla foto in panchina.
 - Pannello: **codice invito della lega CSJVAV** con Copia, casella **Cerca**.
 - Utenti della lista degli admin ricollegati (squadra per squadra in D129); Tabagisti: Caterino al posto di Momo.
+**27/10 (D130), dopo la G1, in locale**: Formazioni senza formazione vecchia; "Pubblica come squadra"; Rifiuta dei cookie (Android); Partita live (fogli di prova ignorati, fischio finale = provvisori se si è soli, revisione che si riapre da sola, tutte le squadre in Fazioni); tifoseria portata sulla squadra; mini-gioco **un voto per squadra** con conteggio automatico al salvataggio del risultato ed elenco di chi ha votato; **squadra solo con invito** a stagione in corso (pagine + regola). Due regole nuove da pubblicare in Console; G1 ancora da calcolare: scaletta in cima a `docs/PUNTI_APERTI.md`.
 **Da fare dopo la G1**: scaletta completa in cima a `docs/PUNTI_APERTI.md` (controlli sulla G1 con i dati veri,
 utenti ancora da iscrivere, idee in sospeso, coda di prima). Prima del calcolo della G2 riprovare la
 "formazione precedente". Copie di sicurezza del 24/10: `backups-firestore/` (locale, con email) e

@@ -44,6 +44,32 @@ service cloud.firestore {
     }
 
     // Vero se la fazione, quando presente, è un valore valido
+    // D130: a stagione in corso si entra in una squadra SOLO con un invito di squadra.
+    // Vale per chi si dà da solo una squadra (non per gli admin): se `team_index` cambia,
+    // o la stagione della lega non è "in_corso", o il profilo porta `teamInvite` = codice
+    // di un invito attivo della stessa lega e della stessa squadra.
+    function teamJoinAllowed() {
+      let d = request.resource.data;
+      let changed = resource == null
+        ? d.get('team_index', null) != null
+        : d.diff(resource.data).affectedKeys().hasAny(['team_index']);
+      return !changed || d.get('team_index', null) == null || seasonNotRunning(d) || inviteOk(d);
+    }
+    function seasonNotRunning(d) {
+      let lid = d.get('currentLeague', '');
+      return !(lid is string) || lid == '' ||
+        !exists(/databases/$(database)/documents/leagues/$(lid)/config/season) ||
+        get(/databases/$(database)/documents/leagues/$(lid)/config/season).data.get('stato', '') != 'in_corso';
+    }
+    function inviteOk(d) {
+      let lid = d.get('currentLeague', '');
+      let code = d.get('teamInvite', '');
+      return lid is string && lid != '' && code is string && code != '' &&
+        exists(/databases/$(database)/documents/leagues/$(lid)/teamInvites/$(code)) &&
+        get(/databases/$(database)/documents/leagues/$(lid)/teamInvites/$(code)).data.status == 'active' &&
+        string(get(/databases/$(database)/documents/leagues/$(lid)/teamInvites/$(code)).data.teamId) == string(d.team_index);
+    }
+
     function factionValid() {
       return !('fazione' in request.resource.data) ||
              request.resource.data.fazione in ['curva', 'piana'];
@@ -329,10 +355,11 @@ service cloud.firestore {
     // ========== Users ==========
     match /users/{userId} {
       allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
-      allow create, delete: if isSignedIn() && (request.auth.uid == userId || isAdmin());
-      // la fazione, una volta scelta, la cambia solo un admin
+      allow create: if isSignedIn() && (isAdmin() || (request.auth.uid == userId && teamJoinAllowed()));
+      allow delete: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      // la fazione, una volta scelta, la cambia solo un admin; la squadra solo con invito (D130)
       allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) &&
-                       (isAdmin() || (!factionLocked() && factionValid()));
+                       (isAdmin() || (!factionLocked() && factionValid() && teamJoinAllowed()));
     }
 
     // ========== Notifications ==========
@@ -436,9 +463,23 @@ service cloud.firestore {
       allow write: if isSignedIn() && request.auth.uid == uid;
     }
 
-    // Voti del contest: una riga per utente e partita ("G3_<uid>")
+    // Voti del contest: dal 27/10/2026 (D130) una riga per SQUADRA e partita ("G3_T6"),
+    // che ogni membro della squadra può scrivere/cambiare (vale l'ultimo). Resta permesso
+    // anche il vecchio voto a persona ("G3_<uid>") per i telefoni con la pagina vecchia.
     match /contest_predictions/{predId} {
       allow read: if isSignedIn();
+
+      allow create, update: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.team_index is int
+        && request.resource.data.team_index ==
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('team_index', null)
+        && predId == request.resource.data.matchKey + '_T' + string(request.resource.data.team_index)
+        && request.resource.data.pick in ['1', 'X', '2']
+        && request.resource.data.points == null
+        && (resource == null || resource.data.points == null)
+        && request.resource.data.faction ==
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('fazione', null);
 
       allow create, update: if isSignedIn()
         && request.resource.data.uid == request.auth.uid

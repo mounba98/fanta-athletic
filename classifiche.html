@@ -2383,7 +2383,7 @@
   <script src="resources/players-leaderboard-classifiche.js?v=20260921-final"></script>
   <script src="resources/mobile-menu.js?v=20261024b"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20261024c"></script>
+  <script src="resources/faction.js?v=20261027"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20261024b"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>
@@ -2450,10 +2450,10 @@
           '<p class="fz-note">I bonus comuni uguali per tutte le squadre non contano qui: si annullano. Contano le presenze per squadra e gli eventi di fazione (una volta per fazione).</p>';
       }
       // 3) Partecipazione al mini-gioco
-      h += '<h3 class="fz-h">Mini-gioco: partecipazione</h3><table class="fz-table"><tr><th></th><th>Giocatori</th><th>Voti</th><th>Media/giocatore</th></tr>' +
+      h += '<h3 class="fz-h">Mini-gioco: partecipazione</h3><table class="fz-table"><tr><th></th><th>Squadre</th><th>Voti</th><th>Media/squadra</th></tr>' +
         ['curva','piana'].map(id => { const x = t[id] || { players:0, predictions:0, points:0 };
           return '<tr><td><span class="fz-dot ' + id + '"></span>' + N[id] + '</td><td>' + x.players + '</td><td>' + x.predictions + '</td><td>' + avg(x) + '</td></tr>'; }).join('') + '</table>' +
-        '<p class="fz-note">Il titolo va alla somma dei punti; la media mostra l\'effetto del numero di giocatori.</p>';
+        '<p class="fz-note">Un voto per squadra (dalla G1 2026/27). Il titolo va alla somma dei punti; la media mostra l\'effetto del numero di squadre.</p>';
       // 4) Precisione dei voti
       h += '<h3 class="fz-h">Mini-gioco: precisione dei voti</h3>' + ['curva','piana'].map(id => { const x = t[id] || {}; const v = pct(x);
         return '<div>' + N[id] + ': <strong>' + v + '%</strong> <span class="fz-note">(' + (x.hits || 0) + ' su ' + (x.predictions || 0) + ')</span></div>' +
@@ -2470,7 +2470,7 @@
       const users = Object.entries(st.users || {}).map(([uid, u]) => ({ uid, ...u })).sort((a, b) => b.points - a.points || b.hits - a.hits);
       if (users.length) {
         const me = window.auth && window.auth.currentUser ? window.auth.currentUser.uid : null;
-        h += '<h3 class="fz-h">Mini-gioco: classifica individuale</h3><table class="fz-table"><tr><th>#</th><th>Giocatore</th><th>Punti</th><th>Azzeccati</th></tr>' +
+        h += '<h3 class="fz-h">Mini-gioco: classifica delle squadre</h3><table class="fz-table"><tr><th>#</th><th>Squadra</th><th>Punti</th><th>Azzeccati</th></tr>' +
           users.slice(0, 30).map((u, i) => '<tr' + (u.uid === me ? ' style="font-weight:800;"' : '') + '><td>' + (i + 1) + '</td><td><span class="fz-dot ' + (u.faction || '') + '"></span>' + fzEsc(u.name) + (u.uid === me ? ' (Tu)' : '') + '</td><td>' + u.points + '</td><td>' + (u.hits || 0) + '/' + (u.predictions || 0) + '</td></tr>').join('') + '</table>';
       }
       document.getElementById('fazioniBody').innerHTML = h;

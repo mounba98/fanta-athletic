@@ -1,7 +1,64 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D129",
+  "allineato": "D130",
   "news": [
+    {
+      "id": "2026-10-27-correzioni-g1",
+      "date": "2026-10-27",
+      "audience": "all",
+      "icon": "🛠️",
+      "title": "Correzioni dopo la prima giornata",
+      "intro": "Sistemati tre fastidi che ci avete segnalato.",
+      "items": [
+        "<b>Formazioni</b>: all'apertura non compare più per qualche secondo una formazione vecchia (con giocatori o allenatore della stagione scorsa). Finché i dati non sono arrivati vedi la scritta <b>Carico la tua formazione…</b>",
+        "<b>Bacheca</b>: con la spunta <b>Pubblica come squadra</b> il post esce davvero con il nome della tua squadra, non col tuo nome.",
+        "<b>Cookie</b>: se tocchi <b>Rifiuta</b> la scelta viene ricordata; il banner e la finestra delle Novità non ricompaiono più a ogni cambio di pagina (succedeva soprattutto su Android).",
+        "<b>Tifoseria</b>: la sceglie il primo della squadra e vale per tutti i compagni. Alcune squadre l'avevano scelta ma non era arrivata sulla squadra: ora si sistema da sola."
+      ]
+    },
+    {
+      "id": "2026-10-27-minigioco-squadra",
+      "date": "2026-10-27",
+      "audience": "all",
+      "icon": "🗳️",
+      "title": "Mini-gioco: un voto per squadra",
+      "intro": "Da questa giornata il 1-X-2 si gioca <b>per squadra</b>, non più a persona.",
+      "items": [
+        "Qualunque compagno può votare o cambiare il voto fino alla chiusura: vale l'<b>ultimo</b>. Nella pagina vedi chi l'ha messo e quando.",
+        "I punti vanno alla squadra e alla sua tifoseria (Curva Morello o Piana). Per la prima giornata abbiamo contato l'ultimo voto di ogni squadra.",
+        "Nella classifica del mini-gioco trovi, giornata per giornata, le squadre che <b>hanno votato</b> e quelle che <b>no</b>: nessun malus, solo per ricordarvelo."
+      ],
+      "link": "contest.html",
+      "linkLabel": "Vai al mini-gioco"
+    },
+    {
+      "id": "2026-10-27-solo-invito",
+      "date": "2026-10-27",
+      "audience": "all",
+      "icon": "🔐",
+      "title": "In squadra si entra solo con un invito",
+      "intro": "A stagione iniziata nessuno può più scegliersi una squadra da solo.",
+      "items": [
+        "Per far entrare un compagno (o un vice-allenatore) apri <b>Formazioni</b> › in fondo <b>Invita vice-allenatori</b> e mandagli il codice (T-…).",
+        "Chi si iscrive ora trova la spiegazione e il pulsante <b>Ho un codice invito</b>."
+      ]
+    },
+    {
+      "id": "2026-10-27-live-admin",
+      "date": "2026-10-27",
+      "audience": "admin",
+      "icon": "🎙️",
+      "title": "Partita live e mini-gioco più semplici",
+      "intro": "Sistemato quello che non ha funzionato nella prima giornata.",
+      "items": [
+        "<b>Fischio finale</b>: se nessun altro sta segnando davvero, si passa subito ai punti provvisori. I fogli vuoti o \"di prova\" non bloccano più: un foglio conta se ha almeno la metà delle voci del più pieno.",
+        "<b>Revisione</b>: la Partita live si apre da sola sulla giornata in revisione, anche se il Calcolo giornata è già salvato.",
+        "Scheda <b>Fazioni</b>: ci sono tutte le squadre, anche quelle senza tifoseria.",
+        "<b>Mini-gioco</b>: i punti si calcolano da soli quando salvate il risultato (Partita live o Calendario Athletic)."
+      ],
+      "link": "live.html",
+      "linkLabel": "Apri la Partita live"
+    },
     {
       "id": "2026-10-25-pannello",
       "date": "2026-10-25",

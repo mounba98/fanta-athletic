@@ -218,7 +218,7 @@
   <!-- Hero -->
   <div class="hero">
     <h1>Classifica Contest</h1>
-    <p>Indovina il Risultato - Stagione 2024/25</p>
+    <p>Indovina 1-X-2 · un voto per squadra</p>
   </div>
 
   <!-- Container -->
@@ -240,11 +240,11 @@
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-value" id="totalPlayers">-</div>
-          <div class="stat-label">Partecipanti</div>
+          <div class="stat-label">Squadre</div>
         </div>
         <div class="stat-box">
           <div class="stat-value" id="totalPredictions">-</div>
-          <div class="stat-label">Pronostici Totali</div>
+          <div class="stat-label">Voti totali</div>
         </div>
         <div class="stat-box">
           <div class="stat-value" id="avgPoints">-</div>
@@ -260,7 +260,7 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Giocatore</th>
+            <th>Squadra</th>
             <th style="text-align:right;">Punti</th>
           </tr>
         </thead>
@@ -272,6 +272,13 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Chi ha votato (D130): solo un elenco, nessun malus -->
+    <div class="card" id="partCard" style="display:none;">
+      <h2 style="margin-top:0;">Chi ha votato</h2>
+      <p style="margin:0 0 10px;color:#6b7280;font-size:14px;">Un voto per squadra. Chi non vota non perde punti: lo prende solo chi indovina.</p>
+      <div id="partList"></div>
     </div>
   </div>
 
@@ -338,6 +345,7 @@
         scoresArray.sort((a, b) => b.totalPoints - a.totalPoints);
 
         state.scores = scoresArray;
+        renderParticipation(data.participation || {});
         renderTeams(data.teams);
         renderLeaderboard();
         renderStats();
@@ -346,13 +354,26 @@
       }
     }
 
+    function renderParticipation(part) {
+      const keys = Object.keys(part).sort((a, b) => parseInt(b.slice(1), 10) - parseInt(a.slice(1), 10));
+      if (!keys.length) return;
+      document.getElementById('partCard').style.display = 'block';
+      document.getElementById('partList').innerHTML = keys.map(k => {
+        const p = part[k] || {}, v = p.voted || [], m = p.missing || [];
+        return '<div style="padding:10px 0;border-top:1px solid rgba(148,163,184,.25);font-size:14px;line-height:1.6;">' +
+          '<strong>Giornata ' + esc(k.slice(1)) + '</strong> · ' + v.length + ' su ' + (v.length + m.length) + '<br>' +
+          (v.length ? '<span style="color:#16a34a;">✓</span> ' + v.map(esc).join(', ') + '<br>' : '') +
+          (m.length ? '<span style="color:#920100;">✗</span> <span style="opacity:.8">' + m.map(esc).join(', ') + '</span>' : '') + '</div>';
+      }).join('');
+    }
+
     function renderTeams(teams) {
       const t = teams || { curva: { points: 0, players: 0 }, piana: { points: 0, players: 0 } };
       ['curva', 'piana'].forEach(id => {
         const x = t[id] || { points: 0, players: 0 };
         document.getElementById(id + 'Pts').textContent = x.points;
         const avg = x.players ? (x.points / x.players).toFixed(1) : '0';
-        document.getElementById(id + 'Sub').textContent = x.players + ' giocatori • media ' + avg;
+        document.getElementById(id + 'Sub').textContent = x.players + ' squadre • media ' + avg;
       });
     }
 

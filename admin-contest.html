@@ -77,7 +77,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
-  <script src="resources/contest-scoring.js?v=20261024"></script>
+  <script src="resources/contest-scoring.js?v=20261027"></script>
   <script src="resources/season.js?v=20261024b"></script>
   <script>
     const CS = window.ContestScoring;
@@ -180,18 +180,10 @@
       btn.disabled = true;
       try {
         log(`▶ ${key}: leggo i pronostici…`);
-        const snap = await window.db.collection('contest_predictions').where('matchKey', '==', key).get();
-        let batch = window.db.batch(), ops = 0, done = 0;
-        for (const d of snap.docs) {
-          const pts = CS.scorePrediction(d.data(), m.result);
-          if (pts === null) { log(`  ⚠ ${d.id}: pronostico non valido, saltato`); continue; }
-          batch.update(d.ref, { points: pts, scoredAt: new Date().toISOString() });
-          done++;
-          if (++ops === 400) { await batch.commit(); batch = window.db.batch(); ops = 0; }
-        }
-        if (ops) await batch.commit();
-        log(`✅ ${key}: valutati ${done} pronostici (risultato ${m.result.home}-${m.result.away})`);
-        await rebuildStandings();
+        const lid = window.Season ? (await window.Season.load()).leagueId : null;
+        const r = await CS.scoreMatch(window.db, key, m.result, lid);
+        log(`✅ ${key}: valutati ${r.done} pronostici (risultato ${m.result.home}-${m.result.away})`);
+        if (r.participation) log(`   Hanno votato ${r.participation.voted.length}, non hanno votato ${r.participation.missing.length}`);
         await refresh();
       } catch (e) {
         console.error(e);
@@ -200,14 +192,14 @@
       }
     }
 
+    // Solo la classifica, dai pronostici già valutati (l'elenco di chi ha votato resta com'è)
     async function rebuildStandings() {
-      const snap = await window.db.collection('contest_predictions').get();
-      const all = snap.docs.map(d => d.data());
+      const ref = window.db.collection('contest_standings').doc('current');
+      const prev = await ref.get().catch(() => null);
+      const all = (await window.db.collection('contest_predictions').get()).docs.map(d => d.data());
       const st = CS.buildStandings(all);
-      await window.db.collection('contest_standings').doc('current').set({
-        users: st.users, teams: st.teams, byMatch: st.byMatch, updatedAt: new Date().toISOString()
-      });
-      log('✅ Classifica ricalcolata da ' + all.filter(p => typeof p.points === 'number').length + ' pronostici valutati');
+      await ref.set({ users: st.users, teams: st.teams, byMatch: st.byMatch,
+        participation: (prev && prev.exists && prev.data().participation) || {}, updatedAt: new Date().toISOString() });
     }
 
     async function renderStandings() {
@@ -227,7 +219,7 @@
       });
       document.getElementById('btnRecalc').addEventListener('click', async function() {
         this.disabled = true;
-        try { await rebuildStandings(); await renderStandings(); } catch (e) { log('❌ ' + (e.code || e.message)); }
+        try { await rebuildStandings(); await renderStandings(); log('✅ Classifica ricalcolata'); } catch (e) { log('❌ ' + (e.code || e.message)); }
         this.disabled = false;
       });
     });

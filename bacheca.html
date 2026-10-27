@@ -1322,10 +1322,30 @@
         const userData = userDoc.data() || {};
         const postAsTeam = document.getElementById('postAsTeam').checked;
 
+        // Il nome della squadra non è nel profilo utente: si legge dalla squadra della lega
+        // (profilo completo da rawDb, perché db dentro la lega dà una copia senza team_index).
+        let teamName = null;
+        if (postAsTeam) {
+          try {
+            const base = rawDb || db;
+            const full = (await base.collection('users').doc(currentUser.uid).get()).data() || {};
+            const lid = full.currentLeague, idx = full.team_index;
+            if (lid && typeof idx === 'number') {
+              const t = await base.collection('leagues/' + lid + '/teams').doc(String(idx)).get();
+              if (t.exists) teamName = t.data().name || null;
+            }
+          } catch (e) { console.warn('[bacheca] squadra non leggibile', e); }
+          if (!teamName) {
+            showLoading(false);
+            showToast('Non trovo la tua squadra: togli la spunta "Pubblica come squadra" per pubblicare col tuo nome', 'error');
+            return;
+          }
+        }
+
         let authorName, authorPhoto;
-        if (postAsTeam && userData.team_name) {
-          authorName = userData.team_name;
-          authorPhoto = userData.team_logo || 'resources/logo.png';
+        if (postAsTeam) {
+          authorName = teamName;
+          authorPhoto = 'resources/logo.png';
         } else {
           authorName = userData.display_name || userData.displayName || userData.nickname || 'Utente';
           authorPhoto = userData.photoURL || null;
@@ -1794,7 +1814,7 @@
   </script>
   <script src="resources/mobile-menu.js?v=20261024b"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20261024c"></script>
+  <script src="resources/faction.js?v=20261027"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20261024b"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>
@@ -1809,7 +1829,7 @@
   <script src="resources/social-notifications.js?v=20260925"></script>
   <script src="resources/auth-ui.js?v=20260920-final"></script>
   <script src="resources/footer.js?v=20260920-final3"></script>
-  <script src="resources/cookie-consent.js?v=20260920-final"></script>
+  <script src="resources/cookie-consent.js?v=20261027"></script>
   
   <!-- Toast Container -->
   <div id="toastContainer" class="toast-container"></div>

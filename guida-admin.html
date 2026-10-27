@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Guida</title>
   <!-- Alzare a ogni decisione dopo aver verificato se la guida va aggiornata (scripts/check-coerenza.py) -->
-  <meta name="guida-allineata" content="D129" />
+  <meta name="guida-allineata" content="D130" />
   <link rel="stylesheet" href="resources/sheet.css?v=20261024" />
   <link rel="stylesheet" href="resources/tablet-support.css?v=20260920-final" />
   <link rel="stylesheet" href="resources/tablet-landscape.css?v=20260920-final" />
@@ -345,11 +345,11 @@ Modalità <b>Entrambe</b>; vince chi fa più punti, <b>pareggio entro 2 punti</b
   <span class="pill green">Punti definitivi</span>
 </div>
 <ol class="steps">
-  <li><b>Fischio finale</b>: chiude il vostro foglio (dopo non si modifica più: le correzioni si fanno in revisione).</li>
+  <li><b>Fischio finale</b>: chiude il vostro foglio (dopo non si modifica più: le correzioni si fanno in revisione). <span class="new">NUOVO</span> <b>Se nessun altro sta segnando davvero, l'app passa subito alla pubblicazione dei punti provvisori.</b> Un foglio di un altro admin conta solo se ha almeno la metà delle voci del foglio più pieno: i fogli vuoti o "di prova" non bloccano più (in cima alla pagina c'è scritto quali <i>non contano</i>).</li>
   <li><span class="new">NUOVO</span> <b>Risultato della partita</b>: dopo il fischio finale compare il riquadro <i>Risultato della partita</i>. Scrivete i gol e premete <b>Salva risultato</b> (finisce nel Calendario Athletic) <b>prima</b> di pubblicare: serve per l'<b>Imbattibilità</b> (capitolo 7). Se pubblicate senza, l'app vi avvisa. Si può correggere anche durante la revisione.</li>
   <li><b>Incrocio</b>: quando entrambi hanno fischiato, l'app confronta i fogli. Le voci uguali valgono subito, quelle diverse vanno in revisione. <b>Se ha segnato un solo admin, vale il suo foglio così com'è.</b></li>
   <li><b>Pubblica punti provvisori</b>: si apre il <b>Calcolo giornata</b> già compilato, con il banner arancione <i>"Dati dalla Partita live &mdash; PROVVISORI"</i>. Controllate e premete <b>Salva giornata</b>. I giocatori vedono i punti con l'avviso <i>"Punti provvisori &mdash; definitivi entro&hellip;"</i>.</li>
-  <li><b>Revisione (48 ore)</b>: per ogni differenza tra i fogli scegliete <b>Vale A</b>, <b>Vale B</b> o <b>0</b>. Se arriva una segnalazione (es. "il gol era di un altro") usate <b>Correzioni da segnalazioni</b>: scegliete chi, la voce, il valore giusto (0 = togli) e scrivete una nota. La correzione resta registrata con il vostro nome.</li>
+  <li><b>Revisione (48 ore)</b> <span class="new">NUOVO</span> si fa nella stessa pagina <b>Partita live</b>: finché una giornata è in revisione la pagina si apre <b>da sola su quella giornata</b> (anche se il Calcolo giornata è già salvato). Per ogni differenza tra i fogli scegliete <b>Vale A</b>, <b>Vale B</b> o <b>0</b>. Se arriva una segnalazione (es. "il gol era di un altro") usate <b>Correzioni da segnalazioni</b>: scegliete chi, la voce, il valore giusto (0 = togli) e scrivete una nota. La correzione resta registrata con il vostro nome.</li>
   <li><b>Pubblica punti definitivi</b> (si può solo quando tutte le differenze sono decise): si riapre il Calcolo giornata con il banner <i>DEFINITIVI</i>. Premete <b>Salva giornata</b> e l'avviso ai giocatori sparisce.</li>
 </ol>
 <div class="box"><b class="t">Basta uno dei due</b>
@@ -417,12 +417,13 @@ I giocatori scelgono il <b>modulo</b> dal menu sopra il campo, in Formazioni: <b
 <ul>
   <li>Per ogni partita dell'Athletic i giocatori votano <b>1, X o 2</b> dalla pagina <b>Mini-gioco</b> (menu ☰).</li>
   <li>Il voto si apre <b>24 ore prima</b> della partita e si chiude <b>30 minuti prima</b>. L'esito giusto vale <b>10 punti</b>. Tutti e tre i valori si cambiano nelle Impostazioni della stagione.</li>
-  <li>I punti vanno sia al giocatore sia alla sua fazione: il mini-gioco conta anche per la sfida Curva vs Piana.</li>
+  <li><span class="new">NUOVO</span> <b>Un voto per squadra</b>: qualunque membro della squadra può votare o cambiare il voto fino alla chiusura, vale l'<b>ultimo</b> (nella pagina si vede chi l'ha messo). I punti vanno alla squadra e alla sua fazione: il mini-gioco, con i bonus di giornata, è quello che fa la sfida Curva vs Piana.</li>
+  <li><span class="new">NUOVO</span> Nella classifica del mini-gioco c'è l'elenco, giornata per giornata, delle squadre che <b>hanno votato</b> e di quelle che <b>non hanno votato</b> (nessun malus).</li>
 </ul>
 <h3>Cosa fa l'admin dopo ogni partita</h3>
 <ol class="steps">
   <li>Inserite il <b>risultato</b> della partita in <b>Calendario Athletic</b> (blocco 2). Serve anche alla Home ("Ultima partita") e al bilancio dell'<b>Archivio Athletic</b>.</li>
-  <li>Andate su Pannello &rsaquo; <b>5 · Mini-gioco</b> &rsaquo; <b>Calcola punti e messaggio</b> e premete <b>Calcola punti</b> sulla partita. Si può rifare senza problemi: ricalcola sempre da zero.</li>
+  <li><span class="new">NUOVO</span> <b>I punti si calcolano da soli</b> appena salvate il risultato (dal riquadro della Partita live o dal Calendario Athletic): compare il messaggio <i>"Mini-gioco: N pronostici valutati"</i>. Se qualcosa va storto, Pannello &rsaquo; <b>5 · Mini-gioco</b> &rsaquo; <b>Calcola punti e messaggio</b> &rsaquo; <b>Calcola punti</b>: si può rifare senza problemi, ricalcola sempre da zero.</li>
   <li>Nella stessa pagina c'è il <b>messaggio pronto per WhatsApp</b> per la partita successiva: <b>Copia messaggio</b> e incollatelo nel gruppo quando si aprono i voti.</li>
 </ol>
 <p class="small">Il calendario delle partite lo vedono anche i giocatori: menu ☰ &rsaquo; <b>Partite Athletic</b>.</p>
@@ -456,10 +457,11 @@ Cancella giornate, risultati, formazioni, scadenze, calendario Athletic, Partita
 
 <h3>Domande frequenti</h3>
 <p><b>Ho segnato una cosa sbagliata durante la partita.</b><br>Premete <b>Annulla</b>, oppure aprite il <b>Diario</b> e togliete quella voce. Se avete già fischiato, si corregge in revisione.</p>
-<p><b>Ha segnato solo uno di noi due.</b><br>Nessun problema: vale il suo foglio, poi si procede normalmente.</p>
+<p><b>Ha segnato solo uno di noi due.</b><br>Nessun problema: vale il suo foglio. Al fischio finale si passa subito ai punti provvisori; i fogli aperti per prova e lasciati vuoti (o quasi) non contano.</p>
+<p><b>Una persona nuova vuole entrare in una squadra a stagione in corso.</b> <span class="new">NUOVO</span><br>Non può più sceglierla da sola: serve il <b>codice invito</b> di un compagno di squadra (vedi sotto). Voi admin potete comunque assegnarla da Pannello &rsaquo; <b>Utenti senza squadra</b>.</p>
 <p><b>Una squadra vuole aggiungere i suoi "secondi" (vice-allenatori).</b> <span class="new">NUOVO</span><br>Chi è già nella squadra apre <b>Formazioni</b> (o Squadre) &rsaquo; in fondo <b>Invita Vice-Allenatori</b> &rsaquo; <b>Genera codice invito</b>, e manda il link al secondo (vale 7 giorni, un codice per persona). Il secondo apre il link, accede e finisce nella squadra: <b>non diventa admin</b>. Se scrive il codice (T-&hellip;) nella pagina "Unisciti a una lega", l'app lo porta da sola alla pagina giusta.</p>
 <p><b>Un giocatore dice che gli manca un bonus dopo la pubblicazione.</b><br>Entro le 48 ore: Partita live &rsaquo; <b>Correzioni da segnalazioni</b>, con una nota. Poi si pubblicano i definitivi.</p>
-<p><b>Un giocatore ha scelto la fazione sbagliata.</b><br>Correggetela voi da <b>Fazioni e nomi reali</b> (vale per tutta la squadra).</p>
+<p><b>Un giocatore ha scelto la fazione sbagliata.</b><br>Correggetela voi da <b>Fazioni e nomi reali</b> (vale per tutta la squadra). La fazione la sceglie il primo della squadra e vale per tutti; nella Partita live, scheda Fazioni, compaiono comunque <b>tutte</b> le squadre.</p>
 <p><b>Ho finito l'asta ma le rose sono vuote.</b><br>È normale: la pagina Asta non riempie le rose. Compilatele dalla pagina <b>Squadre</b>.</p>
 <p><b>Un giocatore vuole cambiare allenatore o tifoseria.</b><br>Solo voi potete farlo, di solito all'asta: allenatore dalla pagina <b>Squadre</b> (aprendo la squadra), tifoseria da <b>Fazioni e nomi reali</b>.</p>
 <p><b>Un giocatore non vede le novità / l'app sembra vecchia.</b><br>Ricaricate la pagina una o due volte, oppure chiudete del tutto l'app e riapritela. Se non basta, avvisate Iacopo.</p>

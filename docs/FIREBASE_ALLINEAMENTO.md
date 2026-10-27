@@ -1,6 +1,6 @@
 # Firebase ↔ locale: cosa vive dove e come si tiene allineato
 
-Allineato a: D129
+Allineato a: D130
 
 **Regola (decisa dall'utente il 24/09/2026)**: tutto ciò che si fa su
 Firebase deve avere la sua copia in questo progetto. Si scrive PRIMA qui,
@@ -32,6 +32,16 @@ va riportato qui subito.
   l'admin non calcola), `scoredAt`.
 - `contest_standings/current`: `users`, `teams`, `byMatch`, `updatedAt`
   (scritto solo da `admin-contest.html`).
+- **D130 (27/10/2026), da pubblicare in Console**: (1) mini-gioco **un voto per squadra**:
+  `contest_predictions/{G}_T{team_index}` con anche `team_index`, `teamName` (`uid`/`name` = ultimo
+  che ha votato); regola nuova (membro della squadra, `team_index` uguale al proprio). Il vecchio voto a
+  persona resta permesso per i telefoni con la pagina vecchia. Al conteggio (`ContestScoring.scoreMatch`,
+  admin) i voti a persona prendono `team_index`/`teamName`, per squadra vale l'ultimo, gli altri
+  `superseded: true`. `contest_standings/current.users` ora è per squadra (chiave `T<n>`) e c'è
+  `participation.{G}` = `{ voted, missing }` (nomi delle squadre). (2) **squadra solo con invito a
+  stagione in corso**: `users/{uid}` create/update da sé stessi con `team_index` nuovo solo se la stagione
+  (`leagues/{lega}/config/season.stato`) non è `in_corso` oppure il profilo porta `teamInvite` = codice di
+  un invito attivo della stessa squadra (`teamJoinAllowed` in `firestore.rules`); gli admin sono esclusi.
 - `leagues/{lega}/rules/{id}`: campi nuovi `ambito` (`squadra`|`fazione`, assente = globale) e `fazione` (`comune`|`curva`|`piana`) — D080.
 - `leagues/{lega}/days/{g}` e `matchday_temp/{g}`: nella mappa `curva` chiavi nuove `tm:<squadra>:<regola>` (bonus per squadra) e `fz:<fazione>:<regola>` (evento di fazione).
 - `leagues/{lega}/results/{g}`: campo `faction_bonus` (`curva`/`piana` → `squadre`, `eventi`, `total`); `results/{g}/teams/{n}`: `breakdown.fazione` e `faction`.

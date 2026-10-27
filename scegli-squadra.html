@@ -146,6 +146,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
+  <script src="resources/team-join-lock.js?v=20261027"></script>
   
   <script>
     if (!firebase.apps.length) {
@@ -199,6 +200,12 @@
 
     async function loadTeams() {
       try {
+        // Stagione in corso: niente scelta libera, si entra solo con un invito (D130)
+        if (window.TeamJoinLock && await TeamJoinLock.locked(currentLeagueId, currentUser && currentUser.uid)) {
+          document.getElementById('teamsContainer').innerHTML = TeamJoinLock.html();
+          const cb = document.getElementById('confirmBtn'); if (cb) cb.style.display = 'none';
+          return;
+        }
         // Carica squadre dalla sottocollezione della lega corrente
         const teamsSnap = await db.collection(`leagues/${currentLeagueId}/teams`).get();
         teams = teamsSnap.docs.map(doc => ({

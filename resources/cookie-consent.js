@@ -26,7 +26,9 @@
       // Verifica versione e scadenza
       if (consent.version !== CONSENT_VERSION) return false;
       if (consent.expiry && new Date(consent.expiry) < new Date()) return false;
-      return consent.accepted === true;
+      // Basta che una scelta sia stata fatta (Accetta o Rifiuta): prima contava solo
+      // "Accetta", e chi rifiutava si ritrovava il banner a ogni pagina.
+      return typeof consent.accepted === 'boolean';
     } catch (e) {
       return false;
     }
@@ -157,9 +159,7 @@
     rejectBtn.addEventListener('click', () => {
       if (saveConsent(false)) {
         banner.style.display = 'none';
-        showToast('⚠️ Alcune funzionalità potrebbero non funzionare correttamente');
-        // Opzionale: cancella localStorage (tranne quello essenziale)
-        clearNonEssentialStorage();
+        showToast('Preferenze salvate: solo i dati tecnici indispensabili');
       }
     });
 
@@ -170,26 +170,8 @@
     });
   }
 
-  function clearNonEssentialStorage() {
-    try {
-      const essentialKeys = [
-        CONSENT_KEY,
-        'fantaAthletic_theme', // Mantieni tema anche se rifiuti
-        'last_league_id' // Mantieni lega per UX
-      ];
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && !essentialKeys.includes(key)) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-      console.log('[cookie-consent] Rimossi dati non essenziali');
-    } catch (e) {
-      console.warn('[cookie-consent] Errore nella pulizia:', e);
-    }
-  }
+  // Niente pulizia al rifiuto: l'app salva sul telefono solo dati tecnici indispensabili
+  // (tema, lega, novità già lette). Cancellarli faceva riapparire le Novità a ogni pagina.
 
   function showToast(message) {
     const toast = document.createElement('div');
@@ -236,7 +218,6 @@
     if (hasConsent()) {
       if (confirm('Vuoi revocare il consenso ai cookie? Alcune funzionalità potrebbero non funzionare.')) {
         saveConsent(false);
-        clearNonEssentialStorage();
         showToast('Consenso revocato');
       }
     } else {

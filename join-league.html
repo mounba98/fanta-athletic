@@ -257,6 +257,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
+  <script src="resources/team-join-lock.js?v=20261027"></script>
   <script>
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
@@ -462,6 +463,15 @@
           new Date(currentLeague.createdAt.toDate()).toLocaleDateString('it-IT') : 
           'Data sconosciuta';
         document.getElementById('leagueCreated').textContent = `Creata il ${createdDate}`;
+
+        // Stagione in corso: niente scelta libera, si entra solo con un invito (D130)
+        if (window.TeamJoinLock && await TeamJoinLock.locked(currentLeague.id, user.uid)) {
+          const box = document.getElementById('teamsList');
+          box.innerHTML = TeamJoinLock.html();
+          box.style.display = 'block';
+          const jb = document.getElementById('joinBtn'); if (jb) jb.style.display = 'none';
+          return;
+        }
 
         if (availableTeams.length > 0) {
           renderTeams();

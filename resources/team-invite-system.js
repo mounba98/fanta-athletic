@@ -127,6 +127,7 @@
         currentLeague: leagueId,
         leagues: firebase.firestore.FieldValue.arrayUnion(leagueId),
         team_index: numericTeamIndex,
+        teamInvite: snapshot.id,   // a stagione in corso le regole chiedono l'invito (D130)
         updatedAt: firebase.firestore.Timestamp.now()
       };
       if (authUser && authUser.uid === userId) {

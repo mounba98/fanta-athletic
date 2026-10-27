@@ -1077,6 +1077,10 @@
       padding: 4px 8px;
       font-weight: 700;
     }
+    /* Finché i dati veri non sono arrivati non si mostra nessuna formazione (niente copie vecchie, SC-002) */
+    #editor.fa-loading { position: relative; min-height: 260px; }
+    #editor.fa-loading > * { visibility: hidden; }
+    #editor.fa-loading::after { content: 'Carico la tua formazione…'; position: absolute; top: 90px; left: 0; right: 0; text-align: center; color: var(--muted); font-weight: 600; }
   </style>
   <!-- Icone app (D105): logo Athletic 2018 su fondo #0c1318 -->
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/app-icons/favicon-32.png" />
@@ -1098,7 +1102,7 @@
       <div class="list" id="teams"></div>
     </section>
 
-    <section class="panel" id="editor">
+    <section class="panel fa-loading" id="editor">
       <!-- Header con giornata e calcio d'inizio -->
       <div class="desktop-only" style="background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);">
         <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
@@ -1778,7 +1782,7 @@
         <p style="color: var(--muted); margin-bottom: 20px;">
           Per gestire le formazioni devi prima scegliere una squadra disponibile nella tua lega.
         </p>
-        <a href="scegli-squadra.html" class="btn">Scegli la tua Squadra</a>
+        <a href="scegli-squadra.html" class="btn">Entra in una squadra</a>
       </section>
     `;
   }
@@ -2092,10 +2096,9 @@
     }
 
     function initTeams(){
-      try { state.teams = JSON.parse(localStorage.getItem('teams_data')||'[]'); } catch { state.teams = []; }
-      if (!Array.isArray(state.teams) || state.teams.length !== 19){
-        state.teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null }));
-      }
+      // Si parte sempre vuoti: la copia sul telefono (teams_data) poteva essere della stagione
+      // passata e si vedeva per qualche secondo al posto di quella vera (SC-002).
+      state.teams = Array.from({length:19}, (_,i)=>({ name: `Squadra ${i+1}`, coach_ids: [], roster: [], lineup: [null,null,null,null,null], captain: null }));
     }
 
     function saveTeams(){
@@ -3331,24 +3334,25 @@
       renderTeamsList();
       renderEditor();
     }
-    boot();
+    boot().catch(e => console.error('[formazioni] avvio', e))
+      .finally(() => { const ed = document.getElementById('editor'); if (ed) ed.classList.remove('fa-loading'); });
   </script>
   <script src="resources/mobile-menu.js?v=20261024b"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
-  <script src="resources/faction.js?v=20261024c"></script>
+  <script src="resources/faction.js?v=20261027"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
   <script src="resources/bottom-nav.js?v=20261024b"></script>
   <script src="resources/app-fresh.js?v=20261004"></script>
     <script src="resources/navbar-autohide.js?v=20260920-final"></script>
   <script src="resources/lazy-load.js?v=20261024"></script>
   <script src="resources/theme.js?v=20260925b"></script>
-  <script src="resources/team-invite-system.js?v=20261025"></script>
+  <script src="resources/team-invite-system.js?v=20261027"></script>
   <script src="resources/navbar.js?v=20261024b"></script>
   <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
   <script src="resources/league-selector.js?v=20260925l"></script>
   <script src="resources/auth-ui.js?v=20260920-final"></script>
   <script src="resources/footer.js?v=20260920-final3"></script>
-  <script src="resources/cookie-consent.js?v=20260920-final"></script>
+  <script src="resources/cookie-consent.js?v=20261027"></script>
 </body>
 </html>

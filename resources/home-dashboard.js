@@ -83,7 +83,7 @@
   async function renderFormation(m, core) {
     const el = $('hdForm');
     const set = (cls, k, big, sub, href) => { el.className = 'hd-tile ' + cls; el.href = href; el.innerHTML = '<div class="hd-k">' + k + '</div><div class="hd-mid">' + big + '</div><div class="hd-sub">' + sub + '</div>'; };
-    if (core.idx === null) return set('warn', 'Formazione', 'Nessuna squadra', 'Scegli la tua squadra', 'scegli-squadra.html');
+    if (core.idx === null) return set('warn', 'Formazione', 'Nessuna squadra', 'Entra in una squadra', 'scegli-squadra.html');
     if (!m.next || !m.next.n) return set('', 'Formazione', 'Niente da fare', 'Nessuna giornata in arrivo', 'formazioni.html');
     const g = 'G' + m.next.n;
     const [saved, dl] = await Promise.all([
@@ -108,7 +108,9 @@
     const now = new Date();
     if (m.next && m.next.n && now < CS.deadlineOf(m.next.start)) {
       if (now >= CS.opensOf(m.next.start)) {
-        const pred = await safe(core.db.collection('contest_predictions').doc('G' + m.next.n + '_' + core.user.uid).get(), null);
+        // un voto per squadra (D130); prima del D130 si votava a persona
+        let pred = core.idx === null ? null : await safe(core.db.collection('contest_predictions').doc(CS.teamPredId('G' + m.next.n, core.idx)).get(), null);
+        if (!pred || !pred.exists) pred = await safe(core.db.collection('contest_predictions').doc('G' + m.next.n + '_' + core.user.uid).get(), null);
         state = pred && pred.exists ? 'voted' : 'open';
         if (pred && pred.exists) pick = pred.data().pick;
       } else state = 'soon';
@@ -122,7 +124,7 @@
     const score = pts ? 'Curva ' + fmt(pts.curva) + ' · Piana ' + fmt(pts.piana) : 'Curva vs Piana';
     const map = {
       open: ['accent', 'Voto aperto', 'Chiude ' + (m.next ? CS.deadlineOf(m.next.start).toLocaleString('it-IT', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : ''), 'contest.html'],
-      voted: ['ok', 'Hai votato ' + esc(pick || ''), score, 'contest.html'],
+      voted: ['ok', 'La squadra ha votato ' + esc(pick || ''), score, 'contest.html'],
       soon: ['', 'Voto in arrivo', m.next ? 'Si apre ' + CS.opensOf(m.next.start).toLocaleString('it-IT', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : score, 'classifiche.html#fazioni'],
       none: ['', 'Mini-gioco', score, 'classifiche.html#fazioni']
     }[state];
@@ -197,7 +199,7 @@
   // ---------- fascia 2: il mio fanta ----------
   async function renderTeam(core) {
     const name = $('myTeamName'), extra = $('hdTeamExtra'), stats = $('hdTeamStats');
-    if (core.idx === null) { name.textContent = 'Nessuna squadra'; extra.textContent = 'Tocca per sceglierne una'; $('myTeamCard').onclick = () => { location.href = 'scegli-squadra.html'; }; return; }
+    if (core.idx === null) { name.textContent = 'Nessuna squadra'; extra.textContent = 'Tocca per entrare in una squadra'; $('myTeamCard').onclick = () => { location.href = 'scegli-squadra.html'; }; return; }
     const t = core.teams[String(core.idx)] || {};
     name.textContent = t.name || 'La mia squadra';
     // allenatore e tifoseria

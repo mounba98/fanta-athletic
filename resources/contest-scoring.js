@@ -1,4 +1,4 @@
-// Contest pronostici — logica pura (nessun accesso al database), D069.
+// Contest pronostici — logica pura (D069), più scoreMatch che scrive sul database (D130).
 // Usata da contest.html, admin-contest.html e contest-leaderboard.html.
 (function(root) {
   'use strict';
@@ -69,7 +69,11 @@
   }
 
   // Ricalcola le classifiche da zero a partire dai pronostici già valutati.
-  // predictions: [{ uid, name, faction, points }] con points numerico.
+  // Dal 27/10/2026 (D130) si gioca UN voto per squadra: la classifica è per squadra
+  // (chiave "T<indice>", nome = nome della squadra) e resta nel campo `users` per
+  // non cambiare chi la legge (Home, Classifiche, classifica del mini-gioco).
+  // I voti a persona rimasti senza squadra (prima del D130) contano per persona.
+  // Si saltano i voti "superati" da un voto più recente della stessa squadra.
   function buildStandings(predictions) {
     const users = {};
     const teams = {
@@ -78,7 +82,7 @@
     };
     const byMatch = {};
     predictions.forEach(p => {
-      if (typeof p.points !== 'number') return;
+      if (typeof p.points !== 'number' || p.superseded) return;
       if (p.faction && teams[p.faction] && p.matchKey) {
         const m = byMatch[p.matchKey] || (byMatch[p.matchKey] = {
           giornata: p.giornata,
@@ -89,9 +93,12 @@
         m[p.faction].votes += 1;
         if (Number(p.points) > 0) m[p.faction].hits += 1;
       }
-      const u = users[p.uid] || (users[p.uid] = {
-        name: p.name || 'Giocatore', faction: p.faction || null, points: 0, predictions: 0, hits: 0
+      const isTeam = typeof p.team_index === 'number';
+      const id = isTeam ? 'T' + p.team_index : p.uid;
+      const u = users[id] || (users[id] = {
+        name: (isTeam ? p.teamName : p.name) || 'Squadra', faction: p.faction || null, points: 0, predictions: 0, hits: 0, team: isTeam
       });
+      if (isTeam && p.teamName) u.name = p.teamName;
       u.points += p.points;
       u.predictions += 1;
       if (Number(p.points) > 0) u.hits += 1;
@@ -108,6 +115,14 @@
     return { users, teams, byMatch };
   }
 
+  // Id del voto di una squadra per una partita: "G3_T6"
+  function teamPredId(matchKey, teamIndex) { return matchKey + '_T' + teamIndex; }
+
+  // Fra più voti della stessa squadra vale l'ultimo (D130)
+  function latest(list) {
+    return (list || []).slice().sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')))[0] || null;
+  }
+
   // c = { punti, aperturaOre, chiusuraMinuti } dalla Stagione
   function configure(c) {
     if (!c) return;
@@ -116,9 +131,80 @@
     if (Number(c.chiusuraMinuti) >= 0 && c.chiusuraMinuti !== null && c.chiusuraMinuti !== '') CFG.closeMinutes = Number(c.chiusuraMinuti);
   }
 
+  // Unica parte che usa il database (D130): valuta i voti di una partita e ricalcola
+  // la classifica. La chiamano admin-contest.html (pulsante) e, da sole, la Partita live
+  // e Gestione Calendario quando si salva il risultato. Solo admin (legge gli utenti).
+  //  - un voto per squadra: i voti vecchi a persona si attribuiscono alla squadra
+  //    dell'autore (team_index scritto sul voto); per ogni squadra conta l'ultimo,
+  //    gli altri restano segnati come `superseded`.
+  //  - segna quali squadre hanno votato e quali no (solo un elenco, nessun malus).
+  async function scoreMatch(db, key, result, leagueId) {
+    const raw = root.__LEGACY_DB__ || db;
+    const snap = await db.collection('contest_predictions').where('matchKey', '==', key).get();
+    const teamNames = {}, teamFaction = {};
+    if (leagueId) {
+      const ts = await raw.collection('leagues/' + leagueId + '/teams').get();
+      ts.docs.forEach(d => { teamNames[d.id] = d.data().name || ('Squadra ' + d.id); teamFaction[d.id] = d.data().fazione || null; });
+    }
+    const userTeam = {};
+    const byTeam = {};
+    for (const d of snap.docs) {
+      const p = Object.assign({ _ref: d.ref }, d.data());
+      let idx = typeof p.team_index === 'number' ? p.team_index : undefined;
+      if (idx === undefined && p.uid) {
+        if (!(p.uid in userTeam)) {
+          const u = await raw.collection('users').doc(p.uid).get().catch(() => null);
+          const t = u && u.exists ? u.data().team_index : null;
+          userTeam[p.uid] = typeof t === 'number' ? t : null;
+        }
+        idx = userTeam[p.uid];
+      }
+      p._team = (idx === null || idx === undefined) ? null : idx;
+      const k = p._team === null ? 'u:' + p.uid : 't:' + p._team;
+      (byTeam[k] = byTeam[k] || []).push(p);
+    }
+    let batch = db.batch(), ops = 0, done = 0;
+    const voted = new Set();
+    for (const list of Object.values(byTeam)) {
+      const win = latest(list);
+      for (const p of list) {
+        const upd = { scoredAt: new Date().toISOString() };
+        if (p._team !== null) {
+          upd.team_index = p._team;
+          if (teamNames[p._team]) upd.teamName = teamNames[p._team];
+          if (teamFaction[p._team]) upd.faction = teamFaction[p._team];
+        }
+        if (p === win) {
+          const pts = scorePrediction(p, result);
+          if (pts === null) continue;
+          upd.points = pts; upd.superseded = false; done++;
+          if (p._team !== null) voted.add(String(p._team));
+        } else {
+          upd.points = 0; upd.superseded = true;
+        }
+        batch.update(p._ref, upd);
+        if (++ops === 400) { await batch.commit(); batch = db.batch(); ops = 0; }
+      }
+    }
+    if (ops) await batch.commit();
+    const ref = db.collection('contest_standings').doc('current');
+    const prev = await ref.get().catch(() => null);
+    const participation = Object.assign({}, (prev && prev.exists && prev.data().participation) || {});
+    if (Object.keys(teamNames).length) {
+      const sort = a => a.sort((x, y) => x.localeCompare(y, 'it'));
+      const ids = Object.keys(teamNames);
+      participation[key] = { voted: sort(ids.filter(i => voted.has(i)).map(i => teamNames[i])),
+        missing: sort(ids.filter(i => !voted.has(i)).map(i => teamNames[i])), at: new Date().toISOString() };
+    }
+    const all = (await db.collection('contest_predictions').get()).docs.map(d => d.data());
+    const st = buildStandings(all);
+    await ref.set({ users: st.users, teams: st.teams, byMatch: st.byMatch, participation, updatedAt: new Date().toISOString() });
+    return { done, total: snap.size, participation: participation[key] || null };
+  }
+
   const api = { POINTS, PICKS, CFG, configure, FACTIONS, MONTHS, outcomeOf,
                 scorePrediction, seasonStartYear, matchStart, deadlineOf, opensOf,
-                resultOf, buildStandings };
+                resultOf, buildStandings, scoreMatch, teamPredId, latest };
   root.ContestScoring = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

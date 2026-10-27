@@ -258,6 +258,9 @@
       // Allenatore della squadra (D108): da scegliere solo se la squadra non ce l'ha
       let coaches = [];
       const team = await api._store.readTeam(data);
+      // Fazione scelta prima di entrare in squadra (iscrizione a metà): la prende la squadra,
+      // se non ne ha ancora una. Il primo membro che sceglie vale per tutti (D130).
+      if (faction && team && !FACTIONS[team.fazione]) await api._store.writeTeamFaction(data, faction);
       const needsCoach = !!team && !(Array.isArray(team.coach_ids) && team.coach_ids.length > 0);
       if (needsCoach) coaches = await api._store.readCoaches(data);
       const askForCoach = needsCoach && coaches.length > 0;

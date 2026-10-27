@@ -428,9 +428,9 @@
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js"></script>
   <script src="resources/toast-css-class.js?v=20260920-final"></script>
-  <script src="resources/contest-scoring.js?v=20261024"></script>
+  <script src="resources/contest-scoring.js?v=20261027"></script>
   <script src="resources/season.js?v=20261024b"></script>
-  <script src="resources/faction.js?v=20261024c"></script>
+  <script src="resources/faction.js?v=20261027"></script>
 
   <script>
     const CS = window.ContestScoring;
@@ -512,15 +512,26 @@
         // Il mio profilo (nome) e i miei pronostici
         const meDoc = await window.db.collection('users').doc(state.user.uid).get();
         const me = meDoc.exists ? meDoc.data() : {};
-        state.name = me.displayName || me.username || (state.user.email || '').split('@')[0] || 'Giocatore';
+        state.name = me.nomeReale || me.displayName || me.display_name || me.username || (state.user.email || '').split('@')[0] || 'Giocatore';
+        // Un voto per squadra (D130): serve la squadra
+        state.teamIndex = typeof me.team_index === 'number' ? me.team_index : null;
+        state.teamName = '';
+        if (state.teamIndex !== null && me.currentLeague) {
+          try {
+            const t = await (window.__LEGACY_DB__ || window.db).collection('leagues/' + me.currentLeague + '/teams').doc(String(state.teamIndex)).get();
+            if (t.exists) state.teamName = t.data().name || '';
+          } catch (e) {}
+        }
 
+        // Voto della squadra: l'ultimo tra quelli della squadra e i miei vecchi voti a persona
         state.myPredictions = {};
-        const predSnap = await window.db.collection('contest_predictions')
-          .where('uid', '==', state.user.uid).get();
-        predSnap.docs.forEach(doc => {
-          const d = doc.data();
-          state.myPredictions[d.matchKey] = d;
-        });
+        const lists = {};
+        const add = doc => { const d = doc.data(); if (d.superseded) return; (lists[d.matchKey] = lists[d.matchKey] || []).push(d); };
+        if (state.teamIndex !== null) {
+          (await window.db.collection('contest_predictions').where('team_index', '==', state.teamIndex).get()).docs.forEach(add);
+        }
+        (await window.db.collection('contest_predictions').where('uid', '==', state.user.uid).get()).docs.forEach(add);
+        Object.keys(lists).forEach(k => { state.myPredictions[k] = CS.latest(lists[k]); });
 
         // Giornata di partenza: prima quella con votazione aperta, poi la prossima, altrimenti l'ultima
         const now = new Date();
@@ -604,7 +615,7 @@
       const teamName = (CS.FACTIONS[state.faction] || {}).name || '';
       document.getElementById('matchInfo').innerHTML = `
         Giornata ${state.selectedMatchday} • ${fmt(match.start)}<br>${status}<br>
-        <small>Giochi per: <strong>${teamName}</strong> • esito giusto = ${CS.POINTS.correct} punti</small>
+        <small>Voti per: <strong>${state.teamName || 'la tua squadra'}</strong> (${teamName}) • un voto per squadra, vale l'ultimo • esito giusto = ${CS.POINTS.correct} punti</small>
       `;
 
       document.getElementById('homeTeamName').textContent = match.homeTeam || 'Athletic Brescia';
@@ -614,7 +625,7 @@
 
       // Tre pulsanti 1 - X - 2
       selectedPick = myPred ? myPred.pick : null;
-      const canEdit = !notYetOpen && !closed && !match.result && !match.postponed;
+      const canEdit = !notYetOpen && !closed && !match.result && !match.postponed && state.teamIndex !== null;
       ['1', 'X', '2'].forEach(k => {
         const btn = document.getElementById('pick' + k);
         btn.textContent = PICK_LABEL[k](match);
@@ -632,11 +643,17 @@
         } else if (match.result) {
           points = ' • <em>punti in arrivo</em>';
         }
+        const who = myPred.uid === state.user.uid ? 'da te' : 'da ' + (myPred.name || 'un compagno');
+        const when = myPred.timestamp ? ', ' + fmt(myPred.timestamp) : '';
         predBox.innerHTML = `
           <div class="my-prediction">
-            Il tuo voto: <strong>${PICK_LABEL[myPred.pick] ? PICK_LABEL[myPred.pick](match) : myPred.pick}</strong>${points}
+            Voto della squadra: <strong>${PICK_LABEL[myPred.pick] ? PICK_LABEL[myPred.pick](match) : myPred.pick}</strong>${points}
+            <br><small>votato ${who}${when}${canEdit ? ' • puoi cambiarlo fino alla chiusura' : ''}</small>
           </div>
         `;
+        predBox.style.display = 'block';
+      } else if (state.teamIndex === null) {
+        predBox.innerHTML = '<div class="my-prediction">Si vota per squadra: entra in una squadra per votare.</div>';
         predBox.style.display = 'block';
       } else {
         predBox.style.display = 'none';
@@ -672,6 +689,7 @@
           return;
         }
 
+        if (state.teamIndex === null) { toast('Entra in una squadra per votare'); return; }
         const doc = {
           uid: state.user.uid,
           matchKey: matchKey,
@@ -679,11 +697,13 @@
           pick: selectedPick,
           faction: state.faction,
           name: state.name,
+          team_index: state.teamIndex,
+          teamName: state.teamName,
           timestamp: now.toISOString(),
           points: null
         };
 
-        await window.db.collection('contest_predictions').doc(matchKey + '_' + state.user.uid).set(doc);
+        await window.db.collection('contest_predictions').doc(CS.teamPredId(matchKey, state.teamIndex)).set(doc);
 
         state.myPredictions[matchKey] = doc;
 
