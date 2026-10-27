@@ -232,6 +232,20 @@
       #playersRank tbody tr.player-row-mobile td,
       #byPlayerDay tbody tr.player-row-mobile td { padding: 6px 8px; text-align: left; }
     }
+    /* Scontri diretti (D130): Punti subito dopo la squadra, ben visibili; sul telefono la tabella
+       non va più tagliata (la regola sopra nasconde ciò che sborda) e si tolgono Pt Fatti/Subiti */
+    #h2hTable .h2h-pts { font-weight: 900; }
+    #h2hTable th, #h2hTable td { text-align: center; }
+    #h2hTable th:nth-child(2), #h2hTable td:nth-child(2) { text-align: left; }
+    .h2h-legend { font-size: 12px; color: var(--muted); margin: -4px 0 10px; }
+    #supremoTable th, #supremoTable td { text-align: center; }
+    #supremoTable th:nth-child(2), #supremoTable td:nth-child(2) { text-align: left; }
+    @media (max-width: 760px), (pointer: coarse) {
+      #h2hTable, #supremoTable { min-width: 0 !important; width: 100%; }
+      #h2hTable .h2h-wide { display: none; }
+      #h2hTable th, #h2hTable td, #supremoTable th, #supremoTable td { padding: 8px 3px !important; font-size: 14px !important; }
+      #h2hTable td:nth-child(2), #supremoTable td:nth-child(2) { white-space: normal; }
+    }
     /* Pulsanti a pillola come nel resto dell'app (D122, sistema grafico D039) */
     .export-btn, .tab-btn, .filters-toggle, .sort-dir-btn { border-radius: 999px; }
   </style>
@@ -348,12 +362,13 @@
       <div class="card">
         <h2>Classifica Scontri Diretti H2H</h2>
         <p id="h2hRulesLine">Criteri: punti in classifica, differenza reti, reti fatte.</p>
+        <p class="h2h-legend">G giocate · V vinte · N pareggiate · P perse · Diff punti fatti meno subiti</p>
         <div class="table-wrapper">
           <table class="table rank-table" id="h2hTable">
             <thead>
               <tr>
-                <th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th>
-                <th>Pt Fatti</th><th>Pt Subiti</th><th>Diff</th><th>Punti</th>
+                <th>#</th><th>Squadra</th><th class="h2h-pts">Punti</th><th>G</th><th>V</th><th>N</th><th>P</th>
+                <th class="h2h-wide">Pt Fatti</th><th class="h2h-wide">Pt Subiti</th><th>Diff</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -1597,6 +1612,8 @@
       });
     }
 
+    // 23.5 → "23,5", 9 → "9" (prima "23.50": inutilmente largo sul telefono)
+    function fmtH2H(x) { const n = Math.round(Number(x) * 2) / 2; return String(n).replace('.', ','); }
     function renderH2HTable() {
       if (!state.hasH2H) {
         const pane = document.getElementById('tab-h2h');
@@ -1674,9 +1691,9 @@
           <tr style="background:${style.bg};color:${style.color};">
             <td>${index + 1}</td>
             <td style="font-weight:${index < 3 ? '800' : '600'};">${row.name}${forfeitIndicator}</td>
+            <td class="h2h-pts">${row.pts}</td>
             <td>${row.g}</td><td>${row.v}</td><td>${row.n}</td><td>${row.p}</td>
-            <td>${row.pf.toFixed(2)}</td><td>${row.ps.toFixed(2)}</td><td>${(row.pf - row.ps).toFixed(2)}</td>
-            <td style="font-weight:${index < 3 ? '900' : '700'};">${row.pts}</td>
+            <td class="h2h-wide">${fmtH2H(row.pf)}</td><td class="h2h-wide">${fmtH2H(row.ps)}</td><td>${fmtH2H(row.pf - row.ps)}</td>
           </tr>
         `;
       }).join('');
@@ -2451,10 +2468,24 @@
           '<p class="fz-note">I bonus comuni uguali per tutte le squadre non contano qui: si annullano. Contano le presenze per squadra e gli eventi di fazione (una volta per fazione).</p>';
       }
       // 3) Partecipazione al mini-gioco
-      h += '<h3 class="fz-h">Mini-gioco: partecipazione</h3><table class="fz-table"><tr><th></th><th>Squadre</th><th>Voti</th><th>Media/squadra</th></tr>' +
+      // Squadre di ogni fazione, anche chi non ha mai votato (D130: la classifica ora le contiene tutte)
+      const tot = { curva: 0, piana: 0 }, votanti = { curva: 0, piana: 0 };
+      Object.entries(st.users || {}).forEach(([k, u]) => {
+        if (!/^T\d+$/.test(k) || !tot.hasOwnProperty(u.faction)) return;
+        tot[u.faction] += 1; if (u.predictions) votanti[u.faction] += 1;
+      });
+      const media = id => { const n = tot[id] || (t[id] || {}).players || 0; return n ? (((t[id] || {}).points || 0) / n).toFixed(1).replace('.', ',') : '0'; };
+      h += '<h3 class="fz-h">Mini-gioco: partecipazione</h3><table class="fz-table"><tr><th></th><th>Squadre</th><th>Votanti</th><th>Voti</th><th>Media</th></tr>' +
         ['curva','piana'].map(id => { const x = t[id] || { players:0, predictions:0, points:0 };
-          return '<tr><td><span class="fz-dot ' + id + '"></span>' + N[id] + '</td><td>' + x.players + '</td><td>' + x.predictions + '</td><td>' + avg(x) + '</td></tr>'; }).join('') + '</table>' +
-        '<p class="fz-note">Un voto per squadra (dalla G1 2026/27). Il titolo va alla somma dei punti; la media mostra l\'effetto del numero di squadre.</p>';
+          return '<tr><td><span class="fz-dot ' + id + '"></span>' + N[id] + '</td><td>' + (tot[id] || x.players) + '</td><td>' + (tot[id] ? votanti[id] : x.players) + '</td><td>' + x.predictions + '</td><td>' + media(id) + '</td></tr>'; }).join('') + '</table>';
+      // Chi non ha votato, giornata per giornata (nessun malus)
+      const part = st.participation || {};
+      const pk = Object.keys(part).sort((a, b) => parseInt(b.slice(1), 10) - parseInt(a.slice(1), 10));
+      if (pk.length) h += '<p class="fz-note" style="margin-top:8px;">' + pk.map(k => {
+        const m = part[k].missing || [], v = part[k].voted || [];
+        return '<b>G' + fzEsc(k.slice(1)) + '</b>: hanno votato ' + v.length + ' su ' + (v.length + m.length) + (m.length ? ' · non hanno votato: ' + m.map(fzEsc).join(', ') : ' · tutte') ;
+      }).join('<br>') + '</p>';
+      h += '<p class="fz-note">Un voto per squadra (dalla G1 2026/27); chi non vota non perde punti. Il titolo va alla somma dei punti; "Votanti" = squadre che hanno votato almeno una volta; la media (punti diviso tutte le squadre della fazione) mostra l\'effetto del numero di squadre.</p>';
       // 4) Precisione dei voti
       h += '<h3 class="fz-h">Mini-gioco: precisione dei voti</h3>' + ['curva','piana'].map(id => { const x = t[id] || {}; const v = pct(x);
         return '<div>' + N[id] + ': <strong>' + v + '%</strong> <span class="fz-note">(' + (x.hits || 0) + ' su ' + (x.predictions || 0) + ')</span></div>' +
