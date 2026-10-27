@@ -57,7 +57,8 @@
         "Scheda <b>Fazioni</b>: ci sono tutte le squadre, anche quelle senza tifoseria.",
         "<b>Mini-gioco</b>: i punti si calcolano da soli quando salvate il risultato (Partita live o Calendario Athletic).",
         "<b>Convocati</b>: alla pubblicazione dei provvisori i convocati pubblicati prendono da soli la Convocazione (+1), se nel foglio non l'avete già segnata. Se c'è un errore si corregge in revisione.",
-        "<b>Correzioni in revisione</b>: nel menu \"Chi\" ci sono anche le squadre, per aggiungere una <b>presenza in curva</b> dimenticata."
+        "<b>Correzioni in revisione</b>: nel menu \"Chi\" ci sono anche le squadre, per aggiungere una <b>presenza in curva</b> dimenticata.",
+        "<b>Correzioni più chiare</b>: il valore è \"quante volte\" (o 1 = sì, 0 = togli) e sotto vedete i punti prima e dopo; la nota è facoltativa; quello che state scrivendo non si perde più se la pagina si aggiorna o chiudete l'app."
       ],
       "link": "live.html",
       "linkLabel": "Apri la Partita live"

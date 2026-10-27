@@ -534,7 +534,7 @@
             opt(d.a, 'Vale ' + d.a) + (d.b !== d.a ? opt(d.b, 'Vale ' + d.b) : '') + (d.a && d.b ? opt(0, 'Nessuna delle due (0)') : '') + '</div></div>';
         }).join('') + '</section>';
       }
-      h += '<section class="card"><h3>Correzioni da segnalazioni</h3>' + ((lv.corrections || []).map(c => '<div class="disp"><b>' + esc(describe(c.key)) + '</b> → ' + c.value + '<div class="info">' + esc(c.note || '') + ' — ' + esc(c.byName || '') + '</div></div>').join('') || '<p class="info">Nessuna.</p>');
+      h += '<section class="card"><h3>Correzioni da segnalazioni</h3>' + ((lv.corrections || []).map(c => '<div class="disp"><b>' + esc(describe(c.key)) + '</b> → ' + c.value + '<div class="info">' + (c.note ? esc(c.note) + ' — ' : '') + esc(c.byName || '') + '</div></div>').join('') || '<p class="info">Nessuna.</p>');
       if (lv.stato !== 'definitivo') {
         h += '<div class="f">Chi <select id="corWho">' +
           '<optgroup label="Giocatori">' + S.players.map(p => '<option value="p|' + p.id + '">' + esc(pname(p.id)) + '</option>').join('') + '</optgroup>' +
@@ -542,8 +542,9 @@
           '<option value="v|">Curva</option>' +
           '<optgroup label="Presenza in curva della squadra">' + S.teams.slice().sort((a, b) => Number(a.id) - Number(b.id)).map(t => '<option value="t|' + t.id + '">' + esc(t.name) + '</option>').join('') + '</optgroup></select></div>' +
           '<div class="f">Voce <select id="corRule"></select></div>' +
-          '<div class="f">Valore corretto (0 = togli) <input id="corVal" type="number" min="0" value="1"></div>' +
-          '<div class="f">Nota (chi l\'ha segnalata, perché) <input id="corNote" placeholder="es. segnalazione di Marco: il gol era di Rossi"></div>' +
+          '<div class="f"><span id="corValLbl">Valore corretto</span> <input id="corVal" type="number" min="0" inputmode="numeric" value="1"></div>' +
+          '<p class="info" id="corHint" style="margin:4px 0 0"></p>' +
+          '<div class="f">Nota <span style="opacity:.7">(facoltativa: chi l\'ha segnalata, perché)</span> <input id="corNote" placeholder="es. segnalazione di Marco: il gol era di Rossi"></div>' +
           '<p style="margin-top:10px"><button class="sbtn blue" id="corAdd">Aggiungi correzione</button></p>';
       }
       h += '</section>';
@@ -561,20 +562,53 @@
       });
       const who = $('corWho');
       if (who) {
+        // Bozza della correzione salvata sul telefono mentre la si compila (D130): la pagina si
+        // ridisegna a ogni aggiornamento dal database e chiudendo l'app si perdeva tutto.
+        const dKey = 'live_cor_' + S.lid + '_' + S.g;
+        const readDraft = () => { try { return JSON.parse(localStorage.getItem(dKey) || 'null'); } catch (e) { return null; } };
+        const saveDraft = () => { try { localStorage.setItem(dKey, JSON.stringify({ who: who.value, rule: $('corRule').value, val: $('corVal').value, note: $('corNote').value })); } catch (e) {} };
+        const keyOfForm = () => { const [sc, t] = who.value.split('|');
+          // presenza di squadra: stessa chiave della scheda Fazioni (curva tm:<squadra>:presenza)
+          return sc === 't' ? 'v||tm:' + t + ':presenza' : sc === 'v' ? 'v||' + $('corRule').value : sc + '|' + t + '|' + $('corRule').value; };
+        const ruleOfForm = () => { const [sc] = who.value.split('|');
+          if (sc === 't') { const pr = (S.rules.scoped || []).find(r => r.ambito === 'squadra' && r.luogo && (!S.venue || r.luogo === S.venue.v));
+            return { input: 'toggle', valore: pr ? Number(pr.valore) : 0 }; }
+          return (S.rules[sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva'] || []).find(r => C.rid(r) === $('corRule').value) || { input: 'toggle', valore: 0 }; };
+        const current = () => Number(C.finalMap(lv.agreed, lv.resolutions, lv.corrections)[keyOfForm()] || 0);
+        // Il valore è "quante volte" (voci ripetibili) o "sì/no" (1/0): i punti li calcola l'app
+        const hint = () => {
+          const r = ruleOfForm(), counter = r.input === 'counter', v = Number(r.valore) || 0;
+          const pts = n => counter ? n * v : (n ? v : 0);
+          $('corValLbl').textContent = counter ? 'Quante volte (0 = togli)' : 'Vale? 1 = sì, 0 = togli';
+          $('corVal').max = counter ? 50 : 1;
+          const now = current(), next = Math.max(0, Number($('corVal').value || 0));
+          $('corHint').innerHTML = 'Adesso: <b>' + now + '</b> (' + fmt(pts(now)) + ' punti) → dopo: <b>' + next + '</b> (' + fmt(pts(next)) + ' punti)';
+        };
         const fill = () => { const [sc] = who.value.split('|');
           if (sc === 't') { $('corRule').innerHTML = '<option value="presenza">Presente alla partita</option>'; return; }
           const rules = S.rules[sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva'];
-          $('corRule').innerHTML = rules.map(r => '<option value="' + C.rid(r) + '">' + esc(C.label(r)) + ' (' + fmt(Number(r.valore)) + ')</option>').join(''); };
-        who.onchange = fill; fill();
+          $('corRule').innerHTML = rules.map(r => '<option value="' + C.rid(r) + '">' + esc(C.label(r)) + ' (' + fmt(Number(r.valore)) + (r.input === 'counter' ? ' ciascuno' : '') + ')</option>').join(''); };
+        const d = readDraft();
+        if (d && d.who && who.querySelector('option[value="' + d.who + '"]')) who.value = d.who;
+        fill();
+        if (d && d.rule && $('corRule').querySelector('option[value="' + d.rule + '"]')) $('corRule').value = d.rule;
+        $('corVal').value = d && d.val !== undefined && d.val !== '' ? d.val : String(current());
+        $('corNote').value = (d && d.note) || '';
+        hint();
+        who.onchange = () => { fill(); $('corVal').value = String(current()); hint(); saveDraft(); };
+        $('corRule').onchange = () => { $('corVal').value = String(current()); hint(); saveDraft(); };
+        $('corVal').oninput = () => { hint(); saveDraft(); };
+        $('corNote').oninput = saveDraft;
         $('corAdd').onclick = async () => {
-          const [sc, t] = who.value.split('|');
-          // presenza di squadra: stessa chiave della scheda Fazioni (curva tm:<squadra>:presenza)
-          const key = sc === 't' ? 'v||tm:' + t + ':presenza' : sc === 'v' ? 'v||' + $('corRule').value : sc + '|' + t + '|' + $('corRule').value;
-          const note = $('corNote').value.trim();
-          if (!note) return toast('Scrivi una nota');
-          const c = { key, value: Number($('corVal').value || 0), note, by: S.user.uid, byName: S.user.displayName || (S.user.email || '').split('@')[0], at: Date.now() };
-          await liveRef().update({ corrections: firebase.firestore.FieldValue.arrayUnion(c) });
-          toast('Correzione aggiunta');
+          const key = keyOfForm();
+          const value = Math.max(0, Number($('corVal').value || 0));
+          if (value === current()) return toast('Il valore è già questo: niente da correggere');
+          const c = { key, value, note: $('corNote').value.trim(), by: S.user.uid, byName: S.user.displayName || (S.user.email || '').split('@')[0], at: Date.now() };
+          try {
+            await liveRef().update({ corrections: firebase.firestore.FieldValue.arrayUnion(c) });
+            try { localStorage.removeItem(dKey); } catch (e) {}
+            toast('Correzione aggiunta');
+          } catch (e) { toast('Errore: ' + (e.code || e.message) + ' (la bozza resta salvata)'); }
         };
       }
       const pf = $('pubFinal'); if (pf) pf.onclick = publishFinal;
