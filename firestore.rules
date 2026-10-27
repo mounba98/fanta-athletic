@@ -2,7 +2,7 @@
 // deve coincidere con questo file: si modifica QUI, poi si incolla in Console.
 // Base: regole reali copiate dalla Console il 24/09/2026 + modifiche D075/D076
 // (fazione Curva Morello/Piana, contest_predictions, contest_standings).
-// Stato: PUBBLICATO in Console il 24/09/2026 (vedi docs/FIREBASE_ALLINEAMENTO.md).
+// Stato: versione D130 (27/10/2026) da pubblicare in Console (vedi docs/FIREBASE_ALLINEAMENTO.md).
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -43,7 +43,6 @@ service cloud.firestore {
              request.resource.data.get('coach_ids', null) != resource.data.coach_ids;
     }
 
-    // Vero se la fazione, quando presente, è un valore valido
     // D130: a stagione in corso si entra in una squadra SOLO con un invito di squadra.
     // Vale per chi si dà da solo una squadra (non per gli admin): se `team_index` cambia,
     // o la stagione della lega non è "in_corso", o il profilo porta `teamInvite` = codice
@@ -70,6 +69,7 @@ service cloud.firestore {
         string(get(/databases/$(database)/documents/leagues/$(lid)/teamInvites/$(code)).data.teamId) == string(d.team_index);
     }
 
+    // Vero se la fazione, quando presente, è un valore valido
     function factionValid() {
       return !('fazione' in request.resource.data) ||
              request.resource.data.fazione in ['curva', 'piana'];
