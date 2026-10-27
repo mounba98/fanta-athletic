@@ -173,7 +173,10 @@
       pill = e;
       // Esito a colori (D130): verde vittoria, rosso sconfitta, ambra pareggio
       outcome = r.esito === 'X' ? 'draw' : r.esito === '0' ? '' : (e === 'Vittoria' ? 'win' : 'lose');
-      mid = '<small style="white-space:nowrap"><b>' + fmtS(mine) + '</b>–<b>' + fmtS(theirs) + '</b></small>';
+      // ogni punteggio col colore di chi l'ha fatto: verde chi vince, rosso chi perde, arancione pari
+      const cm = outcome === 'win' ? 'w' : outcome === 'lose' ? 'l' : outcome === 'draw' ? 'd' : '';
+      const ct = outcome === 'win' ? 'l' : outcome === 'lose' ? 'w' : cm;
+      mid = '<small style="white-space:nowrap"><b class="' + cm + '">' + fmtS(mine) + '</b>–<b class="' + ct + '">' + fmtS(theirs) + '</b></small>';
       sub = 'Tocca per vedere le due formazioni';
     } else {
       mid = '<small>vs</small>';
