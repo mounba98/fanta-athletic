@@ -10,6 +10,7 @@ Il 25/10 (D129) tutto pubblicato e verificato online: Convocati, inviti per i se
    - [x] Tifoseria sulle 5 squadre senza: scritta il 27/10 (D130 punto 15), 11 Curva e 5 Piana.
    - [x] **G1** calcolata da Claude il 27/10 (provvisori, D130 punto 20). **Marta**: in revisione (Partita live › Correzioni, "Chi" = la squadra) le presenze in curva delle 5 squadre che non vedeva, se c'erano; poi **Pubblica punti definitivi** entro gio 29/10 18.52 e Salva giornata.
    - [x] Mini-gioco G1 calcolato (D130 punto 20).
+   - [ ] **Decidere Curva vs Piana** (D130 punto 22): somma, media per squadra o solo mini-gioco; dopo la G1 è 42–4.
    - [ ] Prove sui telefoni veri: Android dell'amico (Rifiuta cookie → cambio pagina), un post "come squadra", un voto di squadra cambiato da un compagno, un invito usato da un non admin a stagione in corso.
 1. **Controlli sulla G1 con i dati veri** (in sola lettura, prima di toccare qualunque cosa):
    - [ ] Convocati della G1 pubblicati dagli admin (stasera): Formazioni dal telefono con cerchio oro / sbiaditi.
