@@ -315,6 +315,9 @@
 
     // ---------- livelli 2 e 3 ----------
     let P = null; // { scope, target, mode: 'bonus'|'malus' }
+    // Voci di un allenatore: solo quelle che valgono per lui (coach_ids della regola,
+    // vuoto = tutti), come nel Calcolo giornata (D131: cicchino +3 solo Mario, -4 gli altri)
+    const forCoach = (rules, cid) => (rules || []).filter(r => !Array.isArray(r.coach_ids) || !r.coach_ids.length || r.coach_ids.includes(cid));
     function openPanel(code) {
       const [sc, t] = code.split('|');
       P = { scope: sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva', target: sc === 'v' ? null : t, mode: 'bonus' };
@@ -324,7 +327,7 @@
     function closePanel() { $('panel').classList.remove('open'); document.body.style.overflow = ''; document.body.classList.remove('panel-open'); P = null; render(); }
     $('panelBack').onclick = closePanel;
     function renderPanel() {
-      const rules = S.rules[P.scope];
+      const rules = P.scope === 'coaches' ? forCoach(S.rules.coaches, P.target) : S.rules[P.scope];
       const sel = P.scope === 'curva' ? S.sheet.curva : (S.sheet[P.scope][P.target] || {});
       let pts = C.points(sel, rules);
       if (P.scope === 'curva') pts += Number(sel[C.SPECIAL_CURVA] || 0);
@@ -584,9 +587,9 @@
           const now = current(), next = Math.max(0, Number($('corVal').value || 0));
           $('corHint').innerHTML = 'Adesso: <b>' + now + '</b> (' + fmt(pts(now)) + ' punti) → dopo: <b>' + next + '</b> (' + fmt(pts(next)) + ' punti)';
         };
-        const fill = () => { const [sc] = who.value.split('|');
+        const fill = () => { const [sc, t] = who.value.split('|');
           if (sc === 't') { $('corRule').innerHTML = '<option value="presenza">Presente alla partita</option>'; return; }
-          const rules = S.rules[sc === 'p' ? 'players' : sc === 'c' ? 'coaches' : 'curva'];
+          const rules = sc === 'c' ? forCoach(S.rules.coaches, t) : S.rules[sc === 'p' ? 'players' : 'curva'];
           $('corRule').innerHTML = rules.map(r => '<option value="' + C.rid(r) + '">' + esc(C.label(r)) + ' (' + fmt(Number(r.valore)) + (r.input === 'counter' ? ' ciascuno' : '') + ')</option>').join(''); };
         const d = readDraft();
         if (d && d.who && who.querySelector('option[value="' + d.who + '"]')) who.value = d.who;

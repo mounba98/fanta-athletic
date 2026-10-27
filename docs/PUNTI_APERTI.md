@@ -1,8 +1,12 @@
-Allineato a: D130
+Allineato a: D131
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 27/10/2026 sera, D130)
 
 **Il 27/10 (D130)**, dopo la G1, tutto corretto, pubblicato e verificato online: Formazioni senza formazione vecchia, "Pubblica come squadra", cookie/Novità su Android, Partita live (fogli di prova ignorati, fischio finale = provvisori se si è soli, convocati confermati al fischio, revisione che si riapre da sola, presenze nelle Correzioni, modulo Correzioni spiegato e con bozza), tifoseria della squadra, mini-gioco **un voto per squadra** con conteggio automatico ed elenco di chi ha votato, **squadra solo con invito** (pagine + regola), Home con sfida a colori e avviso provvisori snello; Classifiche al telefono (Punti degli Scontri visibili, Supremo intero, partecipazione con chi non ha votato) e classifica del mini-gioco con tutte le 16 squadre. Regole in Console pubblicate. **G1 calcolata da Claude** (provvisori) e mini-gioco G1 contato.
+
+**Il 28/10 notte (D131)**: definitivi G1 di Marta usciti con punti sbagliati (contavano quasi solo le Convocazioni). Causa nel Calcolo giornata (riscriveva la giornata con dati vecchi del telefono), corretta in locale; **G1 ricalcolata da Claude sul database vero** con il cicchino di Mario (+3), stato "definitivo". Home a pari punti come Classifiche. **Da pubblicare** (commit + sito) prima che un admin prema di nuovo "Salva giornata" dal sito online.
+- [x] Regole del cicchino sistemate (+3 solo Mario, −4 solo Tommy e Trendiu), rispettate anche dalla Partita live; Classifiche mostra il nome dell'allenatore.
+- [ ] Idea: in Regole › Bonus e malus manca il modo di scegliere **a quali allenatori/giocatori** vale una regola (`coach_ids`/`player_ids`): oggi solo da database.
 
 **▶ PROSSIMA SESSIONE (decisione dell'utente): VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
 1. [ ] **Velocità**: la Home è lenta (tante funzioni nuove). Interventi già individuati: unire i file di codice in pochi pacchetti, Firebase "modulare", squadre con una sola richiesta, sfarfallio del banner (D063), foto Guarducci in JPG; primo avvio di Formazioni ~7 s. Misurare prima (come D066), poi intervenire, pagina per pagina, con prove su telefono.
@@ -11,7 +15,7 @@ Allineato a: D130
 4. [ ] **Foto profilo** (D130 punto 26): finestra di ritaglio con l'area della foto alta 0, selettore del file aperto due volte; caricamento e lettura nello Storage funzionano. Chiedere all'utente cosa vede quando non va; provarla con lui sul telefono vero. Poi cancellare in Console › Storage i 2 file di prova di Claude in `avatars/<uid Iacopo>/` (le regole non permettono di cancellarli dall'app).
 
 **▶ IN SOSPESO DA ALTRI (controllare a inizio sessione)**
-- [ ] **Marta**: revisione della G1 entro **gio 29/10 18.52** — presenze in curva delle 5 squadre che non vedeva (Correzioni, "Chi" = la squadra, valore 1), poi **Pubblica punti definitivi** e Salva giornata. A inizio sessione controllare `live/G1.stato` = definitivo; se no, avvisare l'utente.
+- [x] **Marta**: definitivi della G1 pubblicati il 27/10 alle 22.38 (punti ricalcolati da Claude, D131).
 - [ ] Iacopo spiega a voce agli admin il "valore" delle Correzioni (= quante volte, non i punti).
 - [ ] **Mocci, urgente**: revocare la chiave admin nel ramo `feature/uniform-pitch-bench` (sezione Sicurezza sotto).
 

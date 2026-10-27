@@ -1,4 +1,4 @@
-Allineato a: D130
+Allineato a: D131
 
 # Fanta Athletic — contesto per Claude
 
@@ -59,8 +59,11 @@ in Console**. **Stagione 2026/27 "In corso"**: 16 squadre (11 Curva, 5 Piana), G
 formazioni chiuse alle 20.15, mini-gioco aperto da dom 1/11 21.15.
 **Prossima sessione (decisione dell'utente): velocità, efficienza e funzioni** — Home lenta, revisione
 grafica e di velocità, **foto della squadra** dal telefono e per i membri, **foto profilo** (ritaglio rotto):
-scaletta in cima a `docs/PUNTI_APERTI.md`. **A inizio sessione** controllare che Marta abbia pubblicato
-i **definitivi della G1** (scadenza gio 29/10 18.52: `leagues/{lega}/live/G1.stato`).
+scaletta in cima a `docs/PUNTI_APERTI.md`. **D131 (28/10 notte)**: definitivi G1 usciti sbagliati per un
+difetto del Calcolo giornata (all'apertura riscriveva `matchday_temp` con dati vecchi del telefono), corretto:
+niente salvataggi prima del caricamento (`state.dayLoaded`), dati presi dal documento `live` anche aperto dal
+menu finché `calcolato !== stato`, `days` sostituito per intero, avviso se si salva qualcosa di diverso dai
+definitivi. G1 ricalcolata da Claude (con cicchino di Mario +3), stato definitivo.
 **Come funziona ora (D130), da sapere prima di toccare qualcosa**:
 - **Partita live**: conta solo il foglio di chi ha segnato davvero (non vuoto e ≥ metà delle voci del più
   pieno); con un admin solo il **fischio finale pubblica subito i provvisori**; i **convocati pubblicati

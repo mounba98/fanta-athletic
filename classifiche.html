@@ -2020,8 +2020,14 @@
         }
 
         state.coaches.clear();
+        // nomi degli allenatori dal file dell'app (nel database la collezione è vuota), D131;
+        // un eventuale documento nel database ha la precedenza, come in Home
+        try {
+          const cj = await fetch('resources/coaches.json').then(r => r.json());
+          (cj.coaches || []).forEach(c => state.coaches.set(c.coach_id, { nome: c.nome }));
+        } catch (_) {}
         if (coachesSnap) {
-          coachesSnap.docs.forEach(doc => state.coaches.set(doc.id, doc.data()));
+          coachesSnap.docs.forEach(doc => state.coaches.set(doc.id, Object.assign({}, state.coaches.get(doc.id), doc.data())));
         }
 
         const rawTeams = teamsSnap.docs.map((doc, idx) => {

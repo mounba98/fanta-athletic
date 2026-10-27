@@ -238,7 +238,9 @@
       tot[d.id] = (tot[d.id] || 0) + p;
       if (core.computed[i] === lastG && d.id === String(core.idx)) lastPts = p;
     }));
-    const order = Object.keys(tot).sort((a, b) => tot[b] - tot[a]);
+    // a pari punti in ordine alfabetico, come la tabella di Classifiche (D131)
+    const tname = id => String((core.teams[id] || {}).name || '');
+    const order = Object.keys(tot).sort((a, b) => (tot[b] - tot[a]) || tname(a).localeCompare(tname(b), 'it'));
     const pos = order.indexOf(String(core.idx)) + 1;
     stats.innerHTML = label + '<b>' + (pos ? pos + 'º' : '—') + '</b><small>' + fmt(tot[String(core.idx)] || 0) + ' pt' + (lastPts !== null ? ' · ' + lastG + ' ' + (lastPts >= 0 ? '+' : '') + fmt(lastPts) : '') + '</small>';
     if (both) renderRanks(core, tot);

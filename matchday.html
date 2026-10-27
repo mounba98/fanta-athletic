@@ -346,6 +346,7 @@
   <script src="resources/toast.js?v=20260920-final"></script>
   <script src="resources/rules-loader.js?v=20260920-final"></script>
   <script src="resources/faction-bonus.js?v=20260924"></script>
+  <script src="resources/live-core.js?v=20260925"></script>
   <script>
     // Init Firebase SUBITO
     if (!firebase.apps.length) {
@@ -558,6 +559,8 @@
       selCurva: {},
       tab: 'players',
       search: '',
+      // false finché loadDay non ha finito: prima non si salva niente (D131)
+      dayLoaded: false,
       selectedPlayerId: null,
       selectedCoachId: null,
       // UI preferences
@@ -929,9 +932,15 @@
 
     // Arrivo dalla Partita live (D093): ?g=G5&from=live → si usano SOLO i dati
     // pubblicati dalla live (matchday_temp), senza mescolarli con salvataggi vecchi.
-    const LIVE_MODE = (function(){ try { const q = new URLSearchParams(location.search); return q.get('from') === 'live' ? { g: q.get('g') } : null; } catch (e) { return null; } })();
+    // D131: diventa attiva da sola anche aprendo la pagina dal menu, se la Partita live
+    // ha pubblicato punti (provvisori o definitivi) non ancora calcolati qui.
+    let LIVE_MODE = (function(){ try { const q = new URLSearchParams(location.search); return q.get('from') === 'live' ? { g: q.get('g') } : null; } catch (e) { return null; } })();
 
     async function loadDay(){
+      state.dayLoaded = false;
+      try { await loadDayData(); } finally { state.dayLoaded = true; }
+    }
+    async function loadDayData(){
       // Pulisci i convocati all'inizio per evitare che rimangano quelli della giornata precedente
       state.convocati = new Set();
       
@@ -1030,18 +1039,29 @@
         restoreConvocatiFromSelections();
       }
 
-      if (LIVE_MODE && LIVE_MODE.g === state.giornata && window.db) {
+      // Partita live (D131): i dati si prendono dal documento della live (definitivi o
+      // provvisori), non da matchday_temp, che un altro telefono può aver riscritto.
+      // Vale anche aprendo la pagina dal menu, finché la giornata non è calcolata con
+      // quello stato (dopo, le correzioni "in extremis" fatte qui restano).
+      state.liveDoc = null;
+      if (window.db) {
         try {
           const leagueId = await getLeagueIdOrNotify('caricare i dati della Partita live', { notify: false });
-          const t = await firestore().collection(`leagues/${leagueId}/matchday_temp`).doc(state.giornata).get();
-          const lv = await firestore().collection(`leagues/${leagueId}/live`).doc(state.giornata).get();
-          if (t.exists) {
-            const d = t.data();
-            state.selPlayers = d.players || {}; state.selCoaches = d.coaches || {}; state.selCurva = d.curva || {};
-            restoreConvocatiFromSelections();
+          const lv = leagueId ? await firestore().collection(`leagues/${leagueId}/live`).doc(state.giornata).get() : null;
+          const ld = lv && lv.exists ? lv.data() : null;
+          const stato = ld ? ld.stato : null;
+          if (stato === 'provvisorio' || stato === 'definitivo') {
+            state.liveDoc = ld;
+            const explicit = LIVE_MODE && LIVE_MODE.g === state.giornata;
+            if (!explicit && ld.calcolato !== stato) LIVE_MODE = { g: state.giornata, auto: true };
+            if (LIVE_MODE && LIVE_MODE.g === state.giornata && window.LiveCore) {
+              const map = stato === 'definitivo' ? (ld.final || LiveCore.finalMap(ld.agreed, ld.resolutions, ld.corrections)) : (ld.agreed || {});
+              const sel = LiveCore.unflat(map);
+              state.selPlayers = sel.players; state.selCoaches = sel.coaches; state.selCurva = sel.curva;
+              restoreConvocatiFromSelections();
+              showLiveBanner(stato);
+            }
           }
-          const stato = lv.exists ? lv.data().stato : null;
-          showLiveBanner(stato);
         } catch (e) { console.warn('[matchday] dati Partita live non caricati', e); }
       }
 
@@ -1099,6 +1119,9 @@
         '<div style="font-weight:500;font-size:13px;margin-top:4px;">Controlla e premi <b>Salva giornata</b> per calcolare i punti. <a href="live.html?g=' + encodeURIComponent(state.giornata) + '" style="color:#fff;">Torna alla Partita live</a></div>';
     }
     function saveDay(){
+      // Prima che i dati della giornata siano caricati non si salva niente: si
+      // riscriverebbe il database con quelli vecchi rimasti sul telefono (D131)
+      if (!state.dayLoaded) return;
       // Debug: verifica integrità dati curva prima di salvare
       const curvaKeys = Object.keys(state.selCurva);
       const curvaTotal = computeTotalRules(state.selCurva, normalizeCurvaRules({ rules: state.rules }));
@@ -2661,22 +2684,9 @@
         openBtn.addEventListener('click', openConvocatiModal);
       }
       
-      // Carica convocati salvati e applica bonus
-      try {
-        const saved = localStorage.getItem(`convocati_${state.giornata}`);
-        if (saved) {
-          const arr = JSON.parse(saved);
-          if (Array.isArray(arr) && arr.length) {
-            state.convocati = new Set(arr);
-            updateConvocatiCount();
-            applyConvocatiBonus();
-          }
-        }
-      } catch (_) {}
-      
-      if (!(state.convocati instanceof Set) || state.convocati.size === 0) {
-        restoreConvocatiFromSelections();
-      }
+      // I convocati si leggono sempre dai dati della giornata, mai dalla copia sul
+      // telefono: riapplicarla qui riscriveva il database con dati vecchi (D131)
+      restoreConvocatiFromSelections();
       
       // Mobile helpers
       window.closeMobilePlayerDetail = function() {
@@ -3127,25 +3137,18 @@
           return;
         }
         
-        // 🔄 CARICA DATI DA MATCHDAY_TEMP (per sicurezza, ultima versione)
-        if (window.db) {
-          try {
-            const leagueId = await getLeagueIdOrNotify('caricare i dati live della giornata', { notify: false });
-            if (leagueId) {
-              const matchdayRef = firestore().collection(`leagues/${leagueId}/matchday_temp`).doc(state.giornata);
-              const tempDoc = await matchdayRef.get();
-              if (tempDoc.exists) {
-                const tempData = tempDoc.data();
-                // Merge con dati esistenti (temp ha priorità se più recente)
-                if (tempData.players) state.selPlayers = { ...state.selPlayers, ...tempData.players };
-                if (tempData.coaches) state.selCoaches = { ...state.selCoaches, ...tempData.coaches };
-                if (tempData.curva) state.selCurva = { ...state.selCurva, ...tempData.curva };
-                if (tempData.data) $('#data').value = tempData.data;
-              }
-            }
-          } catch (e) {
-            console.warn('⚠️ Errore caricamento matchday_temp prima del salvataggio:', e);
-          }
+        // Si salva esattamente quello che c'è a schermo (D131). Prima qui si univa
+        // matchday_temp, che un altro telefono poteva aver riscritto con dati vecchi.
+        if (!state.dayLoaded) { toast('⏳ Dati della giornata ancora in caricamento, riprova tra un attimo'); return; }
+
+        // Definitivi della Partita live: avviso se a schermo c'è qualcosa di diverso (D131)
+        if (state.liveDoc && state.liveDoc.stato === 'definitivo' && window.LiveCore) {
+          const imb = (imbattibilitaRule() || {}).rule_id;
+          const fin = state.liveDoc.final || LiveCore.finalMap(state.liveDoc.agreed, state.liveDoc.resolutions, state.liveDoc.corrections);
+          const now = LiveCore.flat({ players: state.selPlayers, coaches: state.selCoaches, curva: state.selCurva });
+          const diff = [...new Set([...Object.keys(fin), ...Object.keys(now)])]
+            .filter(k => !(imb && k.endsWith('|' + imb)) && Number(fin[k] || 0) !== Number(now[k] || 0));
+          if (diff.length && !confirm('⚠️ ' + diff.length + ' voci sono diverse dai punti definitivi della Partita live.\n\nSalva solo se sono correzioni che hai fatto apposta qui. Salvo lo stesso?')) return;
         }
         
         // Save to localStorage
@@ -3165,10 +3168,9 @@
               return;
             }
             await daysRef.set(data, { merge: true });
-            if (LIVE_MODE && LIVE_MODE.g === state.giornata) {
-              // set con merge unisce le mappe: qui le sostituiamo per intero, così una voce tolta in revisione sparisce davvero
-              await daysRef.update({ players: data.players, coaches: data.coaches, curva: data.curva });
-            }
+            // set con merge unisce le mappe: qui le sostituiamo per intero, così la giornata
+            // salvata è sempre uguale a quella da cui si calcolano i punti (D131)
+            await daysRef.update({ players: data.players, coaches: data.coaches, curva: data.curva });
             // Tavolino degli scontri diretti: ora lo calcola H2H.saveDay con le regole della Stagione (D100).
             // applyForfeitPenalties (3 a -10 fisso, squadre numerate in modo diverso) non si usa più.
             

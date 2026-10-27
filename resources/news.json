@@ -1,7 +1,38 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D130",
+  "allineato": "D131",
   "news": [
+    {
+      "id": "2026-10-28-punti-g1",
+      "date": "2026-10-28",
+      "audience": "all",
+      "icon": "🧮",
+      "title": "Punti della prima giornata ricalcolati",
+      "intro": "Nei punti definitivi della G1 c'era un errore di calcolo: contavano quasi solo le Convocazioni.",
+      "items": [
+        "Ora contano tutti i bonus e malus della revisione: gol, esultanze, ammonizioni, Guardalinee… e il <b>capitano raddoppia</b> tutto, non solo la Convocazione.",
+        "Aggiunto il <b>cicchino in panchina di Mister Mario</b> (+3), che era stato dimenticato.",
+        "La tua <b>posizione in Home</b> ora è la stessa della Classifica anche a pari punti (a parità, ordine alfabetico come nella tabella).",
+        "Sono aggiornati anche gli <b>Scontri diretti</b> e il <b>Supremo</b>.",
+        "In <b>Classifiche</b> accanto a ogni squadra ora c'è il nome dell'<b>allenatore</b> (prima c'era un trattino)."
+      ],
+      "link": "classifiche.html",
+      "linkLabel": "Vai alle classifiche"
+    },
+    {
+      "id": "2026-10-28-calcolo-giornata",
+      "date": "2026-10-28",
+      "audience": "admin",
+      "icon": "🛠️",
+      "title": "Calcolo giornata: corretto l'errore dei definitivi",
+      "intro": "Il percorso resta lo stesso: Partita live → <b>Pubblica punti definitivi</b> → <b>Salva giornata</b>.",
+      "items": [
+        "Aprendo il Calcolo giornata la pagina poteva riscrivere la giornata con dati vecchi rimasti sul telefono, e i punti uscivano sbagliati. Ora non salva niente finché non ha caricato i dati veri.",
+        "Se la Partita live ha punti ancora da calcolare, il Calcolo giornata li prende <b>da solo</b> (banner in alto) anche se lo aprite dal menu.",
+        "Se state per salvare voci diverse dai definitivi, l'app ve lo chiede prima: va bene solo per le correzioni fatte apposta dopo la revisione.",
+        "<b>Cicchino</b>: \"Cicchino panchina\" (+3) compare solo per <b>Mario</b>, \"Beccato con cicchino dall'arbitro\" (−4) solo per <b>Tommy</b> e <b>Trendiu</b>, sia nella Partita live sia nel Calcolo giornata."
+      ]
+    },
     {
       "id": "2026-10-27-correzioni-g1",
       "date": "2026-10-27",
