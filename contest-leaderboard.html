@@ -342,7 +342,8 @@
           predictions: u.predictions || 0
         }));
 
-        scoresArray.sort((a, b) => b.totalPoints - a.totalPoints);
+        // a pari punti prima chi ha votato, poi in ordine alfabetico (D130: ci sono anche le squadre che non hanno votato)
+        scoresArray.sort((a, b) => b.totalPoints - a.totalPoints || b.predictions - a.predictions || a.name.localeCompare(b.name, 'it'));
 
         state.scores = scoresArray;
         renderParticipation(data.participation || {});

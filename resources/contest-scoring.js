@@ -115,6 +115,18 @@
     return { users, teams, byMatch };
   }
 
+  // Tutte le squadre della lega in classifica, anche chi non ha mai votato (0 punti, D130):
+  // non cambiano i totali delle fazioni (contano solo chi ha giocato).
+  // teams: { "<indice>": { name, fazione } }
+  function withAllTeams(st, teams) {
+    Object.entries(teams || {}).forEach(([id, t]) => {
+      const k = 'T' + id;
+      if (st.users[k]) { if (t.name) st.users[k].name = t.name; return; }
+      st.users[k] = { name: t.name || ('Squadra ' + id), faction: t.fazione || null, points: 0, predictions: 0, hits: 0, team: true };
+    });
+    return st;
+  }
+
   // Id del voto di una squadra per una partita: "G3_T6"
   function teamPredId(matchKey, teamIndex) { return matchKey + '_T' + teamIndex; }
 
@@ -197,14 +209,16 @@
         missing: sort(ids.filter(i => !voted.has(i)).map(i => teamNames[i])), at: new Date().toISOString() };
     }
     const all = (await db.collection('contest_predictions').get()).docs.map(d => d.data());
-    const st = buildStandings(all);
+    const teamsMap = {};
+    Object.keys(teamNames).forEach(id => { teamsMap[id] = { name: teamNames[id], fazione: teamFaction[id] }; });
+    const st = withAllTeams(buildStandings(all), teamsMap);
     await ref.set({ users: st.users, teams: st.teams, byMatch: st.byMatch, participation, updatedAt: new Date().toISOString() });
     return { done, total: snap.size, participation: participation[key] || null };
   }
 
   const api = { POINTS, PICKS, CFG, configure, FACTIONS, MONTHS, outcomeOf,
                 scorePrediction, seasonStartYear, matchStart, deadlineOf, opensOf,
-                resultOf, buildStandings, scoreMatch, teamPredId, latest };
+                resultOf, buildStandings, withAllTeams, scoreMatch, teamPredId, latest };
   root.ContestScoring = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

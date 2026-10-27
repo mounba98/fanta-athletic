@@ -2468,7 +2468,7 @@
             return '<tr><td>G' + fzEsc(m.giornata) + '</td><td>' + m.curva.points + ' <span class="fz-note">(' + m.curva.hits + '/' + m.curva.votes + ')</span></td><td>' + m.piana.points + ' <span class="fz-note">(' + m.piana.hits + '/' + m.piana.votes + ')</span></td><td>' + cc + ' / ' + pp + '</td></tr>'; }).join('') + '</table>';
       }
       // 6) Classifica individuale
-      const users = Object.entries(st.users || {}).map(([uid, u]) => ({ uid, ...u })).sort((a, b) => b.points - a.points || b.hits - a.hits);
+      const users = Object.entries(st.users || {}).map(([uid, u]) => ({ uid, ...u })).sort((a, b) => b.points - a.points || b.hits - a.hits || (b.predictions || 0) - (a.predictions || 0) || String(a.name).localeCompare(String(b.name), 'it'));
       if (users.length) {
         const me = window.auth && window.auth.currentUser ? window.auth.currentUser.uid : null;
         h += '<h3 class="fz-h">Mini-gioco: classifica delle squadre</h3><table class="fz-table"><tr><th>#</th><th>Squadra</th><th>Punti</th><th>Azzeccati</th></tr>' +

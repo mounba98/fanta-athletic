@@ -77,7 +77,7 @@
   <script src="resources/firebase-auth-compat.js"></script>
   <script src="resources/firebase-firestore-compat.js"></script>
   <script src="resources/firebase-config.js?v=20260920-final"></script>
-  <script src="resources/contest-scoring.js?v=20261027"></script>
+  <script src="resources/contest-scoring.js?v=20261027b"></script>
   <script src="resources/season.js?v=20261024b"></script>
   <script>
     const CS = window.ContestScoring;
@@ -197,7 +197,11 @@
       const ref = window.db.collection('contest_standings').doc('current');
       const prev = await ref.get().catch(() => null);
       const all = (await window.db.collection('contest_predictions').get()).docs.map(d => d.data());
-      const st = CS.buildStandings(all);
+      // tutte le squadre della lega, anche chi non ha votato (D130)
+      const teams = {};
+      const lid = window.Season ? (await window.Season.load()).leagueId : null;
+      if (lid) (await (window.__LEGACY_DB__ || window.db).collection('leagues/' + lid + '/teams').get()).docs.forEach(d => { teams[d.id] = d.data(); });
+      const st = CS.withAllTeams(CS.buildStandings(all), teams);
       await ref.set({ users: st.users, teams: st.teams, byMatch: st.byMatch,
         participation: (prev && prev.exists && prev.data().participation) || {}, updatedAt: new Date().toISOString() });
     }
