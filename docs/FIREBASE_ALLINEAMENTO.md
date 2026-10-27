@@ -32,7 +32,7 @@ va riportato qui subito.
   l'admin non calcola), `scoredAt`.
 - `contest_standings/current`: `users`, `teams`, `byMatch`, `updatedAt`
   (scritto solo da `admin-contest.html`).
-- **D130 (27/10/2026), da pubblicare in Console**: (1) mini-gioco **un voto per squadra**:
+- **D130 (27/10/2026), pubblicato in Console il 27/10**: (1) mini-gioco **un voto per squadra**:
   `contest_predictions/{G}_T{team_index}` con anche `team_index`, `teamName` (`uid`/`name` = ultimo
   che ha votato); regola nuova (membro della squadra, `team_index` uguale al proprio). Il vecchio voto a
   persona resta permesso per i telefoni con la pagina vecchia. Al conteggio (`ContestScoring.scoreMatch`,
