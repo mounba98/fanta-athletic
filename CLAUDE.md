@@ -1,4 +1,4 @@
-Allineato a: D131
+Allineato a: D132
 
 # Fanta Athletic — contesto per Claude
 
@@ -67,6 +67,10 @@ definitivi. G1 ricalcolata da Claude (con cicchino di Mario +3), stato definitiv
 R019 +3 solo T3 (Mario), R036 −4 solo T1/T2 (`coach_ids`, rispettati anche da `live.html`); Classifiche legge i
 nomi degli allenatori da `resources/coaches.json` (la collezione `coaches` della lega è vuota). **Dopo i
 definitivi della G2**: ricontrollo in sola lettura (punto in `PUNTI_APERTI.md`).
+**D132 (03/11)**: G2 senza punti perché dopo "Pubblica provvisori" nessuno aveva premuto "Salva giornata"; calcolata da
+Claude (provvisori, revisione di Marta fino al 4/11 22.51). Nuovo pop-up per gli admin "Salva giornata" (Calcolo giornata,
+più `resources/salva-giornata-reminder.js` in Home e Partita live). Appunti SC-006…SC-009 in coda in `PUNTI_APERTI.md`. **Prossima sessione: pannello admin** (SC-008); poi efficienza,
+dove la Partita live passa direttamente alla versione "in pochi passaggi" con il calcolo dentro la live (D132 punto 7).
 **Come funziona ora (D130), da sapere prima di toccare qualcosa**:
 - **Partita live**: conta solo il foglio di chi ha segnato davvero (non vuoto e ≥ metà delle voci del più
   pieno); con un admin solo il **fischio finale pubblica subito i provvisori**; i **convocati pubblicati

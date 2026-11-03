@@ -1,7 +1,23 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D131",
+  "allineato": "D132",
   "news": [
+    {
+      "id": "2026-11-03-salva-giornata",
+      "date": "2026-11-03",
+      "audience": "admin",
+      "icon": "💾",
+      "title": "Promemoria \"Salva giornata\"",
+      "intro": "Nella G2 i punti erano pubblicati nella Partita live ma non calcolati: mancava solo <b>Salva giornata</b>.",
+      "items": [
+        "Arrivando dalla Partita live al <b>Calcolo giornata</b> compare un riquadro <b>\"Ultimo passo: Salva giornata\"</b> con il pulsante verde: premetelo e confermate.",
+        "Se uscite dalla pagina senza salvare, il telefono chiede se volete davvero uscire.",
+        "Finché i punti non sono calcolati, in <b>Home</b> e nella <b>Partita live</b> compare il riquadro <b>\"Manca un passo\"</b> con <b>Vai a Salva giornata</b> (\"Più tardi\" lo nasconde fino alla prossima apertura dell'app).",
+        "Vale sia per i provvisori sia per i definitivi. I punti provvisori della G2 li ha già calcolati Iacopo: resta la revisione di 48 ore."
+      ],
+      "link": "live.html",
+      "linkLabel": "Apri la Partita live"
+    },
     {
       "id": "2026-10-28-punti-g1",
       "date": "2026-10-28",
