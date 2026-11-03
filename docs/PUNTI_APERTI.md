@@ -18,7 +18,7 @@ Allineato a: D132
 4. [ ] **Foto profilo** (D130 punto 26): finestra di ritaglio con l'area della foto alta 0, selettore del file aperto due volte; caricamento e lettura nello Storage funzionano. Chiedere all'utente cosa vede quando non va; provarla con lui sul telefono vero. Poi cancellare in Console › Storage i 2 file di prova di Claude in `avatars/<uid Iacopo>/` (le regole non permettono di cancellarli dall'app).
 5. [ ] **Regole: "a chi vale"** (D131, in coda su richiesta dell'utente): in Regole › Bonus e malus aggiungere la scelta di **a quali allenatori/giocatori** vale una regola (`coach_ids`/`player_ids`, già rispettati da Calcolo giornata e Partita live). Oggi si cambia solo dal database (es. cicchino +3 solo Mario, −4 solo Tommy e Trendiu). Poi togliere dalla guida "chiedete a Iacopo".
 
-**Il 03/11 (D132)**: G2 rimasta senza punti (Marta aveva pubblicato i provvisori dalla Partita live ma non premuto "Salva giornata"): **calcolata da Claude** (provvisori). Aggiunto il pop-up "Salva giornata" per gli admin (Calcolo giornata, Home, Partita live). **Da pubblicare.**
+**Il 03/11 (D132)**: G2 rimasta senza punti (Marta aveva pubblicato i provvisori dalla Partita live ma non premuto "Salva giornata"): **calcolata da Claude** (provvisori). Aggiunto il pop-up "Salva giornata" per gli admin (Calcolo giornata, Home, Partita live). **Pubblicato e verificato online il 03/11.**
 - [ ] Definitivi della G2 di Marta entro mer 4/11 22.51: con il pop-up nuovo dovrebbe premere da sola "Salva giornata"; poi il ricontrollo in sola lettura qui sotto.
 
 **▶ APPUNTI DEL SECONDO CERVELLO DA FARE (recepiti il 03/11, D132; l'utente: "stasera non li facciamo")**
