@@ -8,7 +8,7 @@ Allineato a: D133
 - [x] Regole del cicchino sistemate (+3 solo Mario, −4 solo Tommy e Trendiu), rispettate anche dalla Partita live; Classifiche mostra il nome dell'allenatore.
 
 **Il 09/11 (D133), prima della G3 (mar 10/11 21.30)**: mini-gioco G2 contato da Claude (non era mai partito); "Salva giornata" ora conta anche il mini-gioco rimasto indietro; menu ☰ con la sezione Amministrazione e Calcolo solo admin (SC-008); Formazioni che "non prendeva" i tocchi corretta (SC-007); due nomi dei bonus (SC-006).
-- [ ] Chiedere a Marta se l'MVP a Leonardo Mori aggiunto il 30/10 nella G1 è voluto (unica differenza dai definitivi: +2, +4 a chi l'aveva capitano).
+- [x] MVP a Leonardo Mori nella G1 (aggiunto da Marta il 30/10): confermato giusto; nella G2 nessun MVP (D133).
 - [ ] Giro di revisione dei nomi di tutti i bonus con gli admin (SC-006, seconda parte).
 - [ ] SC-010 fazioni (come si contano e come si mostrano) e SC-009 (app pronta per gli store?): da decidere con l'utente.
 - [ ] Riprovare Formazioni sul telefono vero (tocchi su campo e lista).

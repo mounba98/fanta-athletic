@@ -71,7 +71,7 @@ definitivi della G2**: ricontrollo in sola lettura (punto in `PUNTI_APERTI.md`).
 (copia in `backups-firestore/`); `ContestScoring.ensureScored` lo conta anche con "Salva giornata"; menu ☰
 con sezione Amministrazione e Calcolo solo admin (pagina con avviso per i non admin); Formazioni/Squadre:
 comandi di tocco che si accumulavano sulle caselle del campo (più finestre una sopra l'altra) corretti;
-nomi R011/R012. Da chiedere a Marta: MVP a Leonardo Mori aggiunto il 30/10 nella G1 (voluto?).
+nomi R011/R012. MVP a Leonardo Mori nella G1 (Marta, 30/10) confermato; G2 senza MVP.
 **D132 (03/11)**: G2 senza punti perché dopo "Pubblica provvisori" nessuno aveva premuto "Salva giornata"; calcolata da
 Claude (provvisori, revisione di Marta fino al 4/11 22.51). Nuovo pop-up per gli admin "Salva giornata" (Calcolo giornata,
 più `resources/salva-giornata-reminder.js` in Home e Partita live). Appunti SC-006…SC-009 in coda in `PUNTI_APERTI.md`. **Prossima sessione: pannello admin** (SC-008); poi efficienza,
