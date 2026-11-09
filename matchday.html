@@ -342,6 +342,7 @@
   <script src="resources/convocati.js?v=20261025"></script>
   <script src="resources/season.js?v=20261024b"></script>
   <script src="resources/contest-scoring.js?v=20261109"></script>
+  <script src="resources/day-calc.js?v=20261109"></script>
   <script src="resources/h2h.js?v=20261024b"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
   <script src="resources/toast.js?v=20260920-final"></script>
@@ -1222,13 +1223,6 @@
 
       console.log(`[matchday] saveTeamResults leagueId=${leagueId}, giornata=${state.giornata}`);
 
-      const prules = normalizePlayersRules({ rules: state.rules });
-      const crules = normalizeCoachRules({ rules: state.rules });
-      const vrules = normalizeCurvaRules({ rules: state.rules });
-      
-      // Curva globale
-      const curvaBase = computeTotalRules(state.selCurva, vrules);
-
       // 1) Salva/aggiorna metadati della giornata (multilega)
       try {
         const dayRef = getDayDocRef(state.giornata, leagueId);
@@ -1243,199 +1237,38 @@
         console.warn('[matchday] Errore aggiornando metadati days:', metaErr);
       }
       
-      // Load teams
-      let teams = [];
+      // Calcolo dei punti (D133): stesso file della Partita live, resources/day-calc.js.
+      // Prima il calcolo era scritto qui; spostato senza cambiare le regole
+      // (verificato: G1 e G2 ricalcolate identiche, squadra per squadra).
+      let inp, res;
       try {
-        const teamsCol = getLeagueCollection('teams', leagueId);
-        if (!teamsCol) {
-          console.warn('[matchday] Impossibile ottenere collection teams per la lega corrente');
-          return;
-        }
-        const teamsSnap = await teamsCol.orderBy(firebase.firestore.FieldPath.documentId()).get();
-        teams = teamsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        inp = await window.DayCalc.loadInputs(leagueId, state.giornata, { rules: state.rules });
+        inp.sel = { players: state.selPlayers, coaches: state.selCoaches, curva: state.selCurva };
+        inp.formation = { enabled: isFormationBonusEnabled(), value: getFormationBonusValue() };
+        res = window.DayCalc.computeTeams(inp);
       } catch(e) {
-        console.warn('[matchday] Errore caricamento teams:', e);
+        console.warn('[matchday] Errore nel calcolo:', e);
         toast('❌ Errore nel caricamento delle squadre per questa lega.');
         return;
       }
-      
-      // Batch scritture risultati team
+      const teams = inp.teams;
+      const fbCtx = { venue: inp.venue };
+      const h2hByTeam = res.h2hByTeam;
+
       let batch = window.db.batch();
       let pending = 0;
-      
-      // Casa o trasferta dal calendario (per la presenza), D080
-      await loadCalendar();
-      const fbCtx = { venue: venueForGiornata(state.giornata).venue };
-
-      // Formazione non consegnata (D124): regola della Stagione
-      let fmRule = { usaPrecedente: false, malus: 0 };
-      try { if (window.Season) fmRule = (await window.Season.load()).formazioneMancante || fmRule; } catch (_) {}
-      const gNow = parseInt(String(state.giornata).replace(/\D/g, ''), 10) || 0;
-
-      // Calcola punti per ogni squadra
-      const h2hByTeam = {};
-      for (const team of teams) {
-        // Carica lineup salvata per questa giornata
-        let lineup = null;
-        let captain = null;
-        let coachId = null;
-        let savedDoc = null;
-        
-        try {
-          // 2a) carica formazione salvata corretta (multilega)
-          const teamRef = getLeagueCollection('teams', leagueId)?.doc(team.id);
-          const savedSnap = teamRef ? await teamRef.collection('saved').doc(state.giornata).get() : null;
-          savedDoc = savedSnap;
-          if (savedDoc && savedDoc.exists) {
-            const savedData = savedDoc.data();
-            lineup = savedData.lineup || [];
-            captain = savedData.captain || null;
-            coachId = (Array.isArray(savedData.coach_ids) && savedData.coach_ids.length ? savedData.coach_ids[0] : (savedData.coach_id || savedData.coachId || null));
-          }
-        } catch(e) {
-          console.warn(`Errore caricamento lineup team ${team.id}:`, e);
-        }
-        
-        if (!Array.isArray(lineup)) {
-          lineup = [];
-        }
-        lineup = lineup.map(slot => slot || null);
-
-        // Nessuna formazione per questa giornata: si gioca con l'ultima salvata
-        // nelle giornate precedenti (solo giocatori ancora in rosa), D124
-        let lineupFrom = null;
-        if (fmRule.usaPrecedente && !lineup.some(Boolean) && gNow > 1) {
-          const roster = Array.isArray(team.roster) ? team.roster.map(String) : [];
-          const teamRef = getLeagueCollection('teams', leagueId)?.doc(team.id);
-          for (let k = gNow - 1; k >= 1 && teamRef && !lineupFrom; k--) {
-            try {
-              const prev = await teamRef.collection('saved').doc('G' + k).get();
-              if (!prev.exists) continue;
-              const pd = prev.data() || {};
-              const pl = (pd.lineup || []).map(pid => (pid && (!roster.length || roster.includes(String(pid)))) ? pid : null);
-              if (!pl.some(Boolean)) continue;
-              lineup = pl;
-              captain = pl.includes(pd.captain) ? pd.captain : null;
-              coachId = (Array.isArray(pd.coach_ids) && pd.coach_ids.length ? pd.coach_ids[0] : (pd.coach_id || pd.coachId || null));
-              lineupFrom = 'G' + k;
-            } catch (e) {
-              console.warn(`Errore formazione precedente team ${team.id} G${k}:`, e);
-            }
-          }
-        }
-        const lineupMalus = lineupFrom ? Math.min(0, Number(fmRule.malus) || 0) : 0;
-        
-        // Calcola punti giocatori titolari
-        const starters = lineup.filter(Boolean);
-        const missingLineup = starters.length === 0;
-        let playerSum = 0;
-        const playerContribs = new Map();
-        for (const pid of starters) {
-          const sel = state.selPlayers[pid] || {};
-          const pts = prules.reduce((s,r) => s + ((r.rule_id in sel) ? (r.input==='counter' ? Number(sel[r.rule_id]||0)*Number(r.valore) : (sel[r.rule_id]?Number(r.valore):0)) : 0), 0) + (sel['__convocato'] ? 1 : 0); // Bonus +1 per convocati
-          playerSum += pts;
-          const existing = playerContribs.get(pid) || { playerId: pid, points: 0, breakdown: JSON.parse(JSON.stringify(sel || {})) };
-          existing.points += pts;
-          playerContribs.set(pid, existing);
-        }
-        
-        // Capitano (raddoppia)
-        let captainBonus = 0;
-        if (captain) {
-          const selC = state.selPlayers[captain] || {};
-          const capPts = prules.reduce((s,r) => s + ((r.rule_id in selC) ? (r.input==='counter' ? Number(selC[r.rule_id]||0)*Number(r.valore) : (selC[r.rule_id]?Number(r.valore):0)) : 0), 0) + (selC['__convocato'] ? 1 : 0); // Bonus +1 per convocati
-          captainBonus = capPts;
-          if (playerContribs.has(captain)) {
-            const capEntry = playerContribs.get(captain);
-            capEntry.points += capPts;
-            playerContribs.set(captain, capEntry);
-          }
-        }
-        
-        // Allenatore
-        let coachPts = 0;
-        if (!coachId) {
-          const teamCoach = Array.isArray(team.coach_ids) && team.coach_ids.length ? team.coach_ids[0] : (team.coach_id || team.coachId || null);
-          if (teamCoach) {
-            coachId = teamCoach;
-          }
-        }
-
-        if (coachId && !missingLineup) {
-          const selCoach = state.selCoaches[coachId] || {};
-          coachPts = crules.reduce((s,r) => s + ((r.rule_id in selCoach) ? (r.input==='counter' ? Number(selCoach[r.rule_id]||0)*Number(r.valore) : (selCoach[r.rule_id]?Number(r.valore):0)) : 0), 0);
-        }
-        
-        // Formazione pubblicata bonus (feature flag)
-        const formationEnabled = isFormationBonusEnabled();
-        const formationValue = getFormationBonusValue();
-        // il bonus "formazione pubblicata" non spetta a chi gioca con quella della giornata prima (D124)
-        let formationBonus = (formationEnabled && starters.length >= 5 && !lineupFrom) ? formationValue : 0;
-
-        // Bonus di fazione (presenze per squadra + eventi della sua fazione), D080
-        const fbRaw = window.FactionBonus ? window.FactionBonus.teamBonus(team.id, team.fazione, state.selCurva, state.rules, fbCtx) : { total: 0 };
-        let factionBonus = fbRaw.total;
-
-        let total = curvaBase + playerSum + captainBonus + coachPts + formationBonus + factionBonus + lineupMalus;
-        if (missingLineup) {
-          factionBonus = 0;
-          total = 0;
-          playerSum = 0;
-          captainBonus = 0;
-          coachPts = 0;
-          formationBonus = 0;
-        }
-        const curvaDisplay = missingLineup ? 0 : curvaBase;
-        h2hByTeam[String(team.id)] = { points: total, starters: starters.length, missing: !!missingLineup };
-        
-        // Prepara payload risultato
-        const payload = {
-            teamId: team.id,
-            teamName: team.name || `Squadra ${parseInt(team.id)+1}`,
-            points: total,
-            breakdown: {
-            curva: curvaDisplay,
-              players: playerSum,
-              captain: captainBonus,
-              coach: coachPts,
-              formation: formationBonus,
-              fazione: factionBonus,
-              malusFormazione: missingLineup ? 0 : lineupMalus
-            },
-            faction: team.fazione || null,
-            lineup: lineup,
-          missingLineup,
-          lineupFrom: missingLineup ? null : lineupFrom,
-            captain: captain,
-            coachId: coachId,
-            players: Array.from(playerContribs.values()).map(entry => ({
-              playerId: entry.playerId,
-              points: Number((entry.points || 0).toFixed(2)),
-              breakdown: entry.breakdown || {}
-            })),
-          giornata: state.giornata,
-          fromSaved: !!(savedDoc && savedDoc.exists),
-          savedMeta: (savedDoc && savedDoc.exists) ? { by: savedDoc.data().userId || null, at: savedDoc.data().savedAt || null } : null,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        
-        // Aggiungi al batch (risultati per-lega)
-        const ref = getResultDocRef(state.giornata, team.id, leagueId);
+      for (const p of res.payloads) {
+        const ref = getResultDocRef(state.giornata, p.teamId, leagueId);
         if (ref) {
-          batch.set(ref, payload, { merge: true });
+          batch.set(ref, Object.assign({}, p, { updatedAt: firebase.firestore.FieldValue.serverTimestamp() }), { merge: true });
           pending++;
         }
-        
-        // Commit chunk per limiti batch (<=500)
         if (pending >= 400) {
           await batch.commit();
-          console.info('[ML] batch committed (chunk)');
           batch = window.db.batch();
           pending = 0;
         }
       }
-      
-      // Commit batch finale
       if (pending > 0) {
         await batch.commit();
         console.info('[matchday] batch risultati committed (final)');
@@ -1457,7 +1290,7 @@
       // I bonus globali "Curva" NON entrano (sono uguali per tutti e si annullano).
       try {
         if (window.FactionBonus) {
-          const totals = window.FactionBonus.factionTotals(teams.map(t => ({ id: t.id, fazione: t.fazione })), state.selCurva, state.rules, fbCtx);
+          const totals = res.factionTotals || window.FactionBonus.factionTotals(teams.map(t => ({ id: t.id, fazione: t.fazione })), state.selCurva, state.rules, fbCtx);
           const resultsCol = getLeagueCollection('results', leagueId);
           if (resultsCol) {
             await resultsCol.doc(String(state.giornata)).set({ faction_bonus: totals, factionBonusAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });

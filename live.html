@@ -121,6 +121,11 @@
   <script src="resources/convocati.js?v=20261025"></script>
   <script src="resources/contest-scoring.js?v=20261109"></script>
   <script src="resources/live-core.js?v=20260925"></script>
+  <script src="resources/faction-bonus.js?v=20260924"></script>
+  <script src="resources/feature-flags.js?v=20260920-final"></script>
+  <script src="resources/h2h.js?v=20261024b"></script>
+  <script src="resources/day-calc.js?v=20261109"></script>
+  <script src="resources/social-notifications.js?v=20260925"></script>
   <script src="resources/salva-giornata-reminder.js?v=20261103"></script>
   <script>
     const C = window.LiveCore;
@@ -385,7 +390,7 @@
     };
     $('closeBtn').onclick = async () => {
       if (!confirm('Fischio finale: chiudi il tuo foglio? Dopo non potrai più modificarlo (le correzioni si fanno in revisione).')) return;
-      S.sheet.closed = true; S.sheet.closedAt = Date.now(); persist(); await pushSheet(); render();
+      S.sheet.closed = true; S.sheet.closedAt = Date.now(); persist(); clearTimeout(S.saveT); await pushSheet(); render();
       // Se nessun altro sta segnando davvero, il foglio vale da solo: si pubblicano subito i provvisori (D092, D130)
       const ps = peersList();
       if (ps.length && ps.every(s => s.closed || s.uid === S.user.uid)) publishProvisional();
@@ -427,8 +432,9 @@
         h += '<p class="info">Fogli incrociati: <b>' + Object.keys(m.agreed).filter(k => m.agreed[k]).length + '</b> voci uguali, <b>' + m.disputes.length + '</b> diverse (vanno in revisione e per ora non contano).</p>' +
           '<button class="sbtn ok" id="pubProv">Pubblica punti provvisori</button>';
       }
-      h += '</section>' + resultCard();
-      $('view').innerHTML = h;
+      h += '</section>';
+      // il risultato si scrive qui, prima di pubblicare (D133): si salva da solo con "Pubblica"
+      $('view').innerHTML = resultCard() + h;
       bindResultCard(renderClosed);
       const b = $('pubProv'); if (b) b.onclick = publishProvisional;
     }
@@ -450,23 +456,34 @@
     function bindResultCard(rerender) {
       const b = $('resSave'); if (!b) return;
       b.onclick = async () => {
-        const m = S.venue && S.venue.m; if (!m) return;
         const h = $('resH').value, a = $('resA').value;
         if (h === '' || a === '' || Number(h) < 0 || Number(a) < 0) return toast('Scrivi i gol di tutte e due le squadre');
-        try {
-          await db().collection('athletic_calendar').doc(m._id).update({ homeScore: parseInt(h, 10), awayScore: parseInt(a, 10) });
-          m.homeScore = parseInt(h, 10); m.awayScore = parseInt(a, 10);
-          toast('Risultato salvato');
-          // punti del mini-gioco contati da soli (D130)
-          const n = parseInt(m.giornata, 10);
-          if (window.ContestScoring && !isNaN(n)) {
-            ContestScoring.scoreMatch(db(), 'G' + n, { home: m.homeScore, away: m.awayScore }, S.lid)
-              .then(r => { if (r.total) toast('🗳️ Mini-gioco: ' + r.done + ' pronostici valutati'); })
-              .catch(e => { console.warn('[live] mini-gioco', e); toast('Mini-gioco non valutato: fallo da Pannello › Mini-gioco'); });
-          }
-          rerender();
-        } catch (e) { toast('Errore: ' + (e.code || e.message)); }
+        try { await saveResult(h, a, true); rerender(); } catch (e) { toast('Errore: ' + (e.code || e.message)); }
       };
+    }
+    // Salva il risultato nel Calendario Athletic. score = conta subito il mini-gioco (D130);
+    // pubblicando i punti lo conta comunque il calcolo della giornata (D133).
+    async function saveResult(h, a, score) {
+      const m = S.venue && S.venue.m; if (!m) return false;
+      await db().collection('athletic_calendar').doc(m._id).update({ homeScore: parseInt(h, 10), awayScore: parseInt(a, 10) });
+      m.homeScore = parseInt(h, 10); m.awayScore = parseInt(a, 10);
+      toast('Risultato salvato');
+      const n = parseInt(m.giornata, 10);
+      if (score && window.ContestScoring && !isNaN(n)) {
+        ContestScoring.scoreMatch(db(), 'G' + n, { home: m.homeScore, away: m.awayScore }, S.lid)
+          .then(r => { if (r.total) toast('🗳️ Mini-gioco: ' + r.done + ' pronostici valutati'); })
+          .catch(e => { console.warn('[live] mini-gioco', e); toast('Mini-gioco non valutato: fallo da Pannello › Mini-gioco'); });
+      }
+      return true;
+    }
+    // Pubblicando: se nel riquadro c'è un risultato scritto e non ancora salvato, lo salva (D133)
+    async function saveTypedResult() {
+      const m = S.venue && S.venue.m, hEl = $('resH'), aEl = $('resA');
+      if (!m || !hEl || !aEl) return;
+      const h = hEl.value, a = aEl.value;
+      if (h === '' || a === '' || Number(h) < 0 || Number(a) < 0) return;
+      if (hasScore(m) && Number(h) === Number(m.homeScore) && Number(a) === Number(m.awayScore)) return;
+      await saveResult(h, a, false);
     }
     // Imbattibilità (D121): con il risultato salvato e 0 gol subiti dall'Athletic, la
     // regola "Imbattibilità" va a tutti i portieri e difensori già nei punti pubblicati
@@ -507,18 +524,53 @@
       return n;
     }
 
+    // ---------- punti calcolati qui (D133) ----------
+    // Prima "Pubblica" apriva il Calcolo giornata e lì andava premuto "Salva giornata"
+    // (nella G2 è rimasto non premuto). Ora i punti si calcolano e si salvano qui, con
+    // lo stesso calcolo del Calcolo giornata (resources/day-calc.js).
+    function liveSel(lv) {
+      const map = lv.stato === 'definitivo' ? (lv.final || C.finalMap(lv.agreed, lv.resolutions, lv.corrections)) : (lv.agreed || {});
+      return withImbattibilita(C.unflat(map));
+    }
+    function busy(msg) {
+      let o = $('liveBusy');
+      if (!msg) { if (o) o.remove(); return; }
+      if (!o) { o = document.createElement('div'); o.id = 'liveBusy'; o.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:24px;'; document.body.appendChild(o); }
+      o.innerHTML = '<div style="background:var(--card,#fff);color:var(--text,#111);border-radius:16px;padding:22px 20px;max-width:360px;text-align:center;font-size:16px;line-height:1.45;"><div style="font-size:30px">⏳</div>' + msg + '</div>';
+    }
+    async function calcolaPunti(stato) {
+      busy('<b>Calcolo i punti…</b><br>Non chiudere la pagina (pochi secondi).');
+      try {
+        const snap = await liveRef().get();
+        const lv = snap.data() || {};
+        const r = await DayCalc.saveDay({ leagueId: S.lid, giornata: S.g, sel: liveSel(lv), stato, liveDeadline: lv.deadline || null,
+          adminName: S.user.displayName || (S.user.email || '').split('@')[0] || 'Admin', label: S.g });
+        busy(null);
+        const mg = r.contest && r.contest.done ? '\n🗳️ Mini-gioco: ' + r.contest.done + ' voti contati.' : '';
+        const warn = r.warnings && r.warnings.length ? '\n⚠️ Non salvati: ' + r.warnings.join(', ') + '. Avvisa Iacopo.' : '';
+        alert('✅ Punti ' + (stato === 'definitivo' ? 'DEFINITIVI' : 'provvisori') + ' calcolati per ' + r.teams + ' squadre: i giocatori li vedono in Classifiche e in Home.' + mg + warn);
+        return true;
+      } catch (e) {
+        busy(null);
+        console.warn('[live] calcolo punti', e);
+        alert('❌ Punti non calcolati (' + (e.code || e.message) + ').\n\nNiente è perso: riprova con "Calcola i punti adesso" qui sotto, oppure apri il Calcolo giornata e premi "Salva giornata".');
+        return false;
+      }
+    }
+
     async function publishProvisional() {
+      try { await saveTypedResult(); } catch (e) { return toast('Risultato non salvato: ' + (e.code || e.message)); }
       if (!resultMissingOk()) return;
       const ps = peersList().filter(s => s.closed);
       const m = C.merge(ps);
       const nConv = withConvocati(m.agreed);
-      if (!confirm('Pubblico i punti provvisori (' + m.disputes.length + ' voci in revisione)? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".' + imbattNote() + (nConv ? '\n\n📋 Convocazione +1 ai ' + nConv + ' convocati pubblicati.' : ''))) return;
+      if (!confirm('Pubblico i punti provvisori' + (m.disputes.length ? ' (' + m.disputes.length + ' voci in revisione)' : '') + '? I punti si calcolano subito e i giocatori li vedono; avete 48 ore per correggere.' + imbattNote() + (nConv ? '\n\n📋 Convocazione +1 ai ' + nConv + ' convocati pubblicati.' : ''))) return;
       const sel = withImbattibilita(C.unflat(m.agreed));
       await L().collection('matchday_temp').doc(S.g).set({ giornata: S.g, players: sel.players, coaches: sel.coaches, curva: sel.curva,
         updatedBy: 'Partita live (provvisorio)', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
       await liveRef().set({ stato: 'provvisorio', agreed: m.agreed, disputes: m.disputes, sheetsUsed: ps.map(s => ({ uid: s.uid, name: s.name })),
         resolutions: {}, corrections: [], provisionalAt: Date.now(), deadline: Date.now() + 48 * 3600000, provisionalBy: S.user.uid }, { merge: true });
-      location.href = 'matchday.html?g=' + encodeURIComponent(S.g) + '&from=live';
+      await calcolaPunti('provvisorio');
     }
 
     function renderReview() {
@@ -527,6 +579,11 @@
       const hh = Math.floor(left / 3600000), mm = Math.floor(left % 3600000 / 60000);
       const names = (lv.sheetsUsed || []).map(s => s.name);
       let h = '<section class="card"><h3>' + (lv.stato === 'definitivo' ? 'Punti definitivi pubblicati ✅' : 'Revisione') + '</h3>';
+      // punti calcolati? (D133) se no, si calcolano da qui
+      const calcOk = lv.calcolato === lv.stato;
+      h += calcOk
+        ? '<p class="info">✅ <b>Punti calcolati</b>: i giocatori li vedono in Classifiche e in Home. <a href="matchday.html?g=' + encodeURIComponent(S.g) + '" style="color:inherit;opacity:.8;text-decoration:underline">Vedi nel Calcolo giornata</a></p>'
+        : '<p class="info" style="color:#b45309">⚠️ <b>Punti non ancora calcolati</b>: i giocatori non vedono niente.</p><p><button class="sbtn ok" id="calcNow">Calcola i punti adesso</button></p>';
       if (lv.stato === 'provvisorio') h += '<p class="info">Punti provvisori usciti. ' + (left ? 'Tempo per la revisione: <b>' + hh + ' h ' + mm + ' min</b>.' : '<b>Le 48 ore sono passate</b>: pubblica i definitivi.') + ' Basta uno dei due admin.</p>';
       h += '</section>';
       const res = lv.resolutions || {};
@@ -616,17 +673,19 @@
         };
       }
       const pf = $('pubFinal'); if (pf) pf.onclick = publishFinal;
+      const cn = $('calcNow'); if (cn) cn.onclick = () => calcolaPunti(S.live.stato);
     }
     async function publishFinal() {
       const lv = S.live;
+      try { await saveTypedResult(); } catch (e) { return toast('Risultato non salvato: ' + (e.code || e.message)); }
       if (!resultMissingOk()) return;
-      if (!confirm('Pubblico i punti DEFINITIVI? Poi si apre il Calcolo giornata: controlla e premi "Salva giornata".' + imbattNote())) return;
+      if (!confirm('Pubblico i punti DEFINITIVI? I punti si ricalcolano subito con le correzioni e l\'avviso "provvisori" sparisce.' + imbattNote())) return;
       const fin = C.finalMap(lv.agreed, lv.resolutions, lv.corrections);
       const sel = withImbattibilita(C.unflat(fin));
       await L().collection('matchday_temp').doc(S.g).set({ giornata: S.g, players: sel.players, coaches: sel.coaches, curva: sel.curva,
         updatedBy: 'Partita live (definitivo)', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
       await liveRef().set({ stato: 'definitivo', final: fin, finalAt: Date.now(), finalBy: S.user.uid }, { merge: true });
-      location.href = 'matchday.html?g=' + encodeURIComponent(S.g) + '&from=live';
+      await calcolaPunti('definitivo');
     }
 
     // ---------- avvio giornata ----------

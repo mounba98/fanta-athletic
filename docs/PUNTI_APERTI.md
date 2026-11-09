@@ -1,4 +1,4 @@
-Allineato a: D133
+Allineato a: D134
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 28/10/2026 notte, D131)
 
@@ -14,7 +14,7 @@ Allineato a: D133
 - [ ] Riprovare Formazioni sul telefono vero (tocchi su campo e lista).
 
 **▶ POI: VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
-0. [ ] **Partita live in pochi passaggi (D132, decisione dell'utente: direttamente la versione completa)**: Fischio finale che chiede il risultato e pubblica, punti calcolati **dentro la Partita live** senza aprire il Calcolo giornata; revisione; Pubblica definitivi che calcola da sé. Da 11 passi a 4. È il pezzo più delicato (calcolo dei punti, errore della G1 in D131): spostare il calcolo in un file condiviso, provarlo su una giornata finta e confrontarlo con G1/G2 prima di usarlo. Il pop-up "Salva giornata" resta come rete di sicurezza.
+0. [~] **Fatto sul ramo `live-snella` (D134), da pubblicare** — **Partita live in pochi passaggi (D132, decisione dell'utente: direttamente la versione completa)**: Fischio finale che chiede il risultato e pubblica, punti calcolati **dentro la Partita live** senza aprire il Calcolo giornata; revisione; Pubblica definitivi che calcola da sé. Da 11 passi a 4. È il pezzo più delicato (calcolo dei punti, errore della G1 in D131): spostare il calcolo in un file condiviso, provarlo su una giornata finta e confrontarlo con G1/G2 prima di usarlo. Il pop-up "Salva giornata" resta come rete di sicurezza.
 1. [ ] **Velocità**: la Home è lenta (tante funzioni nuove). Interventi già individuati: unire i file di codice in pochi pacchetti, Firebase "modulare", squadre con una sola richiesta, sfarfallio del banner (D063), foto Guarducci in JPG; primo avvio di Formazioni ~7 s. Misurare prima (come D066), poi intervenire, pagina per pagina, con prove su telefono.
 2. [ ] **Revisione grafica obbligatoria** insieme alla velocità (l'utente: "mi sembra obbligatoria"). Metodo: ogni pagina misurata al telefono (tabelle che sbordano o tagliate, come Scontri e Supremo il 27/10, D130 punto 33), chiaro/scuro, colori dei podi.
 3. [ ] **Foto della squadra** (D130 punto 25): oggi solo da Squadre **sul computer** e salvata nel database **solo se carica un admin**; renderla caricabile dal telefono e salvata per i membri della squadra (regola sul solo campo `logo`).

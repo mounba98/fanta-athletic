@@ -1,7 +1,23 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D133",
+  "allineato": "D134",
   "news": [
+    {
+      "id": "2026-11-09-live-4-passi",
+      "date": "2026-11-09",
+      "audience": "admin",
+      "icon": "⏱️",
+      "title": "Partita live in 4 passi: i punti si calcolano da soli",
+      "intro": "Niente più \"Salva giornata\" dopo la Partita live.",
+      "items": [
+        "<b>Fischio finale</b> → scrivete il <b>risultato</b> → <b>Pubblica punti provvisori</b> → revisione → <b>Pubblica punti definitivi</b>.",
+        "Premendo Pubblica i punti si calcolano <b>subito, nella Partita live</b> (qualche secondo): stesso calcolo del Calcolo giornata, provato su G1 e G2 con gli stessi identici punti.",
+        "Il risultato scritto nel riquadro si salva da solo con Pubblica; si contano anche mini-gioco e scontri diretti.",
+        "Se qualcosa va storto compare <b>Calcola i punti adesso</b>: basta premerlo. Il Calcolo giornata resta per controllare e per le correzioni dopo i definitivi."
+      ],
+      "link": "live.html",
+      "linkLabel": "Apri la Partita live"
+    },
     {
       "id": "2026-11-09-formazioni-tocchi",
       "date": "2026-11-09",

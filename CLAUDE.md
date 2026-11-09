@@ -1,4 +1,4 @@
-Allineato a: D133
+Allineato a: D134
 
 # Fanta Athletic — contesto per Claude
 
@@ -67,6 +67,7 @@ definitivi. G1 ricalcolata da Claude (con cicchino di Mario +3), stato definitiv
 R019 +3 solo T3 (Mario), R036 −4 solo T1/T2 (`coach_ids`, rispettati anche da `live.html`); Classifiche legge i
 nomi degli allenatori da `resources/coaches.json` (la collezione `coaches` della lega è vuota). **Dopo i
 definitivi della G2**: ricontrollo in sola lettura (punto in `PUNTI_APERTI.md`).
+**D134 (09/11, ramo `live-snella`)**: Partita live in 4 passi, punti calcolati nella live con `resources/day-calc.js` (stesso calcolo del Calcolo giornata, G1/G2 identiche); non pubblicato finché l'utente non decide.
 **D133 (09/11, prima della G3 di mar 10/11 21.30)**: mini-gioco G2 mai contato → contato da Claude
 (copia in `backups-firestore/`); `ContestScoring.ensureScored` lo conta anche con "Salva giornata"; menu ☰
 con sezione Amministrazione e Calcolo solo admin (pagina con avviso per i non admin); Formazioni/Squadre:
