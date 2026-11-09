@@ -216,9 +216,28 @@
     return { done, total: snap.size, participation: participation[key] || null };
   }
 
+  // Rete di sicurezza (D133): nella G2 il risultato era salvato ma il mini-gioco non era
+  // mai stato contato (il conteggio partiva solo da "Salva risultato"). La chiama anche
+  // "Salva giornata": se la partita della giornata ha il risultato e c'è almeno un voto
+  // non ancora valutato, conta tutto. Altrimenti non scrive niente. Solo admin.
+  async function ensureScored(db, giornata, leagueId) {
+    const n = parseInt(String(giornata).replace(/\D/g, ''), 10);
+    if (isNaN(n)) return { skipped: 'giornata' };
+    const raw = root.__LEGACY_DB__ || db;
+    const cal = await raw.collection('athletic_calendar').get();
+    const match = cal.docs.map(d => d.data()).find(m => parseInt(m.giornata, 10) === n);
+    const result = match ? resultOf(match) : null;
+    if (!result) return { skipped: 'risultato' };
+    const key = 'G' + n;
+    const snap = await raw.collection('contest_predictions').where('matchKey', '==', key).get();
+    const pending = snap.docs.some(d => { const p = d.data(); return p.points === null || p.points === undefined; });
+    if (!pending) return { skipped: 'gia-contato', total: snap.size };
+    return scoreMatch(raw, key, result, leagueId);
+  }
+
   const api = { POINTS, PICKS, CFG, configure, FACTIONS, MONTHS, outcomeOf,
                 scorePrediction, seasonStartYear, matchStart, deadlineOf, opensOf,
-                resultOf, buildStandings, withAllTeams, scoreMatch, teamPredId, latest };
+                resultOf, buildStandings, withAllTeams, scoreMatch, ensureScored, teamPredId, latest };
   root.ContestScoring = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

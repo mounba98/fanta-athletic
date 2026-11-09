@@ -1,4 +1,4 @@
-Allineato a: D132
+Allineato a: D133
 
 # Lega, stagione, competizioni — le parole giuste (per il multilega futuro)
 

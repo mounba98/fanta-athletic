@@ -2598,8 +2598,9 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
         } else {
           slot.innerHTML = `<div class="slot-empty">Trascina qui</div>`;
         }
-        slot.addEventListener('dragover', ev=> ev.preventDefault());
-        slot.addEventListener('drop', ev=>{
+        // D133 (SC-007): caselle fisse, quindi comandi che si sostituiscono (prima si accumulavano)
+        slot.ondragover = ev=> ev.preventDefault();
+        slot.ondrop = ev=>{
           ev.preventDefault();
           if (!canWrite) { return; }
           const dragged = ev.dataTransfer.getData('text/plain');
@@ -2612,10 +2613,10 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
           t.lineup = t.lineup.map(x=> x===dragged ? null : x);
           t.lineup[i] = dragged;
           saveTeams(); renderEditor();
-        });
+        };
         if (isMobile()){
           // Tap-to-assign on mobile
-          slot.addEventListener('click', ()=>{
+          slot.onclick = ()=>{
             const pick = state.mobilePick;
             if (!pick) {
               // Nessun giocatore selezionato dalla panchina: se lo slot è
@@ -2633,7 +2634,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
             t.lineup[i] = pick;
             state.mobilePick = null;
             saveTeams(); renderEditor();
-          });
+          };
         }
         });
       };
@@ -3059,7 +3060,7 @@ async function fetchSavedSnapshot(teamIdx, giornata, leagueId = null) {
   <script src="resources/navbar-profile-icon.js?v=20260925b"></script>
   <script src="resources/notifications-dropdown.js?v=20260920-final"></script>
   <script src="resources/league-selector.js?v=20260925l"></script>
-  <script src="resources/mobile-menu.js?v=20261024b"></script>
+  <script src="resources/mobile-menu.js?v=20261109"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/faction.js?v=20261027"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>

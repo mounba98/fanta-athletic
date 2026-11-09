@@ -1,4 +1,4 @@
-Allineato a: D132
+Allineato a: D133
 
 # Fanta Athletic — contesto per Claude
 
@@ -67,6 +67,11 @@ definitivi. G1 ricalcolata da Claude (con cicchino di Mario +3), stato definitiv
 R019 +3 solo T3 (Mario), R036 −4 solo T1/T2 (`coach_ids`, rispettati anche da `live.html`); Classifiche legge i
 nomi degli allenatori da `resources/coaches.json` (la collezione `coaches` della lega è vuota). **Dopo i
 definitivi della G2**: ricontrollo in sola lettura (punto in `PUNTI_APERTI.md`).
+**D133 (09/11, prima della G3 di mar 10/11 21.30)**: mini-gioco G2 mai contato → contato da Claude
+(copia in `backups-firestore/`); `ContestScoring.ensureScored` lo conta anche con "Salva giornata"; menu ☰
+con sezione Amministrazione e Calcolo solo admin (pagina con avviso per i non admin); Formazioni/Squadre:
+comandi di tocco che si accumulavano sulle caselle del campo (più finestre una sopra l'altra) corretti;
+nomi R011/R012. Da chiedere a Marta: MVP a Leonardo Mori aggiunto il 30/10 nella G1 (voluto?).
 **D132 (03/11)**: G2 senza punti perché dopo "Pubblica provvisori" nessuno aveva premuto "Salva giornata"; calcolata da
 Claude (provvisori, revisione di Marta fino al 4/11 22.51). Nuovo pop-up per gli admin "Salva giornata" (Calcolo giornata,
 più `resources/salva-giornata-reminder.js` in Home e Partita live). Appunti SC-006…SC-009 in coda in `PUNTI_APERTI.md`. **Prossima sessione: pannello admin** (SC-008); poi efficienza,

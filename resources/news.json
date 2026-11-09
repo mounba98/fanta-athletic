@@ -1,7 +1,38 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D132",
+  "allineato": "D133",
   "news": [
+    {
+      "id": "2026-11-09-formazioni-tocchi",
+      "date": "2026-11-09",
+      "audience": "all",
+      "icon": "⚽",
+      "title": "Formazioni: il campo risponde sempre",
+      "intro": "A volte toccando il campo o la lista dei giocatori sembrava che l'app \"non li prendesse\".",
+      "items": [
+        "Toccando una casella vuota si apre <b>una sola</b> finestra per scegliere il giocatore (prima, dopo qualche modifica, se ne aprivano più di una una sopra l'altra e bloccavano i tocchi).",
+        "Toccando un giocatore già in campo lo togli, senza che si apra anche la finestra di scelta.",
+        "Mini-gioco della 2ª giornata contato: con lo 0-0 hanno fatto punti le squadre che avevano votato X."
+      ],
+      "link": "formazioni.html",
+      "linkLabel": "Vai a Formazioni"
+    },
+    {
+      "id": "2026-11-09-menu-admin",
+      "date": "2026-11-09",
+      "audience": "admin",
+      "icon": "🛠️",
+      "title": "Menu admin e mini-gioco più sicuro",
+      "intro": "Le funzioni di ogni giornata a un tocco dal menu ☰.",
+      "items": [
+        "Nel menu ☰, sezione <b>Amministrazione</b>: Pannello admin, Convocati, Partita live, Calcolo giornata, Calendario Athletic, Mini-gioco (admin), Bonus e malus.",
+        "<b>Calcolo</b> non è più nel menu dei giocatori, e la pagina si apre solo agli admin.",
+        "Il mini-gioco si conta anche con <b>Salva giornata</b> se il risultato c'è e qualche voto è rimasto indietro: nella G2 il conteggio era saltato (l'ha fatto Iacopo il 9/11).",
+        "Due bonus rinominati: <b>Giocatore squalificato o non convocato presente in tifo</b> e <b>Giocatore squalificato o non convocato canta</b> (valori invariati)."
+      ],
+      "link": "admin.html",
+      "linkLabel": "Apri il Pannello admin"
+    },
     {
       "id": "2026-11-03-salva-giornata",
       "date": "2026-11-03",

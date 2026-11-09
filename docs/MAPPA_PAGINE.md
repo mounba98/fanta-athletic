@@ -1,4 +1,4 @@
-Allineato a: D132
+Allineato a: D133
 
 # Mappa delle pagine — a cosa serve ogni file
 
@@ -29,7 +29,7 @@ nomi di classe generici che vanno in conflitto.
 | `formazioni.html` | Composizione della formazione da schierare (si chiude da sola 1 ora prima della partita del Calendario Athletic, regola in `resources/lineup-deadline.js`, D122) |
 | `lineup-summary.html` | Riepilogo dettagliato di una formazione schierata |
 | `classifiche.html` | Classifica generale e per giornata |
-| `matchday.html` | Inserimento/calcolo risultati di una giornata (uso principalmente admin, ma non protetta da login) |
+| `matchday.html` | Calcolo giornata (solo admin: dal D133 chi non è admin vede un avviso; nel menu ☰ solo nella sezione Amministrazione) |
 | `statistiche.html` | Statistiche giocatori, allenatori, curve di rendimento |
 | ~~`standings.html`~~ | Archiviata (D102): leggeva la memoria del browser, non il database |
 | `h2h-standings.html` | Classifica scontri diretti |

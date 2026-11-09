@@ -18,7 +18,6 @@
     { href: 'calendario-athletic.html', label: 'Partite Athletic', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>', priority: 5 },
     { href: 'archivio-athletic.html', label: 'Archivio Athletic', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><path d="M4 19V5a2 2 0 012-2h12a2 2 0 012 2v14"/><path d="M4 19a2 2 0 002 2h14M8 7h8M8 11h8M8 15h5"/></svg>', priority: 5 },
     { href: 'classifiche.html', label: 'Classifiche', icon: '<img src="resources/icons/classifica.png" alt="Classifiche" />', priority: 5 },
-    { href: 'matchday.html', label: 'Calcolo', icon: '<img src="resources/icons/calcolo.png" alt="Calcolo" />', priority: 6 },
     { href: 'archivio.html', label: 'Albo d\'oro', icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3"/></svg>', priority: 7 },
     { href: 'statistiche.html', label: 'Statistiche', icon: '<img src="resources/icons/statistiche.png" alt="Statistiche" />', priority: 7 },
     { href: 'bacheca.html', label: 'Bacheca', icon: '<img src="resources/icons/bacheca.png" alt="Bacheca" />', priority: 8 },
@@ -173,16 +172,28 @@
         
         if (adminDoc.exists) {
           const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-          const isActive = currentPage === 'admin.html';
           
+          // D133 (SC-008): le funzioni admin di ogni giornata a un tocco dal menu;
+          // "Calcolo" solo qui (prima lo vedevano tutti). Il resto nel Pannello.
+          const ic = d => '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)">' + d + '</svg>';
+          const ADMIN_ITEMS = [
+            { href: 'admin.html', label: 'Pannello admin', icon: '<img src="resources/icons/admin.png" alt="" />' },
+            { href: 'admin-convocati.html', label: 'Convocati', icon: ic('<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M17 11l2 2 4-4"/>') },
+            { href: 'live.html', label: 'Partita live', icon: ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>') },
+            { href: 'matchday.html', label: 'Calcolo giornata', icon: '<img src="resources/icons/calcolo.png" alt="" />' },
+            { href: 'admin-calendario.html', label: 'Calendario Athletic', icon: ic('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>') },
+            { href: 'admin-contest.html', label: 'Mini-gioco (admin)', icon: ic('<path d="M9 11l3 3 8-8M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h9"/>') },
+            { href: 'admin-rules.html', label: 'Bonus e malus', icon: ic('<path d="M12 5v14M5 12h14"/>') }
+          ];
           adminSlot.innerHTML = `
             <div class="admin-separator">
               <span>Amministrazione</span>
             </div>
-            <a href="admin.html" class="mobile-menu-item mobile-menu-admin ${isActive ? 'active' : ''}">
-              <span class="menu-icon"><img src="resources/icons/admin.png" alt="Admin" /></span>
-              <span class="menu-label">Admin Panel</span>
-            </a>
+            ${ADMIN_ITEMS.map(it => `
+            <a href="${it.href}" class="mobile-menu-item mobile-menu-admin ${currentPage === it.href ? 'active' : ''}">
+              <span class="menu-icon">${it.icon}</span>
+              <span class="menu-label">${it.label}</span>
+            </a>`).join('')}
           `;
         } else {
           adminSlot.innerHTML = '';

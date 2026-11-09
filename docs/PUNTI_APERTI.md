@@ -1,4 +1,4 @@
-Allineato a: D132
+Allineato a: D133
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 28/10/2026 notte, D131)
 
@@ -7,8 +7,11 @@ Allineato a: D132
 **Il 28/10 notte (D131)**: definitivi G1 di Marta usciti con punti sbagliati (contavano quasi solo le Convocazioni). Causa nel Calcolo giornata (riscriveva la giornata con dati vecchi del telefono), corretta; **G1 ricalcolata da Claude sul database vero** con il cicchino di Mario (+3), stato "definitivo", banner "in revisione" sparito. Home a pari punti come Classifiche. **Pubblicato e verificato online il 28/10.**
 - [x] Regole del cicchino sistemate (+3 solo Mario, −4 solo Tommy e Trendiu), rispettate anche dalla Partita live; Classifiche mostra il nome dell'allenatore.
 
-**▶ PROSSIMA SESSIONE (decisione dell'utente, D132): PANNELLO ADMIN**
-- [ ] Voci del pannello admin nel menu di sinistra, "Calcolo" nascosto ai non admin e pagina chiusa a chi non è admin (SC-008, sotto). Gli altri appunti SC-006/007/009 a seguire.
+**Il 09/11 (D133), prima della G3 (mar 10/11 21.30)**: mini-gioco G2 contato da Claude (non era mai partito); "Salva giornata" ora conta anche il mini-gioco rimasto indietro; menu ☰ con la sezione Amministrazione e Calcolo solo admin (SC-008); Formazioni che "non prendeva" i tocchi corretta (SC-007); due nomi dei bonus (SC-006).
+- [ ] Chiedere a Marta se l'MVP a Leonardo Mori aggiunto il 30/10 nella G1 è voluto (unica differenza dai definitivi: +2, +4 a chi l'aveva capitano).
+- [ ] Giro di revisione dei nomi di tutti i bonus con gli admin (SC-006, seconda parte).
+- [ ] SC-010 fazioni (come si contano e come si mostrano) e SC-009 (app pronta per gli store?): da decidere con l'utente.
+- [ ] Riprovare Formazioni sul telefono vero (tocchi su campo e lista).
 
 **▶ POI: VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
 0. [ ] **Partita live in pochi passaggi (D132, decisione dell'utente: direttamente la versione completa)**: Fischio finale che chiede il risultato e pubblica, punti calcolati **dentro la Partita live** senza aprire il Calcolo giornata; revisione; Pubblica definitivi che calcola da sé. Da 11 passi a 4. È il pezzo più delicato (calcolo dei punti, errore della G1 in D131): spostare il calcolo in un file condiviso, provarlo su una giornata finta e confrontarlo con G1/G2 prima di usarlo. Il pop-up "Salva giornata" resta come rete di sicurezza.
@@ -22,9 +25,9 @@ Allineato a: D132
 - [ ] Definitivi della G2 di Marta entro mer 4/11 22.51: con il pop-up nuovo dovrebbe premere da sola "Salva giornata"; poi il ricontrollo in sola lettura qui sotto.
 
 **▶ APPUNTI DEL SECONDO CERVELLO DA FARE (recepiti il 03/11, D132; l'utente: "stasera non li facciamo")**
-- [ ] **SC-006 — nomi dei bonus**: "Giocatore squalificato presente in curva" → "Giocatore squalificato o non convocato presente in tifo"; "Giocatore squalificato canta" → "Giocatore squalificato o non convocato canta". Poi giro di revisione dei nomi di tutti i bonus.
-- [ ] **SC-007 — giocatori in campo (Formazioni)**: "non sempre li prende", sia toccando il campo sia toccando la lista sotto. Da riprodurre e correggere.
-- [ ] **SC-008 — menu di sinistra per gli admin**: voci del pannello admin nel menu per arrivarci prima; togliere **"Calcolo"**, oggi visibile a tutti. Controllare anche che la pagina sia chiusa ai non admin (possibile problema di sicurezza).
+- [x] **SC-006 — nomi dei bonus** (D133, i due nomi; resta il giro su tutti): "Giocatore squalificato presente in curva" → "Giocatore squalificato o non convocato presente in tifo"; "Giocatore squalificato canta" → "Giocatore squalificato o non convocato canta". Poi giro di revisione dei nomi di tutti i bonus.
+- [x] **SC-007 — giocatori in campo (Formazioni)** (D133): "non sempre li prende", sia toccando il campo sia toccando la lista sotto. Da riprodurre e correggere.
+- [x] **SC-008 — menu di sinistra per gli admin** (D133): voci del pannello admin nel menu per arrivarci prima; togliere **"Calcolo"**, oggi visibile a tutti. Controllare anche che la pagina sia chiusa ai non admin (possibile problema di sicurezza).
 - [ ] **SC-009 — "app pronta per gli store?"**: verifica in sola lettura (logica separata dalle schermate? framework? dipendenze da un server? pronta per il telefono?), risposta in una frase: pronta / piccoli lavori / lavoro grosso. Non correggere nulla di slancio.
 
 **▶ IN SOSPESO DA ALTRI (controllare a inizio sessione)**
@@ -64,7 +67,7 @@ Allineato a: D132
 - [ ] Foto: controllo sul telefono vero (Formazioni, Squadre, Riepilogo); **foto di Tiziano Ferretti** dagli admin; poi togliere i vecchi file degli allenatori (`resources/tommy_guardu.png`, `trendiu_athletic.jpg`, `mario_athletic.jpg`) e le 3 foto vecchie fuori cartella nello Storage.
 - [ ] Console Firebase › Authentication: l'utente cancella i 6 accessi di prova, con Claude che guida.
 - [ ] Prove sul telefono vero: Novità in Bacheca, chiusura formazioni alle 20.15, aggiornamento alla riapertura, swipe dal bordo.
-- [ ] **Etichette "New"**: Partita live, Stagione, Archivio scadono il **30/10**, "La mia sfida" il 7/11, Convocati l'8/11: poi toglierle (lo segnala `check-coerenza.py`).
+- [x] **Etichette "New"** (tolte quelle scadute il 09/11, D133): Partita live, Stagione, Archivio scadono il **30/10**, "La mia sfida" il 7/11, Convocati l'8/11: poi toglierle (lo segnala `check-coerenza.py`).
 - [ ] **PDF della guida admin** da rifare (scontri diretti, Stagione, Convocati, inviti, Pannello con Cerca, e tutto il D130: Partita live, Correzioni, mini-gioco per squadra, squadra solo con invito): lo lancia l'utente, `scripts/guida-admin-pdf.py`.
 - [ ] Copia locale della G1 (`backups-firestore/G1-prima-calcolo-D130-2026-10-27.json`): cancellarla quando la G1 è definitiva.
 - [ ] Facoltativo, con calma: aggiornare il programma di pubblicazione (firebase-tools 15.30 → 15.34), non a ridosso delle partite.

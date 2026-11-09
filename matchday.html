@@ -341,6 +341,7 @@
   <script src="resources/firebase-config.js?v=20260920-final"></script>
   <script src="resources/convocati.js?v=20261025"></script>
   <script src="resources/season.js?v=20261024b"></script>
+  <script src="resources/contest-scoring.js?v=20261109"></script>
   <script src="resources/h2h.js?v=20261024b"></script>
   <script src="resources/league-helper.js?v=20260920-final"></script>
   <script src="resources/toast.js?v=20260920-final"></script>
@@ -588,6 +589,14 @@
 
     // Admin mode via Firebase Auth + allowlist admins/{uid}
     state.isAdmin = false;
+    function denyNonAdmin(){
+      if (document.getElementById('mdDeny')) return;
+      const d = document.createElement('div');
+      d.id = 'mdDeny';
+      d.style.cssText = 'position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg,#f5f5f7);';
+      d.innerHTML = '<div style="max-width:420px;text-align:center;font-size:16px;line-height:1.5;">Il Calcolo giornata è riservato agli admin.<br><a href="classifiche.html" style="font-weight:700;">Vai alle Classifiche</a> · <a href="index.html" style="font-weight:700;">Torna alla Home</a></div>';
+      document.body.appendChild(d);
+    }
     function loadAdmin(){
       if (window.auth){
         window.auth.onAuthStateChanged(async (user)=>{
@@ -597,6 +606,9 @@
             if (window.db){
               const doc = await window.db.collection('admins').doc(user.uid).get();
               state.isAdmin = !!doc.exists;
+              // Pagina solo per gli admin (D133, SC-008): chi non lo è vede un avviso.
+              // Il database blocca comunque i salvataggi; qui si evita la pagina "finta".
+              if (!doc.exists) denyNonAdmin();
             } else {
               state.isAdmin = false;
             }
@@ -3219,7 +3231,15 @@
                 }
               } catch (e) { console.warn('[matchday] stato provvisorio/definitivo non salvato', e); }
             }
-            
+
+            // Mini-gioco (D133): se il risultato c'è e restano voti non contati, li conta qui
+            if (window.ContestScoring && window.ContestScoring.ensureScored) {
+              try {
+                const r = await window.ContestScoring.ensureScored(firestore(), state.giornata, leagueId);
+                if (r && r.done) toast('🗳️ Mini-gioco: ' + r.done + ' voti contati');
+              } catch (e) { console.warn('[matchday] mini-gioco non contato', e); toast('⚠️ Mini-gioco non contato: fallo da Pannello › Mini-gioco'); }
+            }
+
             // NOTIFICA TUTTI GLI UTENTI
             if (typeof window.notifyGiornataCalcolata === 'function') {
               const adminName = firebase.auth().currentUser?.displayName || 'Admin';
@@ -3546,7 +3566,7 @@
     // very small toast helper
     // toast(msg) centralizzata in resources/toast.js (2026-09-19)
   </script>
-  <script src="resources/mobile-menu.js?v=20261024b"></script>
+  <script src="resources/mobile-menu.js?v=20261109"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/faction.js?v=20261027"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>

@@ -1339,7 +1339,8 @@
         return;
       }
       
-      // Crea modal semplice
+      // Crea modal semplice (una sola alla volta, D133)
+      document.querySelectorAll('#playerPickerModal').forEach(m => m.remove());
       const modal = document.createElement('div');
       modal.id = 'playerPickerModal';
       modal.style.cssText = `
@@ -2769,7 +2770,8 @@
           
           // Click singolo per mobile (semplice!)
           if (isMobile()) {
-            dragEl.addEventListener('click', ()=> handleMobileClickPlayer(pid));
+            // stopPropagation (D133): senza, il tocco arrivava alla casella appena svuotata e apriva la finestra
+            dragEl.addEventListener('click', (e)=> { e.stopPropagation(); handleMobileClickPlayer(pid); });
           }
           
           // Doppio click per rimuovere dal campo
@@ -2817,7 +2819,7 @@
           // Mobile: click su slot vuoto apre finestra con giocatori in panchina
           if (isMobile()) {
             slot.style.cursor = 'pointer';
-            slot.addEventListener('click', (e) => {
+            slot.onclick = (e) => {
               e.preventDefault();
               e.stopPropagation();
               if (!canWrite) {
@@ -2825,15 +2827,21 @@
                 return;
               }
               openPlayerPickerForSlot(i);
-            });
+            };
           }
         }
         
-        // Drop handlers
-        slot.addEventListener('dragover', handleDragOver);
-        slot.addEventListener('dragenter', handleDragEnter);
-        slot.addEventListener('dragleave', handleDragLeave);
-        slot.addEventListener('drop', (e)=> handleDrop(e, i));
+        // Drop handlers.
+        // D133 (SC-007): le caselle del campo restano le stesse finché non cambia il modulo;
+        // con addEventListener ogni ridisegno AGGIUNGEVA un comando: un tocco apriva più
+        // finestre "Seleziona giocatore" una sopra l'altra (quelle rimaste bloccavano i tocchi)
+        // e toccando un giocatore in campo si apriva anche la finestra. Ora ogni comando
+        // sostituisce il precedente.
+        if (pid) { slot.onclick = null; slot.style.cursor = ''; }
+        slot.ondragover = handleDragOver;
+        slot.ondragenter = handleDragEnter;
+        slot.ondragleave = handleDragLeave;
+        slot.ondrop = (e)=> handleDrop(e, i);
         });
       };
       
@@ -3337,7 +3345,7 @@
     boot().catch(e => console.error('[formazioni] avvio', e))
       .finally(() => { const ed = document.getElementById('editor'); if (ed) ed.classList.remove('fa-loading'); });
   </script>
-  <script src="resources/mobile-menu.js?v=20261024b"></script>
+  <script src="resources/mobile-menu.js?v=20261109"></script>
   <script src="resources/edge-swipe-menu.js?v=20260925"></script>
   <script src="resources/faction.js?v=20261027"></script>
   <script src="resources/faction-gate.js?v=20260924"></script>
