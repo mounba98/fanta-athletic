@@ -1,6 +1,8 @@
 Allineato a: D134
 
-# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 28/10/2026 notte, D131)
+# Stagione 2026/27 in corso — cosa manca, in ordine (stato al 09/11/2026, D134)
+
+**▶ PROSSIMA SESSIONE — PARTI DA QUI: verifica dopo la G3** (mar 10/11, prima volta della Partita live in 4 passi, D134). Appena Marta pubblica i provvisori (e poi i definitivi): ricontrollo in sola lettura, voce "G3" qui sotto. Poi la scaletta "velocità, efficienza e funzioni".
 
 **Il 27/10 (D130)**, dopo la G1, tutto corretto, pubblicato e verificato online: Formazioni senza formazione vecchia, "Pubblica come squadra", cookie/Novità su Android, Partita live (fogli di prova ignorati, fischio finale = provvisori se si è soli, convocati confermati al fischio, revisione che si riapre da sola, presenze nelle Correzioni, modulo Correzioni spiegato e con bozza), tifoseria della squadra, mini-gioco **un voto per squadra** con conteggio automatico ed elenco di chi ha votato, **squadra solo con invito** (pagine + regola), Home con sfida a colori e avviso provvisori snello; Classifiche al telefono (Punti degli Scontri visibili, Supremo intero, partecipazione con chi non ha votato) e classifica del mini-gioco con tutte le 16 squadre. Regole in Console pubblicate. **G1 calcolata da Claude** (provvisori) e mini-gioco G1 contato.
 
@@ -12,7 +14,7 @@ Allineato a: D134
 - [ ] Giro di revisione dei nomi di tutti i bonus con gli admin (SC-006, seconda parte).
 - [ ] SC-010 fazioni (come si contano e come si mostrano) e SC-009 (app pronta per gli store?): da decidere con l'utente.
 - [ ] Riprovare Formazioni sul telefono vero (tocchi su campo e lista).
-- [ ] **G3 (mar 10/11), prima volta della Partita live in 4 passi (D134)**: Iacopo avvisa Marta che dopo "Pubblica" non serve più "Salva giornata". Dopo i provvisori: ricontrollo in sola lettura (`days/G3` = provvisori della live più Imbattibilità, `results/G3` provvisorio con 16 squadre, `live.calcolato`, mini-gioco G3 contato, ricalcolo indipendente con `DayCalc`). Poi lo stesso dopo i definitivi.
+- [ ] **G3 (mar 10/11), prima volta della Partita live in 4 passi (D134)** (Marta avvisata il 09/11). Dopo i provvisori: ricontrollo in sola lettura (`days/G3` = provvisori della live più Imbattibilità, `results/G3` provvisorio con 16 squadre, `live.calcolato`, mini-gioco G3 contato, ricalcolo indipendente con `DayCalc`). Poi lo stesso dopo i definitivi.
 
 **▶ POI: VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
 0. [x] **Pubblicato il 09/11 (D134)** — **Partita live in pochi passaggi (D132, decisione dell'utente: direttamente la versione completa)**: Fischio finale che chiede il risultato e pubblica, punti calcolati **dentro la Partita live** senza aprire il Calcolo giornata; revisione; Pubblica definitivi che calcola da sé. Da 11 passi a 4. È il pezzo più delicato (calcolo dei punti, errore della G1 in D131): spostare il calcolo in un file condiviso, provarlo su una giornata finta e confrontarlo con G1/G2 prima di usarlo. Il pop-up "Salva giornata" resta come rete di sicurezza.
@@ -23,7 +25,7 @@ Allineato a: D134
 5. [ ] **Regole: "a chi vale"** (D131, in coda su richiesta dell'utente): in Regole › Bonus e malus aggiungere la scelta di **a quali allenatori/giocatori** vale una regola (`coach_ids`/`player_ids`, già rispettati da Calcolo giornata e Partita live). Oggi si cambia solo dal database (es. cicchino +3 solo Mario, −4 solo Tommy e Trendiu). Poi togliere dalla guida "chiedete a Iacopo".
 
 **Il 03/11 (D132)**: G2 rimasta senza punti (Marta aveva pubblicato i provvisori dalla Partita live ma non premuto "Salva giornata"): **calcolata da Claude** (provvisori). Aggiunto il pop-up "Salva giornata" per gli admin (Calcolo giornata, Home, Partita live). **Pubblicato e verificato online il 03/11.**
-- [ ] Definitivi della G2 di Marta entro mer 4/11 22.51: con il pop-up nuovo dovrebbe premere da sola "Salva giornata"; poi il ricontrollo in sola lettura qui sotto.
+- [x] Definitivi della G2 di Marta pubblicati e salvati l'8/11 (D133); mini-gioco G2 contato da Claude il 9/11.
 
 **▶ APPUNTI DEL SECONDO CERVELLO DA FARE (recepiti il 03/11, D132; l'utente: "stasera non li facciamo")**
 - [x] **SC-006 — nomi dei bonus** (D133, i due nomi; resta il giro su tutti): "Giocatore squalificato presente in curva" → "Giocatore squalificato o non convocato presente in tifo"; "Giocatore squalificato canta" → "Giocatore squalificato o non convocato canta". Poi giro di revisione dei nomi di tutti i bonus.
@@ -33,7 +35,8 @@ Allineato a: D134
 
 **▶ IN SOSPESO DA ALTRI (controllare a inizio sessione)**
 - [x] **Marta**: definitivi della G1 pubblicati il 27/10 alle 22.38 (punti ricalcolati da Claude, D131).
-- [ ] Iacopo spiega a voce agli admin il "valore" delle Correzioni (= quante volte, non i punti) e che **dopo "Pubblica punti definitivi" va sempre premuto "Salva giornata"** (è lì che i punti si calcolano e il banner "in revisione" sparisce); se l'app avvisa "voci diverse dai definitivi", fermarsi e chiedere.
+- [x] Marta avvisata dall'utente (09/11) del percorso in 4 passi: dopo "Pubblica" i punti si calcolano da soli, non serve più "Salva giornata" (D134).
+- [ ] Iacopo spiega a voce agli admin il "valore" delle Correzioni (= quante volte, non i punti).
 - [ ] **Mocci, urgente**: revocare la chiave admin nel ramo `feature/uniform-pitch-bench` (sezione Sicurezza sotto).
 
 **▶ PROVE SUI TELEFONI VERI (non fattibili da Claude, che è admin)**
@@ -50,7 +53,7 @@ Allineato a: D134
 - [x] Imbattibilità: non spettava (1-1).
 - [ ] **Formazione precedente** (chi non consegna gioca con l'ultima, -1): nella G1 tutte e 16 consegnate, quindi non ancora messa alla prova → riprovarla in sola lettura prima del calcolo della G2.
 - [ ] **Partita live con due admin**: mai provata davvero (nella G1 ha segnato solo Marta).
-- [ ] **Dopo i definitivi della G2** (primo giro col Calcolo giornata corretto, D131): controllare in sola lettura che `days/G2` coincida con `live/G2.final`, che `results/G2.stato` = definitivo e che i punti delle squadre tornino con un ricalcolo indipendente (come per la G1).
+- [x] **Dopo i definitivi della G2** (fatto il 09/11, D133: giornata = definitivi + Imbattibilità, stato definitivo, punti identici al ricalcolo con `DayCalc`): controllare in sola lettura che `days/G2` coincida con `live/G2.final`, che `results/G2.stato` = definitivo e che i punti delle squadre tornino con un ricalcolo indipendente (come per la G1).
 - [x] **G1 ricalcolata e verificata** (D131): punti squadre, capitani, allenatori, scontri, fazioni; Home = Classifiche.
 
 **▶ UTENTI E SQUADRE**

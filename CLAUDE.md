@@ -51,32 +51,29 @@ Il piano dell'utente, in ordine:
 
 ## Riprendi da qui (prossima sessione)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI (D131, 28/10/2026 notte: dopo i definitivi della G1)**
+**▶ PROSSIMA SESSIONE — PARTI DA QUI (D134, 09/11/2026: verifica dopo la G3)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic` `main`),
-ultima pubblicazione **28/10/2026** (D131), verificata online, con le **regole Firestore D130 pubblicate
-in Console**. **Stagione 2026/27 "In corso"**: 16 squadre (11 Curva, 5 Piana), G1 giocata (Rifredi–Athletic
-1-1), **definitiva** (revisione di Marta, punti ricalcolati da Claude in D131); G2 lunedì 2/11 (Athletic–Polisportiva Sieci 21.15),
-formazioni chiuse alle 20.15, mini-gioco aperto da dom 1/11 21.15.
-**Prossima sessione (decisione dell'utente): velocità, efficienza e funzioni** — Home lenta, revisione
-grafica e di velocità, **foto della squadra** dal telefono e per i membri, **foto profilo** (ritaglio rotto):
-scaletta in cima a `docs/PUNTI_APERTI.md`. **D131 (28/10 notte)**: definitivi G1 usciti sbagliati per un
-difetto del Calcolo giornata (all'apertura riscriveva `matchday_temp` con dati vecchi del telefono), corretto:
-niente salvataggi prima del caricamento (`state.dayLoaded`), dati presi dal documento `live` anche aperto dal
-menu finché `calcolato !== stato`, `days` sostituito per intero, avviso se si salva qualcosa di diverso dai
-definitivi. G1 ricalcolata da Claude (con cicchino di Mario +3), stato definitivo. Regole del cicchino:
-R019 +3 solo T3 (Mario), R036 −4 solo T1/T2 (`coach_ids`, rispettati anche da `live.html`); Classifiche legge i
-nomi degli allenatori da `resources/coaches.json` (la collezione `coaches` della lega è vuota). **Dopo i
-definitivi della G2**: ricontrollo in sola lettura (punto in `PUNTI_APERTI.md`).
-**D134 (09/11, ramo `live-snella`)**: Partita live in 4 passi, punti calcolati nella live con `resources/day-calc.js` (stesso calcolo del Calcolo giornata, G1/G2 identiche); non pubblicato finché l'utente non decide.
+ultima pubblicazione **09/11/2026** (D134), verificata online. **Stagione 2026/27 "In corso"**: 16 squadre
+(11 Curva, 5 Piana); G1 (1-1) e G2 (0-0) **definitive**, mini-gioco contato per entrambe; **G3 martedì 10/11
+alle 21.30** in trasferta (Crystal Piazza–Athletic), prima giornata con la **Partita live in 4 passi**.
+**Prossima sessione: verifica dopo la G3** (sola lettura: `days/G3` = provvisori della live + Imbattibilità,
+`results/G3` con 16 squadre e stato, `live.calcolato`, mini-gioco, ricalcolo indipendente con `DayCalc`),
+poi la scaletta "velocità, efficienza e funzioni" in `docs/PUNTI_APERTI.md`.
+**D134 (09/11)**: Partita live in 4 passi: "Pubblica provvisori/definitivi" calcolano e salvano i punti nella
+live con `resources/day-calc.js`, **lo stesso calcolo del Calcolo giornata** (che ora lo usa anche lui):
+G1 e G2 ricalcolate identiche su 16 squadre. "Salva giornata" non serve più dopo la live; se il calcolo non
+va, nella live c'è "Calcola i punti adesso" (e resta Salva giornata). Ramo `live-snella` unito a `main`.
 **D133 (09/11, prima della G3 di mar 10/11 21.30)**: mini-gioco G2 mai contato → contato da Claude
 (copia in `backups-firestore/`); `ContestScoring.ensureScored` lo conta anche con "Salva giornata"; menu ☰
 con sezione Amministrazione e Calcolo solo admin (pagina con avviso per i non admin); Formazioni/Squadre:
 comandi di tocco che si accumulavano sulle caselle del campo (più finestre una sopra l'altra) corretti;
 nomi R011/R012. MVP a Leonardo Mori nella G1 (Marta, 30/10) confermato; G2 senza MVP.
+**D131 (28/10)**, sempre valido: il Calcolo giornata non salva prima di aver caricato (`state.dayLoaded`), prende i dati
+dal documento `live` finché `calcolato !== stato`, sostituisce `days` per intero. Cicchino: R019 +3 solo T3 (Mario),
+R036 −4 solo T1/T2 (`coach_ids`); nomi allenatori da `resources/coaches.json` (collezione `coaches` della lega vuota).
 **D132 (03/11)**: G2 senza punti perché dopo "Pubblica provvisori" nessuno aveva premuto "Salva giornata"; calcolata da
 Claude (provvisori, revisione di Marta fino al 4/11 22.51). Nuovo pop-up per gli admin "Salva giornata" (Calcolo giornata,
-più `resources/salva-giornata-reminder.js` in Home e Partita live). Appunti SC-006…SC-009 in coda in `PUNTI_APERTI.md`. **Prossima sessione: pannello admin** (SC-008); poi efficienza,
-dove la Partita live passa direttamente alla versione "in pochi passaggi" con il calcolo dentro la live (D132 punto 7).
+più `resources/salva-giornata-reminder.js` in Home e Partita live). Il pop-up resta come rete di sicurezza.
 **Come funziona ora (D130), da sapere prima di toccare qualcosa**:
 - **Partita live**: conta solo il foglio di chi ha segnato davvero (non vuoto e ≥ metà delle voci del più
   pieno); con un admin solo il **fischio finale pubblica subito i provvisori**; i **convocati pubblicati
