@@ -1,8 +1,8 @@
-Allineato a: D134
+Allineato a: D135
 
 # Stagione 2026/27 in corso — cosa manca, in ordine (stato al 09/11/2026, D134)
 
-**▶ PROSSIMA SESSIONE — PARTI DA QUI: verifica dopo la G3** (mar 10/11, prima volta della Partita live in 4 passi, D134). Appena Marta pubblica i provvisori (e poi i definitivi): ricontrollo in sola lettura, voce "G3" qui sotto. Poi la scaletta "velocità, efficienza e funzioni".
+**▶ PROSSIMA SESSIONE — PARTI DA QUI: definitivi G3** (revisione fino a gio 12/11 23.55). La G3 è rimasta non pubblicata dopo il fischio finale (D135): provvisori pubblicati da Claude il 10/11, Partita live con un pulsante solo dopo il fischio e pop-up "Punti da pubblicare" agli admin. Dopo i definitivi di Marta: ricontrollo in sola lettura (voce "G3" qui sotto). Poi la scaletta "velocità, efficienza e funzioni".
 
 **Il 27/10 (D130)**, dopo la G1, tutto corretto, pubblicato e verificato online: Formazioni senza formazione vecchia, "Pubblica come squadra", cookie/Novità su Android, Partita live (fogli di prova ignorati, fischio finale = provvisori se si è soli, convocati confermati al fischio, revisione che si riapre da sola, presenze nelle Correzioni, modulo Correzioni spiegato e con bozza), tifoseria della squadra, mini-gioco **un voto per squadra** con conteggio automatico ed elenco di chi ha votato, **squadra solo con invito** (pagine + regola), Home con sfida a colori e avviso provvisori snello; Classifiche al telefono (Punti degli Scontri visibili, Supremo intero, partecipazione con chi non ha votato) e classifica del mini-gioco con tutte le 16 squadre. Regole in Console pubblicate. **G1 calcolata da Claude** (provvisori) e mini-gioco G1 contato.
 
@@ -14,7 +14,8 @@ Allineato a: D134
 - [ ] Giro di revisione dei nomi di tutti i bonus con gli admin (SC-006, seconda parte).
 - [ ] SC-010 fazioni (come si contano e come si mostrano) e SC-009 (app pronta per gli store?): da decidere con l'utente.
 - [ ] Riprovare Formazioni sul telefono vero (tocchi su campo e lista).
-- [ ] **G3 (mar 10/11), prima volta della Partita live in 4 passi (D134)** (Marta avvisata il 09/11). Dopo i provvisori: ricontrollo in sola lettura (`days/G3` = provvisori della live più Imbattibilità, `results/G3` provvisorio con 16 squadre, `live.calcolato`, mini-gioco G3 contato, ricalcolo indipendente con `DayCalc`). Poi lo stesso dopo i definitivi.
+- [x] **Provvisori G3 pubblicati da Claude il 10/11 (D135)**: Marta aveva salvato il risultato ma non premuto Pubblica; mini-gioco G3 contato bene. Corretto: un pulsante solo dopo il fischio + pop-up admin.
+- [ ] **Definitivi G3** (Marta; allenatori senza voci nel foglio: controllare in revisione) **(D134)** (Marta avvisata il 09/11). Dopo i provvisori: ricontrollo in sola lettura (`days/G3` = provvisori della live più Imbattibilità, `results/G3` provvisorio con 16 squadre, `live.calcolato`, mini-gioco G3 contato, ricalcolo indipendente con `DayCalc`). Poi lo stesso dopo i definitivi.
 
 **▶ POI: VELOCITÀ, EFFICIENZA E FUNZIONI** (D130 punto 27)
 0. [x] **Pubblicato il 09/11 (D134)** — **Partita live in pochi passaggi (D132, decisione dell'utente: direttamente la versione completa)**: Fischio finale che chiede il risultato e pubblica, punti calcolati **dentro la Partita live** senza aprire il Calcolo giornata; revisione; Pubblica definitivi che calcola da sé. Da 11 passi a 4. È il pezzo più delicato (calcolo dei punti, errore della G1 in D131): spostare il calcolo in un file condiviso, provarlo su una giornata finta e confrontarlo con G1/G2 prima di usarlo. Il pop-up "Salva giornata" resta come rete di sicurezza.

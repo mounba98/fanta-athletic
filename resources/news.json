@@ -1,7 +1,23 @@
 {
   "_nota": "Novità dell'app (D116). La più recente in cima. audience: 'all' = tutti, 'admin' = solo admin. id unico e mai riusato. Testo: HTML semplice (b, i, br, a). Si pubblica insieme al sito. 'allineato' = ultima decisione del diario già valutata per le novità (controllo: scripts/check-coerenza.py).",
-  "allineato": "D134",
+  "allineato": "D135",
   "news": [
+    {
+      "id": "2026-11-10-live-un-pulsante",
+      "date": "2026-11-10",
+      "audience": "admin",
+      "icon": "✅",
+      "title": "Partita live: dopo il fischio un pulsante solo",
+      "intro": "Nella 3ª giornata il risultato era salvato ma i punti non erano mai stati pubblicati: ora non può più succedere senza accorgersene.",
+      "items": [
+        "Dopo il <b>Fischio finale</b> scrivete i gol e premete <b>Salva risultato e pubblica i punti</b>: un pulsante solo, niente più \"Salva risultato\" a parte.",
+        "Se il risultato è già salvato, con un admin solo il fischio finale pubblica subito, come prima.",
+        "Rete di sicurezza: se una partita è finita e i punti non sono pubblicati, all'apertura dell'app agli admin compare <b>Punti da pubblicare</b> con il pulsante per la Partita live.",
+        "Punti provvisori della 3ª giornata pubblicati da Iacopo il 10/11: revisione fino a giovedì 12/11 alle 23.55."
+      ],
+      "link": "live.html",
+      "linkLabel": "Apri la Partita live"
+    },
     {
       "id": "2026-11-09-live-4-passi",
       "date": "2026-11-09",

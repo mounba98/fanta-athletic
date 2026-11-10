@@ -126,7 +126,7 @@
   <script src="resources/h2h.js?v=20261024b"></script>
   <script src="resources/day-calc.js?v=20261109"></script>
   <script src="resources/social-notifications.js?v=20260925"></script>
-  <script src="resources/salva-giornata-reminder.js?v=20261103"></script>
+  <script src="resources/salva-giornata-reminder.js?v=20261110"></script>
   <script>
     const C = window.LiveCore;
     const $ = id => document.getElementById(id);
@@ -391,9 +391,12 @@
     $('closeBtn').onclick = async () => {
       if (!confirm('Fischio finale: chiudi il tuo foglio? Dopo non potrai più modificarlo (le correzioni si fanno in revisione).')) return;
       S.sheet.closed = true; S.sheet.closedAt = Date.now(); persist(); clearTimeout(S.saveT); await pushSheet(); render();
-      // Se nessun altro sta segnando davvero, il foglio vale da solo: si pubblicano subito i provvisori (D092, D130)
+      // Se nessun altro sta segnando davvero, il foglio vale da solo: si pubblicano subito i provvisori (D092, D130).
+      // Solo se il risultato è già salvato (D135): altrimenti la pagina chiede il risultato e ha un solo
+      // pulsante "Salva risultato e pubblica i punti". Nella G3 la domanda "pubblico senza risultato?"
+      // ha fatto salvare il risultato da solo e la pubblicazione è rimasta in sospeso.
       const ps = peersList();
-      if (ps.length && ps.every(s => s.closed || s.uid === S.user.uid)) publishProvisional();
+      if (ps.length && ps.every(s => s.closed || s.uid === S.user.uid) && hasScore(S.venue && S.venue.m)) publishProvisional();
     };
 
     // ---------- dopo il fischio ----------
@@ -422,19 +425,23 @@
       const ps = peersList();
       const open = ps.filter(s => !s.closed);
       let h = '<section class="card"><h3>Hai chiuso il tuo foglio ✅</h3>';
+      // Un solo pulsante (D135): salva il risultato scritto qui sopra e pubblica i punti
+      const pubLbl = hasScore(S.venue && S.venue.m) ? 'Pubblica punti provvisori' : 'Salva risultato e pubblica i punti';
+      const pubBtn = '<button class="sbtn ok" id="pubProv">' + pubLbl + '</button>' +
+        '<p class="info" style="margin-top:8px">Finché non premi questo pulsante <b>i giocatori non vedono i punti</b>.</p>';
       if (open.length) {
         h += '<p class="info">Aspettiamo che chiuda anche: <b>' + open.map(s => esc(s.name)).join(', ') + '</b>. Poi si incrociano i due fogli.</p>';
       } else if (ps.length <= 1) {
-        h += '<p class="info">Sei l\'unico admin che ha segnato questa partita: il tuo foglio vale così com\'è (punti provvisori, correggibili entro 48 ore).</p>' +
-          '<button class="sbtn ok" id="pubProv">Pubblica punti provvisori</button>';
+        h += '<p class="info">Sei l\'unico admin che ha segnato questa partita: il tuo foglio vale così com\'è (punti provvisori, correggibili entro 48 ore).</p>' + pubBtn;
       } else {
         const m = C.merge(ps.map(s => s));
-        h += '<p class="info">Fogli incrociati: <b>' + Object.keys(m.agreed).filter(k => m.agreed[k]).length + '</b> voci uguali, <b>' + m.disputes.length + '</b> diverse (vanno in revisione e per ora non contano).</p>' +
-          '<button class="sbtn ok" id="pubProv">Pubblica punti provvisori</button>';
+        h += '<p class="info">Fogli incrociati: <b>' + Object.keys(m.agreed).filter(k => m.agreed[k]).length + '</b> voci uguali, <b>' + m.disputes.length + '</b> diverse (vanno in revisione e per ora non contano).</p>' + pubBtn;
       }
       h += '</section>';
-      // il risultato si scrive qui, prima di pubblicare (D133): si salva da solo con "Pubblica"
-      $('view').innerHTML = resultCard() + h;
+      // il risultato si scrive qui, prima di pubblicare (D133): si salva da solo con "Pubblica".
+      // Se si può già pubblicare, niente pulsante "Salva risultato" a parte (D135): era quello che
+      // faceva credere di aver finito.
+      $('view').innerHTML = resultCard(!open.length) + h;
       bindResultCard(renderClosed);
       const b = $('pubProv'); if (b) b.onclick = publishProvisional;
     }
@@ -442,7 +449,7 @@
     // Si salva nel Calendario Athletic (come il pulsante "Risultato" di admin-calendario):
     // da lì il Calcolo giornata capisce se l'Athletic non ha subito gol (Imbattibilità).
     const hasScore = m => !!m && m.homeScore !== null && m.homeScore !== undefined && m.homeScore !== '' && m.awayScore !== null && m.awayScore !== undefined && m.awayScore !== '';
-    function resultCard() {
+    function resultCard(noSaveBtn) {
       const m = S.venue && S.venue.m;
       if (!m) return '<section class="card"><h3>Risultato della partita</h3><p class="info">Partita non trovata nel Calendario Athletic: inseritela lì, con il risultato, prima di pubblicare (serve per l\'Imbattibilità).</p></section>';
       const v = x => (x === null || x === undefined) ? '' : esc(String(x));
@@ -451,7 +458,7 @@
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px">' +
         '<span>' + esc(m.homeTeam) + '</span><input id="resH" type="number" min="0" inputmode="numeric" value="' + v(m.homeScore) + '" style="width:64px;padding:8px;border-radius:10px;border:1px solid var(--line,#ccc);font:inherit">' +
         '<span>-</span><input id="resA" type="number" min="0" inputmode="numeric" value="' + v(m.awayScore) + '" style="width:64px;padding:8px;border-radius:10px;border:1px solid var(--line,#ccc);font:inherit">' +
-        '<span>' + esc(m.awayTeam) + '</span><button class="sbtn blue" id="resSave">Salva risultato</button></div></section>';
+        '<span>' + esc(m.awayTeam) + '</span>' + (noSaveBtn ? '' : '<button class="sbtn blue" id="resSave">Salva risultato</button>') + '</div></section>';
     }
     function bindResultCard(rerender) {
       const b = $('resSave'); if (!b) return;
