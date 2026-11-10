@@ -54,7 +54,9 @@ Il piano dell'utente, in ordine:
 **▶ D135 (10/11, dopo la G3, 3-5)**: Marta ha salvato il risultato ma non ha mai premuto "Pubblica punti provvisori"
 (live rimasta `aperta`): **provvisori G3 pubblicati da Claude** (16 squadre, revisione fino a gio 12/11 23.55), mini-gioco
 G3 già contato bene. Corretto: dopo il fischio un solo pulsante "Salva risultato e pubblica i punti"; pop-up admin
-"Punti da pubblicare" per partite finite e mai pubblicate. **Prossima sessione: verifica dei definitivi G3.**
+"Punti da pubblicare" per partite finite e mai pubblicate. Commit `1c127c2` su GitHub; **pubblicazione del sito
+lasciata all'utente** (se non l'ha fatta, ridargli il comando e poi verificare online). **Prossima sessione: verifica dei
+definitivi G3** (dopo gio 12/11), poi velocità/efficienza o SC-009 (breve).
 **▶ PROSSIMA SESSIONE — PARTI DA QUI (D134, 09/11/2026: verifica dopo la G3)**
 **Online e su GitHub** (`https://fanta-athletic.web.app`, `mounba98/fanta-athletic` `main`),
 ultima pubblicazione **09/11/2026** (D134), verificata online. **Stagione 2026/27 "In corso"**: 16 squadre
